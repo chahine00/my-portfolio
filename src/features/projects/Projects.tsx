@@ -7,7 +7,7 @@ import ProjectCard from './ProjectCard.tsx'
 function Projects() {
   return (
     <section id="projects" className="section">
-      <h2>Projects</h2>
+      <h1>Projects</h1>
       <div className="grid">
         {/*
           For each project in the list, render a <ProjectCard />.

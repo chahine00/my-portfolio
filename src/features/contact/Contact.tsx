@@ -43,7 +43,7 @@ function Contact() {
 
   return (
     <section id="contact" className="section">
-      <h2>Contact</h2>
+      <h1>Contact</h1>
       <form className="contact-form" onSubmit={handleSubmit}>
         {/*
           A "CONTROLLED INPUT":
