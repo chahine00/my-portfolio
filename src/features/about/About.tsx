@@ -3,10 +3,9 @@
 function About() {
   return (
     <section id="about" className="section">
-      <h2>About Me</h2>
+      <h2>The Mindset</h2>
       <p>
-        Write a short introduction about yourself, your background, and what
-        you enjoy working on.
+        Real growth comes down to speed and flexibility. I try not to box myself into a single label - I just adapt quickly and pick up whatever tools I need, because staying relevant in the AI era means constantly moving forward.
       </p>
     </section>
   )
