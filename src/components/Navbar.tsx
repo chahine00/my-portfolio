@@ -19,6 +19,7 @@ interface NavItem {
   to: string
   label: string
   match?: string // highlight this link while the address starts with this
+  section?: string // a page link that also has a section on the home page (its id): highlight it there too
   dot?: boolean // show the pulsing "new" dot
 }
 
@@ -27,7 +28,7 @@ const links: NavItem[] = [
   { to: '/#projects', label: 'Projects', match: '/projects' },
   { to: '/#experience', label: 'Experience' },
   { to: '/#skills', label: 'Skills' },
-  { to: '/updates', label: 'Updates', dot: hasRecentUpdate },
+  { to: '/updates', label: 'Updates', section: 'updates', dot: hasRecentUpdate },
   { to: '/#contact', label: 'Contact' },
 ]
 
@@ -99,7 +100,8 @@ function Navbar() {
             // Page links are highlighted on their own address; section links (/#…) only through "match".
             const match = link.match ?? (link.to.startsWith('/#') ? undefined : link.to)
             // On the home page, a section link is also active while you're reading that section.
-            const onSection = pathname === '/' && link.to === `/#${activeSection}`
+            const onSection =
+              pathname === '/' && (link.to === `/#${activeSection}` || link.section === activeSection)
             const isActive = onSection || (match !== undefined && pathname.startsWith(match))
             return (
               <li key={link.to}>
