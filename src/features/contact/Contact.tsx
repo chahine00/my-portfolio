@@ -6,6 +6,7 @@
 import { useState } from 'react'
 import type { SubmitEvent } from 'react'
 import { sendContactMessage } from '../../services/api.ts'
+import { contacts } from '../../data/contact.ts'
 
 // A "union type": status can ONLY be one of these four strings.
 // TypeScript will show an error if you try to set anything else (like 'done').
@@ -44,6 +45,26 @@ function Contact() {
   return (
     <section id="contact" className="section">
       <h1>Contact</h1>
+
+      {/* Direct contact details, read from src/data/contact.ts.
+          Links starting with https open in a new tab; tel: and mailto: don't need to. */}
+      <ul className="contact-list">
+        {contacts.map((contact) => (
+          <li key={contact.label}>
+            <span className="contact-label">{contact.label}</span>
+            <a
+              href={contact.href}
+              {...(contact.href.startsWith('http') && { target: '_blank', rel: 'noreferrer' })}
+            >
+              {/* "&&" only renders the flag when the contact has one. */}
+              {contact.flag && <img src={contact.flag} alt="" className="contact-flag" />}
+              {contact.value}
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <p>Or send me a message:</p>
       <form className="contact-form" onSubmit={handleSubmit}>
         {/*
           A "CONTROLLED INPUT":

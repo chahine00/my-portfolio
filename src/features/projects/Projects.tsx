@@ -15,7 +15,7 @@ function Projects() {
           Props are how a parent component gives information to a child component.
         */}
         {projects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
+          <ProjectCard key={project.slug} project={project} />
         ))}
       </div>
     </section>

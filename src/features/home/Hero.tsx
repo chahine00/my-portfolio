@@ -8,9 +8,16 @@ function Hero() {
     <section id="home" className="section hero">
       <h1>Hi, I'm Ali Chahine</h1>
       <p>Software Engineer.</p>
-      <a href="#projects" className="button">
-        View my work
-      </a>
+      {/* Both buttons sit side by side in a row. */}
+      <div className="hero-actions">
+        <a href="#projects" className="button">
+          View my work
+        </a>
+        {/* The PDF lives in /public, so it is served from the site root. */}
+        <a href="/Ali_Chahine_CV.pdf" download="Ali_Chahine_CV.pdf" className="button button-outline">
+          Download CV
+        </a>
+      </div>
     </section>
   )
 }

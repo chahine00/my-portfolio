@@ -3,6 +3,7 @@
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router'
 import './styles/global.css' // Importing a CSS file applies its styles to the whole app.
 import App from './app/App.tsx'
 
@@ -17,8 +18,11 @@ if (rootElement === null) {
 
 // Tell React to draw our <App /> component inside that div.
 // <StrictMode> is a helper that warns you about common mistakes while developing.
+// <BrowserRouter> lets the app have several pages (like /updates) using the URL.
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </StrictMode>,
 )

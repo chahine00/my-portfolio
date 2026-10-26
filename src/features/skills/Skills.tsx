@@ -1,137 +1,48 @@
+// The "Skills" section: a SHORT core stack, not everything you've ever used.
+// Keep it focused (about 4 groups, 15–20 skills). The projects are where you prove them.
+// Put the groups in the order that matches the jobs you want: the most important first.
 
-const skillGroups = [
+const coreStack = [
   {
-    category: 'Programming Languages',
-    skills: [
-      'Python',
-      'JavaScript',
-      'C#',
-      'PHP (Familiar)',
-    ],
+    category: 'AI & LLMs',
+    skills: ['LangChain', 'RAG Pipelines', 'AI Agents', 'Embeddings', 'Milvus', 'vLLM'],
   },
   {
-    category: 'Backend Development',
-    skills: [
-      'Flask',
-      'FastAPI',
-      'Django',
-      'Node.js',
-      'Express.js',
-      'ASP.NET Core',
-      'Laravel (Familiar)',
-    ],
+    category: 'Backend',
+    skills: ['Python', 'FastAPI', 'Django', 'Flask', 'Node.js', 'Express.js', 'C# / ASP.NET Core'],
   },
   {
-    category: 'Frontend Development',
-    skills: [
-      'React.js',
-      'Angular',
-      'HTML',
-      'CSS',
-    ],
+    category: 'Frontend & Mobile',
+    skills: ['JavaScript', 'React', 'React Native', 'Angular'],
   },
   {
-    category: 'Mobile Development',
-    skills: [
-      'React Native',
-      'Xamarin',
-      'Mobile UI Development',
-      'Mobile App Testing',
-      'Google Play Deployment',
-    ],
+    category: 'Data & Cloud',
+    skills: ['MySQL', 'MongoDB', 'DynamoDB', 'AWS (Lambda, EC2)', 'Docker', 'CI/CD'],
   },
-  {
-    category: 'AI & LLM Engineering',
-    skills: [
-      'LLMs',
-      'vLLM',
-      'Prompt Engineering',
-      'Embeddings',
-      'LangChain',
-      'AI Agents',
-      'Chains',
-      'RAG Pipelines',
-    ],
-  },
-  {
-    category: 'AI Automation & Orchestration',
-    skills: [
-      'n8n',
-      'Apache Airflow',
-      'AI Workflow Automation',
-    ],
-  },
-  {
-    category: 'Databases & Data Storage',
-    skills: [
-      'MySQL',
-      'MongoDB',
-      'DynamoDB',
-      'Couchbase',
-      'Vector Databases',
-      'Milvus',
-      'Database Modeling',
-      'Query Optimization',
-    ],
-  },
-  {
-    category: 'Cloud & DevOps',
-    skills: [
-      'AWS Lambda',
-      'Amazon API Gateway',
-      'Amazon EC2',
-      'Docker',
-      'Linux',
-      'Nginx',
-      'Apache',
-      'CI/CD',
-      'Deployment & Monitoring',
-    ],
-  },
-  {
-    category: 'API Development & Security',
-    skills: [
-      'REST APIs',
-      'JWT',
-      'OAuth2',
-      'RBAC',
-      'Rate Limiting',
-      'XSS/CSRF Protection',
-      'Authentication & Authorization',
-    ],
-  },
-  {
-    category: 'Real-Time Systems',
-    skills: [
-      'WebSockets',
-      'Socket.IO',
-    ],
-  },
-  {
-    category: 'Developer Tools & Collaboration',
-    skills: [
-      'Git',
-      'GitHub',
-      'Jira',
-      'ClickUp',
-      'Agile/Scrum',
-    ],
-  },
-];
+]
+
+// Shown as one quiet line under the core stack. Things you've used, but aren't your main pitch.
+const alsoWorkedWith = [
+  'Couchbase',
+  'WebSockets / Socket.IO',
+  'n8n',
+  'Apache Airflow',
+  'Nginx',
+  'Linux',
+  'JWT / OAuth2',
+  'Xamarin',
+]
 
 function Skills() {
   return (
     <section id="skills" className="section">
-      <h1>Technical Skills</h1>
+      <h1>Core Stack</h1>
 
-      <div className="skill-groups">
-        {skillGroups.map((group) => (
-          <div
-            className="skill-group"
-            key={group.category}
-          >
+      {/* One frame, one row per group: the group name on the left, its skills on the right. */}
+      <div className="card stack">
+        {coreStack.map((group) => (
+          <div className="stack__row" key={group.category}>
             <h3>{group.category}</h3>
-
             <ul className="tags">
               {group.skills.map((skill) => (
                 <li key={skill}>{skill}</li>
@@ -140,8 +51,13 @@ function Skills() {
           </div>
         ))}
       </div>
+
+      {/* .join(' · ') turns the array into one string with dots between the items. */}
+      <p className="stack__also">
+        <span>Also worked with:</span> {alsoWorkedWith.join(' · ')}
+      </p>
     </section>
-  );
+  )
 }
 
-export default Skills;
+export default Skills

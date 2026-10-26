@@ -1,6 +1,7 @@
-// A REUSABLE component: it draws one project card.
-// Projects.tsx uses it once for every project in the list.
+// A REUSABLE component: it draws one project card on the home page.
+// The card is a short preview; "View project" opens the full page (ProjectPage.tsx).
 
+import { Link } from 'react-router'
 // "import type" imports only a TypeScript type (it disappears when the app runs).
 import type { Project } from '../../data/projects.ts'
 
@@ -12,12 +13,32 @@ interface ProjectCardProps {
 
 // Props arrive as one object. { project } is "destructuring": it takes the
 // "project" property out of that object so we can use it directly.
-// It's the same as writing:  function ProjectCard(props: ProjectCardProps) { const project = props.project ... }
 function ProjectCard({ project }: ProjectCardProps) {
+  const pageUrl = `/projects/${project.slug}`
+  const cover = project.images?.[0] // ?.[0] = "the first image, if there are any images"
+
+  // Role and period on one line, e.g. "Solo developer · 2026". .filter(Boolean) drops missing ones.
+  const meta = [project.role, project.period].filter(Boolean).join(' · ')
+
   return (
-    <article className="card">
-      <h3>{project.title}</h3>
-      <p>{project.description}</p>
+    <article className="card project-card">
+      {cover && (
+        <Link to={pageUrl} className="project-card__cover" tabIndex={-1} aria-hidden="true">
+          <img src={cover} alt="" loading="lazy" />
+        </Link>
+      )}
+
+      <h3>
+        <Link to={pageUrl} className="project-card__title">
+          {project.title}
+        </Link>
+      </h3>
+      {meta && <p className="project-card__role">{meta}</p>}
+
+      <p>{project.problem}</p>
+
+      {/* The result gets its own highlighted box: it's what recruiters remember. */}
+      {project.result && <p className="project-card__result">{project.result}</p>}
 
       <ul className="tags">
         {project.tech.map((tech) => (
@@ -26,11 +47,8 @@ function ProjectCard({ project }: ProjectCardProps) {
       </ul>
 
       <div className="card__links">
-        {/*
-          CONDITIONAL RENDERING with &&:
-          "if project.githubUrl has a value, show this link; otherwise show nothing".
-          target="_blank" opens the link in a new tab.
-        */}
+        <Link to={pageUrl}>View project →</Link>
+        {/* target="_blank" opens the link in a new tab. */}
         {project.githubUrl && (
           <a href={project.githubUrl} target="_blank" rel="noreferrer">
             GitHub
