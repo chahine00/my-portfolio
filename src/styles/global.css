@@ -316,11 +316,36 @@ main {
     gap: 8px;
     min-height: 44px;
     padding: 0 16px;
+    transition: background-color 0.2s;
   }
 
-  /* The sliding underline doesn't suit full-width rows. */
-  .navbar__links a::after {
-    display: none;
+  /* The current section/page gets a tinted row; hovering or tapping a row tints it too. */
+  .navbar__links a:hover,
+  .navbar__links a:active,
+  .navbar__links a.active {
+    background: var(--card);
+  }
+
+  /* The sliding underline becomes an accent bar on the left edge of the row.
+     ".navbar" in front makes these win over the underline rules further down. */
+  .navbar .navbar__links a::after {
+    top: 8px;
+    bottom: 8px;
+    left: 0;
+    width: 3px;
+    height: auto;
+    border-radius: 0 3px 3px 0;
+    transform: scaleY(0);
+    transform-origin: center;
+  }
+
+  .navbar .navbar__links a.active::after {
+    transform: scaleY(1);
+  }
+
+  /* Hovering a row only tints it; the bar stays for the current one. */
+  .navbar .navbar__links a:hover:not(.active)::after {
+    transform: scaleY(0);
   }
 
   /* ".navbar" in front makes this win over the .theme-toggle rule further down. */
