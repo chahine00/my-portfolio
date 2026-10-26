@@ -6,7 +6,7 @@
 import { Link } from 'react-router'
 // "import type" imports only a TypeScript type (it disappears when the app runs).
 import type { Project } from '../../data/projects.ts'
-import { asset } from '../../utils/asset.ts'
+import { fallbackTo, thumb } from '../../utils/asset.ts'
 
 // This describes the PROPS this component accepts.
 // Here it's just one prop, called "project", of type Project.
@@ -27,7 +27,7 @@ function ProjectCard({ project }: ProjectCardProps) {
     <article className="card project-card card-clickable">
       {cover && (
         <div className="project-card__cover">
-          <img src={asset(cover)} alt="" loading="lazy" />
+          <img src={thumb(cover)} onError={fallbackTo(cover)} alt="" loading="lazy" decoding="async" />
         </div>
       )}
 
