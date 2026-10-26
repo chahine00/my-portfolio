@@ -24,8 +24,8 @@ interface NavItem {
 
 const links: NavItem[] = [
   { to: '/#about', label: 'About' },
-  { to: '/#experience', label: 'Experience' },
   { to: '/#projects', label: 'Projects', match: '/projects' },
+  { to: '/#experience', label: 'Experience' },
   { to: '/#skills', label: 'Skills' },
   { to: '/updates', label: 'Updates', dot: hasRecentUpdate },
   { to: '/#contact', label: 'Contact' },

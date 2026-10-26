@@ -54,11 +54,11 @@ function HomePage() {
     <>
       <Hero />
       <About />
-      <Experience />
       <Projects />
+      <Experience />
       <Skills />
-      <Education />
       <Updates />
+      <Education />
       <Testimonials />
       <Contact />
     </>
