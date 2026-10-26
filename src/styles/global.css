@@ -210,8 +210,8 @@ main {
   gap: 8px 16px;
 }
 
-.navbar__brand {
-  justify-self: start;
+.navbar__lane {
+  min-width: 0;
 }
 
 .navbar .theme-toggle {
@@ -220,39 +220,21 @@ main {
 
 /* Phones and small tablets: the same links, always visible, in their own row under
    the name and the theme button. */
-/* The time and weather next to the name only show on phones. */
-.navbar__local {
-  display: none;
-}
-
 @media (max-width: 720px) {
   .navbar {
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 1fr auto;
     grid-template-areas:
-      'brand role toggle'
-      'links links links';
+      'brand toggle'
+      'links links';
     padding: 10px 16px 6px;
   }
 
-  .navbar__brand {
+  .navbar__lane {
     grid-area: brand;
   }
 
   .navbar .theme-toggle {
     grid-area: toggle;
-  }
-
-  .navbar__local {
-    display: block;
-    grid-area: role;
-    justify-self: center;
-    overflow: hidden;
-    color: var(--muted);
-    font-size: 0.8rem;
-    /* Digits all the same width, so the text doesn't wiggle when the minute changes. */
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-    text-overflow: ellipsis;
   }
 
   .navbar__nav {
@@ -1474,15 +1456,48 @@ a {
   background-position: 0% 0;
 }
 
-/* Brand name: always shown as <Ali Chahine />. On hover the tags spread apart
-   and the letters do a wave. */
-.navbar__brand {
-  display: inline-flex;
-  align-items: center;
+/* Brand name: always shown as <Ali Chahine />, and always moving.
+   The lane is the empty space it has at the top (left of the links on big screens,
+   left of the theme button on phones). The name glides from one end of it to the other and back. */
+.navbar__lane {
+  position: relative;
+  /* Clip the letters' little jump sideways, but leave room above and below for the wave. */
+  overflow-x: clip;
+  padding-block: 6px;
+  margin-block: -6px;
 }
 
+.navbar__brand {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  /* Two moves at once make it stop exactly at the far end, whatever the lane's width:
+     "left" pushes it across the lane (% of the lane), and translateX pulls it back by its
+     own width (% of the name), so its right edge lands on the lane's right edge. */
+  animation: brand-glide 9s ease-in-out infinite alternate;
+}
+
+@keyframes brand-glide {
+  from {
+    left: 0%;
+    transform: translateX(0%);
+  }
+  to {
+    left: 100%;
+    transform: translateX(-100%);
+  }
+}
+
+/* Hold still under the pointer, so it's easy to click. */
+.navbar__brand:hover,
+.navbar__brand:focus-visible {
+  animation-play-state: paused;
+}
+
+/* The letters keep doing a wave, one after the other, every few seconds. */
 .brand__letter {
   display: inline-block;
+  animation: brand-wave 3s ease-in-out infinite calc(var(--i) * 60ms);
   transition: color 0.3s;
   /* Each letter changes color a moment after the one before it. */
   transition-delay: calc(var(--i) * 30ms);
@@ -1490,34 +1505,44 @@ a {
 
 .navbar__brand:hover .brand__letter {
   color: var(--accent);
-  animation: brand-wave 0.5s ease calc(var(--i) * 30ms);
 }
 
 @keyframes brand-wave {
-  40% { transform: translateY(-5px); }
+  0%, 20%, 100% { transform: translateY(0); }
+  10% { transform: translateY(-4px); }
 }
 
+/* The < and /> breathe: they step out from the name and back in. */
 .brand__bracket {
   display: inline-block;
   margin-right: 4px;
   color: var(--accent);
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   white-space: pre;
-  transition: transform 0.3s ease;
+  animation: brand-breathe-open 3s ease-in-out infinite;
 }
 
 .brand__bracket--close {
   margin-right: 0;
   margin-left: 4px;
+  animation-name: brand-breathe-close;
 }
 
-/* The tags step outward, away from the name. */
-.navbar__brand:hover .brand__bracket {
-  transform: translateX(-4px);
+@keyframes brand-breathe-open {
+  50% { transform: translateX(-4px); }
 }
 
-.navbar__brand:hover .brand__bracket--close {
-  transform: translateX(4px);
+@keyframes brand-breathe-close {
+  50% { transform: translateX(4px); }
+}
+
+/* People who turn off animations in their settings get the name standing still. */
+@media (prefers-reduced-motion: reduce) {
+  .navbar__brand,
+  .brand__letter,
+  .brand__bracket {
+    animation: none;
+  }
 }
 
 /* Theme button: the icon turns a little on hover */

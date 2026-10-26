@@ -5,7 +5,6 @@ import type { CSSProperties } from 'react'
 import { Link, useLocation } from 'react-router'
 import { hasRecentUpdate } from '../data/updates.ts'
 import { profile } from '../data/profile.ts'
-import LocalTime from './LocalTime.tsx'
 import ThemeToggle from './ThemeToggle.tsx'
 
 // Instead of writing each <li> by hand, we keep the links in an array.
@@ -70,28 +69,29 @@ function Navbar() {
     // In JSX we write "className" instead of "class" (class is a reserved word in JavaScript).
     <header className={scrolled ? 'navbar navbar--scrolled' : 'navbar'}>
       {/*
-        The name is shown as a code tag, <Ali Chahine />. On hover the tags spread apart and the letters do a little wave.
+        The name is shown as a code tag, <Ali Chahine />. It glides back and forth across the
+        empty space at the top (its "lane"), the letters keep doing a little wave, and the tags breathe.
         Each letter is its own <span> with its position (--i), so the wave can run left to right.
         Screen readers just read the aria-label, not the separate letters.
       */}
-      <Link to="/#home" className="navbar__brand" aria-label={profile.name}>
-        <span className="brand__bracket" aria-hidden="true">
-          &lt;
-        </span>
-        <span aria-hidden="true">
-          {[...profile.name].map((letter, i) => (
-            <span key={i} className="brand__letter" style={{ '--i': i } as CSSProperties}>
-              {/* A normal space would collapse, so use a non-breaking one. */}
-              {letter === ' ' ? '\u00A0' : letter}
-            </span>
-          ))}
-        </span>
-        <span className="brand__bracket brand__bracket--close" aria-hidden="true">
-          /&gt;
-        </span>
-      </Link>
-      {/* Phones only: the visitor's city, time and weather fill the space between the name and the theme button. */}
-      <LocalTime />
+      <div className="navbar__lane">
+        <Link to="/#home" className="navbar__brand" aria-label={profile.name}>
+          <span className="brand__bracket" aria-hidden="true">
+            &lt;
+          </span>
+          <span aria-hidden="true">
+            {[...profile.name].map((letter, i) => (
+              <span key={i} className="brand__letter" style={{ '--i': i } as CSSProperties}>
+                {/* A normal space would collapse, so use a non-breaking one. */}
+                {letter === ' ' ? '\u00A0' : letter}
+              </span>
+            ))}
+          </span>
+          <span className="brand__bracket brand__bracket--close" aria-hidden="true">
+            /&gt;
+          </span>
+        </Link>
+      </div>
       <nav className="navbar__nav">
         <ul className="navbar__links">
           {/*
