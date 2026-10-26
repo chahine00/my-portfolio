@@ -202,186 +202,74 @@ main {
   }
 }
 
-/* The links, the theme button and (on phones) the menu button, side by side on the right. */
-.navbar__right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+/* The bar is a grid of three columns: name | links | theme button. The two outer columns
+   are equal, so the links sit exactly in the middle of the bar. */
+.navbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px 16px;
 }
 
-/* Wider screens: three columns (name | links | theme button). The two outer columns are
-   equal, so the links sit exactly in the middle of the bar. "display: contents" lets the
-   links and the theme button inside .navbar__right take their own columns. */
-@media (min-width: 721px) {
+.navbar__brand {
+  justify-self: start;
+}
+
+.navbar .theme-toggle {
+  justify-self: end;
+}
+
+/* Phones and small tablets: the same links, always visible, in their own row under
+   the name and the theme button. */
+@media (max-width: 720px) {
   .navbar {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'brand toggle'
+      'links links';
+    padding: 10px 20px 6px;
   }
 
   .navbar__brand {
-    justify-self: start;
-  }
-
-  .navbar__right {
-    display: contents;
-  }
-
-  .navbar__nav {
-    grid-column: 2;
+    grid-area: brand;
   }
 
   .navbar .theme-toggle {
-    grid-column: 3;
-    justify-self: end;
-  }
-}
-
-/* The ☰ menu button only exists on phones. */
-.navbar__menu-button {
-  display: none;
-}
-
-/* Phones: the links move into a dropdown that the ☰ button opens. */
-@media (max-width: 720px) {
-  .navbar {
-    padding: 8px 20px;
-  }
-
-  .navbar__right {
-    gap: 8px;
-  }
-
-  .navbar__menu-button {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: none;
-    background: none;
-    color: var(--text);
-    cursor: pointer;
-  }
-
-  /* Three bars drawn with one span and its ::before/::after; they turn into an ✕ when open. */
-  .menu-icon,
-  .menu-icon::before,
-  .menu-icon::after {
-    display: block;
-    width: 22px;
-    height: 2px;
-    border-radius: 2px;
-    background: currentColor;
-    transition: transform 0.2s, background-color 0.2s;
-  }
-
-  .menu-icon {
-    position: relative;
-  }
-
-  .menu-icon::before,
-  .menu-icon::after {
-    content: '';
-    position: absolute;
-    left: 0;
-  }
-
-  .menu-icon::before {
-    top: -7px;
-  }
-
-  .menu-icon::after {
-    top: 7px;
-  }
-
-  .menu-icon--open {
-    background: transparent;
-  }
-
-  .menu-icon--open::before {
-    transform: translateY(7px) rotate(45deg);
-  }
-
-  .menu-icon--open::after {
-    transform: translateY(-7px) rotate(-45deg);
-  }
-
-  .navbar__dot--menu {
-    position: absolute;
-    top: 9px;
-    right: 7px;
+    grid-area: toggle;
   }
 
   .navbar__nav {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    max-height: calc(100dvh - 60px);
-    overflow-y: auto;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    box-shadow: 0 12px 24px rgb(0 0 0 / 0.15);
-  }
-
-  .navbar__nav--open {
-    display: block;
+    grid-area: links;
   }
 
   .navbar__links {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
+    justify-content: center;
+    gap: 0 18px;
+  }
+
+  /* A little height around each link makes it easier to tap; the underline sits just under the text. */
+  .navbar__links a {
+    display: inline-block;
     padding: 8px 0;
   }
 
-  /* Full-width rows, at least 44px tall, so they're easy to tap. */
-  .navbar__links a {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 0 20px;
-    transition: background-color 0.2s;
-  }
-
-  /* The current section/page gets a tinted row; hovering or tapping a row tints it too. */
-  .navbar__links a:hover,
-  .navbar__links a:active,
-  .navbar__links a.active {
-    background: var(--card);
-  }
-
-  /* The sliding underline becomes an accent bar on the left edge of the row.
-     ".navbar" in front makes these win over the underline rules further down. */
   .navbar .navbar__links a::after {
-    top: 8px;
-    bottom: 8px;
-    left: 0;
-    width: 3px;
-    height: auto;
-    border-radius: 0 3px 3px 0;
-    transform: scaleY(0);
-    transform-origin: center;
+    bottom: 4px;
   }
+}
 
-  .navbar .navbar__links a.active::after {
-    transform: scaleY(1);
+/* Narrow phones: two tidy rows of three links, so none ends up alone on a line. */
+@media (max-width: 480px) {
+  .navbar__links {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: center;
+    justify-items: center;
+    gap: 0 24px;
   }
+}
 
-  /* Hovering a row only tints it; the bar stays for the current one. */
-  .navbar .navbar__links a:hover:not(.active)::after {
-    transform: scaleY(0);
-  }
-
-  /* ".navbar" in front makes this win over the .theme-toggle rule further down. */
-  .navbar .theme-toggle {
-    width: 40px;
-    height: 40px;
-  }
-
+/* Phones: bigger tap areas for small links. */
+@media (max-width: 720px) {
   /* Bigger tap areas for the small text links. */
   .back-link,
   .forward-link,
@@ -1225,7 +1113,7 @@ main {
 
 /* The pulse is a copy of the dot (::after) that grows and fades. Animating only transform
    and opacity lets the graphics card do it, so it never slows down scrolling. */
-.navbar__dot:not(.navbar__dot--menu) {
+.navbar__dot {
   position: relative;
 }
 

@@ -33,8 +33,6 @@ const links: NavItem[] = [
 
 function Navbar() {
   const { pathname } = useLocation()
-  // Phones only: whether the dropdown menu is open. On wider screens the links are always visible.
-  const [menuOpen, setMenuOpen] = useState(false)
   // Which home section is on screen right now, e.g. 'skills'. Used to light up its link.
   const [activeSection, setActiveSection] = useState('')
   // True once the page is scrolled a little: the navbar then gets a soft shadow.
@@ -48,16 +46,6 @@ function Navbar() {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
-
-  // Close the menu when Escape is pressed.
-  useEffect(() => {
-    if (!menuOpen) return
-    function handleKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') setMenuOpen(false)
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [menuOpen])
 
   // "Scroll spy": watch the home sections and remember the one crossing the middle of the screen.
   useEffect(() => {
@@ -100,48 +88,32 @@ function Navbar() {
           /&gt;
         </span>
       </Link>
-      <div className="navbar__right">
-        <nav id="site-menu" className={menuOpen ? 'navbar__nav navbar__nav--open' : 'navbar__nav'}>
-          <ul className="navbar__links">
-            {/*
-              Curly braces { } let you write JavaScript inside JSX.
-              .map() goes through each item in the array and returns an <li> for it.
-              React needs a unique "key" on each item in a list so it can keep track of them.
-            */}
-            {links.map((link) => {
-              // Page links are highlighted on their own address; section links (/#…) only through "match".
-              const match = link.match ?? (link.to.startsWith('/#') ? undefined : link.to)
-              // On the home page, a section link is also active while you're reading that section.
-              const onSection = pathname === '/' && link.to === `/#${activeSection}`
-              const isActive = onSection || (match !== undefined && pathname.startsWith(match))
-              return (
-                <li key={link.to}>
-                  {/* Following a link closes the menu (phones). */}
-                  <Link to={link.to} className={isActive ? 'active' : undefined} onClick={() => setMenuOpen(false)}>
-                    {link.label}
-                    {/* The pulsing dot only shows when there's a post from the last 30 days. */}
-                    {link.dot && <span className="navbar__dot" aria-label="new post" />}
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
-        </nav>
-        <ThemeToggle />
-        {/* Phones only: the ☰ button that opens and closes the menu. */}
-        <button
-          type="button"
-          className="navbar__menu-button"
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={menuOpen}
-          aria-controls="site-menu"
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          <span className={menuOpen ? 'menu-icon menu-icon--open' : 'menu-icon'} aria-hidden="true" />
-          {/* The "new post" dot stays visible while the menu is closed. */}
-          {hasRecentUpdate && !menuOpen && <span className="navbar__dot navbar__dot--menu" aria-hidden="true" />}
-        </button>
-      </div>
+      <nav className="navbar__nav">
+        <ul className="navbar__links">
+          {/*
+            Curly braces { } let you write JavaScript inside JSX.
+            .map() goes through each item in the array and returns an <li> for it.
+            React needs a unique "key" on each item in a list so it can keep track of them.
+          */}
+          {links.map((link) => {
+            // Page links are highlighted on their own address; section links (/#…) only through "match".
+            const match = link.match ?? (link.to.startsWith('/#') ? undefined : link.to)
+            // On the home page, a section link is also active while you're reading that section.
+            const onSection = pathname === '/' && link.to === `/#${activeSection}`
+            const isActive = onSection || (match !== undefined && pathname.startsWith(match))
+            return (
+              <li key={link.to}>
+                <Link to={link.to} className={isActive ? 'active' : undefined}>
+                  {link.label}
+                  {/* The pulsing dot only shows when there's a post from the last 30 days. */}
+                  {link.dot && <span className="navbar__dot" aria-label="new post" />}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+      <ThemeToggle />
     </header>
   )
 }
