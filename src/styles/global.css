@@ -298,6 +298,18 @@ main {
   margin-bottom: 12px;
 }
 
+.job__company {
+  color: inherit;
+  transition: color 0.2s;
+}
+
+.job__company:hover,
+.job__company:focus-visible {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .job__role + .job__role {
   margin-top: 16px;
   padding-top: 16px;

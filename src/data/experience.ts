@@ -9,6 +9,7 @@ export interface Role {
 
 export interface Job {
   company: string
+  url?: string // company page, linked from the name
   roles: Role[] // several roles at one company show your growth there
   tech?: string[]
 }
@@ -16,6 +17,7 @@ export interface Job {
 export const experience: Job[] = [
   {
     company: 'boxMind AI',
+    url: 'https://www.linkedin.com/company/boxmindai/',
     roles: [
       {
         title: 'Backend Developer',
@@ -31,6 +33,7 @@ export const experience: Job[] = [
   },
   {
     company: 'Mobile Arts',
+    url: 'https://www.linkedin.com/company/mobile-arts/',
     roles: [
       {
         title: 'Junior Full-Stack Developer',

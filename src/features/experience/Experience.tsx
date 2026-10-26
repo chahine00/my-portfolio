@@ -12,7 +12,15 @@ function Experience() {
         {experience.map((job) => (
           <li className="timeline__item" key={job.company}>
             <article className="card job">
-              <h3>{job.company}</h3>
+              <h3>
+                {job.url ? (
+                  <a className="job__company" href={job.url} target="_blank" rel="noreferrer">
+                    {job.company}
+                  </a>
+                ) : (
+                  job.company
+                )}
+              </h3>
 
               {/* One block per role, so growth at the same company is visible. */}
               {job.roles.map((role) => (
