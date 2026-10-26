@@ -220,8 +220,8 @@ main {
 
 /* Phones and small tablets: the same links, always visible, in their own row under
    the name and the theme button. */
-/* The role next to the name only shows on phones. */
-.navbar__role {
+/* The time and weather next to the name only show on phones. */
+.navbar__local {
   display: none;
 }
 
@@ -242,13 +242,15 @@ main {
     grid-area: toggle;
   }
 
-  .navbar__role {
+  .navbar__local {
     display: block;
     grid-area: role;
     justify-self: center;
     overflow: hidden;
     color: var(--muted);
     font-size: 0.8rem;
+    /* Digits all the same width, so the text doesn't wiggle when the minute changes. */
+    font-variant-numeric: tabular-nums;
     white-space: nowrap;
     text-overflow: ellipsis;
   }

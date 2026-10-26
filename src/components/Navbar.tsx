@@ -5,6 +5,7 @@ import type { CSSProperties } from 'react'
 import { Link, useLocation } from 'react-router'
 import { hasRecentUpdate } from '../data/updates.ts'
 import { profile } from '../data/profile.ts'
+import LocalTime from './LocalTime.tsx'
 import ThemeToggle from './ThemeToggle.tsx'
 
 // Instead of writing each <li> by hand, we keep the links in an array.
@@ -89,10 +90,8 @@ function Navbar() {
           /&gt;
         </span>
       </Link>
-      {/* Phones only: your role fills the space between the name and the theme button. */}
-      <span className="navbar__role" aria-hidden="true">
-        {profile.role}
-      </span>
+      {/* Phones only: the visitor's city, time and weather fill the space between the name and the theme button. */}
+      <LocalTime />
       <nav className="navbar__nav">
         <ul className="navbar__links">
           {/*
