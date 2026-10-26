@@ -8,7 +8,7 @@ export const profile = {
   location: 'Beirut, Lebanon',
   availability: 'Open to new opportunities', // set to '' to hide it
   // Your photo in /public, e.g. '/photo.jpg'. Until you add one, your initials are shown.
-  photo: '',
+  photo: '/photo.jpg',
 }
 
 // The small numbers in the About section.
