@@ -1282,10 +1282,10 @@ main {
 /* Back to top: fixed to the bottom-right corner of the screen (shown once you scroll down) */
 .back-to-top {
   position: fixed;
-  /* Same side space as the navbar, so it lines up with it and isn't pushed into the corner.
-     The bottom also clears the iPhone home bar. */
-  right: clamp(24px, 4vw, 48px);
-  bottom: calc(clamp(24px, 4vw, 40px) + env(safe-area-inset-bottom));
+  /* Well away from the corner: at least 32px on phones, growing with the screen up to
+     80px from the side and 64px from the bottom. The bottom also clears the iPhone home bar. */
+  right: clamp(32px, 6vw, 80px);
+  bottom: calc(clamp(32px, 5vw, 64px) + env(safe-area-inset-bottom));
   z-index: 20;
   width: 56px;
   height: 56px;
