@@ -89,6 +89,10 @@ function Navbar() {
           /&gt;
         </span>
       </Link>
+      {/* Phones only: your role fills the space between the name and the theme button. */}
+      <span className="navbar__role" aria-hidden="true">
+        {profile.role}
+      </span>
       <nav className="navbar__nav">
         <ul className="navbar__links">
           {/*

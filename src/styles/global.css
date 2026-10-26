@@ -220,12 +220,17 @@ main {
 
 /* Phones and small tablets: the same links, always visible, in their own row under
    the name and the theme button. */
+/* The role next to the name only shows on phones. */
+.navbar__role {
+  display: none;
+}
+
 @media (max-width: 720px) {
   .navbar {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto 1fr auto;
     grid-template-areas:
-      'brand toggle'
-      'links links';
+      'brand role toggle'
+      'links links links';
     padding: 10px 16px 6px;
   }
 
@@ -235,6 +240,17 @@ main {
 
   .navbar .theme-toggle {
     grid-area: toggle;
+  }
+
+  .navbar__role {
+    display: block;
+    grid-area: role;
+    justify-self: center;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .navbar__nav {
@@ -832,6 +848,7 @@ main {
 .post__nav-label {
   color: var(--muted);
   font-size: 0.875rem;
+  white-space: nowrap;
 }
 
 /* The post or project name stays on one line; a name too long for the space ends with "…"
@@ -842,17 +859,6 @@ main {
   text-overflow: ellipsis;
 }
 
-/* Phones: Older and Newer stack on top of each other, each with the full width. */
-@media (max-width: 720px) {
-  .post__nav {
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .post__nav a {
-    max-width: 100%;
-  }
-}
 
 .post__nav-newer {
   margin-left: auto;
