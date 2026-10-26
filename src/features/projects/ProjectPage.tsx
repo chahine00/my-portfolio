@@ -22,7 +22,9 @@ function ProjectPage() {
       <section className="section">
         <h1>Project not found</h1>
         <p>This project doesn't exist or was removed.</p>
-        <Link to="/#projects">← Back to projects</Link>
+        <Link to="/#projects" className="back-link">
+          <span aria-hidden="true">←</span> Back to projects
+        </Link>
       </section>
     )
   }
@@ -44,7 +46,9 @@ function ProjectPage() {
   return (
     <article className="section project-page">
       {/* Goes back to the home page and scrolls to the Projects section. */}
-      <Link to="/#projects">← All projects</Link>
+      <Link to="/#projects" className="back-link">
+        <span aria-hidden="true">←</span> All projects
+      </Link>
 
       <header className="project-page__header">
         {project.context && <p className="eyebrow">{project.context}</p>}
@@ -170,7 +174,7 @@ function ProjectPage() {
       <nav className="post__nav" aria-label="More projects">
         {previous ? (
           <Link to={`/projects/${previous.slug}`}>
-            <span>← Previous project</span>
+            <span><b aria-hidden="true">←</b> Previous project</span>
             {previous.title}
           </Link>
         ) : (
@@ -178,7 +182,7 @@ function ProjectPage() {
         )}
         {next && (
           <Link to={`/projects/${next.slug}`} className="post__nav-newer">
-            <span>Next project →</span>
+            <span>Next project <b aria-hidden="true">→</b></span>
             {next.title}
           </Link>
         )}

@@ -17,7 +17,10 @@ function Hero() {
     <section id="home" className="section hero">
       <div className="hero__text">
         <p className="eyebrow">{profile.role}</p>
-        <h1>Hi, I'm {profile.name}</h1>
+        {/* Hover the heading: a color sweep runs across the name. */}
+        <h1 className="hero__title">
+          Hi, I'm <span className="hero__name">{profile.name}</span>
+        </h1>
         <p className="hero__tagline">{profile.tagline}</p>
 
         <ul className="hero__meta">

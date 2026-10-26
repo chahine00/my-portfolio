@@ -13,7 +13,9 @@ function Updates() {
     <section id="updates" className="section">
       <div className="section-header">
         <h1>Latest Updates</h1>
-        <Link to="/updates">See all →</Link>
+        <Link to="/updates" className="forward-link">
+          See all <span aria-hidden="true">→</span>
+        </Link>
       </div>
       <p className="page-intro">News, thoughts and things I've been working on.</p>
 

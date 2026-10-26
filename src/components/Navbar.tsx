@@ -1,7 +1,10 @@
 // The navigation bar at the top of the page.
 
+import { useEffect, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { Link, useLocation } from 'react-router'
 import { hasRecentUpdate } from '../data/updates.ts'
+import { profile } from '../data/profile.ts'
 import ThemeToggle from './ThemeToggle.tsx'
 
 // Instead of writing each <li> by hand, we keep the links in an array.
@@ -30,12 +33,60 @@ const links: NavItem[] = [
 
 function Navbar() {
   const { pathname } = useLocation()
+  // Which home section is on screen right now, e.g. 'skills'. Used to light up its link.
+  const [activeSection, setActiveSection] = useState('')
+  // True once the page is scrolled a little: the navbar then gets a soft shadow.
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 8)
+    }
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // "Scroll spy": watch the home sections and remember the one crossing the middle of the screen.
+  useEffect(() => {
+    if (pathname !== '/') return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveSection(entry.target.id)
+        }
+      },
+      // Shrinks the watched area to a thin line across the middle of the screen.
+      { rootMargin: '-50% 0px -50% 0px' },
+    )
+    document.querySelectorAll('main section[id]').forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
+  }, [pathname])
 
   return (
     // In JSX we write "className" instead of "class" (class is a reserved word in JavaScript).
-    <header className="navbar">
-      <Link to="/#home" className="navbar__brand">
-        Ali Chahine
+    <header className={scrolled ? 'navbar navbar--scrolled' : 'navbar'}>
+      {/*
+        On hover the name turns into a code tag, <Ali Chahine />, and the letters do a little wave.
+        Each letter is its own <span> with its position (--i), so the wave can run left to right.
+        Screen readers just read the aria-label, not the separate letters.
+      */}
+      <Link to="/#home" className="navbar__brand" aria-label={profile.name}>
+        <span className="brand__bracket" aria-hidden="true">
+          &lt;
+        </span>
+        <span aria-hidden="true">
+          {[...profile.name].map((letter, i) => (
+            <span key={i} className="brand__letter" style={{ '--i': i } as CSSProperties}>
+              {/* A normal space would collapse, so use a non-breaking one. */}
+              {letter === ' ' ? '\u00A0' : letter}
+            </span>
+          ))}
+        </span>
+        <span className="brand__bracket brand__bracket--close" aria-hidden="true">
+          /&gt;
+        </span>
       </Link>
       <nav>
         <ul className="navbar__links">
@@ -47,9 +98,12 @@ function Navbar() {
           {links.map((link) => {
             // Page links are highlighted on their own address; section links (/#…) only through "match".
             const match = link.match ?? (link.to.startsWith('/#') ? undefined : link.to)
+            // On the home page, a section link is also active while you're reading that section.
+            const onSection = pathname === '/' && link.to === `/#${activeSection}`
+            const isActive = onSection || (match !== undefined && pathname.startsWith(match))
             return (
               <li key={link.to}>
-                <Link to={link.to} className={match && pathname.startsWith(match) ? 'active' : undefined}>
+                <Link to={link.to} className={isActive ? 'active' : undefined}>
                   {link.label}
                   {/* The pulsing dot only shows when there's a post from the last 30 days. */}
                   {link.dot && <span className="navbar__dot" aria-label="new post" />}

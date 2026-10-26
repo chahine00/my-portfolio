@@ -15,7 +15,9 @@ function UpdatesPage() {
   return (
     <section className="section">
       {/* Goes back to the home page and scrolls to the Updates section. */}
-      <Link to="/#updates">← Back to home</Link>
+      <Link to="/#updates" className="back-link">
+        <span aria-hidden="true">←</span> Back to home
+      </Link>
 
       <h1>All Updates</h1>
       <p className="page-intro">

@@ -1,5 +1,7 @@
 // A REUSABLE component: it draws one project card on the home page.
-// The card is a short preview; "View project" opens the full page (ProjectPage.tsx).
+// The card is a short preview; clicking ANYWHERE on it opens the full page (ProjectPage.tsx).
+// The title link is stretched over the whole card with CSS (see .card-link in global.css).
+// GitHub / Live demo sit on top of it, so they still open their own links.
 
 import { Link } from 'react-router'
 // "import type" imports only a TypeScript type (it disappears when the app runs).
@@ -21,15 +23,15 @@ function ProjectCard({ project }: ProjectCardProps) {
   const meta = [project.role, project.period].filter(Boolean).join(' · ')
 
   return (
-    <article className="card project-card">
+    <article className="card project-card card-clickable">
       {cover && (
-        <Link to={pageUrl} className="project-card__cover" tabIndex={-1} aria-hidden="true">
+        <div className="project-card__cover">
           <img src={cover} alt="" loading="lazy" />
-        </Link>
+        </div>
       )}
 
       <h3>
-        <Link to={pageUrl} className="project-card__title">
+        <Link to={pageUrl} className="project-card__title card-link">
           {project.title}
         </Link>
       </h3>
@@ -47,7 +49,10 @@ function ProjectCard({ project }: ProjectCardProps) {
       </ul>
 
       <div className="card__links">
-        <Link to={pageUrl}>View project →</Link>
+        {/* Looks like a link, but the whole card is the link. */}
+        <span className="card-cta" aria-hidden="true">
+          View project <span>→</span>
+        </span>
         {/* target="_blank" opens the link in a new tab. */}
         {project.githubUrl && (
           <a href={project.githubUrl} target="_blank" rel="noreferrer">

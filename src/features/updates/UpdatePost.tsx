@@ -23,7 +23,9 @@ function UpdatePost() {
       <section className="section">
         <h1>Post not found</h1>
         <p>This post doesn't exist or was removed.</p>
-        <Link to="/updates">← See all updates</Link>
+        <Link to="/updates" className="back-link">
+          <span aria-hidden="true">←</span> See all updates
+        </Link>
       </section>
     )
   }
@@ -37,7 +39,9 @@ function UpdatePost() {
 
   return (
     <article className="section post">
-      <Link to="/updates">← All updates</Link>
+      <Link to="/updates" className="back-link">
+        <span aria-hidden="true">←</span> All updates
+      </Link>
 
       <header className="post__header">
         <time dateTime={post.date} className="post__date">
@@ -65,7 +69,7 @@ function UpdatePost() {
       <nav className="post__nav" aria-label="More posts">
         {older ? (
           <Link to={`/updates/${older.slug}`}>
-            <span>← Older post</span>
+            <span><b aria-hidden="true">←</b> Older post</span>
             {older.title}
           </Link>
         ) : (
@@ -73,7 +77,7 @@ function UpdatePost() {
         )}
         {newer && (
           <Link to={`/updates/${newer.slug}`} className="post__nav-newer">
-            <span>Newer post →</span>
+            <span>Newer post <b aria-hidden="true">→</b></span>
             {newer.title}
           </Link>
         )}

@@ -1,6 +1,6 @@
 // The one-page home: all the sections you scroll through, in order.
 
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { useLocation } from 'react-router'
 import Hero from './Hero.tsx'
 import About from '../about/About.tsx'
@@ -24,6 +24,31 @@ function HomePage() {
       document.getElementById(hash.slice(1))?.scrollIntoView()
     }
   }, [hash, key])
+
+  // Sections fade in as they scroll into view.
+  // useLayoutEffect runs BEFORE the page is drawn, so sections don't flash visible first.
+  useLayoutEffect(() => {
+    // Respect visitors who turned on "reduce motion" in their system settings.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const sections = document.querySelectorAll('main .section')
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            observer.unobserve(entry.target) // each section only animates once
+          }
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px' },
+    )
+    sections.forEach((section) => {
+      section.classList.add('reveal')
+      observer.observe(section)
+    })
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <>
