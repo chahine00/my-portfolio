@@ -23,13 +23,13 @@ export const experience: Job[] = [
         title: 'Backend Developer',
         period: 'Jul 2023 – Mar 2026',
         points: [
-          'Lead backend engineer: owned the full architecture',
-          'Shipped LLM features to production with the AI team',
-          'Secured APIs (JWT, RBAC) and deployed on AWS',
+          'First employee: designed the database, architecture & folder structure',
+          'Set the backend principles and security layer (JWT, RBAC)',
+          'Shipped LLM features with prompt engineering, with the AI team',
         ],
       },
     ],
-    tech: ['Python', 'FastAPI', 'Flask', 'MySQL', 'AWS', 'LLMs'],
+    tech: ['Python', 'FastAPI', 'Flask', 'MySQL', 'AWS', 'LLMs', 'Prompt Engineering'],
   },
   {
     company: 'Mobile Arts',

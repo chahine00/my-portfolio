@@ -5,7 +5,7 @@
 const coreStack = [
   {
     category: 'AI & LLMs',
-    skills: ['LangChain', 'RAG Pipelines', 'AI Agents', 'Embeddings', 'Milvus', 'vLLM'],
+    skills: ['LLMs', 'Prompt Engineering', 'LangChain', 'RAG Pipelines', 'AI Agents', 'Embeddings', 'Milvus', 'vLLM'],
   },
   {
     category: 'Backend',
