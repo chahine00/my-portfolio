@@ -184,6 +184,6 @@ All the content lives in small data files, so adding a project, a post or a cont
           'Used React Router for the pages and made the section links point to "/#section", so they work from any page and still scroll smoothly on the home page.',
       },
     ],
-    githubUrl: 'https://github.com/',
+    githubUrl: 'https://github.com/chahine00/my-portfolio',
   },
 ]

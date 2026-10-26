@@ -27,7 +27,7 @@ function App() {
           "/"        → the one-page home with all the sections
           "/updates" → the Updates page (all posts)
           "/updates/:slug" → one post. ":slug" is a placeholder for any post name,
-                             e.g. /updates/example-project
+                             e.g. /updates/postman-isnt-a-browser
           "/projects/:slug" → one project's page, e.g. /projects/portfolio-website
           To add a new page: create its component, add a <Route> here,
           and add a link to it in Navbar.tsx.

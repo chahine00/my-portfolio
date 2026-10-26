@@ -1346,7 +1346,7 @@ main {
   }
 }
 
-/* Back to top: always visible, fixed to the bottom-right corner of the screen */
+/* Back to top: fixed to the bottom-right corner of the screen (shown once you scroll down) */
 .back-to-top {
   position: fixed;
   right: 20px;

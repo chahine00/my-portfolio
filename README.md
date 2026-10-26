@@ -47,7 +47,7 @@ Read them roughly in this order, from simplest to most advanced:
 | `data/projects.ts` | TypeScript `interface`, optional properties `?`, array types `Project[]`. |
 | `Projects.tsx`, `ProjectCard.tsx` | **Props**: passing data from a parent to a child component. Conditional rendering with `&&`. |
 | `Contact.tsx` | **State** with `useState`, controlled inputs, form events, `async`/`await`, `try`/`catch`, union types. |
-| `services/api.ts` | `fetch()`, Promises, environment variables. |
+| `services/api.ts` | `fetch()`, Promises, `async`/`await`, error handling. |
 
 ## Practice exercises
 

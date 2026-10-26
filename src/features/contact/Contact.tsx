@@ -1,5 +1,5 @@
 // The "Contact" section: a form that sends a message.
-// This is the only component that uses STATE, so it's the best one to study.
+// It uses STATE for the form fields and the sending status, so it's a good one to study.
 
 // useState is a React "hook". It lets a component remember values,
 // and React re-draws the component whenever one of those values changes.
