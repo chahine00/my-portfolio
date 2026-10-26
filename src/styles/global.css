@@ -201,25 +201,155 @@ main {
   }
 }
 
-/* Phones: name on top, the links in one row below it that you can swipe sideways. */
+/* The links, the theme button and (on phones) the menu button, side by side on the right. */
+.navbar__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* The ☰ menu button only exists on phones. */
+.navbar__menu-button {
+  display: none;
+}
+
+/* Phones: the links move into a dropdown that the ☰ button opens. */
 @media (max-width: 720px) {
   .navbar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 12px 16px 8px;
+    padding: 8px 16px;
   }
 
-  .navbar nav {
-    width: 100%;
-    overflow-x: auto;
+  .navbar__right {
+    gap: 8px;
+  }
+
+  .navbar__menu-button {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  /* Three bars drawn with one span and its ::before/::after; they turn into an ✕ when open. */
+  .menu-icon,
+  .menu-icon::before,
+  .menu-icon::after {
+    display: block;
+    width: 22px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+
+  .menu-icon {
+    position: relative;
+  }
+
+  .menu-icon::before,
+  .menu-icon::after {
+    content: '';
+    position: absolute;
+    left: 0;
+  }
+
+  .menu-icon::before {
+    top: -7px;
+  }
+
+  .menu-icon::after {
+    top: 7px;
+  }
+
+  .menu-icon--open {
+    background: transparent;
+  }
+
+  .menu-icon--open::before {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .menu-icon--open::after {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .navbar__dot--menu {
+    position: absolute;
+    top: 9px;
+    right: 7px;
+  }
+
+  .navbar__nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: calc(100dvh - 60px);
+    overflow-y: auto;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 12px 24px rgb(0 0 0 / 0.15);
+  }
+
+  .navbar__nav--open {
+    display: block;
   }
 
   .navbar__links {
-    flex-wrap: nowrap;
-    gap: 14px;
-    padding-bottom: 4px;
-    white-space: nowrap;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 0;
+  }
+
+  /* Full-width rows, at least 44px tall, so they're easy to tap. */
+  .navbar__links a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+  }
+
+  /* The sliding underline doesn't suit full-width rows. */
+  .navbar__links a::after {
+    display: none;
+  }
+
+  /* ".navbar" in front makes this win over the .theme-toggle rule further down. */
+  .navbar .theme-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Bigger tap areas for the small text links. */
+  .back-link,
+  .forward-link,
+  .card__links a,
+  .contact-list a {
+    min-height: 44px;
+  }
+
+  .card__links a,
+  .contact-list a {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* The taller contact links already space the rows, and the label lines up with its link. */
+  .contact-list {
+    gap: 0;
+  }
+
+  .contact-list li {
+    align-items: center;
   }
 }
 
@@ -1145,6 +1275,18 @@ main {
 
 .back-to-top:hover {
   transform: translateY(-3px);
+}
+
+/* Hidden at the top of the page; fades in once you scroll down (see BackToTop.tsx). */
+.back-to-top {
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.2s, opacity 0.2s, visibility 0.2s;
+}
+
+.back-to-top--visible {
+  opacity: 1;
+  visibility: visible;
 }
 
 @media (prefers-reduced-motion: reduce) {

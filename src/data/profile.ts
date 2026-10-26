@@ -3,7 +3,7 @@
 
 export const profile = {
   name: 'Ali Chahine',
-  role: 'Software Engineers',
+  role: 'Software Engineer',
   tagline: 'I build end-to-end software solutions.',
   location: 'Beirut, Lebanon',
   availability: 'Open to new opportunities', // set to '' to hide it
