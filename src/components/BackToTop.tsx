@@ -1,18 +1,35 @@
-// A round "back to top" button that floats in the bottom-right corner of every page.
-// It only appears once you've scrolled down, so it doesn't cover the top of the page.
+// A round "back to top" button that floats at the bottom of every page.
+// It only shows while you're scrolling (and not at the top of the page), then fades out
+// a moment after you stop, so it doesn't sit on top of what you're reading.
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+
+// How long the button stays after the last scroll, in milliseconds.
+const HIDE_AFTER_MS = 2000
 
 function BackToTop() {
-  const [visible, setVisible] = useState(false)
+  // True while the visitor is scrolling (and for a moment after) below the top of the page.
+  const [scrolling, setScrolling] = useState(false)
+  // True while the mouse is over the button or it has keyboard focus: it then stays put.
+  const [held, setHeld] = useState(false)
+  // useRef keeps the timer between renders without causing a re-render.
+  const hideTimer = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     function handleScroll() {
-      setVisible(window.scrollY > 400)
+      window.clearTimeout(hideTimer.current)
+      if (window.scrollY <= 400) {
+        setScrolling(false)
+        return
+      }
+      setScrolling(true)
+      hideTimer.current = window.setTimeout(() => setScrolling(false), HIDE_AFTER_MS)
     }
-    handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.clearTimeout(hideTimer.current)
+    }
   }, [])
 
   function scrollToTop() {
@@ -21,8 +38,21 @@ function BackToTop() {
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })
   }
 
+  const visible = scrolling || (held && window.scrollY > 400)
+
   return (
-    <button type="button" className={visible ? 'back-to-top back-to-top--visible' : 'back-to-top'} onClick={scrollToTop} aria-label="Back to top" title="Back to top">
+    <button
+      type="button"
+      className={visible ? 'back-to-top back-to-top--visible' : 'back-to-top'}
+      onClick={scrollToTop}
+      // Only a real mouse or keyboard focus keeps it; a finger tap on a phone shouldn't make it stick.
+      onPointerEnter={(event) => event.pointerType === 'mouse' && setHeld(true)}
+      onPointerLeave={() => setHeld(false)}
+      onFocus={(event) => event.currentTarget.matches(':focus-visible') && setHeld(true)}
+      onBlur={() => setHeld(false)}
+      aria-label="Back to top"
+      title="Back to top"
+    >
       ↑
     </button>
   )
