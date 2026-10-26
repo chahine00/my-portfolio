@@ -8,7 +8,6 @@
 // the page simply skips that part.
 //
 // Photos go in public/projects/<slug>/, e.g. public/projects/my-app/1.png.
-// Then run  sh scripts/make-thumbs.sh  to make the small copy used on the card.
 
 // An "interface" is a TypeScript feature that describes the SHAPE of an object:
 // which properties it has, and what type each one is.

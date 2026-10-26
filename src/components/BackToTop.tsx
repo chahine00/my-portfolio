@@ -1,4 +1,4 @@
-// A round "back to top" button that floats at the bottom of every page.
+// A round "back to top" button that floats in the bottom-right corner of every page.
 // It only appears once you've scrolled down, so it doesn't cover the top of the page.
 
 import { useEffect, useState } from 'react'
@@ -8,10 +8,9 @@ function BackToTop() {
 
   useEffect(() => {
     function handleScroll() {
-      // React skips re-drawing when the value doesn't change, so this only does
-      // real work at the moment you cross the 400px line.
       setVisible(window.scrollY > 400)
     }
+    handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -23,13 +22,7 @@ function BackToTop() {
   }
 
   return (
-    <button
-      type="button"
-      className={visible ? 'back-to-top back-to-top--visible' : 'back-to-top'}
-      onClick={scrollToTop}
-      aria-label="Back to top"
-      title="Back to top"
-    >
+    <button type="button" className={visible ? 'back-to-top back-to-top--visible' : 'back-to-top'} onClick={scrollToTop} aria-label="Back to top" title="Back to top">
       ↑
     </button>
   )

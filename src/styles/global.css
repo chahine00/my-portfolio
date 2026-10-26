@@ -1193,27 +1193,13 @@ main {
   vertical-align: 2px;
   border-radius: 50%;
   background: var(--accent);
-}
-
-/* The pulse is a copy of the dot (::after) that grows and fades. Animating only transform
-   and opacity lets the graphics card do it, so it never slows down scrolling. */
-.navbar__dot:not(.navbar__dot--menu) {
-  position: relative;
-}
-
-.navbar__dot::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: var(--accent);
   animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 0.6; }
-  70% { transform: scale(3); opacity: 0; }
-  100% { transform: scale(3); opacity: 0; }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent); }
+  70% { box-shadow: 0 0 0 7px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
 }
 
 .navbar__links a.active {
@@ -1363,17 +1349,16 @@ main {
 /* Back to top: fixed to the bottom-right corner of the screen (shown once you scroll down) */
 .back-to-top {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  right: 20px;
+  bottom: 20px;
   z-index: 20;
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  font-size: 1.6rem;
-  font-weight: 700;
+  font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
   box-shadow: 0 4px 14px rgb(0 0 0 / 0.2);
@@ -1394,28 +1379,6 @@ main {
 .back-to-top--visible {
   opacity: 1;
   visibility: visible;
-}
-
-/* Phones: a bigger button in the bottom center, where either thumb reaches it easily,
-   instead of the far corner. Centered with left/right + margin (not transform),
-   so the hover and press effects still work. */
-@media (max-width: 720px) {
-  .back-to-top {
-    left: 0;
-    right: 0;
-    bottom: calc(16px + env(safe-area-inset-bottom));
-    width: 60px;
-    height: 60px;
-    margin: 0 auto;
-    font-size: 1.75rem;
-    font-weight: 700;
-  }
-
-  /* Room at the very end of the page, so the button never covers the footer.
-     "footer.footer" wins over the .footer rule further down. */
-  footer.footer {
-    padding-bottom: calc(96px + env(safe-area-inset-bottom));
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1641,21 +1604,11 @@ a {
 }
 
 .hero__available-dot {
-  position: relative;
-}
-
-/* Same idea as the navbar dot: a soft ring that grows and fades, using only transform and opacity. */
-.hero__available-dot::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  background: rgb(34 197 94 / 0.25);
   animation: breathe 2.4s ease-in-out infinite;
 }
 
 @keyframes breathe {
-  50% { transform: scale(1.6); opacity: 0; }
+  50% { box-shadow: 0 0 0 6px rgb(34 197 94 / 0); }
 }
 
 /* About numbers: grow slightly on hover */

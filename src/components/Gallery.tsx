@@ -3,7 +3,7 @@
 
 import { useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
-import { asset, fallbackTo, thumb } from '../utils/asset.ts'
+import { asset } from '../utils/asset.ts'
 
 interface GalleryProps {
   images: string[]
@@ -68,7 +68,7 @@ function Gallery({ images, title }: GalleryProps) {
                 onClick={() => setIndex(i)}
                 aria-label={`Show photo ${i + 1}`}
               >
-                <img src={thumb(src)} onError={fallbackTo(src)} alt="" loading="lazy" decoding="async" />
+                <img src={asset(src)} alt="" loading="lazy" />
               </button>
             </li>
           ))}

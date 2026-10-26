@@ -5,7 +5,6 @@
 // To add a post:
 // 1. Put its photos in a new folder, e.g. public/updates/my-new-post/1.jpg, 2.jpg …
 // 2. Add a new object to the list below. Newest posts are shown first automatically.
-// 3. Run  sh scripts/make-thumbs.sh  to make the small copies used on the cards (faster scrolling).
 
 export interface Update {
   slug: string // the post's address: 'my-new-post' → /updates/my-new-post (lowercase, dashes, no spaces)
