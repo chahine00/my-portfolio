@@ -4,6 +4,7 @@
 import { profile } from '../../data/profile.ts'
 import Icon from '../../components/Icon.tsx'
 import SocialLinks from '../../components/SocialLinks.tsx'
+import { asset } from '../../utils/asset.ts'
 
 // "Ali Chahine" → "AC". Shown in the circle until you add a photo.
 const initials = profile.name
@@ -40,7 +41,7 @@ function Hero() {
             View my work
           </a>
           {/* The PDF lives in /public, so it is served from the site root. */}
-          <a href="/Ali_Chahine_CV.pdf" download="Ali_Chahine_CV.pdf" className="button button-outline">
+          <a href={asset('/Ali_Chahine_CV.pdf')} download="Ali_Chahine_CV.pdf" className="button button-outline">
             Download CV
           </a>
           <SocialLinks />
@@ -48,7 +49,7 @@ function Hero() {
       </div>
 
       <div className="hero__photo">
-        {profile.photo ? <img src={profile.photo} alt={profile.name} /> : <span>{initials}</span>}
+        {profile.photo ? <img src={asset(profile.photo)} alt={profile.name} /> : <span>{initials}</span>}
       </div>
     </section>
   )

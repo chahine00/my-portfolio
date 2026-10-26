@@ -7,6 +7,7 @@ import { useState } from 'react'
 import type { SubmitEvent } from 'react'
 import { sendContactMessage } from '../../services/api.ts'
 import { contacts } from '../../data/contact.ts'
+import { asset } from '../../utils/asset.ts'
 
 // A "union type": status can ONLY be one of these four strings.
 // TypeScript will show an error if you try to set anything else (like 'done').
@@ -57,7 +58,7 @@ function Contact() {
               {...(contact.href.startsWith('http') && { target: '_blank', rel: 'noreferrer' })}
             >
               {/* "&&" only renders the flag when the contact has one. */}
-              {contact.flag && <img src={contact.flag} alt="" className="contact-flag" />}
+              {contact.flag && <img src={asset(contact.flag)} alt="" className="contact-flag" />}
               {contact.value}
             </a>
           </li>

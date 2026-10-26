@@ -7,6 +7,7 @@
 import { Link } from 'react-router'
 import { formatDate, isRecent } from '../../data/updates.ts'
 import type { Update } from '../../data/updates.ts'
+import { asset } from '../../utils/asset.ts'
 
 interface UpdateTimelineProps {
   updates: Update[]
@@ -43,7 +44,7 @@ function UpdateTimeline({ updates }: UpdateTimelineProps) {
                 <div className="update-thumbs">
                   {update.images.slice(0, MAX_THUMBS).map((src, index) => (
                     <span className="update-thumbs__item" key={src}>
-                      <img src={src} alt="" loading="lazy" />
+                      <img src={asset(src)} alt="" loading="lazy" />
                       {index === MAX_THUMBS - 1 && hiddenCount > 0 && (
                         <span className="update-thumbs__more">+{hiddenCount}</span>
                       )}

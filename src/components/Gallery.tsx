@@ -3,6 +3,7 @@
 
 import { useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
+import { asset } from '../utils/asset.ts'
 
 interface GalleryProps {
   images: string[]
@@ -47,7 +48,7 @@ function Gallery({ images, title }: GalleryProps) {
     <div className="gallery" onKeyDown={handleKeyDown}>
       <div className="gallery__main">
         <button type="button" className="gallery__open" onClick={() => dialogRef.current?.showModal()} aria-label="View full size">
-          <img src={images[index]} alt={alt} />
+          <img src={asset(images[index])} alt={alt} />
         </button>
         {arrows}
         {hasMany && (
@@ -67,7 +68,7 @@ function Gallery({ images, title }: GalleryProps) {
                 onClick={() => setIndex(i)}
                 aria-label={`Show photo ${i + 1}`}
               >
-                <img src={src} alt="" loading="lazy" />
+                <img src={asset(src)} alt="" loading="lazy" />
               </button>
             </li>
           ))}
@@ -82,7 +83,7 @@ function Gallery({ images, title }: GalleryProps) {
           if (event.target === event.currentTarget) dialogRef.current?.close()
         }}
       >
-        <img src={images[index]} alt={alt} />
+        <img src={asset(images[index])} alt={alt} />
         {arrows}
         <button type="button" className="lightbox__close" onClick={() => dialogRef.current?.close()} aria-label="Close">
           ✕
