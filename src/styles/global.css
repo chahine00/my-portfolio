@@ -226,7 +226,7 @@ main {
     grid-template-areas:
       'brand toggle'
       'links links';
-    padding: 10px 20px 6px;
+    padding: 10px 16px 6px;
   }
 
   .navbar__brand {
@@ -241,9 +241,23 @@ main {
     grid-area: links;
   }
 
+  /* All six links on one line: the text and the spacing shrink a little on narrow phones
+     so they fit, and grow back to normal on wider screens. */
   .navbar__links {
-    justify-content: center;
-    gap: 0 18px;
+    flex-wrap: nowrap;
+    /* Centered with auto margins rather than justify-content, so if the row is ever wider
+       than the screen it starts at the left edge and can still be swiped. */
+    width: max-content;
+    margin: 0 auto;
+    gap: 0 clamp(6px, 2.2vw, 18px);
+    font-size: clamp(0.65rem, 3.3vw, 1rem);
+    white-space: nowrap;
+  }
+
+  /* Safety net for very small screens: swipe sideways instead of cutting a link off. */
+  .navbar__nav {
+    overflow-x: auto;
+    scrollbar-width: none;
   }
 
   /* A little height around each link makes it easier to tap; the underline sits just under the text. */
@@ -254,17 +268,6 @@ main {
 
   .navbar .navbar__links a::after {
     bottom: 4px;
-  }
-}
-
-/* Narrow phones: two tidy rows of three links, so none ends up alone on a line. */
-@media (max-width: 480px) {
-  .navbar__links {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    justify-content: center;
-    justify-items: center;
-    gap: 0 24px;
   }
 }
 
