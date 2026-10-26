@@ -17,7 +17,7 @@ export interface ContactMessage {
 // click the button in it once, and every message after that is delivered.
 // After activating, FormSubmit also gives you a random code you can use instead of the address
 // below, so the address doesn't appear in the site's code: 'https://formsubmit.co/ajax/<code>'.
-const CONTACT_FORM_URL = 'https://formsubmit.co/ajax/skewnest21@gmail.com'
+const CONTACT_FORM_URL = 'https://formsubmit.co/ajax/leb_ach@hotmail.com'
 
 // "async" means this function does something that takes time (a network request).
 // It returns a Promise. "Promise<void>" means "it finishes later and gives back nothing".
