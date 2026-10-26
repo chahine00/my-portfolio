@@ -17,9 +17,13 @@
   background: var(--bg);
 }
 
-/* If the user's computer is in dark mode, swap the variables for darker colors. */
+/*
+  Dark colors. They apply when:
+  - the visitor's computer is in dark mode and they didn't pick light with the toggle, or
+  - they picked dark with the toggle (data-theme="dark" on <html>).
+*/
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #0d1117;
     --text: #e6edf3;
     --muted: #9198a1;
@@ -27,6 +31,15 @@
     --card: #161b22;
     --border: #30363d;
   }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0d1117;
+  --text: #e6edf3;
+  --muted: #9198a1;
+  --accent: #818cf8;
+  --card: #161b22;
+  --border: #30363d;
 }
 
 *,
@@ -97,15 +110,279 @@ main {
   margin-top: 4px;
 }
 
-/* Hero */
-.hero h1 {
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  margin: 0 0 8px;
+/* Hero: text on the left, photo on the right (photo on top on phones) */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
 }
 
-.hero p {
+.hero h1 {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  margin: 4px 0 8px;
+  line-height: 1.15;
+}
+
+.hero__tagline {
+  margin: 0;
   color: var(--muted);
   font-size: 1.25rem;
+}
+
+.hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.hero__meta li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero__available {
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.hero__available-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgb(34 197 94 / 0.25);
+}
+
+.hero__photo {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 220px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 4px solid var(--card);
+  box-shadow: 0 0 0 2px var(--accent);
+  background: linear-gradient(135deg, var(--accent), #06b6d4);
+  color: #fff;
+  font-size: 4rem;
+  font-weight: 700;
+}
+
+.hero__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  /* Stops the long text from making the page wider than the phone screen. */
+  .hero__text {
+    min-width: 0;
+  }
+
+  .hero__photo {
+    align-self: flex-start;
+    width: 120px;
+    font-size: 2.2rem;
+  }
+}
+
+/* Phones: name on top, the links in one row below it that you can swipe sideways. */
+@media (max-width: 720px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 16px 8px;
+  }
+
+  .navbar nav {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .navbar__links {
+    flex-wrap: nowrap;
+    gap: 14px;
+    padding-bottom: 4px;
+    white-space: nowrap;
+  }
+}
+
+/* Round icon links (hero + footer) */
+.social-links {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.social-links a {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text);
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.social-links a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Light/dark switch in the navbar */
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* About: small numbers row */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 40px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stats li {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats strong {
+  color: var(--accent);
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.stats span {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+/* Experience */
+.job h3 {
+  margin-bottom: 12px;
+}
+
+.job__role + .job__role {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
+}
+
+.job__role-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 12px;
+  margin-bottom: 8px;
+}
+
+.job__role-head span {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.job .tags {
+  margin: 16px 0 0;
+}
+
+/* Education */
+.edu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.edu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.edu-list li {
+  display: flex;
+  flex-direction: column;
+}
+
+.edu-list span {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+  .edu-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Testimonials */
+.quote {
+  margin: 0;
+}
+
+.quote blockquote {
+  margin: 0 0 16px;
+  font-style: italic;
+}
+
+.quote figcaption {
+  display: flex;
+  flex-direction: column;
+}
+
+.quote figcaption span {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+/* 404 page */
+.not-found {
+  text-align: center;
+}
+
+.not-found__code {
+  margin: 0;
+  color: var(--accent);
+  font-size: 5rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
 /* Buttons */
@@ -123,8 +400,9 @@ main {
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 24px;
 }
 
 .button-outline {
@@ -863,6 +1141,10 @@ main {
 }
 
 /* Footer */
+.footer .social-links {
+  justify-content: center;
+}
+
 .footer {
   padding: 24px 16px;
   border-top: 1px solid var(--border);

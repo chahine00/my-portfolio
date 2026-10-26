@@ -1,4 +1,7 @@
 // The "About Me" section. Edit the text below to introduce yourself.
+// The numbers come from "stats" in src/data/profile.ts.
+
+import { stats } from '../../data/profile.ts'
 
 function About() {
   return (
@@ -9,6 +12,15 @@ function About() {
       <p>
         Real growth comes down to speed and flexibility. I try not to box myself into a single label - I just adapt quickly and pick up whatever tools I need, because staying relevant in the AI era means constantly moving forward.
       </p>
+
+      <ul className="stats">
+        {stats.map((stat) => (
+          <li key={stat.label}>
+            <strong>{stat.value}</strong>
+            <span>{stat.label}</span>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }

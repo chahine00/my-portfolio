@@ -4,7 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Coffee & A Warm Welcome</title>
+    <title>Ali Chahine — Software Engineer</title>
+    <meta name="description" content="Software engineer building scalable backends and AI-powered features. Python, FastAPI, Node.js, AWS, LLMs." />
+
+    <!-- Link previews (LinkedIn, WhatsApp, X…). Once the site is online, replace "/og-image.png"
+         with the full address, e.g. https://your-domain.com/og-image.png, so every app can find it. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Ali Chahine — Software Engineer" />
+    <meta property="og:description" content="Scalable backends and AI-powered features." />
+    <meta property="og:image" content="/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Applies the saved light/dark choice BEFORE the page is drawn, so it doesn't flash. -->
+    <script>
+      try {
+        const theme = localStorage.getItem('theme')
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

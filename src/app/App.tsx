@@ -10,6 +10,7 @@ import HomePage from '../features/home/HomePage.tsx'
 import UpdatesPage from '../features/updates/UpdatesPage.tsx'
 import UpdatePost from '../features/updates/UpdatePost.tsx'
 import ProjectPage from '../features/projects/ProjectPage.tsx'
+import NotFound from '../features/not-found/NotFound.tsx'
 
 // A component is just a function that returns JSX (HTML-like code).
 // Component names must start with a Capital letter.
@@ -30,14 +31,14 @@ function App() {
           "/projects/:slug" → one project's page, e.g. /projects/portfolio-website
           To add a new page: create its component, add a <Route> here,
           and add a link to it in Navbar.tsx.
-          The last route ("*") catches any unknown URL and shows the home page.
+          The last route ("*") catches any unknown URL and shows a "Page not found" page.
         */}
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/updates" element={<UpdatesPage />} />
           <Route path="/updates/:slug" element={<UpdatePost />} />
           <Route path="/projects/:slug" element={<ProjectPage />} />
-          <Route path="*" element={<HomePage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />

@@ -2,6 +2,7 @@
 
 import { Link, useLocation } from 'react-router'
 import { hasRecentUpdate } from '../data/updates.ts'
+import ThemeToggle from './ThemeToggle.tsx'
 
 // Instead of writing each <li> by hand, we keep the links in an array.
 // To add a new link, you only need to add one line here.
@@ -20,6 +21,7 @@ interface NavItem {
 
 const links: NavItem[] = [
   { to: '/#about', label: 'About' },
+  { to: '/#experience', label: 'Experience' },
   { to: '/#projects', label: 'Projects', match: '/projects' },
   { to: '/#skills', label: 'Skills' },
   { to: '/updates', label: 'Updates', dot: hasRecentUpdate },
@@ -55,6 +57,9 @@ function Navbar() {
               </li>
             )
           })}
+          <li>
+            <ThemeToggle />
+          </li>
         </ul>
       </nav>
     </header>

@@ -4,9 +4,12 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router'
 import Hero from './Hero.tsx'
 import About from '../about/About.tsx'
+import Experience from '../experience/Experience.tsx'
 import Projects from '../projects/Projects.tsx'
 import Skills from '../skills/Skills.tsx'
+import Education from '../education/Education.tsx'
 import Updates from '../updates/Updates.tsx'
+import Testimonials from '../testimonials/Testimonials.tsx'
 import Contact from '../contact/Contact.tsx'
 
 function HomePage() {
@@ -26,9 +29,12 @@ function HomePage() {
     <>
       <Hero />
       <About />
+      <Experience />
       <Projects />
       <Skills />
+      <Education />
       <Updates />
+      <Testimonials />
       <Contact />
     </>
   )
