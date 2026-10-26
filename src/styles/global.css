@@ -1381,6 +1381,27 @@ main {
   visibility: visible;
 }
 
+/* Phones: a bigger button in the bottom center, where either thumb reaches it easily,
+   instead of the far corner. Centered with left/right + margin (not transform),
+   so the hover and press effects still work. */
+@media (max-width: 720px) {
+  .back-to-top {
+    left: 0;
+    right: 0;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    width: 52px;
+    height: 52px;
+    margin: 0 auto;
+    font-size: 1.4rem;
+  }
+
+  /* Room at the very end of the page, so the button never covers the footer.
+     "footer.footer" wins over the .footer rule further down. */
+  footer.footer {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .back-to-top:hover {
     transform: none;
