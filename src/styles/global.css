@@ -1488,10 +1488,19 @@ a {
   }
 }
 
-/* Hold still under the pointer, so it's easy to click. */
+/* Hold still under the pointer and while pressed (phones have no hover), so it's easy to click. */
 .navbar__brand:hover,
+.navbar__brand:active,
 .navbar__brand:focus-visible {
   animation-play-state: paused;
+}
+
+/* No dragging or text selection: both would turn a slightly moving press into something
+   other than a click (Safari ignores draggable="false" on links, so it needs this). */
+.navbar__brand {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* The letters keep doing a wave, one after the other, every few seconds. */

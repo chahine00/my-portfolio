@@ -75,7 +75,9 @@ function Navbar() {
         Screen readers just read the aria-label, not the separate letters.
       */}
       <div className="navbar__lane">
-        <Link to="/#home" className="navbar__brand" aria-label={profile.name}>
+        {/* draggable={false}: a press that moves a little (easy on a moving target) would
+            otherwise start dragging the link, and the click would be lost. */}
+        <Link to="/#home" className="navbar__brand" aria-label={profile.name} draggable={false}>
           <span className="brand__bracket" aria-hidden="true">
             &lt;
           </span>
