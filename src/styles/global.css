@@ -583,6 +583,7 @@ main {
 
 .card__links {
   display: flex;
+  align-items: center; /* "View project →", "Live demo" and "GitHub" share one line */
   gap: 12px;
 }
 
@@ -824,12 +825,33 @@ main {
 .post__nav a {
   display: flex;
   flex-direction: column;
-  max-width: 45%;
+  min-width: 0; /* lets the title shrink and end with "…" instead of widening the link */
+  max-width: 48%;
 }
 
-.post__nav span {
+.post__nav-label {
   color: var(--muted);
   font-size: 0.875rem;
+}
+
+/* The post or project name stays on one line; a name too long for the space ends with "…"
+   (the full name shows when you hover the link). */
+.post__nav-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Phones: Older and Newer stack on top of each other, each with the full width. */
+@media (max-width: 720px) {
+  .post__nav {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .post__nav a {
+    max-width: 100%;
+  }
 }
 
 .post__nav-newer {
@@ -1667,7 +1689,7 @@ a {
   transform: translateX(4px);
 }
 
-.post__nav a:hover span {
+.post__nav a:hover .post__nav-label {
   color: var(--accent);
 }
 

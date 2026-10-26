@@ -173,17 +173,17 @@ function ProjectPage() {
 
       <nav className="post__nav" aria-label="More projects">
         {previous ? (
-          <Link to={`/projects/${previous.slug}`}>
-            <span><b aria-hidden="true">←</b> Previous project</span>
-            {previous.title}
+          <Link to={`/projects/${previous.slug}`} title={previous.title}>
+            <span className="post__nav-label"><b aria-hidden="true">←</b> Previous project</span>
+            <span className="post__nav-title">{previous.title}</span>
           </Link>
         ) : (
           <span />
         )}
         {next && (
-          <Link to={`/projects/${next.slug}`} className="post__nav-newer">
-            <span>Next project <b aria-hidden="true">→</b></span>
-            {next.title}
+          <Link to={`/projects/${next.slug}`} className="post__nav-newer" title={next.title}>
+            <span className="post__nav-label">Next project <b aria-hidden="true">→</b></span>
+            <span className="post__nav-title">{next.title}</span>
           </Link>
         )}
       </nav>

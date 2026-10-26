@@ -68,17 +68,17 @@ function UpdatePost() {
 
       <nav className="post__nav" aria-label="More posts">
         {older ? (
-          <Link to={`/updates/${older.slug}`}>
-            <span><b aria-hidden="true">←</b> Older post</span>
-            {older.title}
+          <Link to={`/updates/${older.slug}`} title={older.title}>
+            <span className="post__nav-label"><b aria-hidden="true">←</b> Older post</span>
+            <span className="post__nav-title">{older.title}</span>
           </Link>
         ) : (
           <span />
         )}
         {newer && (
-          <Link to={`/updates/${newer.slug}`} className="post__nav-newer">
-            <span>Newer post <b aria-hidden="true">→</b></span>
-            {newer.title}
+          <Link to={`/updates/${newer.slug}`} className="post__nav-newer" title={newer.title}>
+            <span className="post__nav-label">Newer post <b aria-hidden="true">→</b></span>
+            <span className="post__nav-title">{newer.title}</span>
           </Link>
         )}
       </nav>
