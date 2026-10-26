@@ -1282,25 +1282,25 @@ main {
 /* Back to top: fixed to the bottom-right corner of the screen (shown once you scroll down) */
 .back-to-top {
   position: fixed;
-  /* Its center sits 75% of the way across the screen (halfway between the middle and the
-     right edge), easy to reach and away from the corner. "- 28px" is half its width, used
-     instead of a transform so the hover and press effects still work. The bottom grows with
-     the screen (32px to 64px) and clears the iPhone home bar. */
-  left: calc(75% - 28px);
+  /* Its center sits 85% of the way across the screen on desktop (75% on phones, see below).
+     "- 28px" is half its width, used instead of a transform so the hover and press effects
+     still work. The bottom grows with the screen (32px to 64px) and clears the iPhone home bar. */
+  left: calc(85% - 28px);
   bottom: calc(clamp(32px, 5vw, 64px) + env(safe-area-inset-bottom));
   z-index: 20;
   width: 56px;
   height: 56px;
-  /* A ring in the page color plus an accent outline makes it stand out on any background. */
+  /* A solid deep indigo in both themes (the dark theme's lighter accent looked see-through),
+     with a ring in the page color and an outline so it stands out on any background. */
   border: 3px solid var(--bg);
   border-radius: 50%;
-  background: var(--accent);
+  background: #4f46e5;
   color: #fff;
   font-size: 1.6rem;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 0 0 2px var(--accent), 0 8px 24px rgb(0 0 0 / 0.35);
+  box-shadow: 0 0 0 2px #4f46e5, 0 8px 24px rgb(0 0 0 / 0.4);
   transition: transform 0.2s;
 }
 
@@ -1308,16 +1308,23 @@ main {
   transform: translateY(-3px);
 }
 
-/* Hidden at the top of the page; fades in once you scroll down (see BackToTop.tsx). */
+/* Hidden at the top of the page; shows while you scroll and fades out 2s after you stop (see BackToTop.tsx). */
 .back-to-top {
   opacity: 0;
   visibility: hidden;
-  transition: transform 0.2s, opacity 0.2s, visibility 0.2s;
+  transition: transform 0.2s, opacity 0.3s, visibility 0.3s;
 }
 
 .back-to-top--visible {
   opacity: 1;
   visibility: visible;
+}
+
+/* Phones: 75% of the way across, a little closer to the middle for the thumb. */
+@media (max-width: 720px) {
+  .back-to-top {
+    left: calc(75% - 28px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

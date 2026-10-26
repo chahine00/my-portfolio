@@ -1,22 +1,39 @@
-// A round "back to top" button that floats in the bottom-right corner of every page.
-// It only appears once you've scrolled down, so it doesn't cover the top of the page.
+// A round "back to top" button that floats near the bottom of every page.
+// It appears while you scroll (once you're past the top of the page) and fades out
+// 2 seconds after you stop, so it doesn't sit on top of what you're reading.
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent, PointerEvent } from 'react'
+
+// How long the button stays after the last scroll, in milliseconds.
+const HIDE_AFTER_MS = 2000
 
 function BackToTop() {
   const [visible, setVisible] = useState(false)
+  // True while the mouse is over the button: it then stays, so it can't vanish under the cursor.
+  const [hovered, setHovered] = useState(false)
+  // useRef keeps the timer between renders without re-drawing anything.
+  const hideTimer = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     function handleScroll() {
+      window.clearTimeout(hideTimer.current)
+      // React only re-draws when the value actually changes, so this stays cheap while scrolling.
       setVisible(window.scrollY > 400)
+      if (window.scrollY > 400) {
+        hideTimer.current = window.setTimeout(() => setVisible(false), HIDE_AFTER_MS)
+      }
     }
-    handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.clearTimeout(hideTimer.current)
+    }
   }, [])
 
   function scrollToTop() {
+    // The mouse is still over the button after a click; don't let that keep it shown at the top.
+    setHovered(false)
     // After a trackpad or finger "flick" the page keeps gliding for a moment, and that glide
     // would cancel the trip to the top. So while we travel up, the leftover glide is ignored:
     // until the page reaches the top, or 1.5 seconds at most.
@@ -59,8 +76,11 @@ function BackToTop() {
   return (
     <button
       type="button"
-      className={visible ? 'back-to-top back-to-top--visible' : 'back-to-top'}
+      className={visible || hovered ? 'back-to-top back-to-top--visible' : 'back-to-top'}
       onPointerDown={handlePointerDown}
+      // Only a real mouse keeps it shown; a finger tap on a phone shouldn't make it stick.
+      onPointerEnter={(event) => event.pointerType === 'mouse' && setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
       onClick={handleClick}
       aria-label="Back to top"
       title="Back to top"
