@@ -1474,7 +1474,8 @@ a {
   background-position: 0% 0;
 }
 
-/* Brand name: becomes <Ali Chahine /> on hover, with a letter wave */
+/* Brand name: always shown as <Ali Chahine />. On hover the tags spread apart
+   and the letters do a wave. */
 .navbar__brand {
   display: inline-flex;
   align-items: center;
@@ -1496,27 +1497,27 @@ a {
   40% { transform: translateY(-5px); }
 }
 
-/* The < and /> are hidden (zero width) until hover, then slide open. */
 .brand__bracket {
   display: inline-block;
-  max-width: 0;
-  overflow: hidden;
-  opacity: 0;
+  margin-right: 4px;
   color: var(--accent);
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   white-space: pre;
-  transition: max-width 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
+.brand__bracket--close {
+  margin-right: 0;
+  margin-left: 4px;
+}
+
+/* The tags step outward, away from the name. */
 .navbar__brand:hover .brand__bracket {
-  max-width: 3ch;
-  opacity: 1;
-  margin-right: 4px;
+  transform: translateX(-4px);
 }
 
 .navbar__brand:hover .brand__bracket--close {
-  margin-right: 0;
-  margin-left: 4px;
+  transform: translateX(4px);
 }
 
 /* Theme button: the icon turns a little on hover */

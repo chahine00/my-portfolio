@@ -70,7 +70,7 @@ function Navbar() {
     // In JSX we write "className" instead of "class" (class is a reserved word in JavaScript).
     <header className={scrolled ? 'navbar navbar--scrolled' : 'navbar'}>
       {/*
-        On hover the name turns into a code tag, <Ali Chahine />, and the letters do a little wave.
+        The name is shown as a code tag, <Ali Chahine />. On hover the tags spread apart and the letters do a little wave.
         Each letter is its own <span> with its position (--i), so the wave can run left to right.
         Screen readers just read the aria-label, not the separate letters.
       */}
