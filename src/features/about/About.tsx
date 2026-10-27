@@ -109,7 +109,7 @@ function About() {
           onPointerEnter={handleStatsEnter}
           onPointerLeave={handleStatsLeave}
         >
-          {stats.map((stat) => (
+          {stats.map((stat, i) => (
             <li key={stat.label}>
               {/* A button, so it works with the keyboard too. aria-expanded tells screen readers it's open. */}
               <button
@@ -118,6 +118,8 @@ function About() {
                 onClick={openPanel}
                 aria-expanded={rolesOpen && !closing}
                 aria-controls="roles-panel"
+                // --i: its position, so the light sweep passes over the three one after another.
+                style={{ '--i': i } as CSSProperties}
               >
                 <strong>{stat.value}</strong>
                 <span>
