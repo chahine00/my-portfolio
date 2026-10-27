@@ -10,7 +10,7 @@ function About() {
       <p className="eyebrow">About</p>
       <h1>The Mindset</h1>
       <p>
-        In the AI era, technology changes fast, but engineering fundamentals stay the same. My core is backend systems, APIs, and AI integrations—but I pick up whatever stack or tools a project demands to ship fast and keep moving forward.
+        In the AI era, technology changes fast, but engineering fundamentals stay the same. My core is backend systems, APIs, and AI integrations, but I pick up whatever stack or tools a project demands to ship fast and keep moving forward. With degrees in both computer science and business management, I focus on why a feature matters, not just how to build it.
       </p>
 
       <ul className="stats">

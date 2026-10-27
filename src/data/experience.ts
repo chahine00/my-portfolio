@@ -19,15 +19,15 @@ export const experience: Job[] = [
     company: 'Freelance',
     roles: [
       {
-        title: 'Full-Stack & Mobile Developer',
+        title: 'Full-Stack Developer (Backend, Web & Mobile)',
         period: '2025 – present',
         points: [
-          'Built and launched Cinetwork on Google Play, the App Store and the web, from the database to store release',
-          'Set up paid subscriptions and AdMob ads that earn the app money',
+          'Take on client projects end to end: backend APIs, databases, web and mobile apps, and cloud deployment',
+          'Latest: Cinetwork, live on Google Play, the App Store and the web; I also helped set its pricing',
         ],
       },
     ],
-    tech: ['React Native', 'Flask', 'MySQL', 'AWS', 'AdMob'],
+    tech: ['Flask', 'MySQL', 'AWS', 'Nginx', 'React Native', 'AdMob'],
   },
   {
     company: 'boxMind AI',
@@ -40,7 +40,7 @@ export const experience: Job[] = [
           "First hire and the team's backend developer, building AI products for education, banking and healthcare",
           "Built the databases and secure APIs (JWT, roles, data isolation) that bring the AI team's work to the frontend",
           'Integrated LLM calls and RAG with Milvus, with hands-on prompt engineering',
-          'Handled QA and Docker deployment on AWS, and took part in product decisions',
+          'Handled QA and Docker deployment on AWS, and helped shape product and business ideas',
         ],
       },
     ],
@@ -61,6 +61,6 @@ export const experience: Job[] = [
         points: ['Built React Native & Xamarin apps', 'Published apps on Google Play'],
       },
     ],
-    tech: ['C#', 'ASP.NET Core', 'Angular', 'React Native', 'AWS Lambda'],
+    tech: ['C#', 'ASP.NET Core', 'Node.js', 'Angular', 'React Native', 'AWS Lambda'],
   },
 ]

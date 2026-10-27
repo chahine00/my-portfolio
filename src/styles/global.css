@@ -908,6 +908,139 @@ main {
   }
 }
 
+/* The Core Stack frame as a "control screen": a faint grid, corner marks and a header with a
+   live light. When it scrolls into view (useReveal adds .is-visible), it powers on from a thin
+   line, a scan line sweeps down once, and the rows boot up one after another (--i). */
+.stack--screen {
+  --line: color-mix(in srgb, var(--accent) 35%, transparent);
+  position: relative;
+  overflow: hidden;
+  border-color: var(--line);
+  border-radius: 14px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--accent) 7%, transparent) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 7%, transparent) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--card);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+/* Corner marks, top left and bottom right, like a viewfinder. */
+.stack--screen::before,
+.stack--screen::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--accent);
+  pointer-events: none;
+}
+
+.stack--screen::before {
+  top: 8px;
+  left: 8px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.stack--screen::after {
+  right: 8px;
+  bottom: 8px;
+  border-top: 0;
+  border-left: 0;
+}
+
+.stack__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 0 14px;
+  color: var(--muted);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+}
+
+.stack__count {
+  color: var(--accent);
+}
+
+/* A "live" light that blinks. */
+.stack__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: panel-blink 1.6s steps(1) infinite;
+}
+
+@keyframes panel-blink {
+  50% { opacity: 0.25; }
+}
+
+/* The scan line: a soft bright bar, parked above the frame until it sweeps down. */
+.stack__scan {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 60px;
+  background: linear-gradient(transparent, color-mix(in srgb, var(--accent) 22%, transparent), transparent);
+  pointer-events: none;
+  transform: translateY(-60px);
+}
+
+/* Before it's on screen: hidden. */
+.stack--screen:not(.is-visible),
+.stack--screen:not(.is-visible) .stack__row {
+  opacity: 0;
+}
+
+/* "backwards" (not "both"): once an animation ends, the element drops its last frame and goes
+   back to plain styles. Keeping the last frame (a filter and a transform) makes some browsers
+   draw the text as a blurry image. */
+.stack--screen.is-visible {
+  animation: panel-open 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.stack--screen.is-visible .stack__scan {
+  animation: panel-scan 1.1s ease-in 0.2s backwards;
+}
+
+.stack--screen.is-visible .stack__row {
+  animation: card-boot 0.5s ease-out backwards;
+  animation-delay: calc(0.3s + var(--i) * 0.12s);
+}
+
+@keyframes panel-open {
+  from { clip-path: inset(48% 0 48% 0 round 14px); opacity: 0.4; }
+  to { clip-path: inset(0 0 0 0 round 14px); opacity: 1; }
+}
+
+@keyframes panel-scan {
+  from { transform: translateY(-60px); opacity: 1; }
+  to { transform: translateY(400px); opacity: 0; }
+}
+
+@keyframes card-boot {
+  from { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* People who turn off animations get the frame and rows right away, with no motion. */
+@media (prefers-reduced-motion: reduce) {
+  .stack--screen:not(.is-visible),
+  .stack--screen:not(.is-visible) .stack__row {
+    opacity: 1;
+  }
+
+  .stack--screen.is-visible,
+  .stack--screen.is-visible .stack__scan,
+  .stack--screen.is-visible .stack__row,
+  .stack__dot {
+    animation: none;
+  }
+}
+
 /* Blog: a timeline of posts (home section + full page) */
 .section-header {
   display: flex;

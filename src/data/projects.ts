@@ -144,7 +144,7 @@ Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos 
     built: [
       'Built the app in React Native, from one codebase for Android, iOS and the web',
       'Built the backend API in Flask (Python) with a MySQL relational database',
-      'Added paid subscriptions with in-app purchases on Google Play and the App Store, unlocking premium features in the backend',
+      'Helped set the pricing, then added paid subscriptions with in-app purchases on Google Play and the App Store, unlocking premium features in the backend',
       'Integrated AdMob ads to earn revenue from free users, without getting in the way of the main flows',
       'Deployed the web app on AWS EC2 behind Nginx, with HTTPS (Let\'s Encrypt) and S3 + CloudFront for assets',
       'Published and maintain the app on Google Play and the App Store, handling iOS signing, provisioning and permissions',
