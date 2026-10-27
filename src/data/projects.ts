@@ -51,12 +51,12 @@ export const projects: Project[] = [
     context: 'Freelance project',
     role: 'Full-stack & mobile developer',
     period: '2025 – present',
-    team: 'Solo',
+    team: 'Freelance, with the client',
     status: 'Live',
     problem:
       'Filmmakers, crew, students and creatives had no single place to network, show their work, find opportunities and find the people and services they need for their next project.',
     result:
-      'Built solo and shipped from one React Native codebase to Android, iOS and the web, monetized with paid subscriptions and AdMob, with a sneak-peek launch at the Byblos International Film Festival.',
+      'Shipped from one React Native codebase to Android, iOS and the web, monetized with paid subscriptions and AdMob, with a sneak-peek launch at the Byblos International Film Festival.',
     tech: ['React Native', 'Flask', 'MySQL', 'AWS', 'Nginx', 'AdMob'],
     images: [
       '/projects/cinetwork/1.jpg',
@@ -67,13 +67,13 @@ export const projects: Project[] = [
     ],
     overview: `Cinetwork is a professional networking platform for filmmakers, audiovisual professionals, students and creatives. In one place, they can build a professional profile, connect with the industry, find jobs and projects, and discover films, talent and services. Its motto: Connect. Create. Work.
 
-I built it as a freelance project, on my own, from the database to the app stores. It started mobile-first, then the client asked for a web version too, so I adapted the same React Native codebase to run on the web. It's now live on Android, iOS and at thecinetwork.com.
+I built it as a freelancer, working closely with the client, from the database to the app stores. It started mobile-first, then the client asked for a web version too, so I adapted the same React Native codebase to run on the web. It's now live on Android, iOS and at thecinetwork.com.
 
 Cinetwork is also a business: users can pay for subscriptions inside the app, and AdMob ads earn revenue from the free tier.
 
 Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos International Film Festival.`,
     built: [
-      'Built the app solo in React Native, from one codebase for Android, iOS and the web',
+      'Built the app in React Native, from one codebase for Android, iOS and the web',
       'Built the backend API in Flask (Python) with a MySQL relational database',
       'Added paid subscriptions with in-app purchases on Google Play and the App Store, unlocking premium features in the backend',
       'Integrated AdMob ads to earn revenue from free users, without getting in the way of the main flows',
@@ -110,7 +110,7 @@ Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos 
     learnings: [
       'A working app is only half the job. Making it deployed, secure and stable is the other half.',
       'Cross-platform code saves a lot of time, but each platform still has its own rules for permissions, signing, payments and release.',
-      'Freelancing means owning everything: the product, the code, the release and the client relationship.',
+      'Freelancing teaches you to care about everything: the product, the code, the release and the relationship with the client.',
     ],
     liveUrl: 'https://www.thecinetwork.com',
   },
@@ -118,19 +118,19 @@ Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos 
     slug: 'boxmind-ai-backend',
     title: 'boxMind AI: Enterprise AI Products',
     context: 'Company project',
-    role: 'Sole backend engineer',
+    role: 'Backend developer',
     period: 'Jul 2023 – Mar 2026',
-    team: 'Solo on backend, with the AI and frontend teams',
+    team: 'With the AI and frontend teams',
     status: 'In production',
     problem:
       'boxMind, an early-stage enterprise AI company, builds AI products for education, banking and healthcare, and each one needed a secure, scalable backend to take its AI features into production.',
     result:
-      "Over ~3 years as the first employee and only backend engineer, I built the backend behind many of the company's AI products and turned the AI team's work into secure APIs.",
+      "Over almost three years, I built the backend behind many of the company's AI products, turning the AI team's work into secure APIs for the frontend.",
     tech: ['Python', 'FastAPI', 'Flask', 'MySQL', 'Milvus', 'LLMs & RAG', 'Docker', 'AWS'],
     images: ['/projects/boxmind-ai-backend/1.svg'],
     overview: `boxMind is the AI arm of Allied Engineering Group. It builds privacy-first enterprise AI for sectors like banking, government, telecom and healthcare, where security and reliability are not optional.
 
-I joined as the first employee and stayed the only backend engineer, the link between the AI team and the frontend team. I owned the backend end to end: the database architecture, the APIs, security, testing and deployment.
+I joined in the company's early days as its first hire, and for almost three years I was the backend developer working between the AI team and the frontend team. That meant taking care of the database, the APIs, security, testing and deployment.
 
 It wasn't one project but many, over almost three years: AI chatbots and RAG assistants that answer questions over an organization's own documents, AI models for predictions and inference, an education platform bringing new ways of learning into schools, and solutions for banks and hospitals.
 
@@ -145,14 +145,13 @@ The role went beyond code: I was part of the discussions and decisions on which 
       'Integrated LLM calls, RAG, AI agents and model inference into the products, retrieving context from a Milvus vector database that I managed',
       'Designed and refined the prompts behind the AI features',
       'Built background AI workers and data pipelines for long-running AI jobs',
-      'Owned QA: tested the APIs, tracked down bugs and fixed them before release',
+      'Took care of QA: tested the APIs, tracked down bugs and fixed them before release',
       'Containerized the services with Docker and deployed them on AWS (EC2, Lambda, API Gateway), configured the web server, and set up logging, monitoring and error handling',
     ],
     metrics: [
-      { value: '1st', label: 'employee at the company' },
-      { value: 'Solo', label: 'backend engineer' },
+      { value: '~3 years', label: 'building AI products' },
       { value: '3 fields', label: 'education, banking, healthcare' },
-      { value: '~3 years', label: 'owning the backend' },
+      { value: '2 teams', label: 'AI and frontend, connected by the APIs' },
     ],
     challenges: [
       {

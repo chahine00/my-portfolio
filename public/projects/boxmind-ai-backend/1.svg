@@ -7,7 +7,7 @@
   </defs>
   <rect width="1200" height="750" fill="url(#bg)"/>
   <text x="80" y="100" fill="#e8eef6" font-size="44" font-weight="700">boxMind AI · many products, one backend</text>
-  <text x="80" y="146" fill="#8fa6c0" font-size="24">~3 years as the first employee and only backend engineer</text>
+  <text x="80" y="146" fill="#8fa6c0" font-size="24">~3 years building the backend with the AI and frontend teams</text>
 
   <!-- The products: one card per field, each with a colored bar on top -->
   <g>
