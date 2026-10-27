@@ -1,6 +1,7 @@
 // The big welcome section at the top of the page.
 // The text comes from src/data/profile.ts.
 
+import { useEffect, useRef } from 'react'
 import { profile } from '../../data/profile.ts'
 import Icon from '../../components/Icon.tsx'
 import SocialLinks from '../../components/SocialLinks.tsx'
@@ -13,14 +14,32 @@ const initials = profile.name
   .join('')
 
 function Hero() {
+  const nameRef = useRef<HTMLSpanElement>(null)
+
+  // Scrolling down runs the same color sweep as hovering: the further you scroll
+  // (up to 40% of the screen's height), the further the colored band has moved across the name.
+  // The page passes it to the CSS as --sweep (100% = not started, 0% = done).
+  useEffect(() => {
+    function handleScroll() {
+      const progress = Math.min(window.scrollY / (window.innerHeight * 0.4), 1)
+      nameRef.current?.style.setProperty('--sweep', `${100 - progress * 100}%`)
+    }
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
     // id="home" lets the navbar link "/#home" scroll here.
     <section id="home" className="section hero">
       <div className="hero__text">
         <p className="eyebrow">{profile.role}</p>
-        {/* Hover the heading: a color sweep runs across the name. */}
+        {/* Hover the heading, or scroll down: a color sweep runs across the name. */}
         <h1 className="hero__title">
-          Hi, I'm <span className="hero__name">{profile.name}</span>
+          Hi, I'm{' '}
+          <span className="hero__name" ref={nameRef}>
+            {profile.name}
+          </span>
         </h1>
         <p className="hero__tagline">{profile.tagline}</p>
 
