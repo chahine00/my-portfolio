@@ -320,8 +320,9 @@ main {
     min-width: 0;
   }
 
+  /* Phones: the photo sits centered above the text. */
   .hero__photo {
-    align-self: flex-start;
+    align-self: center;
     width: 120px;
     font-size: 2.2rem;
   }
