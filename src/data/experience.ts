@@ -16,6 +16,21 @@ export interface Job {
 
 export const experience: Job[] = [
   {
+    company: 'Freelance',
+    roles: [
+      {
+        title: 'Full-Stack & Mobile Developer',
+        period: '2025 – present',
+        points: [
+          'Built and launched Cinetwork, live on Google Play, the App Store and the web',
+          'Handled the full product for the client, from the database and API to store release and AWS hosting',
+          'Set up paid subscriptions and AdMob ads that earn the app money',
+        ],
+      },
+    ],
+    tech: ['React Native', 'Flask', 'MySQL', 'AWS', 'AdMob'],
+  },
+  {
     company: 'boxMind AI',
     url: 'https://www.linkedin.com/company/boxmindai/',
     roles: [

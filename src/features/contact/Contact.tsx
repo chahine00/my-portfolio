@@ -59,6 +59,15 @@ function Contact() {
     <section id="contact" className="section">
       <h1>Contact</h1>
 
+      {/* One next step for each kind of visitor: companies hiring, and clients with a project. */}
+      <p className="contact-intro">
+        Hiring for a team?{' '}
+        <a href={asset('/Ali_Chahine_CV.pdf')} download="Ali_Chahine_CV.pdf">
+          Download my CV
+        </a>{' '}
+        or email me. Have a project in mind? Send me a message below and I'll get back to you.
+      </p>
+
       {/* Direct contact details, read from src/data/contact.ts.
           Links starting with https open in a new tab; tel: and mailto: don't need to. */}
       <ul className="contact-list">
