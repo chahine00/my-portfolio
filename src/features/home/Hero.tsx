@@ -52,6 +52,9 @@ function useTypingLoop(phrases: string[]) {
   return text
 }
 
+// The longest phrase, used to reserve room for the typing line.
+const longestPhrase = profile.building.reduce((a, b) => (b.length > a.length ? b : a))
+
 function Hero() {
   const typed = useTypingLoop(profile.building)
   const nameRef = useRef<HTMLSpanElement>(null)
@@ -85,6 +88,11 @@ function Hero() {
 
         {/* A line of "code" that keeps typing what you build. Screen readers get the full list once instead. */}
         <p className="hero__code" aria-label={`I build ${profile.building.join(', ')}`}>
+          {/* An invisible copy of the LONGEST phrase sits in the same spot and sets the line's size,
+              so the page (and your photo next to it) doesn't jump when a long phrase wraps. */}
+          <span className="hero__code-ghost" aria-hidden="true">
+            &gt; ali.build('{longestPhrase}')
+          </span>
           <span aria-hidden="true">
             <span className="hero__code-prompt">&gt;</span> ali.build(<span className="hero__code-string">'{typed}</span>
             <span className="hero__code-caret" />
