@@ -1,5 +1,5 @@
 // Your work history, newest first. Shown in the Experience section.
-// Keep it short: max 6 points per role, each one line.
+// Keep it short: max 4 points per role, each one line. The details live on the project pages.
 
 export interface Role {
   title: string
@@ -22,8 +22,7 @@ export const experience: Job[] = [
         title: 'Full-Stack & Mobile Developer',
         period: '2025 – present',
         points: [
-          'Built and launched Cinetwork, live on Google Play, the App Store and the web',
-          'Handled the full product for the client, from the database and API to store release and AWS hosting',
+          'Built and launched Cinetwork on Google Play, the App Store and the web, from the database to store release',
           'Set up paid subscriptions and AdMob ads that earn the app money',
         ],
       },
@@ -38,16 +37,14 @@ export const experience: Job[] = [
         title: 'Backend Developer',
         period: 'Jul 2023 – Mar 2026',
         points: [
-          "Joined as the first hire and stayed the team's backend developer, building AI products for education, banking and healthcare",
-          'Architected the databases and APIs, with roles, permissions and per-user data isolation',
-          "Worked with the AI and frontend teams, turning the AI team's logic into secure APIs (JWT)",
-          'Integrated AI features into the backend (LLM calls, RAG with Milvus), with hands-on prompt engineering',
-          'Handled QA, testing and deployment with Docker on AWS, including the web server',
-          'Took part in product decisions on new features and growth',
+          "First hire and the team's backend developer, building AI products for education, banking and healthcare",
+          "Built the databases and secure APIs (JWT, roles, data isolation) that bring the AI team's work to the frontend",
+          'Integrated LLM calls and RAG with Milvus, with hands-on prompt engineering',
+          'Handled QA and Docker deployment on AWS, and took part in product decisions',
         ],
       },
     ],
-    tech: ['Python', 'FastAPI', 'Flask', 'MySQL', 'Milvus', 'LLMs', 'RAG', 'AI Agents', 'Docker', 'AWS'],
+    tech: ['Python', 'FastAPI', 'MySQL', 'Milvus', 'LLMs & RAG', 'Docker', 'AWS'],
   },
   {
     company: 'Mobile Arts',
@@ -56,7 +53,7 @@ export const experience: Job[] = [
       {
         title: 'Junior Full-Stack Developer',
         period: 'Nov 2022 – Apr 2023',
-        points: ['Built features with ASP.NET Core & Angular', 'Migrated legacy systems to .NET Core', 'Built AWS Lambda services'],
+        points: ['Built features with ASP.NET Core & Angular and moved legacy systems to .NET Core', 'Built AWS Lambda services'],
       },
       {
         title: 'Mobile Developer & Intern',

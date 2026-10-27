@@ -6,7 +6,7 @@ import { sortedUpdates } from '../../data/updates.ts'
 import UpdateTimeline from './UpdateTimeline.tsx'
 
 // How many posts to preview on the home page.
-const PREVIEW_COUNT = 3
+const PREVIEW_COUNT = 2
 
 function Updates() {
   return (
@@ -19,7 +19,7 @@ function Updates() {
       </div>
       <p className="page-intro">News, thoughts and things I've been working on.</p>
 
-      {/* .slice(0, 3) takes only the first 3 items (the newest ones). */}
+      {/* .slice(0, 2) takes only the first 2 items (the newest ones). */}
       <UpdateTimeline updates={sortedUpdates.slice(0, PREVIEW_COUNT)} />
 
       <div className="updates-footer">
