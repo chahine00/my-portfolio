@@ -1461,7 +1461,8 @@ a {
    The lane is the empty space it has at the top (left of the links on big screens,
    left of the theme button on phones). The name glides from one end of it to the other and back. */
 .navbar__lane {
-  position: relative;
+  /* Lets the name measure the lane's width (100cqw below). */
+  container-type: inline-size;
   /* Clip the letters' little jump sideways, but leave room above and below for the wave. */
   overflow-x: clip;
   padding-block: 6px;
@@ -1469,23 +1470,20 @@ a {
 }
 
 .navbar__brand {
-  position: relative;
   display: inline-flex;
   align-items: center;
-  /* Two moves at once make it stop exactly at the far end, whatever the lane's width:
-     "left" pushes it across the lane (% of the lane), and translateX pulls it back by its
-     own width (% of the name), so its right edge lands on the lane's right edge. */
   animation: brand-glide 9s ease-in-out infinite alternate;
 }
 
+/* It travels the lane's width (100cqw) minus its own width (100%), so its right edge stops
+   exactly at the lane's right edge, whatever the screen size. Only "transform" moves it:
+   mixing it with "left" made the name jump back when the animation paused on hover. */
 @keyframes brand-glide {
   from {
-    left: 0%;
-    transform: translateX(0%);
+    transform: translateX(0);
   }
   to {
-    left: 100%;
-    transform: translateX(-100%);
+    transform: translateX(calc(100cqw - 100%));
   }
 }
 
