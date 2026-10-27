@@ -4,10 +4,6 @@
 
 const coreStack = [
   {
-    category: 'AI & LLMs',
-    skills: ['LLMs', 'Prompt Engineering', 'LangChain', 'RAG Pipelines', 'AI Agents', 'Embeddings', 'Milvus', 'vLLM'],
-  },
-  {
     category: 'Backend',
     skills: ['Python', 'FastAPI', 'Django', 'Flask', 'Node.js', 'Express.js', 'C# / ASP.NET Core'],
   },
@@ -18,6 +14,10 @@ const coreStack = [
   {
     category: 'Data & Cloud',
     skills: ['MySQL', 'MongoDB', 'DynamoDB', 'AWS (Lambda, EC2)', 'Docker', 'CI/CD'],
+  },
+  {
+    category: 'AI Integration',
+    skills: ['LLMs', 'Prompt Engineering', 'LangChain', 'RAG Pipelines', 'AI Agents', 'Embeddings', 'Milvus', 'vLLM'],
   },
 ]
 
