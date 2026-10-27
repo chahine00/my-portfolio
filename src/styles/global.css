@@ -345,6 +345,7 @@ main {
   /* Phones: the two buttons share a row, the icon links get their own row under them. */
   .hero-actions .social-links {
     flex-basis: 100%;
+    margin-top: 8px; /* a little more room under the buttons than between them */
   }
 
   /* Phones: the photo sits centered above the text. */
