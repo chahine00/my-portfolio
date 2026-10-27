@@ -1631,18 +1631,19 @@ a {
   50% { transform: scale(1.6); opacity: 0; }
 }
 
-/* "Open to new opportunities" gives a quick little shake, then rests, every 4 seconds,
+/* "Open to new opportunities" gives a clear little shake, then rests, every 3 seconds,
    to catch the eye without moving away from its place. */
 .hero__available {
-  animation: available-shake 4s ease-in-out infinite;
+  animation: available-shake 3s ease-in-out infinite;
 }
 
 @keyframes available-shake {
-  0%, 15%, 100% { transform: translateX(0) rotate(0); }
-  3% { transform: translateX(-2px) rotate(-1deg); }
-  6% { transform: translateX(2px) rotate(1deg); }
-  9% { transform: translateX(-2px) rotate(-1deg); }
-  12% { transform: translateX(1px) rotate(0.5deg); }
+  0%, 24%, 100% { transform: translateX(0) rotate(0); }
+  4% { transform: translateX(-4px) rotate(-2deg); }
+  8% { transform: translateX(4px) rotate(2deg); }
+  12% { transform: translateX(-4px) rotate(-2deg); }
+  16% { transform: translateX(3px) rotate(1deg); }
+  20% { transform: translateX(-2px) rotate(-0.5deg); }
 }
 
 /* People who turn off animations in their settings get it standing still. */
