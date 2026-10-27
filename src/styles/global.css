@@ -572,6 +572,11 @@ main {
   margin-top: 24px;
 }
 
+.hero-talk {
+  padding: 0 4px;
+  font-weight: 600;
+}
+
 .button-outline {
   background: transparent;
   color: var(--accent);
@@ -1272,6 +1277,25 @@ main {
 .contact-list a {
   color: var(--accent);
   overflow-wrap: anywhere;
+}
+
+/* The small round WhatsApp button next to a phone number, in WhatsApp green. */
+.contact-list a.contact-whatsapp {
+  display: inline-grid;
+  place-items: center;
+  align-self: center;
+  width: 34px;
+  height: 34px;
+  min-height: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, #25d366 15%, transparent);
+  color: #1da851;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.contact-list a.contact-whatsapp:hover {
+  background: color-mix(in srgb, #25d366 28%, transparent);
+  transform: scale(1.08);
 }
 
 .contact-flag {

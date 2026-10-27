@@ -8,6 +8,7 @@ import type { SubmitEvent } from 'react'
 import { sendContactMessage } from '../../services/api.ts'
 import { contacts } from '../../data/contact.ts'
 import { asset } from '../../utils/asset.ts'
+import Icon from '../../components/Icon.tsx'
 
 // A "union type": status can ONLY be one of these four strings.
 // TypeScript will show an error if you try to set anything else (like 'done').
@@ -85,6 +86,19 @@ function Contact() {
               {contact.flag && <img src={asset(contact.flag)} alt="" className="contact-flag" />}
               {contact.value}
             </a>
+            {/* Numbers that are also on WhatsApp get a small button that opens a chat. */}
+            {contact.whatsapp && (
+              <a
+                href={contact.whatsapp}
+                target="_blank"
+                rel="noreferrer"
+                className="contact-whatsapp"
+                aria-label={`WhatsApp ${contact.value}`}
+                title="Chat on WhatsApp"
+              >
+                <Icon name="whatsapp" size={18} />
+              </a>
+            )}
           </li>
         ))}
       </ul>
