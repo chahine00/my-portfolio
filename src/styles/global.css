@@ -302,7 +302,10 @@ main {
     grid-template-areas:
       'brand toggle'
       'links links';
-    padding: 10px 16px 6px;
+    /* The top padding and row gap are balanced so the name sits halfway between
+       the top edge and the links row. */
+    gap: 4px 16px;
+    padding: 17px 16px 6px;
   }
 
   .navbar__lane {
@@ -1415,9 +1418,26 @@ main {
   }
 }
 
+/* The arrow hops upward twice, then rests, every 2 seconds: a hint that it takes you up.
+   Only the arrow moves, so the button's own hover and press effects still work. */
+.back-to-top svg {
+  animation: back-to-top-hop 2s ease-in-out infinite;
+}
+
+@keyframes back-to-top-hop {
+  0%, 40%, 100% { transform: translateY(0); }
+  10% { transform: translateY(-5px); }
+  20% { transform: translateY(0); }
+  30% { transform: translateY(-3px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .back-to-top:hover {
     transform: none;
+  }
+
+  .back-to-top svg {
+    animation: none;
   }
 }
 
