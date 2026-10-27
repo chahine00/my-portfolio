@@ -12,7 +12,7 @@ export const profile = {
   // Typed out one by one under the tagline, like code being written. Keep each one short.
   building: [
     'secure APIs & databases',
-    'mcross-platform mobile apps',         // Focus on business/internal use
+    'cross-platform mobile apps',         // Focus on business/internal use
     'LLM & RAG features',
     'web apps, end to end'
   ]}
