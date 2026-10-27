@@ -134,7 +134,7 @@ I joined in the company's early days as its first hire, and for almost three yea
 
 It wasn't one project but many, over almost three years: AI chatbots and RAG assistants that answer questions over an organization's own documents, AI models for predictions and inference, an education platform bringing new ways of learning into schools, and solutions for banks and hospitals.
 
-On the AI side, I turned the AI team's logic into secure API calls and built AI into the product: LLM calls, retrieval-augmented generation (RAG) over a Milvus vector database, AI agents, background AI workers and the data pipelines behind them. It gave me hands-on experience with LLMs, prompt engineering and agent design.
+My focus was the backend, but working next to the AI team gave me hands-on experience with AI: I connected their work to the products through LLM calls, retrieval-augmented generation (RAG) over a Milvus vector database, background AI workers and data pipelines, and I worked on prompts and AI agents along the way.
 
 The role went beyond code: I was part of the discussions and decisions on which features to build and how to grow the product.`,
     built: [
@@ -142,9 +142,9 @@ The role went beyond code: I was part of the discussions and decisions on which 
       'Built the APIs in FastAPI and Flask, with clear API, business-logic and data layers, and the folder structure and coding principles behind them',
       "Exposed the AI team's logic to the frontend through secure endpoints, with JWT authentication and middleware guards",
       "Designed roles and permissions (RBAC) and strict data isolation: each user's data stays private, and private rooms are open only to their members",
-      'Integrated LLM calls, RAG, AI agents and model inference into the products, retrieving context from a Milvus vector database that I managed',
-      'Designed and refined the prompts behind the AI features',
-      'Built background AI workers and data pipelines for long-running AI jobs',
+      'Integrated the AI team\'s LLM, RAG and inference features into the backend, with retrieval from a Milvus vector database that I managed',
+      'Helped write and refine the prompts behind the AI features',
+      'Set up background workers and data pipelines for long-running AI jobs',
       'Took care of QA: tested the APIs, tracked down bugs and fixed them before release',
       'Containerized the services with Docker and deployed them on AWS (EC2, Lambda, API Gateway), configured the web server, and set up logging, monitoring and error handling',
     ],

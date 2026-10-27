@@ -26,7 +26,7 @@ export const experience: Job[] = [
           "Joined as the first hire and stayed the team's backend developer, building AI products for education, banking and healthcare",
           'Architected the databases and APIs, with roles, permissions and per-user data isolation',
           "Worked with the AI and frontend teams, turning the AI team's logic into secure APIs (JWT)",
-          'Built chatbots, RAG, AI agents and inference features on Milvus, with prompt engineering',
+          'Integrated AI features into the backend (LLM calls, RAG with Milvus), with hands-on prompt engineering',
           'Handled QA, testing and deployment with Docker on AWS, including the web server',
           'Took part in product decisions on new features and growth',
         ],
