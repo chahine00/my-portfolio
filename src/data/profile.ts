@@ -6,7 +6,7 @@ export const profile = {
   role: 'Software Engineer',
   tagline: 'I build end-to-end software solutions.',
   location: 'Beirut, Lebanon',
-  availability: 'Open to full-time roles & freelance projects', // set to '' to hide it
+  availability: "Hiring or got a project? Let's make it happen", // set to '' to hide it
   // Your photo in /public, e.g. '/photo.jpg'. Until you add one, your initials are shown.
   photo: '/photo.jpg',
 }
