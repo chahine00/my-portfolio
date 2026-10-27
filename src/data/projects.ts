@@ -48,15 +48,16 @@ export const projects: Project[] = [
   {
     slug: 'cinetwork',
     title: 'Cinetwork',
-    context: 'Client project',
+    context: 'Freelance project',
     role: 'Full-stack & mobile developer',
     period: '2025 – present',
+    team: 'Solo',
     status: 'Live',
     problem:
-      'Film students, independent creators and industry experts in Lebanon had no single place to find each other, collaborate on projects and book production services.',
+      'Filmmakers, crew, students and creatives had no single place to network, show their work, find opportunities and find the people and services they need for their next project.',
     result:
-      'One React Native codebase shipped to Android, iOS and the web, with a sneak-peek launch at the Byblos International Film Festival.',
-    tech: ['React Native', 'Flask', 'MySQL', 'AWS', 'Nginx'],
+      'Built solo and shipped from one React Native codebase to Android, iOS and the web, monetized with paid subscriptions and AdMob, with a sneak-peek launch at the Byblos International Film Festival.',
+    tech: ['React Native', 'Flask', 'MySQL', 'AWS', 'Nginx', 'AdMob'],
     images: [
       '/projects/cinetwork/1.jpg',
       '/projects/cinetwork/2.jpg',
@@ -64,29 +65,41 @@ export const projects: Project[] = [
       '/projects/cinetwork/4.jpg',
       '/projects/cinetwork/5.jpg',
     ],
-    overview: `Cinetwork is a networking platform for the film and cinema community: students, independent filmmakers and experts in film production, post-production, social media and music.
+    overview: `Cinetwork is a professional networking platform for filmmakers, audiovisual professionals, students and creatives. In one place, they can build a professional profile, connect with the industry, find jobs and projects, and discover films, talent and services. Its motto: Connect. Create. Work.
 
-I built it as a cross-platform React Native app. It started mobile-first, then the client asked for a web version too, so I adapted the same codebase to run on the web and deployed it on AWS with a custom domain and HTTPS. The same app is now available on Android, iOS and at thecinetwork.com.
+I built it as a freelance project, on my own, from the database to the app stores. It started mobile-first, then the client asked for a web version too, so I adapted the same React Native codebase to run on the web. It's now live on Android, iOS and at thecinetwork.com.
+
+Cinetwork is also a business: users can pay for subscriptions inside the app, and AdMob ads earn revenue from the free tier.
 
 Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos International Film Festival.`,
     built: [
-      'Built the app in React Native from one codebase for Android, iOS and the web',
+      'Built the app solo in React Native, from one codebase for Android, iOS and the web',
       'Built the backend API in Flask (Python) with a MySQL relational database',
+      'Added paid subscriptions with in-app purchases on Google Play and the App Store, unlocking premium features in the backend',
+      'Integrated AdMob ads to earn revenue from free users, without getting in the way of the main flows',
       'Deployed the web app on AWS EC2 behind Nginx, with HTTPS (Let\'s Encrypt) and S3 + CloudFront for assets',
-      'Published the app on Google Play and the App Store, handling iOS signing, provisioning and permissions',
+      'Published and maintain the app on Google Play and the App Store, handling iOS signing, provisioning and permissions',
     ],
     features: [
-      'Student and expert profiles, with guest browsing',
-      'Categories for film production, post-production, social media and music',
-      'Student hub to collaborate, find a crew and showcase projects',
-      'Streaming for student and independent films',
-      'PR and video production services with a contact flow',
+      'Professional profiles with CV, portfolio, experience and showreel',
+      'Networking with filmmakers, crew, creatives, students and industry professionals',
+      'Jobs, projects and opportunities in the audiovisual industry',
+      'An availability status, so productions can find available talent',
+      'Discovery of student and independent films and emerging filmmakers',
+      'A student space with workshops, internships, discounts, facilities and project support',
+      'Exclusive offers from businesses that support the industry',
+      'Premium subscriptions, with ads on the free tier',
     ],
     challenges: [
       {
         challenge: 'Turning a mobile-first React Native app into a production web app.',
         solution:
           'Adapted the build for the web and set up EC2, Nginx SPA routing, DNS and SSL. Then I fixed the mixed-content, CORS and API-routing issues between the frontend, the backend and CloudFront.',
+      },
+      {
+        challenge: 'Making money from the app without hurting the experience, on two stores with different payment rules.',
+        solution:
+          'Used each store\'s own in-app subscriptions, kept the subscription status in the backend as the single source of truth, and placed ads only where they don\'t interrupt the core flows.',
       },
       {
         challenge: 'Shipping the same app to the App Store after Android.',
@@ -96,27 +109,30 @@ Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos 
     ],
     learnings: [
       'A working app is only half the job. Making it deployed, secure and stable is the other half.',
-      'Cross-platform code saves a lot of time, but each platform still has its own rules for permissions, signing and release.',
+      'Cross-platform code saves a lot of time, but each platform still has its own rules for permissions, signing, payments and release.',
+      'Freelancing means owning everything: the product, the code, the release and the client relationship.',
     ],
     liveUrl: 'https://www.thecinetwork.com',
   },
   {
     slug: 'boxmind-ai-backend',
-    title: 'boxMind AI: Backend Platform',
+    title: 'boxMind AI: Enterprise AI Products',
     context: 'Company project',
     role: 'Sole backend engineer',
     period: 'Jul 2023 – Mar 2026',
     team: 'Solo on backend, with the AI and frontend teams',
     status: 'In production',
     problem:
-      'boxMind, an early-stage enterprise AI company, needed a secure and scalable backend from day one to take its AI and LLM features into production.',
+      'boxMind, an early-stage enterprise AI company, builds AI products for education, banking and healthcare, and each one needed a secure, scalable backend to take its AI features into production.',
     result:
-      "As the first employee and only backend engineer, I built the backend from the ground up and turned the AI team's work into the secure APIs the product runs on.",
-    tech: ['Python', 'FastAPI', 'Flask', 'MySQL', 'Milvus', 'LLMs & RAG', 'AWS'],
+      "Over ~3 years as the first employee and only backend engineer, I built the backend behind many of the company's AI products and turned the AI team's work into secure APIs.",
+    tech: ['Python', 'FastAPI', 'Flask', 'MySQL', 'Milvus', 'LLMs & RAG', 'Docker', 'AWS'],
     images: ['/projects/boxmind-ai-backend/1.svg'],
     overview: `boxMind is the AI arm of Allied Engineering Group. It builds privacy-first enterprise AI for sectors like banking, government, telecom and healthcare, where security and reliability are not optional.
 
 I joined as the first employee and stayed the only backend engineer, the link between the AI team and the frontend team. I owned the backend end to end: the database architecture, the APIs, security, testing and deployment.
+
+It wasn't one project but many, over almost three years: AI chatbots and RAG assistants that answer questions over an organization's own documents, AI models for predictions and inference, an education platform bringing new ways of learning into schools, and solutions for banks and hospitals.
 
 On the AI side, I turned the AI team's logic into secure API calls and built AI into the product: LLM calls, retrieval-augmented generation (RAG) over a Milvus vector database, AI agents, background AI workers and the data pipelines behind them. It gave me hands-on experience with LLMs, prompt engineering and agent design.
 
@@ -124,19 +140,26 @@ The role went beyond code: I was part of the discussions and decisions on which 
     built: [
       'Architected the MySQL database from scratch: schema, relationships, data models and query tuning',
       'Built the APIs in FastAPI and Flask, with clear API, business-logic and data layers, and the folder structure and coding principles behind them',
-      "Exposed the AI team's logic to the frontend through secure endpoints, with JWT authentication, role-based access control (RBAC) and middleware guards",
-      'Integrated LLM calls, RAG and AI agents into the product, retrieving context from a Milvus vector database that I managed',
+      "Exposed the AI team's logic to the frontend through secure endpoints, with JWT authentication and middleware guards",
+      "Designed roles and permissions (RBAC) and strict data isolation: each user's data stays private, and private rooms are open only to their members",
+      'Integrated LLM calls, RAG, AI agents and model inference into the products, retrieving context from a Milvus vector database that I managed',
       'Designed and refined the prompts behind the AI features',
       'Built background AI workers and data pipelines for long-running AI jobs',
       'Owned QA: tested the APIs, tracked down bugs and fixed them before release',
-      'Deployed on AWS (EC2, Lambda, API Gateway), configured the web server, and set up logging, monitoring and error handling',
+      'Containerized the services with Docker and deployed them on AWS (EC2, Lambda, API Gateway), configured the web server, and set up logging, monitoring and error handling',
     ],
     metrics: [
       { value: '1st', label: 'employee at the company' },
       { value: 'Solo', label: 'backend engineer' },
+      { value: '3 fields', label: 'education, banking, healthcare' },
       { value: '~3 years', label: 'owning the backend' },
     ],
     challenges: [
+      {
+        challenge: 'Users of the same platform held sensitive data (bank, patient and student records) that had to stay private, even from each other.',
+        solution:
+          'Scoped every query in the backend to the user and the rooms they belong to, on top of role permissions, so no one can reach another user\'s data or private room.',
+      },
       {
         challenge: "The AI team's logic had to reach the frontend without exposing the models, prompts or data behind it.",
         solution:
@@ -157,6 +180,7 @@ The role went beyond code: I was part of the discussions and decisions on which 
       'The first decisions (the schema, the folder structure, the conventions) shape everything a team builds afterwards.',
       'Security belongs in the architecture from day one, not added at the end.',
       'Good AI features depend as much on retrieval, data and prompts as on the model itself.',
+      'One well-designed backend can serve products in very different fields, if security and data isolation are built into its core.',
       'Being in product decisions makes you build the right things, not only build things right.',
     ],
     note: 'The code is in a private company repository, so it can\'t be shared.',

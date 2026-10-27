@@ -6,29 +6,56 @@
     </linearGradient>
   </defs>
   <rect width="1200" height="750" fill="url(#bg)"/>
-  <text x="80" y="110" fill="#e8eef6" font-size="44" font-weight="700">boxMind AI · Backend Platform</text>
-  <text x="80" y="158" fill="#8fa6c0" font-size="24">Architecture I designed and owned as the first backend engineer</text>
+  <text x="80" y="100" fill="#e8eef6" font-size="44" font-weight="700">boxMind AI · many products, one backend</text>
+  <text x="80" y="146" fill="#8fa6c0" font-size="24">~3 years as the first employee and only backend engineer</text>
 
-  <g font-size="26" font-weight="600">
-    <rect x="80" y="210" width="1040" height="78" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
-    <text x="110" y="258" fill="#e8eef6">Clients · web apps · AI team services</text>
+  <!-- The products: one card per field, each with a colored bar on top -->
+  <g>
+    <rect x="80" y="190" width="245" height="118" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
+    <rect x="80" y="190" width="245" height="8" rx="4" fill="#3fae95"/>
+    <text x="104" y="244" fill="#e8eef6" font-size="25" font-weight="600">Chatbots &amp; RAG</text>
+    <text x="104" y="278" fill="#8fa6c0" font-size="18">Q&amp;A over private docs</text>
 
-    <rect x="80" y="306" width="1040" height="78" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
-    <text x="110" y="354" fill="#e8eef6">API layer · FastAPI / Flask</text>
-    <text x="1090" y="354" fill="#8fa6c0" font-size="20" font-weight="500" text-anchor="end">versioned REST endpoints</text>
+    <rect x="345" y="190" width="245" height="118" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
+    <rect x="345" y="190" width="245" height="8" rx="4" fill="#f0b429"/>
+    <text x="369" y="244" fill="#e8eef6" font-size="25" font-weight="600">Education</text>
+    <text x="369" y="278" fill="#8fa6c0" font-size="18">new ways of learning</text>
 
-    <rect x="80" y="402" width="1040" height="78" rx="14" fill="#2a2440" stroke="#8b6fd6"/>
-    <text x="110" y="450" fill="#e8eef6">Security · JWT auth · RBAC guards</text>
-    <text x="1090" y="450" fill="#b9a8ec" font-size="20" font-weight="500" text-anchor="end">validation · rate limiting</text>
+    <rect x="610" y="190" width="245" height="118" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
+    <rect x="610" y="190" width="245" height="8" rx="4" fill="#5b9bf0"/>
+    <text x="634" y="244" fill="#e8eef6" font-size="25" font-weight="600">Banking</text>
+    <text x="634" y="278" fill="#8fa6c0" font-size="18">secure AI for banks</text>
 
-    <rect x="80" y="498" width="505" height="78" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
-    <text x="110" y="546" fill="#e8eef6">Services · business logic</text>
+    <rect x="875" y="190" width="245" height="118" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
+    <rect x="875" y="190" width="245" height="8" rx="4" fill="#e5737f"/>
+    <text x="899" y="244" fill="#e8eef6" font-size="25" font-weight="600">Healthcare</text>
+    <text x="899" y="278" fill="#8fa6c0" font-size="18">AI for hospitals</text>
+  </g>
 
-    <rect x="615" y="498" width="505" height="78" rx="14" fill="#173f3a" stroke="#3fae95"/>
-    <text x="645" y="546" fill="#e8eef6">LLM layer · prompts</text>
+  <!-- Lines from each product down into the shared backend -->
+  <g stroke="#3b6ea5" stroke-width="2" stroke-dasharray="5 5">
+    <line x1="202" y1="308" x2="202" y2="346"/>
+    <line x1="467" y1="308" x2="467" y2="346"/>
+    <line x1="732" y1="308" x2="732" y2="346"/>
+    <line x1="997" y1="308" x2="997" y2="346"/>
+  </g>
 
-    <rect x="80" y="594" width="1040" height="78" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
-    <text x="110" y="642" fill="#e8eef6">Data · MySQL schema &amp; models</text>
-    <text x="1090" y="642" fill="#8fa6c0" font-size="20" font-weight="500" text-anchor="end">AWS (Lambda · API Gateway · EC2)</text>
+  <!-- The backend layers I designed -->
+  <g font-size="25" font-weight="600">
+    <rect x="80" y="346" width="1040" height="70" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
+    <text x="110" y="390" fill="#e8eef6">APIs · FastAPI / Flask</text>
+    <text x="1090" y="390" fill="#8fa6c0" font-size="19" font-weight="500" text-anchor="end">secure endpoints for the frontend</text>
+
+    <rect x="80" y="430" width="1040" height="70" rx="14" fill="#2a2440" stroke="#8b6fd6"/>
+    <text x="110" y="474" fill="#e8eef6">Security · JWT · roles &amp; permissions</text>
+    <text x="1090" y="474" fill="#b9a8ec" font-size="19" font-weight="500" text-anchor="end">per-user data isolation · private rooms</text>
+
+    <rect x="80" y="514" width="1040" height="70" rx="14" fill="#173f3a" stroke="#3fae95"/>
+    <text x="110" y="558" fill="#e8eef6">AI · LLM calls · RAG · agents</text>
+    <text x="1090" y="558" fill="#9fdcc9" font-size="19" font-weight="500" text-anchor="end">predictions &amp; inference · prompts</text>
+
+    <rect x="80" y="598" width="1040" height="70" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
+    <text x="110" y="642" fill="#e8eef6">Data · MySQL · Milvus vectors</text>
+    <text x="1090" y="642" fill="#8fa6c0" font-size="19" font-weight="500" text-anchor="end">Docker · AWS</text>
   </g>
 </svg>

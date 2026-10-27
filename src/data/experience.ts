@@ -1,5 +1,5 @@
 // Your work history, newest first. Shown in the Experience section.
-// Keep it short: max 5 points per role, each one line.
+// Keep it short: max 6 points per role, each one line.
 
 export interface Role {
   title: string
@@ -23,15 +23,16 @@ export const experience: Job[] = [
         title: 'Backend Developer',
         period: 'Jul 2023 – Mar 2026',
         points: [
-          'First employee and sole backend engineer: architected the database and built the APIs',
-          "Turned the AI team's logic into secure APIs for the frontend team (JWT, RBAC)",
-          'Built LLM, RAG and AI-agent features on a Milvus vector database, with prompt engineering',
-          'Owned QA, testing and AWS deployment, including the web server',
+          'First employee and sole backend engineer of AI products for education, banking and healthcare',
+          'Architected the databases and APIs, with roles, permissions and per-user data isolation',
+          "Turned the AI team's logic into secure APIs for the frontend team (JWT)",
+          'Built chatbots, RAG, AI agents and inference features on Milvus, with prompt engineering',
+          'Owned QA, testing and deployment with Docker on AWS, including the web server',
           'Took part in product decisions on new features and growth',
         ],
       },
     ],
-    tech: ['Python', 'FastAPI', 'Flask', 'MySQL', 'Milvus', 'LLMs', 'RAG', 'AI Agents', 'AWS'],
+    tech: ['Python', 'FastAPI', 'Flask', 'MySQL', 'Milvus', 'LLMs', 'RAG', 'AI Agents', 'Docker', 'AWS'],
   },
   {
     company: 'Mobile Arts',
