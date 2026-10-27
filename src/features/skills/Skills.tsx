@@ -5,35 +5,20 @@
 const coreStack = [
   {
     category: 'Backend',
-    skills: ['Python', 'FastAPI', 'Flask', 'Django', 'C# / ASP.NET Core'],
-  },
-  {
-    category: 'Frontend & Mobile',
-    skills: ['JavaScript', 'React', 'React Native', 'Angular'],
-  },
-  {
-    category: 'Data & Cloud',
-    skills: ['SQL (MySQL)', 'NoSQL (MongoDB, DynamoDB, Couchbase)', 'AWS', 'Docker', 'CI/CD'],
+    skills: ['Python', 'FastAPI', 'Flask', 'REST APIs', 'JWT / OAuth2'],
   },
   {
     category: 'AI Integration',
-    skills: ['LLMs', 'Prompt Engineering', 'RAG Pipelines', 'Milvus', 'LangChain', 'AI Agents'],
+    skills: ['LLMs', 'RAG Pipelines', 'Milvus', 'Prompt Engineering', 'AI Agents'],
   },
-]
-
-// Shown as one quiet line under the core stack. Things you've used, but aren't your main pitch.
-const alsoWorkedWith = [
-  'Node.js',
-  'Express.js',
-  'Embeddings',
-  'vLLM',
-  'WebSockets / Socket.IO',
-  'n8n',
-  'Apache Airflow',
-  'Nginx',
-  'Linux',
-  'JWT / OAuth2',
-  'Xamarin',
+  {
+    category: 'Data & Cloud',
+    skills: ['SQL (MySQL)', 'Docker', 'AWS', 'Nginx', 'CI/CD'],
+  },
+  {
+    category: 'Mobile',
+    skills: ['React Native'],
+  },
 ]
 
 function Skills() {
@@ -54,11 +39,6 @@ function Skills() {
           </div>
         ))}
       </div>
-
-      {/* .join(' · ') turns the array into one string with dots between the items. */}
-      <p className="stack__also">
-        <span>Also worked with:</span> {alsoWorkedWith.join(' · ')}
-      </p>
     </section>
   )
 }

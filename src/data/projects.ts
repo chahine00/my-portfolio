@@ -46,75 +46,6 @@ export interface Project {
 // Order matters: put your strongest project first. 3 strong projects beat 10 average ones.
 export const projects: Project[] = [
   {
-    slug: 'cinetwork',
-    title: 'Cinetwork',
-    context: 'Freelance project',
-    role: 'Mobile, web & backend',
-    period: '2025 – present',
-    team: 'Freelance, with the client',
-    status: 'Live',
-    problem:
-      'Filmmakers, crew, students and creatives had no single place to network, show their work, find opportunities and find the people and services they need for their next project.',
-    result:
-      'Shipped from one React Native codebase to Android, iOS and the web, monetized with paid subscriptions and AdMob, with a sneak-peek launch at the Byblos International Film Festival.',
-    tech: ['React Native', 'Flask', 'MySQL', 'AWS', 'Nginx', 'AdMob'],
-    images: [
-      '/projects/cinetwork/1.jpg',
-      '/projects/cinetwork/2.jpg',
-      '/projects/cinetwork/3.jpg',
-      '/projects/cinetwork/4.jpg',
-      '/projects/cinetwork/5.jpg',
-    ],
-    overview: `Cinetwork is a professional networking platform for filmmakers, audiovisual professionals, students and creatives. In one place, they can build a professional profile, connect with the industry, find jobs and projects, and discover films, talent and services. Its motto: Connect. Create. Work.
-
-I built it as a freelancer, working closely with the client, from the database to the app stores. It started mobile-first, then the client asked for a web version too, so I adapted the same React Native codebase to run on the web. It's now live on Android, iOS and at thecinetwork.com.
-
-Cinetwork is also a business: users can pay for subscriptions inside the app, and AdMob ads earn revenue from the free tier.
-
-Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos International Film Festival.`,
-    built: [
-      'Built the app in React Native, from one codebase for Android, iOS and the web',
-      'Built the backend API in Flask (Python) with a MySQL relational database',
-      'Added paid subscriptions with in-app purchases on Google Play and the App Store, unlocking premium features in the backend',
-      'Integrated AdMob ads to earn revenue from free users, without getting in the way of the main flows',
-      'Deployed the web app on AWS EC2 behind Nginx, with HTTPS (Let\'s Encrypt) and S3 + CloudFront for assets',
-      'Published and maintain the app on Google Play and the App Store, handling iOS signing, provisioning and permissions',
-    ],
-    features: [
-      'Professional profiles with CV, portfolio, experience and showreel',
-      'Networking with filmmakers, crew, creatives, students and industry professionals',
-      'Jobs, projects and opportunities in the audiovisual industry',
-      'An availability status, so productions can find available talent',
-      'Discovery of student and independent films and emerging filmmakers',
-      'A student space with workshops, internships, discounts, facilities and project support',
-      'Exclusive offers from businesses that support the industry',
-      'Premium subscriptions, with ads on the free tier',
-    ],
-    challenges: [
-      {
-        challenge: 'Turning a mobile-first React Native app into a production web app.',
-        solution:
-          'Adapted the build for the web and set up EC2, Nginx SPA routing, DNS and SSL. Then I fixed the mixed-content, CORS and API-routing issues between the frontend, the backend and CloudFront.',
-      },
-      {
-        challenge: 'Making money from the app without hurting the experience, on two stores with different payment rules.',
-        solution:
-          'Used each store\'s own in-app subscriptions, kept the subscription status in the backend as the single source of truth, and placed ads only where they don\'t interrupt the core flows.',
-      },
-      {
-        challenge: 'Shipping the same app to the App Store after Android.',
-        solution:
-          'Learned the iOS pipeline: user-facing permission texts in Info.plist, signing through Apple Developer accounts and provisioning profiles, and builds through App Store Connect.',
-      },
-    ],
-    learnings: [
-      'A working app is only half the job. Making it deployed, secure and stable is the other half.',
-      'Cross-platform code saves a lot of time, but each platform still has its own rules for permissions, signing, payments and release.',
-      'Freelancing teaches you to care about everything: the product, the code, the release and the relationship with the client.',
-    ],
-    liveUrl: 'https://www.thecinetwork.com',
-  },
-  {
     slug: 'boxmind-ai-backend',
     title: 'boxMind AI: Enterprise AI Products',
     context: 'Company project',
@@ -185,42 +116,71 @@ The role went beyond code: I was part of the discussions and decisions on which 
     note: 'The code is in a private company repository, so it can\'t be shared.',
   },
   {
-    slug: 'portfolio-website',
-    title: 'Portfolio Website',
-    context: 'Personal project',
-    role: 'Frontend & design',
-    period: '2026',
-    team: 'Solo',
+    slug: 'cinetwork',
+    title: 'Cinetwork',
+    context: 'Freelance project',
+    role: 'Mobile, web & backend',
+    period: '2025 – present',
+    team: 'Freelance, with the client',
     status: 'Live',
     problem:
-      'I needed one place to show my work, share news and let recruiters reach me without depending on other platforms.',
-    tech: ['React', 'TypeScript', 'Vite', 'React Router'],
+      'End-to-end cross-platform app (React Native, Flask, MySQL, AWS) enabling film community networking.',
+    result: 'Monetized with subscriptions & AdMob; featured at the Byblos International Film Festival.',
+    tech: ['React Native', 'Flask', 'MySQL', 'AWS', 'Nginx', 'AdMob'],
     images: [
-      '/projects/portfolio-website/1.png',
-      '/projects/portfolio-website/2.png',
-      '/projects/portfolio-website/3.png',
+      '/projects/cinetwork/1.jpg',
+      '/projects/cinetwork/2.jpg',
+      '/projects/cinetwork/3.jpg',
+      '/projects/cinetwork/4.jpg',
+      '/projects/cinetwork/5.jpg',
     ],
-    overview: `A fast, single-page portfolio that scrolls smoothly between sections, with separate pages for the blog and for each project.
+    overview: `Cinetwork is a professional networking platform for filmmakers, audiovisual professionals, students and creatives. In one place, they can build a professional profile, connect with the industry, find jobs and projects, and discover films, talent and services. Its motto: Connect. Create. Work.
 
-All the content lives in small data files, so adding a project, a post or a contact is a matter of editing a list, not touching the layout.`,
+I built it as a freelancer, working closely with the client, from the database to the app stores. It started mobile-first, then the client asked for a web version too, so I adapted the same React Native codebase to run on the web. It's now live on Android, iOS and at thecinetwork.com.
+
+Cinetwork is also a business: users can pay for subscriptions inside the app, and AdMob ads earn revenue from the free tier.
+
+Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos International Film Festival.`,
     built: [
-      'Built a one-page React + TypeScript site with smooth section navigation and separate pages',
-      'Designed a posts system and project case studies with photo galleries and a full-screen viewer',
-      'Added light/dark themes, a downloadable CV and accessible, keyboard-friendly navigation',
+      'Built the app in React Native, from one codebase for Android, iOS and the web',
+      'Built the backend API in Flask (Python) with a MySQL relational database',
+      'Added paid subscriptions with in-app purchases on Google Play and the App Store, unlocking premium features in the backend',
+      'Integrated AdMob ads to earn revenue from free users, without getting in the way of the main flows',
+      'Deployed the web app on AWS EC2 behind Nginx, with HTTPS (Let\'s Encrypt) and S3 + CloudFront for assets',
+      'Published and maintain the app on Google Play and the App Store, handling iOS signing, provisioning and permissions',
     ],
     features: [
-      'One-page layout with a sticky navbar and back-to-top button',
-      'Blog timeline with a "new post" indicator',
-      'Project case-study pages with photo galleries',
-      'Automatic light and dark mode',
+      'Professional profiles with CV, portfolio, experience and showreel',
+      'Networking with filmmakers, crew, creatives, students and industry professionals',
+      'Jobs, projects and opportunities in the audiovisual industry',
+      'An availability status, so productions can find available talent',
+      'Discovery of student and independent films and emerging filmmakers',
+      'A student space with workshops, internships, discounts, facilities and project support',
+      'Exclusive offers from businesses that support the industry',
+      'Premium subscriptions, with ads on the free tier',
     ],
     challenges: [
       {
-        challenge: 'Keeping the one-page scrolling while also having separate pages.',
+        challenge: 'Turning a mobile-first React Native app into a production web app.',
         solution:
-          'Used React Router for the pages and made the section links point to "/#section", so they work from any page and still scroll smoothly on the home page.',
+          'Adapted the build for the web and set up EC2, Nginx SPA routing, DNS and SSL. Then I fixed the mixed-content, CORS and API-routing issues between the frontend, the backend and CloudFront.',
+      },
+      {
+        challenge: 'Making money from the app without hurting the experience, on two stores with different payment rules.',
+        solution:
+          'Used each store\'s own in-app subscriptions, kept the subscription status in the backend as the single source of truth, and placed ads only where they don\'t interrupt the core flows.',
+      },
+      {
+        challenge: 'Shipping the same app to the App Store after Android.',
+        solution:
+          'Learned the iOS pipeline: user-facing permission texts in Info.plist, signing through Apple Developer accounts and provisioning profiles, and builds through App Store Connect.',
       },
     ],
-    githubUrl: 'https://github.com/chahine00/my-portfolio',
+    learnings: [
+      'A working app is only half the job. Making it deployed, secure and stable is the other half.',
+      'Cross-platform code saves a lot of time, but each platform still has its own rules for permissions, signing, payments and release.',
+      'Freelancing teaches you to care about everything: the product, the code, the release and the relationship with the client.',
+    ],
+    liveUrl: 'https://www.thecinetwork.com',
   },
 ]

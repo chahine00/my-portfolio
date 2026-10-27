@@ -121,10 +121,6 @@ function Hero() {
           <a href={asset('/Ali_Chahine_CV.pdf')} download="Ali_Chahine_CV.pdf" className="button button-outline">
             Download CV
           </a>
-          {/* A light text link, not a third button, so the row stays simple. */}
-          <a href="#contact" className="forward-link hero-talk">
-            Let's talk <span aria-hidden="true">→</span>
-          </a>
           <SocialLinks />
         </div>
       </div>

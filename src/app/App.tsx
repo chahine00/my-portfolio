@@ -37,7 +37,7 @@ function App() {
           "/blog/:slug" → one post. ":slug" is a placeholder for any post name,
                           e.g. /blog/postman-isnt-a-browser
           "/updates…" → the blog's old address. Old shared links are sent on to /blog.
-          "/projects/:slug" → one project's page, e.g. /projects/portfolio-website
+          "/projects/:slug" → one project's page, e.g. /projects/cinetwork
           To add a new page: create its component, add a <Route> here,
           and add a link to it in Navbar.tsx.
           The last route ("*") catches any unknown URL and shows a "Page not found" page.
