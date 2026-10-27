@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent, PointerEvent } from 'react'
+import Icon from './Icon.tsx'
 
 // How long the button stays after the last scroll, in milliseconds.
 const HIDE_AFTER_MS = 2000
@@ -85,7 +86,8 @@ function BackToTop() {
       aria-label="Back to top"
       title="Back to top"
     >
-      ↑
+      {/* An icon, not the ↑ character: phone fonts draw that character thin. */}
+      <Icon name="arrow-up" size={24} />
     </button>
   )
 }

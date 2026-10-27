@@ -1387,9 +1387,10 @@ main {
   border-radius: 50%;
   background: #4f46e5;
   color: #fff;
-  font-size: 1.6rem;
-  font-weight: 700;
-  line-height: 1;
+  /* Centers the arrow icon. */
+  display: grid;
+  place-items: center;
+  padding: 0;
   cursor: pointer;
   box-shadow: 0 0 0 2px #4f46e5, 0 8px 24px rgb(0 0 0 / 0.4);
   transition: transform 0.2s;

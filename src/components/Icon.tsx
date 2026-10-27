@@ -1,6 +1,6 @@
 // Small inline icons. Drawn with SVG, so they take the text color and need no image files.
 
-export type IconName = 'email' | 'linkedin' | 'github' | 'sun' | 'moon' | 'pin'
+export type IconName = 'email' | 'linkedin' | 'github' | 'sun' | 'moon' | 'pin' | 'arrow-up'
 
 interface IconProps {
   name: IconName
@@ -25,6 +25,12 @@ function Icon({ name, size = 20 }: IconProps) {
         <svg {...stroke}>
           <path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" />
           <circle cx="12" cy="10" r="2.5" />
+        </svg>
+      )
+    case 'arrow-up':
+      return (
+        <svg {...stroke}>
+          <path d="M12 19V5M5 12l7-7 7 7" />
         </svg>
       )
     case 'sun':
