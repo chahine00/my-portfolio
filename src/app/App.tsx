@@ -4,6 +4,7 @@
 // To use a component from another file, import it first.
 import { Route, Routes } from 'react-router'
 import Navbar from '../components/Navbar.tsx'
+import BackgroundGlow from '../components/BackgroundGlow.tsx'
 import Footer from '../components/Footer.tsx'
 import BackToTop from '../components/BackToTop.tsx'
 import HomePage from '../features/home/HomePage.tsx'
@@ -20,6 +21,7 @@ function App() {
     // A component must return ONE parent element, and a Fragment lets us
     // group several elements without adding an extra <div> to the page.
     <>
+      <BackgroundGlow />
       <Navbar />
       <main>
         {/*

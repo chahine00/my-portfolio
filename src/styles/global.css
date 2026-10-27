@@ -11,6 +11,10 @@
   --accent: #4f46e5;
   --card: #f6f8fa;
   --border: #d1d9e0;
+  /* Background glows (see BackgroundGlow.tsx): indigo, cyan and pink, kept light so text stays easy to read. */
+  --glow-1: rgb(99 102 241 / 0.16);
+  --glow-2: rgb(6 182 212 / 0.13);
+  --glow-3: rgb(236 72 153 / 0.10);
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.6;
   color: var(--text);
@@ -30,6 +34,10 @@
     --accent: #818cf8;
     --card: #161b22;
     --border: #30363d;
+    /* Dark mode: deeper and dimmer, so they glow without washing out the dark. */
+    --glow-1: rgb(99 102 241 / 0.26);
+    --glow-2: rgb(34 211 238 / 0.12);
+    --glow-3: rgb(168 85 247 / 0.18);
   }
 }
 
@@ -40,6 +48,9 @@
   --accent: #818cf8;
   --card: #161b22;
   --border: #30363d;
+  --glow-1: rgb(99 102 241 / 0.26);
+  --glow-2: rgb(34 211 238 / 0.12);
+  --glow-3: rgb(168 85 247 / 0.18);
 }
 
 *,
@@ -50,7 +61,69 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  /* See-through, so the glows (.bg-glow) show. The page color itself comes from :root above. */
+  background: transparent;
+}
+
+/* Background glows: a layer fixed behind everything, with three big soft color spots. */
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-glow__blob {
+  position: absolute;
+  border-radius: 50%;
+  /* "translate" follows the scroll; "transform" (in the animation) is the slow drift.
+     They're separate properties, so both apply at once. */
+  will-change: transform, translate;
+}
+
+/* Each spot is a radial gradient: full color in the middle, fading to nothing at the edge. */
+.bg-glow__blob--1 {
+  top: -20vmax;
+  left: -15vmax;
+  width: 60vmax;
+  height: 60vmax;
+  background: radial-gradient(circle, var(--glow-1), transparent 70%);
+  translate: calc(var(--scroll, 0) * 25vw) calc(var(--scroll, 0) * 40vh);
+  animation: glow-drift 22s ease-in-out infinite alternate;
+}
+
+.bg-glow__blob--2 {
+  top: 25vh;
+  right: -20vmax;
+  width: 55vmax;
+  height: 55vmax;
+  background: radial-gradient(circle, var(--glow-2), transparent 70%);
+  translate: calc(var(--scroll, 0) * -30vw) calc(var(--scroll, 0) * -25vh);
+  animation: glow-drift 28s ease-in-out infinite alternate-reverse;
+}
+
+.bg-glow__blob--3 {
+  bottom: -25vmax;
+  left: 20vw;
+  width: 50vmax;
+  height: 50vmax;
+  background: radial-gradient(circle, var(--glow-3), transparent 70%);
+  translate: calc(var(--scroll, 0) * 20vw) calc(var(--scroll, 0) * -45vh);
+  animation: glow-drift 34s ease-in-out infinite alternate;
+}
+
+@keyframes glow-drift {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(6vmax, 4vmax) scale(1.15); }
+}
+
+/* People who turn off animations in their settings get still glows. */
+@media (prefers-reduced-motion: reduce) {
+  .bg-glow__blob {
+    translate: none;
+    animation: none;
+  }
 }
 
 a {
@@ -79,7 +152,10 @@ main {
   align-items: center;
   /* Side space grows with the screen: 24px on small laptops up to 48px on big screens. */
   padding: 16px clamp(24px, 4vw, 48px);
-  background: var(--bg);
+  /* Frosted glass: mostly the page color, slightly see-through and blurred, so the glows pass behind it. */
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
 }
 
@@ -1634,7 +1710,7 @@ a {
 /* "Open to new opportunities" gives a clear little shake, then rests, every 3 seconds,
    to catch the eye without moving away from its place. */
 .hero__available {
-  animation: available-shake 3s ease-in-out infinite;
+  animation: available-shake 5s ease-in-out infinite;
 }
 
 @keyframes available-shake {
