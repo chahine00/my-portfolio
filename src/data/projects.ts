@@ -104,33 +104,44 @@ Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos 
     slug: 'boxmind-ai-backend',
     title: 'boxMind AI: Backend Platform',
     context: 'Company project',
-    role: 'Primary backend engineer',
+    role: 'Sole backend engineer',
     period: 'Jul 2023 – Mar 2026',
+    team: 'Solo on backend, with the AI and frontend teams',
     status: 'In production',
     problem:
       'boxMind, an early-stage enterprise AI company, needed a secure and scalable backend from day one to take its AI and LLM features into production.',
     result:
-      'As the first employee, I built the backend from the ground up. Its database, architecture and project structure became the foundation of the product.',
-    tech: ['Python', 'FastAPI', 'Flask', 'MySQL', 'LLMs', 'Prompt Engineering', 'AWS'],
+      "As the first employee and only backend engineer, I built the backend from the ground up and turned the AI team's work into the secure APIs the product runs on.",
+    tech: ['Python', 'FastAPI', 'Flask', 'MySQL', 'Milvus', 'LLMs & RAG', 'AWS'],
     images: ['/projects/boxmind-ai-backend/1.svg'],
     overview: `boxMind is the AI arm of Allied Engineering Group. It builds privacy-first enterprise AI for sectors like banking, government, telecom and healthcare, where security and reliability are not optional.
 
-I joined as the first employee and the primary backend engineer, working closely with the AI team. I owned the backend end to end: the database design, the system architecture, the project folder structure and the coding principles the team followed, and the security layer.
+I joined as the first employee and stayed the only backend engineer, the link between the AI team and the frontend team. I owned the backend end to end: the database architecture, the APIs, security, testing and deployment.
 
-On the AI side, I integrated LLM-powered features into the backend and worked on prompt engineering, so that the AI team's models could run as reliable product features.`,
+On the AI side, I turned the AI team's logic into secure API calls and built AI into the product: LLM calls, retrieval-augmented generation (RAG) over a Milvus vector database, AI agents, background AI workers and the data pipelines behind them. It gave me hands-on experience with LLMs, prompt engineering and agent design.
+
+The role went beyond code: I was part of the discussions and decisions on which features to build and how to grow the product.`,
     built: [
-      'Designed the database from scratch: the MySQL schema, relationships and data models',
-      'Architected the backend in Flask and FastAPI, with clear API, business-logic and data layers',
-      'Defined the project folder structure, model patterns and coding principles the team built on',
-      'Secured the platform with JWT authentication, role-based access control (RBAC) and middleware guards',
-      'Integrated LLM features into production with the AI team, and designed and refined the prompts behind them',
-      'Optimized MySQL queries, deployed on AWS (Lambda, API Gateway, EC2) and set up logging, monitoring and error handling',
+      'Architected the MySQL database from scratch: schema, relationships, data models and query tuning',
+      'Built the APIs in FastAPI and Flask, with clear API, business-logic and data layers, and the folder structure and coding principles behind them',
+      "Exposed the AI team's logic to the frontend through secure endpoints, with JWT authentication, role-based access control (RBAC) and middleware guards",
+      'Integrated LLM calls, RAG and AI agents into the product, retrieving context from a Milvus vector database that I managed',
+      'Designed and refined the prompts behind the AI features',
+      'Built background AI workers and data pipelines for long-running AI jobs',
+      'Owned QA: tested the APIs, tracked down bugs and fixed them before release',
+      'Deployed on AWS (EC2, Lambda, API Gateway), configured the web server, and set up logging, monitoring and error handling',
     ],
     metrics: [
       { value: '1st', label: 'employee at the company' },
+      { value: 'Solo', label: 'backend engineer' },
       { value: '~3 years', label: 'owning the backend' },
     ],
     challenges: [
+      {
+        challenge: "The AI team's logic had to reach the frontend without exposing the models, prompts or data behind it.",
+        solution:
+          'Put it behind authenticated endpoints that check permissions and validate input, keeping prompts, keys and AI calls on the server.',
+      },
       {
         challenge: 'Different products needed different access-control models: some had fixed roles, others had custom roles with flexible permissions.',
         solution:
@@ -139,12 +150,14 @@ On the AI side, I integrated LLM-powered features into the backend and worked on
       {
         challenge: 'LLM output is non-deterministic, but product features need predictable results.',
         solution:
-          'Used prompt engineering with structured prompts and validated the model output in the backend before it reached users.',
+          'Used structured prompts, grounded answers with RAG context, and validated the model output in the backend before it reached users.',
       },
     ],
     learnings: [
       'The first decisions (the schema, the folder structure, the conventions) shape everything a team builds afterwards.',
       'Security belongs in the architecture from day one, not added at the end.',
+      'Good AI features depend as much on retrieval, data and prompts as on the model itself.',
+      'Being in product decisions makes you build the right things, not only build things right.',
     ],
     note: 'The code is in a private company repository, so it can\'t be shared.',
   },
