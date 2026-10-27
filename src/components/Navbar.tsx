@@ -1,6 +1,6 @@
 // The navigation bar at the top of the page.
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { Link, useLocation } from 'react-router'
 import { hasRecentUpdate } from '../data/updates.ts'
@@ -38,6 +38,19 @@ function Navbar() {
   const [activeSection, setActiveSection] = useState('')
   // True once the page is scrolled a little: the navbar then gets a soft shadow.
   const [scrolled, setScrolled] = useState(false)
+  const headerRef = useRef<HTMLElement>(null)
+
+  // Share the navbar's height with the CSS (--navbar-height), so section links stop right
+  // under the bar. It changes with the screen size (on phones the links get their own row).
+  useEffect(() => {
+    const header = headerRef.current
+    if (!header) return
+    const observer = new ResizeObserver(() => {
+      document.documentElement.style.setProperty('--navbar-height', `${header.offsetHeight}px`)
+    })
+    observer.observe(header)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     function handleScroll() {
@@ -67,7 +80,7 @@ function Navbar() {
 
   return (
     // In JSX we write "className" instead of "class" (class is a reserved word in JavaScript).
-    <header className={scrolled ? 'navbar navbar--scrolled' : 'navbar'}>
+    <header ref={headerRef} className={scrolled ? 'navbar navbar--scrolled' : 'navbar'}>
       {/*
         The name is shown as a code tag, <Ali Chahine />. It glides back and forth across the
         empty space at the top (its "lane"), the letters keep doing a little wave, and the tags breathe.

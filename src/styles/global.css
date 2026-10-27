@@ -139,7 +139,9 @@ main {
 
 .section {
   padding: 64px 0;
-  scroll-margin-top: 64px;
+  /* Where a nav link stops: the navbar's real height (set in Navbar.tsx) minus most of the
+     section's top padding, so the heading lands just 24px under the bar instead of far below it. */
+  scroll-margin-top: calc(var(--navbar-height, 64px) - 40px);
 }
 
 /* Navbar */
