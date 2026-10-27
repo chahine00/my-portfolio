@@ -5,7 +5,7 @@
 const coreStack = [
   {
     category: 'Backend',
-    skills: ['Python', 'FastAPI', 'Django', 'Flask', 'Node.js', 'Express.js', 'C# / ASP.NET Core'],
+    skills: ['Python', 'FastAPI', 'Flask', 'Django', 'C# / ASP.NET Core'],
   },
   {
     category: 'Frontend & Mobile',
@@ -13,17 +13,20 @@ const coreStack = [
   },
   {
     category: 'Data & Cloud',
-    skills: ['MySQL', 'MongoDB', 'DynamoDB', 'AWS (Lambda, EC2)', 'Docker', 'CI/CD'],
+    skills: ['SQL (MySQL)', 'NoSQL (MongoDB, DynamoDB, Couchbase)', 'AWS', 'Docker', 'CI/CD'],
   },
   {
     category: 'AI Integration',
-    skills: ['LLMs', 'Prompt Engineering', 'LangChain', 'RAG Pipelines', 'AI Agents', 'Embeddings', 'Milvus', 'vLLM'],
+    skills: ['LLMs', 'Prompt Engineering', 'RAG Pipelines', 'Milvus', 'LangChain', 'AI Agents'],
   },
 ]
 
 // Shown as one quiet line under the core stack. Things you've used, but aren't your main pitch.
 const alsoWorkedWith = [
-  'Couchbase',
+  'Node.js',
+  'Express.js',
+  'Embeddings',
+  'vLLM',
   'WebSockets / Socket.IO',
   'n8n',
   'Apache Airflow',
