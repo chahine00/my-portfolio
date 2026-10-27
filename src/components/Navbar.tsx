@@ -10,9 +10,9 @@ import ThemeToggle from './ThemeToggle.tsx'
 // Instead of writing each <li> by hand, we keep the links in an array.
 // To add a new link, you only need to add one line here.
 // "/#id" links go to a section of the home page (its id="") and scroll to it,
-// so they also work from another page like /updates.
-// A link can also open a separate page instead, like to: '/updates'.
-// While you're on that page (or a page inside it, like /updates/some-post),
+// so they also work from another page like /blog.
+// A link can also open a separate page instead, like to: '/blog'.
+// While you're on that page (or a page inside it, like /blog/some-post),
 // the link is highlighted. "match" highlights a section link on other pages too:
 // Projects is highlighted on /projects/some-project.
 interface NavItem {
@@ -28,7 +28,7 @@ const links: NavItem[] = [
   { to: '/#projects', label: 'Projects', match: '/projects' },
   { to: '/#experience', label: 'Experience' },
   { to: '/#skills', label: 'Skills' },
-  { to: '/updates', label: 'Updates', section: 'updates', dot: hasRecentUpdate },
+  { to: '/blog', label: 'Blog', section: 'blog', dot: hasRecentUpdate },
   { to: '/#contact', label: 'Contact' },
 ]
 

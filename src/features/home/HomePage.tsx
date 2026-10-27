@@ -17,7 +17,7 @@ function HomePage() {
   // "key" changes on every navigation, so clicking the same link twice still scrolls.
   const { hash, key } = useLocation()
 
-  // When the URL has a #section (for example coming back from /updates to /#skills),
+  // When the URL has a #section (for example coming back from /blog to /#skills),
   // scroll to that section once the page is on screen.
   useEffect(() => {
     if (hash) {

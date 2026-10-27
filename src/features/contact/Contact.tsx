@@ -58,15 +58,15 @@ function Contact() {
 
   return (
     <section id="contact" className="section">
-      <h1>Contact</h1>
-
-      {/* One next step for each kind of visitor: companies hiring, and clients with a project. */}
+      <p className="eyebrow">Contact</p>
+      <h1>Reach out to me!</h1>
+      {/* One question for every kind of visitor (companies hiring, clients, people saying hi), then the next step. */}
       <p className="contact-intro">
-        Hiring for a team?{' '}
+        Hiring for a team, have a project to discuss, or just want to say hi? Send me a message below or{' '}
         <a href={asset('/Ali_Chahine_CV.pdf')} download="Ali_Chahine_CV.pdf">
-          Download my CV
-        </a>{' '}
-        or email me. Have a project in mind? Send me a message below and I'll get back to you.
+          download my CV
+        </a>
+        .
       </p>
 
       {/* Direct contact details, read from src/data/contact.ts.
@@ -103,7 +103,7 @@ function Contact() {
         ))}
       </ul>
 
-      <p>Or send me a message:</p>
+      <p className="contact-form-label">Or send me a message:</p>
 
       {/* After sending, a clear success box replaces the form. */}
       {status === 'sent' ? (

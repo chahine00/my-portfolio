@@ -1,7 +1,7 @@
 // The big welcome section at the top of the page.
 // The text comes from src/data/profile.ts.
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { profile } from '../../data/profile.ts'
 import Icon from '../../components/Icon.tsx'
 import SocialLinks from '../../components/SocialLinks.tsx'
@@ -13,7 +13,47 @@ const initials = profile.name
   .map((word) => word[0])
   .join('')
 
+// Types each phrase from profile.building, waits, deletes it, then moves to the next one.
+// Returns the text typed so far.
+function useTypingLoop(phrases: string[]) {
+  // People who turn off animations just see the first phrase, already written.
+  const [reduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  const [text, setText] = useState(reduceMotion ? phrases[0] : '')
+
+  useEffect(() => {
+    if (reduceMotion) return
+
+    let phrase = 0
+    let length = 0
+    let deleting = false
+    let timer: number
+
+    function step() {
+      const full = phrases[phrase]
+      length += deleting ? -1 : 1
+      setText(full.slice(0, length))
+
+      let delay = deleting ? 35 : 75 // deleting is faster than typing
+      if (!deleting && length === full.length) {
+        deleting = true
+        delay = 1800 // pause so the finished phrase can be read
+      } else if (deleting && length === 0) {
+        deleting = false
+        phrase = (phrase + 1) % phrases.length
+        delay = 400
+      }
+      timer = window.setTimeout(step, delay)
+    }
+
+    timer = window.setTimeout(step, 600)
+    return () => window.clearTimeout(timer)
+  }, [phrases, reduceMotion])
+
+  return text
+}
+
 function Hero() {
+  const typed = useTypingLoop(profile.building)
   const nameRef = useRef<HTMLSpanElement>(null)
 
   // Scrolling down runs the same color sweep as hovering: the further you scroll
@@ -42,6 +82,15 @@ function Hero() {
           </span>
         </h1>
         <p className="hero__tagline">{profile.tagline}</p>
+
+        {/* A line of "code" that keeps typing what you build. Screen readers get the full list once instead. */}
+        <p className="hero__code" aria-label={`I build ${profile.building.join(', ')}`}>
+          <span aria-hidden="true">
+            <span className="hero__code-prompt">&gt;</span> ali.build(<span className="hero__code-string">'{typed}</span>
+            <span className="hero__code-caret" />
+            <span className="hero__code-string">'</span>)
+          </span>
+        </p>
 
         <ul className="hero__meta">
           <li>

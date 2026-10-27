@@ -200,7 +200,7 @@ The role went beyond code: I was part of the discussions and decisions on which 
       '/projects/portfolio-website/2.png',
       '/projects/portfolio-website/3.png',
     ],
-    overview: `A fast, single-page portfolio that scrolls smoothly between sections, with separate pages for updates and for each project.
+    overview: `A fast, single-page portfolio that scrolls smoothly between sections, with separate pages for the blog and for each project.
 
 All the content lives in small data files, so adding a project, a post or a contact is a matter of editing a list, not touching the layout.`,
     built: [
@@ -210,7 +210,7 @@ All the content lives in small data files, so adding a project, a post or a cont
     ],
     features: [
       'One-page layout with a sticky navbar and back-to-top button',
-      'Updates timeline with a "new post" indicator',
+      'Blog timeline with a "new post" indicator',
       'Project case-study pages with photo galleries',
       'Automatic light and dark mode',
     ],

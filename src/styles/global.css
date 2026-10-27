@@ -210,6 +210,40 @@ main {
   font-size: 1.25rem;
 }
 
+/* The typing code line under the tagline (see useTypingLoop in Hero.tsx) */
+.hero__code {
+  margin: 12px 0 0;
+  min-height: 1.6em; /* keeps the page from jumping while the text is deleted */
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.hero__code-prompt,
+.hero__code-string {
+  color: var(--accent);
+}
+
+.hero__code-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin: 0 1px;
+  vertical-align: -0.2em;
+  background: var(--accent);
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__code-caret {
+    animation: none;
+  }
+}
+
 .hero__meta {
   display: flex;
   flex-wrap: wrap;
@@ -489,6 +523,58 @@ main {
   margin: 16px 0 0;
 }
 
+/* Experience: each job fades up as you scroll to it (Experience.tsx adds "is-visible"). */
+.timeline--reveal .timeline__item {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+.timeline--reveal .timeline__item.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Blog posts: each card slides in from the left, and its dot on the line pops in after it. */
+.timeline--posts .timeline__item {
+  transform: translateX(-48px);
+}
+
+.timeline--posts .timeline__item::before {
+  transform: scale(0);
+}
+
+.timeline--posts .timeline__item.is-visible::before {
+  animation: dot-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--reveal-delay, 0s) + 0.3s);
+}
+
+.timeline--posts .timeline__item.is-visible:hover::before {
+  animation: none;
+  transform: scale(1.35);
+}
+
+@keyframes dot-pop {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+/* No motion wanted: show the jobs and posts straight away. */
+@media (prefers-reduced-motion: reduce) {
+  .timeline--reveal .timeline__item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .timeline--posts .timeline__item::before,
+  .timeline--posts .timeline__item.is-visible::before {
+    animation: none;
+    transform: none;
+  }
+}
+
 /* Education */
 .edu-grid {
   display: grid;
@@ -619,6 +705,7 @@ main {
 
 /* Cover photo at the top of the card, reaching the card's edges. */
 .project-card__cover {
+  position: relative;
   display: block;
   margin: -20px -20px 16px;
   overflow: hidden;
@@ -628,12 +715,52 @@ main {
   background: var(--border);
 }
 
+/* The strip of photos inside the cover. Only one fits at a time; ProjectCard.tsx slides it. */
+.cover-banner {
+  display: flex;
+  height: 100%;
+  transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
 .project-card__cover img {
+  flex: 0 0 100%;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: top;
   transition: transform 0.3s;
+}
+
+/* Dots at the bottom of the cover: the current photo's dot is wider. */
+.cover-banner__dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  display: flex;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.35);
+  transform: translateX(-50%);
+}
+
+.cover-banner__dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.55);
+  transition: width 0.3s, background-color 0.3s;
+}
+
+.cover-banner__dots span.is-active {
+  width: 18px;
+  background: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover-banner {
+    transition: none;
+  }
 }
 
 .project-card:hover .project-card__cover img {
@@ -736,7 +863,7 @@ main {
   }
 }
 
-/* Updates: a timeline of posts (home section + full page) */
+/* Blog: a timeline of posts (home section + full page) */
 .section-header {
   display: flex;
   flex-wrap: wrap;
@@ -1202,7 +1329,7 @@ main {
   cursor: pointer;
 }
 
-/* Navbar dot: a small pulsing dot next to "Updates" when there's a recent post. */
+/* Navbar dot: a small pulsing dot next to "Blog" when there's a recent post. */
 .navbar__dot {
   display: inline-block;
   width: 7px;
@@ -1256,19 +1383,32 @@ main {
 }
 
 /* Contact */
+/* The sentence under the heading, with room before the contact details. */
+.contact-intro {
+  margin: 0 0 24px;
+}
+
 .contact-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin: 0 0 24px;
+  gap: 4px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* Every row is as tall as the WhatsApp button, so rows with and without one are evenly spaced. */
 .contact-list li {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  min-height: 34px;
   gap: 4px 12px;
+}
+
+/* "Or send me a message:" starts a new block, so more space above it than below. */
+.contact-form-label {
+  margin: 32px 0 12px;
 }
 
 .contact-label {

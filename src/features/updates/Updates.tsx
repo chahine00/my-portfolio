@@ -1,5 +1,5 @@
-// The "Latest Updates" section on the home page: a preview of the newest posts,
-// with a button that opens the full Updates page.
+// The "Blog" section on the home page: a preview of the newest posts,
+// with a button that opens the full Blog page.
 
 import { Link } from 'react-router'
 import { sortedUpdates } from '../../data/updates.ts'
@@ -10,10 +10,10 @@ const PREVIEW_COUNT = 2
 
 function Updates() {
   return (
-    <section id="updates" className="section">
+    <section id="blog" className="section">
       <div className="section-header">
-        <h1>Latest Updates</h1>
-        <Link to="/updates" className="forward-link">
+        <h1>Blog</h1>
+        <Link to="/blog" className="forward-link">
           See all <span aria-hidden="true">→</span>
         </Link>
       </div>
@@ -23,8 +23,8 @@ function Updates() {
       <UpdateTimeline updates={sortedUpdates.slice(0, PREVIEW_COUNT)} />
 
       <div className="updates-footer">
-        <Link to="/updates" className="button">
-          View all updates ({sortedUpdates.length})
+        <Link to="/blog" className="button">
+          View all posts ({sortedUpdates.length})
         </Link>
       </div>
     </section>

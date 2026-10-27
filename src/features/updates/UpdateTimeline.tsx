@@ -1,6 +1,7 @@
 // A REUSABLE timeline of posts. The home page shows the newest few,
-// and the Updates page shows all of them, using this same component.
-// Each card links to the post's own page (/updates/<slug>).
+// and the Blog page shows all of them, using this same component.
+// Each card links to the post's own page (/blog/<slug>).
+// Posts appear one by one as you scroll down to them (see src/utils/useReveal.ts).
 // The WHOLE card is clickable: the title link is stretched over the card with CSS
 // (see .card-link in global.css), so there's still just one real link per card.
 
@@ -8,6 +9,7 @@ import { Link } from 'react-router'
 import { formatDate, isRecent } from '../../data/updates.ts'
 import type { Update } from '../../data/updates.ts'
 import { fallbackTo, thumb } from '../../utils/asset.ts'
+import { useReveal } from '../../utils/useReveal.ts'
 
 interface UpdateTimelineProps {
   updates: Update[]
@@ -17,10 +19,12 @@ interface UpdateTimelineProps {
 const MAX_THUMBS = 3
 
 function UpdateTimeline({ updates }: UpdateTimelineProps) {
+  const listRef = useReveal<HTMLOListElement>()
+
   return (
-    <ol className="timeline">
+    <ol className="timeline timeline--reveal timeline--posts" ref={listRef}>
       {updates.map((update) => {
-        const postUrl = `/updates/${update.slug}`
+        const postUrl = `/blog/${update.slug}`
         const hiddenCount = update.images.length - MAX_THUMBS
 
         return (

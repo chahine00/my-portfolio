@@ -18,7 +18,7 @@ if (rootElement === null) {
 
 // Tell React to draw our <App /> component inside that div.
 // <StrictMode> is a helper that warns you about common mistakes while developing.
-// <BrowserRouter> lets the app have several pages (like /updates) using the URL.
+// <BrowserRouter> lets the app have several pages (like /blog) using the URL.
 // basename is the sub-folder the site lives in on GitHub Pages (see vite.config.ts).
 createRoot(rootElement).render(
   <StrictMode>

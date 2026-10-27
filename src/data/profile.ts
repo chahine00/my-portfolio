@@ -9,7 +9,13 @@ export const profile = {
   availability: "Hiring or got a project? Let's make it happen", // set to '' to hide it
   // Your photo in /public, e.g. '/photo.jpg'. Until you add one, your initials are shown.
   photo: '/photo.jpg',
-}
+  // Typed out one by one under the tagline, like code being written. Keep each one short.
+  building: [
+    'secure APIs & databases',
+    'mcross-platform mobile apps',         // Focus on business/internal use
+    'LLM & RAG features',
+    'web apps, end to end'
+  ]}
 
 // The kinds of work you do. Pressing any number in About opens a panel with these.
 // "proof" is where you did it, so each role is backed by real work.

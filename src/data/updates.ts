@@ -1,6 +1,6 @@
-// Your posts / news. The newest ones appear in the "Latest Updates" section
-// of the home page, and all of them on the Updates page (/updates).
-// Each post also gets its own page at /updates/<slug>.
+// Your blog posts. The newest ones appear in the "Blog" section
+// of the home page, and all of them on the Blog page (/blog).
+// Each post also gets its own page at /blog/<slug>.
 //
 // To add a post:
 // 1. Put its photos in a new folder, e.g. public/updates/my-new-post/1.jpg, 2.jpg …
@@ -8,7 +8,7 @@
 // 3. Run  sh scripts/make-thumbs.sh  to make the small copies used on the cards (faster scrolling).
 
 export interface Update {
-  slug: string // the post's address: 'my-new-post' → /updates/my-new-post (lowercase, dashes, no spaces)
+  slug: string // the post's address: 'my-new-post' → /blog/my-new-post (lowercase, dashes, no spaces)
   title: string
   date: string // written as 'YYYY-MM-DD', e.g. '2026-10-26'
   summary: string // one or two sentences, shown on the cards

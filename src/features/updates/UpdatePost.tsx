@@ -1,4 +1,4 @@
-// The page for ONE post, at /updates/<slug>.
+// The page for ONE post, at /blog/<slug>.
 // The <slug> part of the URL tells us which post to show.
 
 import { useEffect } from 'react'
@@ -23,8 +23,8 @@ function UpdatePost() {
       <section className="section">
         <h1>Post not found</h1>
         <p>This post doesn't exist or was removed.</p>
-        <Link to="/updates" className="back-link">
-          <span aria-hidden="true">←</span> See all updates
+        <Link to="/blog" className="back-link">
+          <span aria-hidden="true">←</span> See all posts
         </Link>
       </section>
     )
@@ -39,8 +39,8 @@ function UpdatePost() {
 
   return (
     <article className="section post">
-      <Link to="/updates" className="back-link">
-        <span aria-hidden="true">←</span> All updates
+      <Link to="/blog" className="back-link">
+        <span aria-hidden="true">←</span> All posts
       </Link>
 
       <header className="post__header">
@@ -68,7 +68,7 @@ function UpdatePost() {
 
       <nav className="post__nav" aria-label="More posts">
         {older ? (
-          <Link to={`/updates/${older.slug}`} title={older.title}>
+          <Link to={`/blog/${older.slug}`} title={older.title}>
             <span className="post__nav-label"><b aria-hidden="true">←</b> Older post</span>
             <span className="post__nav-title">{older.title}</span>
           </Link>
@@ -76,7 +76,7 @@ function UpdatePost() {
           <span />
         )}
         {newer && (
-          <Link to={`/updates/${newer.slug}`} className="post__nav-newer" title={newer.title}>
+          <Link to={`/blog/${newer.slug}`} className="post__nav-newer" title={newer.title}>
             <span className="post__nav-label">Newer post <b aria-hidden="true">→</b></span>
             <span className="post__nav-title">{newer.title}</span>
           </Link>

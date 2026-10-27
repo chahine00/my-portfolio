@@ -1,4 +1,4 @@
-// The Updates page: its own page at /updates, showing every post.
+// The Blog page: its own page at /blog, showing every post.
 // The home page only shows a preview (see Updates.tsx).
 
 import { useEffect } from 'react'
@@ -14,12 +14,12 @@ function UpdatesPage() {
 
   return (
     <section className="section">
-      {/* Goes back to the home page and scrolls to the Updates section. */}
-      <Link to="/#updates" className="back-link">
+      {/* Goes back to the home page and scrolls to the Blog section. */}
+      <Link to="/#blog" className="back-link">
         <span aria-hidden="true">←</span> Back to home
       </Link>
 
-      <h1>All Updates</h1>
+      <h1>Blog</h1>
       <p className="page-intro">
         Everything I've shared so far — {sortedUpdates.length} posts, newest first.
       </p>
