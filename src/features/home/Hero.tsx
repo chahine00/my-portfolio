@@ -48,6 +48,7 @@ function Hero() {
             <Icon name="pin" size={16} /> {profile.location}
           </li>
           {profile.availability && (
+            // Every few seconds the line gives a little shake (see global.css).
             <li className="hero__available">
               <span className="hero__available-dot" /> {profile.availability}
             </li>

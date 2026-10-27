@@ -1633,6 +1633,27 @@ a {
   50% { transform: scale(1.6); opacity: 0; }
 }
 
+/* "Open to new opportunities" gives a quick little shake, then rests, every 4 seconds,
+   to catch the eye without moving away from its place. */
+.hero__available {
+  animation: available-shake 4s ease-in-out infinite;
+}
+
+@keyframes available-shake {
+  0%, 15%, 100% { transform: translateX(0) rotate(0); }
+  3% { transform: translateX(-2px) rotate(-1deg); }
+  6% { transform: translateX(2px) rotate(1deg); }
+  9% { transform: translateX(-2px) rotate(-1deg); }
+  12% { transform: translateX(1px) rotate(0.5deg); }
+}
+
+/* People who turn off animations in their settings get it standing still. */
+@media (prefers-reduced-motion: reduce) {
+  .hero__available {
+    animation: none;
+  }
+}
+
 /* About numbers: grow slightly on hover */
 .stats strong {
   display: inline-block;
