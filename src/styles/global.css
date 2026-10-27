@@ -275,6 +275,7 @@ main {
 }
 
 .hero__available-dot {
+  flex-shrink: 0; /* stays a round dot, never squeezed by long text */
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -324,6 +325,12 @@ main {
      so the longest phrase ('cross-platform mobile apps') still fits on small phones. */
   .hero__code {
     font-size: clamp(0.7rem, 3.3vw, 0.95rem);
+    white-space: nowrap;
+  }
+
+  /* Phones: "Hiring or got a project?…" stays on one row next to its dot, shrinking a little on small phones. */
+  .hero__available {
+    font-size: clamp(0.72rem, 3.5vw, 0.95rem);
     white-space: nowrap;
   }
 
