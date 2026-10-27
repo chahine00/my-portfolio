@@ -320,6 +320,13 @@ main {
     min-width: 0;
   }
 
+  /* Phones: the typing line stays on one row. Its text shrinks with the screen width,
+     so the longest phrase ('cross-platform mobile apps') still fits on small phones. */
+  .hero__code {
+    font-size: clamp(0.7rem, 3.3vw, 0.95rem);
+    white-space: nowrap;
+  }
+
   /* Phones: the photo sits centered above the text. */
   .hero__photo {
     align-self: center;
