@@ -1760,6 +1760,267 @@ a {
   transform: scale(1.1);
 }
 
+/* The numbers row is only as wide as the numbers, so hovering opens the panel only on them,
+   not on the empty space beside them. While open, its bottom padding is the space above the panel. */
+.stats {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.stats--open {
+  padding-bottom: 24px;
+}
+
+/* Each number is a button that opens the roles panel. It looks like the other numbers,
+   plus a small arrow that turns when the panel is open. */
+.stats__toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.stats__toggle:hover strong,
+.stats__toggle--open strong {
+  transform: scale(1.1);
+}
+
+.stats__toggle > span {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.stats__caret {
+  display: inline-block;
+  color: var(--accent);
+  transition: transform 0.25s;
+  /* Nudges right now and then, a hint that it can be pressed. */
+  animation: caret-nudge 2.4s ease-in-out infinite;
+}
+
+.stats__toggle--open .stats__caret {
+  transform: rotate(90deg);
+  animation: none;
+}
+
+@keyframes caret-nudge {
+  0%, 60%, 100% { translate: 0; }
+  75% { translate: 3px; }
+}
+
+/* The roles panel: a glassy "control screen" with a faint grid, corner marks and a scan line. */
+.roles-panel {
+  --line: color-mix(in srgb, var(--accent) 35%, transparent);
+  position: relative;
+  padding: 20px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--accent) 7%, transparent) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 7%, transparent) 1px, transparent 1px) 0 0 / 24px 24px,
+    color-mix(in srgb, var(--card) 75%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--accent) 12%, transparent);
+  /* Opens like a screen powering on: from a thin line in the middle to full height. */
+  animation: panel-open 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes panel-open {
+  from { clip-path: inset(48% 0 48% 0 round 14px); opacity: 0.4; }
+  to { clip-path: inset(0 0 0 0 round 14px); opacity: 1; }
+}
+
+/* Closing: fades and folds back toward the middle line (0.3s, the same as CLOSE_FADE_MS in About.tsx). */
+.roles-panel--closing {
+  animation: panel-close 0.3s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes panel-close {
+  from { clip-path: inset(0 0 0 0 round 14px); opacity: 1; }
+  to { clip-path: inset(40% 0 40% 0 round 14px); opacity: 0; }
+}
+
+/* Corner marks, top left and bottom right, like a viewfinder. */
+.roles-panel::before,
+.roles-panel::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--accent);
+  pointer-events: none;
+}
+
+.roles-panel::before {
+  top: 8px;
+  left: 8px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.roles-panel::after {
+  right: 8px;
+  bottom: 8px;
+  border-top: 0;
+  border-left: 0;
+}
+
+/* The scan line: a soft bright bar that sweeps top to bottom once, as the panel opens. */
+.roles-panel__grid::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 60px;
+  background: linear-gradient(transparent, color-mix(in srgb, var(--accent) 22%, transparent), transparent);
+  pointer-events: none;
+  animation: panel-scan 1.1s ease-in 0.2s both;
+}
+
+@keyframes panel-scan {
+  from { transform: translateY(-60px); opacity: 1; }
+  to { transform: translateY(600px); opacity: 0; }
+}
+
+.roles-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px 14px;
+  color: var(--muted);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+}
+
+.roles-panel__count {
+  color: var(--accent);
+}
+
+/* A "live" light that blinks. */
+.roles-panel__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: panel-blink 1.6s steps(1) infinite;
+}
+
+@keyframes panel-blink {
+  50% { opacity: 0.25; }
+}
+
+.roles-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Phones: one card per row. */
+@media (max-width: 600px) {
+  .roles-panel__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Each role card boots up after the one before it (--i), then glows on hover. */
+.role-card {
+  position: relative;
+  padding: 16px 16px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+  animation: card-boot 0.5s ease-out both;
+  animation-delay: calc(0.25s + var(--i) * 0.12s);
+}
+
+.role-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 24px color-mix(in srgb, var(--accent) 30%, transparent);
+  transform: translateY(-2px);
+}
+
+@keyframes card-boot {
+  from { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.role-card__index {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  color: color-mix(in srgb, var(--accent) 55%, transparent);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+}
+
+.role-card__name {
+  margin: 0 0 6px;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 1.05rem;
+}
+
+.role-card__name span {
+  color: var(--accent);
+}
+
+.role-card__summary {
+  margin: 0 0 4px;
+  font-size: 0.92rem;
+}
+
+.role-card__proof {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.role-card__stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.role-card__stack li {
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--accent);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+}
+
+/* People who turn off animations in their settings get the panel and cards without motion. */
+@media (prefers-reduced-motion: reduce) {
+  .stats__caret,
+  .roles-panel,
+  .roles-panel__grid::before,
+  .roles-panel__dot,
+  .role-card {
+    animation: none;
+  }
+
+  .role-card:hover {
+    transform: none;
+  }
+}
+
 /* Timeline dots: grow when you hover their card */
 .timeline__item::before {
   transition: transform 0.25s;
