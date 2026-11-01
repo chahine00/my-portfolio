@@ -30,9 +30,10 @@ function HomePage() {
       <Hero />
       <About />
       <Projects />
+      {/* The blog comes right after the projects: it shows what you're doing now. */}
+      <Updates />
       <Experience />
       <Skills />
-      <Updates />
       <Education />
       <Testimonials />
       <Contact />

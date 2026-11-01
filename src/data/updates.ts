@@ -7,8 +7,18 @@
 // 2. Add a new object to the list below. Newest posts are shown first automatically.
 // 3. Run  sh scripts/make-thumbs.sh  to make the small copies used on the cards (faster scrolling).
 
+// The blog's categories, in the order their filter buttons appear. Every post has exactly one.
+// To add a category, add it here and use it on a post.
+export const categories = ['Tech Notes', 'Ideas', 'Milestones', 'Community'] as const
+export type Category = (typeof categories)[number]
+
 export interface Update {
   slug: string // the post's address: 'my-new-post' → /blog/my-new-post (lowercase, dashes, no spaces)
+  // Tech Notes: practical lessons from real work (how-tos, bugs, architecture)
+  // Ideas: how I think about building software (opinions, deep dives)
+  // Milestones: things I built, launched or achieved (projects, hackathons, career steps)
+  // Community: events and people I learned from (conferences, meetups, talks)
+  category: Category
   title: string
   date: string // written as 'YYYY-MM-DD', e.g. '2026-10-26'
   summary: string // one or two sentences, shown on the cards
@@ -22,6 +32,7 @@ export interface Update {
 export const updates: Update[] = [
   {
     slug: 'first-ios-app-submission',
+    category: 'Tech Notes',
     title: 'Submitting my first iOS app to the App Store',
     date: '2026-10-13',
     summary:
@@ -44,6 +55,7 @@ I have always preferred Android. At least it doesn't force me to buy a MacBook j
   },
   {
     slug: 'cinetwork-byblos-film-festival',
+    category: 'Milestones',
     title: 'Cinetwork gets a sneak peek at the Byblos International Film Festival',
     date: '2026-09-01',
     summary:
@@ -62,6 +74,7 @@ More to come soon. 🍿✨`,
   },
   {
     slug: 'flamex-intelligence-hackathon',
+    category: 'Milestones',
     title: 'FlameX Intelligence at the AOU AI Product Hackathon',
     date: '2026-08-03',
     summary:
@@ -83,6 +96,7 @@ Grateful for the experience and the collaboration with my teammates!`,
   },
   {
     slug: 'react-native-to-web-on-aws',
+    category: 'Tech Notes',
     title: 'From a React Native app to a production web platform on AWS',
     date: '2026-06-12',
     summary:
@@ -126,6 +140,7 @@ Stack: React Native (converted to web) for the frontend, Flask (Python) for the 
   },
   {
     slug: 'red-alert-2-engineering',
+    category: 'Ideas',
     title: 'How Command & Conquer: Red Alert 2 tricked computers',
     date: '2026-04-22',
     summary:
@@ -161,6 +176,7 @@ Great performance isn't always about stronger hardware. It's about smarter desig
   },
   {
     slug: 'think-before-you-code',
+    category: 'Ideas',
     title: 'Think → Discuss → Model → Then code',
     date: '2026-04-07',
     summary:
@@ -189,6 +205,7 @@ It's not just about building features, it's about building the right system for 
   },
   {
     slug: 'closing-the-boxmind-chapter',
+    category: 'Milestones',
     title: 'Closing my chapter at boxMind.ai',
     date: '2026-03-30',
     summary:
@@ -207,6 +224,7 @@ I'm grateful for the experience and fully focused on new opportunities where I c
   },
   {
     slug: 'postman-isnt-a-browser',
+    category: 'Tech Notes',
     title: "Postman isn't a browser",
     date: '2025-12-12',
     summary:
@@ -236,6 +254,7 @@ Your frontend devs will actually like you for it.`,
   },
   {
     slug: 'layered-security-middleware',
+    category: 'Tech Notes',
     title: 'Building layered security with middleware',
     date: '2025-11-05',
     summary:
@@ -259,6 +278,7 @@ I put together a short presentation on how each guard was designed and why.`,
   },
   {
     slug: 'devfest-2025-with-techlarious',
+    category: 'Community',
     title: 'DevFest 2025 with Techlarious and GDG Coast Lebanon',
     date: '2025-10-29',
     summary:
@@ -278,6 +298,7 @@ Grateful for the connections and the opportunity to contribute to the community,
   },
   {
     slug: 'next-gen-ai-summit-naples',
+    category: 'Community',
     title: 'Stumbling upon the Next Gen AI Summit in Naples',
     date: '2025-10-20',
     summary:
@@ -304,6 +325,7 @@ Seeing the Naples summit firsthand reminded me that education's future is alread
   },
   {
     slug: 'the-healthy-commit',
+    category: 'Community',
     title: 'The Healthy Commit at AOU with Techlarious',
     date: '2025-07-20',
     summary:
@@ -343,6 +365,17 @@ const NEW_FOR_DAYS = 30
 export function isRecent(date: string) {
   const ageInDays = (Date.now() - new Date(`${date}T00:00:00`).getTime()) / (1000 * 60 * 60 * 24)
   return ageInDays <= NEW_FOR_DAYS
+}
+
+// Keeps the posts in the chosen category ('All' = every category) whose title, summary, tags
+// or text contain the search words. Each word must match somewhere; upper/lower case doesn't matter.
+export function filterUpdates(posts: Update[], query: string, category: string) {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean)
+  return posts.filter((post) => {
+    if (category !== 'All' && post.category !== category) return false
+    const text = [post.title, post.summary, post.content, ...(post.tags ?? [])].join(' ').toLowerCase()
+    return words.every((word) => text.includes(word))
+  })
 }
 
 export const hasRecentUpdate = sortedUpdates.length > 0 && isRecent(sortedUpdates[0].date)

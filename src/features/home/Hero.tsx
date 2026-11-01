@@ -7,12 +7,6 @@ import Icon from '../../components/Icon.tsx'
 import SocialLinks from '../../components/SocialLinks.tsx'
 import { asset } from '../../utils/asset.ts'
 
-// "Ali Chahine" → "AC". Shown in the circle until you add a photo.
-const initials = profile.name
-  .split(' ')
-  .map((word) => word[0])
-  .join('')
-
 // Types each phrase from profile.building, waits, deletes it, then moves to the next one.
 // Returns the text typed so far.
 function useTypingLoop(phrases: string[]) {
@@ -125,9 +119,13 @@ function Hero() {
         </div>
       </div>
 
-      <div className="hero__photo">
-        {profile.photo ? <img src={asset(profile.photo)} alt={profile.name} /> : <span>{initials}</span>}
-      </div>
+      {/* The photo blends into the page: its left edge (its bottom edge on phones) fades into the
+          background, and the text overlaps that faded part, so text and photo read as one piece. */}
+      {profile.photo && (
+        <div className="hero__photo">
+          <img src={asset(profile.photo)} alt={profile.name} />
+        </div>
+      )}
     </section>
   )
 }

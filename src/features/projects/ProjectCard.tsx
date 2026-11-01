@@ -17,7 +17,7 @@ interface ProjectCardProps {
 }
 
 // How long each photo stays before the banner slides to the next one (in milliseconds).
-const SLIDE_EVERY = 3500
+const SLIDE_EVERY = 2000
 
 // The photo(s) at the top of the card. With one photo it's a still cover; with several,
 // they sit side by side in a strip that moves left one photo at a time, then starts again.

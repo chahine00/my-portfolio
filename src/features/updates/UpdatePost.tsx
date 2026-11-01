@@ -44,9 +44,15 @@ function UpdatePost() {
       </Link>
 
       <header className="post__header">
-        <time dateTime={post.date} className="post__date">
-          {formatDate(post.date)}
-        </time>
+        {/* The category opens the Blog page showing only that category. */}
+        <div className="post__meta">
+          <Link to={`/blog?category=${encodeURIComponent(post.category)}`} className="update-card__category">
+            {post.category}
+          </Link>
+          <time dateTime={post.date} className="post__date">
+            {formatDate(post.date)}
+          </time>
+        </div>
         <h1>{post.title}</h1>
         {post.tags && (
           <ul className="tags">

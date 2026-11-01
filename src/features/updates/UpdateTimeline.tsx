@@ -20,7 +20,8 @@ interface UpdateTimelineProps {
 const MAX_THUMBS = 3
 
 function UpdateTimeline({ updates }: UpdateTimelineProps) {
-  const listRef = useReveal<HTMLOListElement>()
+  // The posts' slugs as the watch key: when a filter changes the list, the new posts get revealed too.
+  const listRef = useReveal<HTMLOListElement>('.timeline__item', updates.map((update) => update.slug).join())
 
   return (
     <ol className="timeline timeline--reveal timeline--posts" ref={listRef}>
@@ -34,6 +35,7 @@ function UpdateTimeline({ updates }: UpdateTimelineProps) {
             <article className="card update-card card-clickable">
               <div className="update-card__meta">
                 {/* <time> tells browsers and search engines that this text is a date. */}
+                <span className="update-card__category">{update.category}</span>
                 <time dateTime={update.date}>{formatDate(update.date)}</time>
                 {isRecent(update.date) && <span className="badge-new">New</span>}
               </div>

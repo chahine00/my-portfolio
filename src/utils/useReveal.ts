@@ -1,10 +1,12 @@
 // Makes the items of a list appear one by one as you scroll down to them.
 // Put the returned ref on the list, and give the list the class "timeline--reveal"
 // (the animation itself is in global.css). Used by Experience and the blog posts.
+// watchKey: change it whenever the list's items change (e.g. after filtering), so the new items
+// are watched too. Items that were already shown stay shown.
 
 import { useEffect, useRef } from 'react'
 
-export function useReveal<T extends HTMLElement>(itemSelector = '.timeline__item') {
+export function useReveal<T extends HTMLElement>(itemSelector = '.timeline__item', watchKey = '') {
   // Points at the list, so we can watch its items scroll into view.
   const listRef = useRef<T>(null)
 
@@ -41,7 +43,7 @@ export function useReveal<T extends HTMLElement>(itemSelector = '.timeline__item
     items.forEach((item) => observer.observe(item))
     // Cleanup: stop watching when the list leaves the page.
     return () => observer.disconnect()
-  }, [itemSelector])
+  }, [itemSelector, watchKey])
 
   return listRef
 }

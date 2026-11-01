@@ -283,44 +283,30 @@ main {
   box-shadow: 0 0 0 3px rgb(34 197 94 / 0.25);
 }
 
+/* The photo, blended into the page: a large rounded photo on the right whose left part fades
+   to see-through (mask). The text column is pulled over that faded part (negative margin)
+   and sits above it (z-index), so the two overlap instead of standing side by side. */
+.hero__text {
+  position: relative;
+  z-index: 1;
+}
+
 .hero__photo {
+  position: relative;
   flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 220px;
-  aspect-ratio: 1;
-  overflow: hidden;
-  border-radius: 50%;
-  /* A gradient ring: a thin gap in the page color, then indigo fading to cyan, with a soft glow.
-     The colors slowly travel around the ring (--ring-angle turns the gradient, not the photo). */
-  border: 4px solid transparent;
-  background:
-    linear-gradient(var(--bg), var(--bg)) padding-box,
-    conic-gradient(from var(--ring-angle), var(--accent), #06b6d4, var(--accent)) border-box;
-  padding: 4px;
-  box-shadow: 0 12px 36px color-mix(in srgb, var(--accent) 22%, transparent);
-  animation: ring-spin 8s linear infinite;
-  color: #fff;
-  font-size: 4rem;
-  font-weight: 700;
-}
-
-/* Registering --ring-angle as an angle lets the browser animate it smoothly. */
-@property --ring-angle {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 135deg;
-}
-
-@keyframes ring-spin {
-  to { --ring-angle: 495deg; }
+  width: 260px;
+  aspect-ratio: 4 / 5;
+  margin-left: -70px;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 38%);
 }
 
 .hero__photo img {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: 28px;
   object-fit: cover;
+  object-position: center 30%;
 }
 
 @media (max-width: 720px) {
@@ -361,11 +347,16 @@ main {
     margin-top: 8px; /* a little more room under the buttons than between them */
   }
 
-  /* Phones: the photo sits centered above the text. */
+  /* Phones: the photo goes on top (column-reverse), full width but not too tall. Its BOTTOM
+     edge fades into the page, with a little space before the text starts. */
   .hero__photo {
+    width: 100%;
+    max-width: 220px;
+    aspect-ratio: 1;
     align-self: center;
-    width: 120px;
-    font-size: 2.2rem;
+    margin: 0 0 16px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
   }
 }
 
@@ -508,6 +499,71 @@ main {
 .theme-toggle:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+/* About: the statement is the section title, with the three "how I work" cards in a row under it. */
+.mindset__dot {
+  margin: 0 4px;
+  color: var(--muted);
+}
+
+.mindset__title {
+  max-width: 22ch;
+  margin: 8px 0 28px;
+  font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+  line-height: 1.15;
+}
+
+.mindset__title span {
+  background: linear-gradient(135deg, var(--accent), #06b6d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.mindset__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mindset__item {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.mindset__item:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+}
+
+.mindset__item h3 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  transition: color 0.3s;
+}
+
+.mindset__item:hover h3 {
+  color: var(--accent);
+}
+
+.mindset__item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* Phones and small tablets: the cards stack. */
+@media (max-width: 760px) {
+  .mindset__list {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* About: small numbers row */
@@ -899,7 +955,7 @@ main {
 .cover-banner {
   display: flex;
   height: 100%;
-  transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 /* One photo of the strip: the blurred copy fills the frame, the real photo sits on top, whole. */
@@ -1330,9 +1386,160 @@ main {
   margin-top: 24px;
 }
 
+/* The post's category, a small accent pill before the date. */
+.update-card__category {
+  padding: 1px 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Home page Blog section: "Browse: Engineering · Events · Journey", small links to the Blog page,
+   each showing only that category. */
+.blog-topics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -12px 0 24px;
+  font-size: 0.875rem;
+}
+
+.blog-topics span {
+  color: var(--muted);
+}
+
+.blog-topics a {
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.blog-topics a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Blog search box and category buttons, above the posts. */
+.blog-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-bottom: 28px;
+}
+
+/* The search box: an icon inside a rounded field. The whole label is the field's frame. */
+.blog-search {
+  display: flex;
+  flex: 1 1 260px;
+  align-items: center;
+  gap: 10px;
+  max-width: 360px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--muted);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.blog-search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.blog-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+}
+
+/* Category buttons: pills with a count; the chosen one is filled with the accent color. */
+.blog-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.blog-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.blog-category span {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.blog-category:hover {
+  border-color: var(--accent);
+}
+
+.blog-category[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+.blog-category[aria-pressed='true'] span {
+  color: rgb(255 255 255 / 0.8);
+}
+
+/* Shown when nothing matches the search. */
+.blog-empty {
+  padding: 24px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.blog-empty p {
+  margin: 0 0 12px;
+}
+
+p.blog-empty {
+  margin: 0;
+}
+
+/* Phones: the search box takes the full row, the buttons go under it. */
+@media (max-width: 640px) {
+  .blog-search {
+    max-width: none;
+    flex-basis: 100%;
+  }
+}
+
 /* One post's page */
 .post {
   max-width: 760px;
+}
+
+.post__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .post__header {
@@ -2252,15 +2459,7 @@ a {
   transform: translateY(-3px);
 }
 
-/* Hero photo: gentle zoom; "open to opportunities" dot breathes */
-.hero__photo {
-  transition: transform 0.4s, box-shadow 0.4s;
-}
-
-.hero__photo:hover {
-  transform: scale(1.03);
-  box-shadow: 0 16px 44px color-mix(in srgb, var(--accent) 35%, transparent);
-}
+/* "Open to opportunities" dot breathes */
 
 .hero__available-dot {
   position: relative;
@@ -2312,34 +2511,38 @@ a {
   transform: scale(1.1);
 }
 
-/* The pills sit close together, instead of the wide gap between plain numbers. */
+/* The three numbers merged into one bar: three equal parts split by thin lines, as wide as the
+   three cards above, so they line up. The whole bar's border lights up on hover. */
 .stats {
-  gap: 12px;
-}
-
-/* Each number sits in a soft pill whose border lights up on hover. */
-.stats__item {
-  padding: 10px 18px 10px 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 16px;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: color-mix(in srgb, var(--card) 60%, transparent);
+  background: var(--card);
   transition: border-color 0.25s;
 }
 
-.stats__item:hover {
+.stats:hover {
   border-color: var(--accent);
 }
 
-/* Phones: the three pills share one row in equal columns, a little more compact. */
-@media (max-width: 480px) {
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-  }
+.stats__item {
+  align-items: center;
+  padding: 16px 12px;
+  text-align: center;
+}
 
+.stats__item + .stats__item {
+  border-left: 1px solid var(--border);
+}
+
+/* Phones: a little more compact. */
+@media (max-width: 480px) {
   .stats__item {
-    padding: 8px 10px;
+    padding: 12px 8px;
   }
 
   .stats__item strong {
@@ -2537,11 +2740,11 @@ a {
   .metrics li:hover,
   .tags li:hover,
   .social-links a:hover,
-  .hero__photo:hover,
   .theme-toggle:hover,
   .contact-tile:hover,
   .edu-chip:hover,
   .edu-degree:hover,
+  .mindset__item:hover,
   .back-link:hover span,
   .forward-link:hover span,
   .post__nav a:hover,
