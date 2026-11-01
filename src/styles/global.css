@@ -373,9 +373,13 @@ main {
 }
 
 @media (max-width: 720px) {
+  /* Phones: less empty space above the photo (24px instead of the sections' 64px) and between
+     the photo and the text (the photo's faded bottom already reads as space). */
   .hero {
     flex-direction: column-reverse;
     align-items: stretch;
+    gap: 8px;
+    padding-top: 24px;
   }
 
   /* Stops the long text from making the page wider than the phone screen. */
@@ -411,13 +415,13 @@ main {
   }
 
   /* Phones: the photo goes on top (column-reverse), full width but not too tall. Its BOTTOM
-     edge fades into the page, with a little space before the text starts. */
+     edge fades into the page, right above the text. */
   .hero__photo {
     width: 100%;
     max-width: 220px;
     aspect-ratio: 1;
     align-self: center;
-    margin: 0 0 16px;
+    margin: 0;
     -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
     mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
   }
@@ -1949,6 +1953,21 @@ main {
 
   .blog-bar .blog-category {
     flex-shrink: 0;
+  }
+}
+
+/* Phones, on the Blog page only: the navbar scrolls away with the page instead of staying on top,
+   and the Blog bar takes its place at the very top of the screen. One bar instead of two stacked
+   bars leaves more of the small screen for the posts. ("← Home" in the bar leads back.) */
+@media (max-width: 720px) {
+  body:has(.blog-bar) .navbar {
+    position: relative;
+  }
+
+  .blog-bar {
+    top: 0;
+    /* Clears the iPhone notch / status bar when the page runs full screen. */
+    padding-top: calc(12px + env(safe-area-inset-top));
   }
 }
 
