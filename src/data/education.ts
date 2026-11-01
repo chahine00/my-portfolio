@@ -4,6 +4,9 @@ export interface EducationItem {
   title: string
   place: string
   year: string
+  // The school's or organizer's logo in /public, e.g. '/logos/aou.png'.
+  // Without one, the initials of "place" are shown in a badge instead.
+  logo?: string
 }
 
 export const degrees: EducationItem[] = [
@@ -17,4 +20,15 @@ export const certificates: EducationItem[] = [
   { title: 'Foundations of Computer Science', place: 'SE Factory', year: '2022' },
 ]
 
-export const languages = ['Arabic (native)', 'English', 'French (basic)']
+// level: 3 = native, 2 = fluent, 1 = basic. It fills that many of the three small bars.
+export interface Language {
+  name: string
+  level: 1 | 2 | 3
+  label: string
+}
+
+export const languages: Language[] = [
+  { name: 'Arabic', level: 3, label: 'Native' },
+  { name: 'English', level: 2, label: 'Fluent' },
+  { name: 'French', level: 1, label: 'Basic' },
+]

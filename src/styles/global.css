@@ -456,23 +456,12 @@ main {
   /* Bigger tap areas for the small text links. */
   .back-link,
   .forward-link,
-  .card__links a,
-  .contact-list a {
+  .card__links a {
     min-height: 44px;
   }
 
-  .card__links a,
-  .contact-list a {
+  .card__links a {
     display: inline-flex;
-    align-items: center;
-  }
-
-  /* The taller contact links already space the rows, and the label lines up with its link. */
-  .contact-list {
-    gap: 0;
-  }
-
-  .contact-list li {
     align-items: center;
   }
 }
@@ -638,36 +627,168 @@ main {
   }
 }
 
-/* Education */
-.edu-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+/* Education: a small label above each group ("University", "Certificates & bootcamps"). */
+.edu-group {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.edu-list {
-  display: flex;
-  flex-direction: column;
+.edu-group:not(:first-of-type) {
+  margin-top: 24px;
+}
+
+/* The school's logo, or its initials in a badge until a logo is added. */
+.edu-logo {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* A white background, so logos made for white paper look right in dark mode too. */
+.edu-logo img {
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  background: #fff;
+  object-fit: contain;
+}
+
+.edu-meta {
+  display: block;
+  color: var(--muted);
+}
+
+/* University degrees: bigger cards with a bigger logo, side by side. */
+.edu-degrees {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.edu-list li {
+.edu-degree {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  transition: border-color 0.2s, transform 0.2s;
 }
 
-.edu-list span {
-  color: var(--muted);
+.edu-degree:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.edu-degree .edu-logo {
+  width: 56px;
+  height: 56px;
+  font-size: 1rem;
+}
+
+.edu-degree strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.edu-degree .edu-meta {
   font-size: 0.875rem;
 }
 
-@media (max-width: 640px) {
-  .edu-grid {
-    grid-template-columns: 1fr;
-  }
+/* Certificates and bootcamps: smaller cards, all the same size. The columns are equal, and
+   grid-auto-rows: 1fr makes every row as tall as the tallest card, so a long name just wraps
+   onto a second line instead of making its card bigger than the others. */
+.edu-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  grid-auto-rows: 1fr;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.edu-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 10px 10px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  line-height: 1.3;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.edu-chip:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.edu-chip .edu-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+}
+
+.edu-chip strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.edu-chip .edu-meta {
+  font-size: 0.8rem;
+}
+
+/* Languages: name, three small bars (filled up to the level), and the level in words. */
+.languages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.languages__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.languages__bars {
+  display: flex;
+  gap: 3px;
+}
+
+.languages__bars span {
+  width: 14px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border);
+}
+
+.languages__bars span.is-on {
+  background: var(--accent);
+}
+
+.languages__label {
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
 /* Testimonials */
@@ -902,17 +1023,6 @@ main {
 .stack__row + .stack__row {
   padding-top: 16px;
   border-top: 1px solid var(--border);
-}
-
-.stack__also {
-  margin: 16px 0 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.stack__also span {
-  color: var(--text);
-  font-weight: 600;
 }
 
 @media (max-width: 640px) {
@@ -1590,22 +1700,93 @@ main {
   margin: 0 0 24px;
 }
 
-.contact-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+/* One box per contact: icon, then the name and the address/number. They fill the row
+   in equal columns and wrap on narrow screens. */
+.contact-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* Every row is as tall as the WhatsApp button, so rows with and without one are evenly spaced. */
-.contact-list li {
+.contact-tile {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  min-height: 34px;
-  gap: 4px 12px;
+  gap: 8px;
+  padding-right: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+/* The main link fills the box (except the WhatsApp button), so clicking anywhere else opens it. */
+.contact-tile__main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 14px 0 14px 16px;
+  border-radius: 14px;
+  color: var(--text);
+}
+
+.contact-tile:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 15%, transparent);
+  transform: translateY(-3px);
+}
+
+.contact-tile__icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+}
+
+/* The round WhatsApp button on a phone box, in WhatsApp green. Only it opens the chat. */
+.contact-tile__whatsapp {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: color-mix(in srgb, #25d366 15%, transparent);
+  color: #1da851;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.contact-tile__whatsapp:hover {
+  background: color-mix(in srgb, #25d366 28%, transparent);
+  transform: scale(1.08);
+}
+
+.contact-tile__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.contact-tile__text strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contact-tile__text span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* "Or send me a message:" starts a new block, so more space above it than below. */
@@ -1613,40 +1794,9 @@ main {
   margin: 32px 0 12px;
 }
 
-.contact-label {
-  min-width: 90px;
-  color: var(--muted);
-}
-
-.contact-list a {
-  color: var(--accent);
-  overflow-wrap: anywhere;
-}
-
-/* The small round WhatsApp button next to a phone number, in WhatsApp green. */
-.contact-list a.contact-whatsapp {
-  display: inline-grid;
-  place-items: center;
-  align-self: center;
-  width: 34px;
-  height: 34px;
-  min-height: 0;
-  border-radius: 50%;
-  background: color-mix(in srgb, #25d366 15%, transparent);
-  color: #1da851;
-  transition: background-color 0.2s, transform 0.2s;
-}
-
-.contact-list a.contact-whatsapp:hover {
-  background: color-mix(in srgb, #25d366 28%, transparent);
-  transform: scale(1.08);
-}
-
 .contact-flag {
   width: 21px;
   height: 14px;
-  margin-right: 8px;
-  vertical-align: -2px;
   border-radius: 2px;
   box-shadow: 0 0 0 1px var(--border);
 }
@@ -2034,7 +2184,6 @@ a {
 /* Cards: lift and accent border on hover */
 .project-card,
 .job,
-.edu-grid .card,
 .quote,
 .challenges .card,
 .metrics li {
@@ -2043,7 +2192,6 @@ a {
 
 .project-card:hover,
 .job:hover,
-.edu-grid .card:hover,
 .quote:hover,
 .challenges .card:hover,
 .metrics li:hover {
@@ -2208,15 +2356,6 @@ a {
   outline-offset: 2px;
 }
 
-/* Contact rows: slide a little on hover */
-.contact-list li {
-  transition: transform 0.2s;
-}
-
-.contact-list li:hover {
-  transform: translateX(4px);
-}
-
 /* Form fields: accent border when typing */
 .contact-form input,
 .contact-form textarea {
@@ -2361,7 +2500,6 @@ a {
   .button:hover:not(:disabled),
   .project-card:hover,
   .job:hover,
-  .edu-grid .card:hover,
   .quote:hover,
   .challenges .card:hover,
   .metrics li:hover,
@@ -2369,7 +2507,9 @@ a {
   .social-links a:hover,
   .hero__photo:hover,
   .theme-toggle:hover,
-  .contact-list li:hover,
+  .contact-tile:hover,
+  .edu-chip:hover,
+  .edu-degree:hover,
   .back-link:hover span,
   .forward-link:hover span,
   .post__nav a:hover,

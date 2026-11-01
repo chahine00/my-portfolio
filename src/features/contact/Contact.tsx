@@ -1,4 +1,4 @@
-// The "Contact" section: a form that sends a message.
+// The "Contact" section: a box per contact (email, phones, LinkedIn…), then a form that sends a message.
 // It uses STATE for the form fields and the sending status, so it's a good one to study.
 
 // useState is a React "hook". It lets a component remember values,
@@ -69,38 +69,48 @@ function Contact() {
         .
       </p>
 
-      {/* Direct contact details, read from src/data/contact.ts.
-          Links starting with https open in a new tab; tel: and mailto: don't need to. */}
-      <ul className="contact-list">
-        {contacts.map((contact) => (
-          <li key={contact.label}>
-            <span className="contact-label">{contact.label}</span>
-            <a
-              href={contact.href}
-              {...(contact.href.startsWith('http') && {
-                target: '_blank',
-                rel: 'noreferrer',
-              })}
-            >
-              {/* "&&" only renders the flag when the contact has one. */}
-              {contact.flag && <img src={asset(contact.flag)} alt="" className="contact-flag" />}
-              {contact.value}
-            </a>
-            {/* Numbers that are also on WhatsApp get a small button that opens a chat. */}
-            {contact.whatsapp && (
+      {/* One box per contact, read from src/data/contact.ts. Clicking the box opens the contact
+          (email, phone call, LinkedIn…). A number that's on WhatsApp also gets a round WhatsApp
+          button: only that button opens the chat. Links starting with https open in a new tab. */}
+      <ul className="contact-tiles">
+        {contacts.map((contact) => {
+          const icon = contact.icon ?? (contact.href.startsWith('tel:') ? 'phone' : undefined)
+          return (
+            <li key={contact.label} className="contact-tile">
               <a
-                href={contact.whatsapp}
-                target="_blank"
-                rel="noreferrer"
-                className="contact-whatsapp"
-                aria-label={`WhatsApp ${contact.value}`}
-                title="Chat on WhatsApp"
+                href={contact.href}
+                className="contact-tile__main"
+                {...(contact.href.startsWith('http') && { target: '_blank', rel: 'noreferrer' })}
               >
-                <Icon name="whatsapp" size={18} />
+                {icon && (
+                  <span className="contact-tile__icon">
+                    <Icon name={icon} size={22} />
+                  </span>
+                )}
+                <span className="contact-tile__text">
+                  <strong>
+                    {contact.label}
+                    {/* "&&" only renders the flag when the contact has one. */}
+                    {contact.flag && <img src={asset(contact.flag)} alt="" className="contact-flag" />}
+                  </strong>
+                  <span>{contact.value}</span>
+                </span>
               </a>
-            )}
-          </li>
-        ))}
+              {contact.whatsapp && (
+                <a
+                  href={contact.whatsapp}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="contact-tile__whatsapp"
+                  aria-label={`WhatsApp ${contact.value}`}
+                  title="Chat on WhatsApp"
+                >
+                  <Icon name="whatsapp" size={20} />
+                </a>
+              )}
+            </li>
+          )
+        })}
       </ul>
 
       <p className="contact-form-label">Or send me a message:</p>
