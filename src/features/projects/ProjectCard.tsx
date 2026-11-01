@@ -59,15 +59,28 @@ function CoverBanner({ images }: { images: string[] }) {
     >
       {/* translateX moves the whole strip: photo 2 is at -100%, photo 3 at -200%… */}
       <div className="cover-banner" style={{ transform: `translateX(-${index * 100}%)` }}>
+        {/* Each photo is shown whole (never cropped), so wide screenshots and tall phone
+            screenshots both fit. The space around it is filled with a blurred copy of the same photo. */}
         {images.map((src, i) => (
-          <img
-            key={src}
-            src={thumb(src)}
-            onError={fallbackTo(src)}
-            alt=""
-            loading={i === 0 ? 'eager' : 'lazy'}
-            decoding="async"
-          />
+          <div className="cover-slide" key={src}>
+            <img
+              className="cover-slide__bg"
+              src={thumb(src)}
+              onError={fallbackTo(src)}
+              alt=""
+              aria-hidden="true"
+              loading={i === 0 ? 'eager' : 'lazy'}
+              decoding="async"
+            />
+            <img
+              className="cover-slide__img"
+              src={thumb(src)}
+              onError={fallbackTo(src)}
+              alt=""
+              loading={i === 0 ? 'eager' : 'lazy'}
+              decoding="async"
+            />
+          </div>
         ))}
       </div>
 

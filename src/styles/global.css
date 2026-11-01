@@ -902,12 +902,29 @@ main {
   transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-.project-card__cover img {
+/* One photo of the strip: the blurred copy fills the frame, the real photo sits on top, whole. */
+.cover-slide {
+  position: relative;
   flex: 0 0 100%;
+  overflow: hidden;
+}
+
+.cover-slide img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+}
+
+/* Blown up past the edges (scale) so the blur doesn't leave a light rim. */
+.cover-slide__bg {
   object-fit: cover;
-  object-position: top;
+  filter: blur(18px) brightness(0.85);
+  transform: scale(1.15);
+}
+
+.cover-slide__img {
+  object-fit: contain;
   transition: transform 0.3s;
 }
 
@@ -943,7 +960,7 @@ main {
   }
 }
 
-.project-card:hover .project-card__cover img {
+.project-card:hover .cover-slide__img {
   transform: scale(1.03);
 }
 
@@ -1684,7 +1701,7 @@ main {
     animation: none;
   }
 
-  .project-card:hover .project-card__cover img {
+  .project-card:hover .cover-slide__img {
     transform: none;
   }
 
