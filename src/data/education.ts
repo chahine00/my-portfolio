@@ -10,8 +10,8 @@ export interface EducationItem {
 }
 
 export const degrees: EducationItem[] = [
-  { title: 'BSc Computer Science', place: 'Arab Open University', year: '2018 – 2022' },
-  { title: 'Bachelor of Business Management', place: 'Arab Open University', year: '2010 – 2016' },
+  { title: 'BSc Computer Science', place: 'Arab Open University', year: '2018 – 2022', logo: '/logos/aou.png' },
+  { title: 'Bachelor of Business Management', place: 'Arab Open University', year: '2010 – 2016', logo: '/logos/aou.png' },
 ]
 
 // Add certificates here too, e.g. { title: 'AWS Cloud Practitioner', place: 'Amazon', year: '2026' }
@@ -29,6 +29,6 @@ export interface Language {
 
 export const languages: Language[] = [
   { name: 'Arabic', level: 3, label: 'Native' },
-  { name: 'English', level: 2, label: 'Fluent' },
+  { name: 'English', level: 2, label: 'Conversational' },
   { name: 'French', level: 1, label: 'Basic' },
 ]

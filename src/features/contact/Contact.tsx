@@ -23,6 +23,8 @@ function Contact() {
   const [status, setStatus] = useState<Status>('idle') // <Status> tells TypeScript which values are allowed
   // Remembers who just wrote, so the thank-you message can use their name after the form is cleared.
   const [sentName, setSentName] = useState('')
+  // The label of the phone number that was just copied, so its box can say "Copied!" for a moment.
+  const [copied, setCopied] = useState('')
   // useRef points at the success box, so we can move the screen (and keyboard focus) to it.
   const successRef = useRef<HTMLDivElement>(null)
 
@@ -32,6 +34,17 @@ function Contact() {
     successRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     successRef.current?.focus({ preventScroll: true })
   }, [status])
+
+  // Clicking a phone box copies the number (instead of opening the phone app).
+  async function copyNumber(label: string, number: string) {
+    try {
+      await navigator.clipboard.writeText(number)
+      setCopied(label)
+      window.setTimeout(() => setCopied((current) => (current === label ? '' : current)), 2000)
+    } catch {
+      // Some browsers block copying; the number is still on screen to copy by hand.
+    }
+  }
 
   // This function runs when the form is submitted (button click or pressing Enter).
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
@@ -70,32 +83,55 @@ function Contact() {
       </p>
 
       {/* One box per contact, read from src/data/contact.ts. Clicking the box opens the contact
-          (email, phone call, LinkedIn…). A number that's on WhatsApp also gets a round WhatsApp
+          (email, LinkedIn…); on a phone box it copies the number. A number that's on WhatsApp also gets a round WhatsApp
           button: only that button opens the chat. Links starting with https open in a new tab. */}
       <ul className="contact-tiles">
         {contacts.map((contact) => {
           const icon = contact.icon ?? (contact.href.startsWith('tel:') ? 'phone' : undefined)
+          const isCopied = copied === contact.label
+          // The inside of the box, the same for a link and for a copy button.
+          const content = (
+            <>
+              {icon && (
+                <span className="contact-tile__icon">
+                  <Icon name={icon} size={22} />
+                </span>
+              )}
+              <span className="contact-tile__text">
+                <strong>
+                  {contact.label}
+                  {/* "&&" only renders the flag when the contact has one. */}
+                  {contact.flag && <img src={asset(contact.flag)} alt="" className="contact-flag" />}
+                </strong>
+                {/* role="status" makes screen readers say "Copied!" when it appears. */}
+                <span className={isCopied ? 'contact-tile__copied' : undefined} role="status">
+                  {isCopied ? 'Copied!' : contact.value}
+                </span>
+              </span>
+            </>
+          )
           return (
             <li key={contact.label} className="contact-tile">
-              <a
-                href={contact.href}
-                className="contact-tile__main"
-                {...(contact.href.startsWith('http') && { target: '_blank', rel: 'noreferrer' })}
-              >
-                {icon && (
-                  <span className="contact-tile__icon">
-                    <Icon name={icon} size={22} />
-                  </span>
-                )}
-                <span className="contact-tile__text">
-                  <strong>
-                    {contact.label}
-                    {/* "&&" only renders the flag when the contact has one. */}
-                    {contact.flag && <img src={asset(contact.flag)} alt="" className="contact-flag" />}
-                  </strong>
-                  <span>{contact.value}</span>
-                </span>
-              </a>
+              {contact.href.startsWith('tel:') ? (
+                // Phone numbers: a button that copies the number. title and aria-label say so.
+                <button
+                  type="button"
+                  className="contact-tile__main"
+                  onClick={() => copyNumber(contact.label, contact.value)}
+                  aria-label={`Copy ${contact.value}`}
+                  title="Click to copy"
+                >
+                  {content}
+                </button>
+              ) : (
+                <a
+                  href={contact.href}
+                  className="contact-tile__main"
+                  {...(contact.href.startsWith('http') && { target: '_blank', rel: 'noreferrer' })}
+                >
+                  {content}
+                </a>
+              )}
               {contact.whatsapp && (
                 <a
                   href={contact.whatsapp}
