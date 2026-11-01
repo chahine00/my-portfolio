@@ -1309,7 +1309,7 @@ main {
   gap: 6px;
   padding: 5px 8px;
   border-radius: 999px;
-  background: rgb(0 0 0 / 0.35);
+  background: rgb(0 0 0 / 0.2);
   transform: translateX(-50%);
 }
 
@@ -1801,6 +1801,11 @@ main {
 }
 
 .blog-preview__cover img {
+  /* The photo fills its box but never decides the box's size: the boxes have their sizes before
+     any photo loads. (Otherwise the cards grew while the photos loaded during a scroll, and the
+     menu's "Contact" link stopped short of its section the first time.) */
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -1888,7 +1893,7 @@ main {
 
 .blog-preview__item--featured .blog-preview__cover {
   flex: 1 1 auto;
-  min-height: 240px;
+  min-height: 320px;
 }
 
 .blog-preview__item--featured .blog-preview__body {
@@ -2087,34 +2092,50 @@ main {
      so the ::before (z-index -1) stays behind the bar's content. */
 }
 
-/* The bar's background: a rounded patch of the page color, a little wider than the content
-   (a bit before "Blog" and after "← Home"), blurred so every edge and corner fades out softly,
-   like a rounded glow, with no lines. Its top is cut straight (it sits right under the navbar).
+/* The bar's background: a patch of the page color that is fully solid behind the bar's content
+   and fades out smoothly all around it, so it melts into the page with no edge or line.
+   The fades sit OUTSIDE the content (in the space left and right of it, a strip above, a longer
+   strip below), so a post scrolling underneath never shows through behind the search or the buttons.
+   Two gradient masks do it: one fades the left and right sides, the other the top and bottom;
+   "intersect" keeps only what both allow, which also softens the corners.
    --bleed: how far it reaches past the content on each side (16px on phones, the space they have). */
 .blog-bar {
-  --bleed: clamp(16px, (100vw - 960px) / 2, 32px);
+  --bleed: clamp(16px, (100vw - 960px) / 2, 200px);
+  --fade-top: 36px;
+  /* Short at first, so the fade doesn't dim the first post sitting right under the bar. */
+  --fade-bottom: 28px;
 }
 
 .blog-bar::before {
   content: '';
   position: absolute;
   z-index: -1;
-  top: -10px;
-  bottom: -10px;
+  top: calc(-1 * var(--fade-top));
+  bottom: calc(-1 * var(--fade-bottom));
   left: calc(-1 * var(--bleed));
   right: calc(-1 * var(--bleed));
-  border-radius: 28px;
-  background: var(--bg);
-  filter: blur(12px);
+  /* Frosted, not solid: the page's colored glow shows through (so the bar doesn't look like a dark
+     block over it, especially in dark mode), while posts scrolling underneath are blurred and dimmed. */
+  background: color-mix(in srgb, var(--bg) 40%, transparent);
+  -webkit-backdrop-filter: blur(26px);
+  backdrop-filter: blur(26px);
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2) calc(var(--bleed) * 0.5), #000 var(--bleed), #000 calc(100% - var(--bleed)), rgb(0 0 0 / 0.2) calc(100% - var(--bleed) * 0.5), transparent),
+    linear-gradient(180deg, transparent, rgb(0 0 0 / 0.2) calc(var(--fade-top) * 0.5), #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), rgb(0 0 0 / 0.2) calc(100% - var(--fade-bottom) * 0.5), transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2) calc(var(--bleed) * 0.5), #000 var(--bleed), #000 calc(100% - var(--bleed)), rgb(0 0 0 / 0.2) calc(100% - var(--bleed) * 0.5), transparent),
+    linear-gradient(180deg, transparent, rgb(0 0 0 / 0.2) calc(var(--fade-top) * 0.5), #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), rgb(0 0 0 / 0.2) calc(100% - var(--fade-bottom) * 0.5), transparent);
+  mask-composite: intersect;
   pointer-events: none;
 }
 
-/* While the bar is stuck under the navbar (UpdatesPage.tsx adds the class): cut the blurred top off
-   exactly at the bar's top edge, so the top stays solid and no post shows through under the navbar.
-   Before that, all four sides and corners keep their soft, rounded fade. */
-.blog-bar--stuck::before {
-  top: -40px;
-  clip-path: inset(40px -60px -60px -60px);
+/* While the bar is stuck under the navbar (UpdatesPage.tsx adds the class): no fade on top, so the
+   top stays solid right under the navbar and no post shows through there. */
+.blog-bar--stuck {
+  --fade-top: 0px;
+  /* Once stuck, posts scroll under the bar: a long fade lets them slip away softly. */
+  --fade-bottom: 110px;
 }
 
 .blog-bar .blog-filters {
@@ -2966,12 +2987,12 @@ button.contact-tile__main {
 /* Dark mode: the dark page needs a deeper shadow, with a faint indigo glow. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .back-to-top {
-    --btt-shadow: 0 4px 10px rgb(0 0 0 / 0.35), 0 8px 28px -4px rgb(99 102 241 / 0.35);
+    --btt-shadow: 0 4px 10px rgb(0 0 0 / 0.2), 0 8px 28px -4px rgb(99 102 241 / 0.35);
   }
 }
 
 :root[data-theme='dark'] .back-to-top {
-  --btt-shadow: 0 4px 10px rgb(0 0 0 / 0.35), 0 8px 28px -4px rgb(99 102 241 / 0.35);
+  --btt-shadow: 0 4px 10px rgb(0 0 0 / 0.2), 0 8px 28px -4px rgb(99 102 241 / 0.35);
 }
 
 .back-to-top:hover {
