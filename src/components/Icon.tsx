@@ -1,6 +1,24 @@
 // Small inline icons. Drawn with SVG, so they take the text color and need no image files.
 
-export type IconName = 'email' | 'linkedin' | 'github' | 'whatsapp' | 'sun' | 'moon' | 'pin' | 'arrow-up' | 'phone' | 'search'
+export type IconName =
+  | 'email'
+  | 'linkedin'
+  | 'github'
+  | 'whatsapp'
+  | 'sun'
+  | 'moon'
+  | 'pin'
+  | 'arrow-up'
+  | 'phone'
+  | 'search'
+  // The menu's section icons (shown on phones, see Navbar.tsx):
+  | 'user'
+  | 'folder'
+  | 'briefcase'
+  | 'code'
+  | 'cap'
+  | 'pen'
+  | 'chat'
 
 interface IconProps {
   name: IconName
@@ -57,6 +75,52 @@ function Icon({ name, size = 20 }: IconProps) {
       return (
         <svg {...stroke}>
           <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+        </svg>
+      )
+    case 'user':
+      return (
+        <svg {...stroke}>
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 21a8 8 0 0 1 16 0" />
+        </svg>
+      )
+    case 'folder':
+      return (
+        <svg {...stroke}>
+          <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        </svg>
+      )
+    case 'briefcase':
+      return (
+        <svg {...stroke}>
+          <rect x="3" y="7" width="18" height="13" rx="2" />
+          <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18" />
+        </svg>
+      )
+    case 'code':
+      return (
+        <svg {...stroke}>
+          <path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" />
+        </svg>
+      )
+    case 'cap':
+      return (
+        <svg {...stroke}>
+          <path d="m2 9 10-5 10 5-10 5z" />
+          <path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5M22 9v6" />
+        </svg>
+      )
+    case 'pen':
+      return (
+        <svg {...stroke}>
+          <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z" />
+          <path d="m13.5 6.5 4 4" />
+        </svg>
+      )
+    case 'chat':
+      return (
+        <svg {...stroke}>
+          <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z" />
         </svg>
       )
     case 'linkedin':

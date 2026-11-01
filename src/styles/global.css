@@ -3808,3 +3808,138 @@ a {
     font-size: 1.15rem;
   }
 }
+
+/* ------------------------------------------------------------------------------------------------
+   Menu icons and the phone tab bar (see Navbar.tsx).
+   Desktop and tablets: text links, no icons. Phones: every link is an icon with a small label under
+   it, so all seven fit on one row. On the home page, the top bar scrolls away with the page and the
+   same row comes back as a "tab bar" fixed to the bottom of the screen, within easy reach of the thumb.
+   ------------------------------------------------------------------------------------------------ */
+.navbar__icon {
+  display: none;
+}
+
+.tabbar {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  /* The row of tabs: seven equal columns across the full width. */
+  .navbar__links {
+    width: 100%;
+    margin: 0;
+    gap: 0;
+    /* 0.62rem on most phones, a touch smaller on the narrowest ones so "Experience" still fits. */
+    font-size: clamp(0.55rem, 2.6vw, 0.62rem);
+  }
+
+  /* Each tab starts at its own width (a long label like "Experience" gets a bit more room),
+     then the spare space is shared evenly. */
+  .navbar__links li {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .navbar__links a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 0 2px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition: color 0.2s;
+  }
+
+  /* The current section: accent color, and a soft pill behind its icon (instead of the underline). */
+  .navbar__links a.active {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .navbar__links a::after {
+    display: none;
+  }
+
+  .navbar__icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 26px;
+    border-radius: 999px;
+    transition: background-color 0.2s;
+  }
+
+  .navbar__links a.active .navbar__icon {
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+  }
+
+  .navbar__label {
+    white-space: nowrap;
+  }
+
+  .navbar__label .navbar__dot {
+    width: 5px;
+    height: 5px;
+    margin-left: 3px;
+    vertical-align: 1px;
+  }
+
+  /* The top bar no longer needs its sideways-swipe safety net: the tabs always fit. Its row reaches
+     a little into the bar's side padding, so the tabs are as wide as in the tab bar. */
+  .navbar__nav {
+    overflow: visible;
+    margin: 0 -8px;
+  }
+
+  /* Home page: the top bar scrolls away with the page (the tab bar takes over). */
+  body:has(.tabbar) .navbar {
+    position: relative;
+  }
+
+  /* The tab bar: frosted like the top bar, hidden below the screen's edge until the top bar has
+     scrolled away (Navbar.tsx adds .tabbar--visible), then it slides up. */
+  .tabbar {
+    display: block;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 15;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 -4px 16px rgb(0 0 0 / 0.06);
+    opacity: 0;
+    transform: translateY(110%);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .tabbar--visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Room at the end of the page, so the tab bar never covers the footer. */
+  body:has(.tabbar) {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+
+  /* The back-to-top button sits above the tab bar while it's shown. */
+  .back-to-top {
+    transition: transform 0.2s, opacity 0.3s, visibility 0.3s, bottom 0.3s ease;
+  }
+
+  body:has(.tabbar--visible) .back-to-top {
+    bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 720px) and (prefers-reduced-motion: reduce) {
+  .tabbar {
+    transition: opacity 0.2s;
+  }
+}
