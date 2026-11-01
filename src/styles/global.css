@@ -15,7 +15,14 @@
   --glow-1: rgb(99 102 241 / 0.16);
   --glow-2: rgb(6 182 212 / 0.13);
   --glow-3: rgb(236 72 153 / 0.10);
+  /* Card shadows. Light: soft and tinted with the indigo accent instead of grey, in two layers
+     (a tight one close under the card and a wide faint one), so cards float without a dirty halo.
+     --shadow-soft: resting (photos), --shadow-lift: a card you hover. */
+  --shadow-soft: 0 1px 2px rgb(79 70 229 / 0.06), 0 8px 20px -10px rgb(79 70 229 / 0.25);
+  --shadow-lift: 0 2px 4px rgb(79 70 229 / 0.06), 0 16px 32px -14px rgb(79 70 229 / 0.35);
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* The titles' font (loaded in index.html). Body text keeps the system font above. */
+  --font-display: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.6;
   color: var(--text);
   background: var(--bg);
@@ -38,6 +45,9 @@
     --glow-1: rgb(99 102 241 / 0.26);
     --glow-2: rgb(34 211 238 / 0.12);
     --glow-3: rgb(168 85 247 / 0.18);
+    /* Dark: deeper shadows, and a faint indigo glow under a hovered card. */
+    --shadow-soft: 0 2px 6px rgb(0 0 0 / 0.3), 0 10px 24px -10px rgb(0 0 0 / 0.5);
+    --shadow-lift: 0 2px 6px rgb(0 0 0 / 0.3), 0 18px 36px -14px rgb(0 0 0 / 0.6), 0 12px 32px -16px rgb(129 140 248 / 0.35);
   }
 }
 
@@ -51,6 +61,8 @@
   --glow-1: rgb(99 102 241 / 0.26);
   --glow-2: rgb(34 211 238 / 0.12);
   --glow-3: rgb(168 85 247 / 0.18);
+  --shadow-soft: 0 2px 6px rgb(0 0 0 / 0.3), 0 10px 24px -10px rgb(0 0 0 / 0.5);
+  --shadow-lift: 0 2px 6px rgb(0 0 0 / 0.3), 0 18px 36px -14px rgb(0 0 0 / 0.6), 0 12px 32px -16px rgb(129 140 248 / 0.35);
 }
 
 *,
@@ -186,8 +198,53 @@ main {
   text-transform: uppercase;
 }
 
-.eyebrow + h1 {
+.eyebrow + h1,
+.eyebrow + h2 {
   margin-top: 4px;
+}
+
+/* The title at the top of each home section (SectionTitle.tsx): the label, then the title with
+   its last words in the accent gradient. An optional link (like "See all →") sits on the right. */
+.section-title {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px 16px;
+  margin-bottom: 28px;
+}
+
+.section-title h2 {
+  margin: 6px 0 0;
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.section-title__accent {
+  background: linear-gradient(135deg, var(--accent), #06b6d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* The big titles use Space Grotesk: the hero name, the home section titles, and the
+   Blog, post and project page titles. Smaller headings (card titles) keep the system font. */
+.hero h1,
+.section-title h2,
+.mindset__title,
+.blog-hero h1,
+.post__header h1,
+.project-page__header h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* A short intro line right under a section title sits closer to it. */
+.section-title + .page-intro,
+.section-title + .contact-intro {
+  margin-top: -16px;
 }
 
 /* Hero: text on the left, photo on the right (photo on top on phones) */
@@ -569,13 +626,24 @@ main {
 }
 
 .mindset__title {
-  max-width: 22ch;
+  max-width: 26ch;
   margin: 8px 0 28px;
+  letter-spacing: -0.02em;
   font-size: clamp(1.8rem, 4.5vw, 2.8rem);
   line-height: 1.15;
 }
 
+/* The line under the statement: pulled up close to it, the cards keep their usual gap below.
+   No width limit, so it stays on one line on laptops and desktops (it wraps only on small screens). */
+.mindset__lead {
+  margin: -16px 0 28px;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
 .mindset__title span {
+  /* Always on its own line, so the contrast reads as two lines: what changes / what doesn't. */
+  display: block;
   background: linear-gradient(135deg, var(--accent), #06b6d4);
   -webkit-background-clip: text;
   background-clip: text;
@@ -1303,18 +1371,6 @@ main {
 }
 
 /* Blog: a timeline of posts (home section + full page) */
-.section-header {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px 16px;
-}
-
-.section-header h1 {
-  margin-bottom: 0;
-}
-
 .page-intro {
   margin: 8px 0 32px;
   color: var(--muted);
@@ -1370,12 +1426,13 @@ main {
 }
 
 .update-card {
-  transition: border-color 0.2s, transform 0.2s;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .update-card:hover {
   border-color: var(--accent);
   transform: translateX(4px);
+  box-shadow: var(--shadow-lift);
 }
 
 .update-card h3 {
@@ -1506,7 +1563,7 @@ main {
 
 .blog-preview__item:hover {
   border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
-  box-shadow: 0 12px 32px rgb(0 0 0 / 0.12);
+  box-shadow: var(--shadow-lift);
 }
 
 /* How the cards appear when you scroll to them (useReveal adds .is-visible and --reveal-delay):
@@ -1755,7 +1812,7 @@ main {
   overflow: hidden;
   border-radius: 14px;
   background: var(--border);
-  box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
+  box-shadow: var(--shadow-soft);
 }
 
 .blog-hero__tile img {
@@ -2435,7 +2492,9 @@ button.contact-tile__main {
   background: none;
   font: inherit;
   text-align: left;
-  cursor: copy;
+  /* A small custom cursor: the normal arrow with a little "copy" badge (two sheets) at its corner,
+     instead of the browser's big copy cursor. "3 2" is the arrow's tip; "copy" is the fallback. */
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3.5 2.5v14l3.4-3.1 2.3 5.2 2-.9-2.3-5.1h4.6z' fill='%23111' stroke='%23fff' stroke-width='1.3' stroke-linejoin='round'/%3E%3Crect x='14.2' y='13.2' width='5' height='6.2' rx='1.3' fill='%23fff' stroke='%234f46e5' stroke-width='1.3'/%3E%3Crect x='16.4' y='15.4' width='5' height='6.2' rx='1.3' fill='%234f46e5' stroke='%23fff' stroke-width='1.1'/%3E%3C/svg%3E") 3 2, copy;
 }
 
 .contact-tile__text .contact-tile__copied {
@@ -2620,8 +2679,22 @@ button.contact-tile__main {
   place-items: center;
   padding: 0;
   cursor: pointer;
-  box-shadow: 0 0 0 2px #4f46e5, 0 8px 24px rgb(0 0 0 / 0.4);
-  transition: transform 0.2s;
+  /* The outline, then a soft shadow tinted with the button's indigo (not grey), in two layers:
+     a tight one right under it and a wide faint one. Set per theme below. */
+  --btt-shadow: 0 2px 4px rgb(79 70 229 / 0.18), 0 10px 24px -6px rgb(79 70 229 / 0.35);
+  box-shadow: 0 0 0 2px #4f46e5, var(--btt-shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Dark mode: the dark page needs a deeper shadow, with a faint indigo glow. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .back-to-top {
+    --btt-shadow: 0 4px 10px rgb(0 0 0 / 0.35), 0 8px 28px -4px rgb(99 102 241 / 0.35);
+  }
+}
+
+:root[data-theme='dark'] .back-to-top {
+  --btt-shadow: 0 4px 10px rgb(0 0 0 / 0.35), 0 8px 28px -4px rgb(99 102 241 / 0.35);
 }
 
 .back-to-top:hover {
@@ -2906,7 +2979,7 @@ a {
 .metrics li:hover {
   transform: translateY(-4px);
   border-color: var(--accent);
-  box-shadow: 0 10px 24px rgb(0 0 0 / 0.08);
+  box-shadow: var(--shadow-lift);
 }
 
 /* Tags (skill / tech pills) */

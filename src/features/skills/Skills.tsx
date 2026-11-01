@@ -7,6 +7,7 @@
 
 import type { CSSProperties } from 'react'
 import { useReveal } from '../../utils/useReveal.ts'
+import SectionTitle from '../../components/SectionTitle.tsx'
 
 const coreStack = [
   {
@@ -33,7 +34,7 @@ function Skills() {
 
   return (
     <section id="skills" className="section" ref={sectionRef}>
-      <h1>Core Stack</h1>
+      <SectionTitle label="Skills" title="My core" accent="stack" />
 
       {/* One frame, one row per group: the group name on the left, its skills on the right. */}
       <div className="card stack stack--screen">

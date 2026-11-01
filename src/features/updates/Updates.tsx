@@ -5,6 +5,7 @@
 import { Link } from 'react-router'
 import { categories, sortedUpdates } from '../../data/updates.ts'
 import BlogPreview from './BlogPreview.tsx'
+import SectionTitle from '../../components/SectionTitle.tsx'
 
 // How many posts to preview on the home page.
 const PREVIEW_COUNT = 3
@@ -12,12 +13,16 @@ const PREVIEW_COUNT = 3
 function Updates() {
   return (
     <section id="blog" className="section">
-      <div className="section-header">
-        <h1>Blog</h1>
-        <Link to="/blog" className="forward-link">
-          See all <span aria-hidden="true">→</span>
-        </Link>
-      </div>
+      <SectionTitle
+        label="Blog"
+        title="Notes, ideas &"
+        accent="milestones"
+        action={
+          <Link to="/blog" className="forward-link">
+            See all <span aria-hidden="true">→</span>
+          </Link>
+        }
+      />
       <p className="page-intro">News, thoughts and things I've been working on.</p>
 
       <nav className="blog-topics" aria-label="Blog categories">

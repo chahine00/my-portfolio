@@ -2,6 +2,7 @@
 // It shows NOTHING until you add quotes in src/data/testimonials.ts.
 
 import { testimonials } from '../../data/testimonials.ts'
+import SectionTitle from '../../components/SectionTitle.tsx'
 
 function Testimonials() {
   // Returning null means "draw nothing".
@@ -9,7 +10,7 @@ function Testimonials() {
 
   return (
     <section id="testimonials" className="section">
-      <h1>What people say</h1>
+      <SectionTitle label="Testimonials" title="What people" accent="say" />
       <div className="grid">
         {testimonials.map((item) => (
           <figure className="card quote" key={item.name}>

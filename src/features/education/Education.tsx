@@ -5,6 +5,7 @@
 import { certificates, degrees, languages } from '../../data/education.ts'
 import type { EducationItem } from '../../data/education.ts'
 import { asset } from '../../utils/asset.ts'
+import SectionTitle from '../../components/SectionTitle.tsx'
 
 // "Arab Open University" → "AOU", "SE Factory" → "SF". Shown until a logo is added.
 function initialsOf(name: string) {
@@ -27,7 +28,7 @@ function Logo({ item }: { item: EducationItem }) {
 function Education() {
   return (
     <section id="education" className="section">
-      <h1>Education</h1>
+      <SectionTitle label="Education" title="Where I" accent="learned" />
 
       <p className="edu-group">University</p>
       <ul className="edu-degrees">

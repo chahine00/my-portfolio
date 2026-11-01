@@ -3,11 +3,12 @@
 // Import the data (the list of projects) and the component that draws ONE project.
 import { projects } from '../../data/projects.ts'
 import ProjectCard from './ProjectCard.tsx'
+import SectionTitle from '../../components/SectionTitle.tsx'
 
 function Projects() {
   return (
     <section id="projects" className="section">
-      <h1>Projects</h1>
+      <SectionTitle label="Projects" title="Things I've" accent="built" />
       <div className="grid">
         {/*
           For each project in the list, render a <ProjectCard />.

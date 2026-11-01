@@ -1,4 +1,4 @@
-// The "About Me" section: one short statement as the title, three "how I work" cards under it,
+// The "About Me" section: one short statement as the title, a line on what it means, three "how I work" cards under it,
 // and the small numbers underneath. Edit the text below to introduce yourself.
 // The numbers come from "stats" in src/data/profile.ts.
 
@@ -7,16 +7,16 @@ import { stats } from '../../data/profile.ts'
 // How you work, in three short points. Keep each one to a title and one line.
 const principles = [
   {
-    title: 'Fundamentals first',
-    text: "My core is backend systems, APIs and AI integrations: the parts that stay solid when tools change.",
+    title: 'Solid foundations',
+    text: 'The base and the logic: problem solving, data and system design. The core of every backend and AI project, and it outlasts every tool.',
   },
   {
-    title: 'Move at AI speed',
-    text: '  I pick up whatever stack or tool a project demands, so it ships fast and keeps moving forward',
+    title: 'Built to adapt',
+    text: 'New stack, new tool, new AI model? I learn it fast and put it to work, so projects keep moving forward.',
   },
   {
     title: 'Why before how',
-    text: 'AI can handle the how. With degrees in computer science and business, I start with why a feature matters.',
+    text: 'AI can handle the how. My background in computer science and business keeps me focused on why a feature matters.',
   },
 ]
 
@@ -28,9 +28,13 @@ function About() {
       <p className="eyebrow">
         About <span className="mindset__dot">·</span> The Mindset
       </p>
-      <h1 className="mindset__title">
-        In the AI era, tech changes fast. <span>Engineering fundamentals don't.</span>
-      </h1>
+      <h2 className="mindset__title">
+        In the AI Era, tools change fast. <span>The foundations don't.</span>
+      </h2>
+      {/* One personal line: the point behind the statement, not a list of skills. */}
+      <p className="mindset__lead">
+        I've learned that once you understand how things really work, every new tool is easy to pick up.
+      </p>
 
       {/* Three cards side by side: a title and one line each. */}
       <ul className="mindset__list">

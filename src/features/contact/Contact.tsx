@@ -9,6 +9,7 @@ import { sendContactMessage } from '../../services/api.ts'
 import { contacts } from '../../data/contact.ts'
 import { asset } from '../../utils/asset.ts'
 import Icon from '../../components/Icon.tsx'
+import SectionTitle from '../../components/SectionTitle.tsx'
 
 // A "union type": status can ONLY be one of these four strings.
 // TypeScript will show an error if you try to set anything else (like 'done').
@@ -71,8 +72,7 @@ function Contact() {
 
   return (
     <section id="contact" className="section">
-      <p className="eyebrow">Contact</p>
-      <h1>Reach out to me!</h1>
+      <SectionTitle label="Contact" title="Let's work" accent="together" />
       {/* One question for every kind of visitor (companies hiring, clients, people saying hi), then the next step. */}
       <p className="contact-intro">
         Hiring for a team, have a project to discuss, or just want to say hi? Send me a message below or{' '}

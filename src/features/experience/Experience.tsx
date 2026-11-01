@@ -5,6 +5,7 @@
 import { experience } from '../../data/experience.ts'
 import TimelineDot from '../../components/TimelineDot.tsx'
 import { useReveal } from '../../utils/useReveal.ts'
+import SectionTitle from '../../components/SectionTitle.tsx'
 
 function Experience() {
   // Each job appears as you scroll to it (see src/utils/useReveal.ts).
@@ -12,7 +13,7 @@ function Experience() {
 
   return (
     <section id="experience" className="section">
-      <h1>Experience</h1>
+      <SectionTitle label="Experience" title="Where I've" accent="worked" />
 
       <ol className="timeline timeline--reveal" ref={listRef}>
         {experience.map((job) => (
