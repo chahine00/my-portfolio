@@ -3,7 +3,7 @@
 // Put the groups in the order that matches the jobs you want: the most important first.
 //
 // The frame looks like a small "control screen". When it scrolls into view, a scan line sweeps
-// down once and the rows boot up one after another (the animation is in global.css).
+// down (and repeats every few seconds) and the rows boot up one after another (the animation is in global.css).
 
 import type { CSSProperties } from 'react'
 import { useReveal } from '../../utils/useReveal.ts'
