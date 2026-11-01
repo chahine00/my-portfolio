@@ -1685,37 +1685,18 @@ main {
   }
 }
 
-/* Blog page banner: a panel with a soft gradient edge. The title on the left (the last word in a
-   gradient), a mosaic of recent post photos on the right: one tall photo and two stacked beside it. */
+/* Blog page banner: a flat card with a crisp 1px border, like the other cards. The title on the left
+   (the last word in a gradient), a mosaic of recent post photos on the right: one tall photo and two stacked beside it. */
 .blog-hero {
-  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 340px);
   align-items: center;
   gap: 32px;
   margin: 20px 0 28px;
   padding: 36px;
+  border: 1px solid var(--border);
   border-radius: 22px;
-  /* Two backgrounds: the card inside, and a gradient that only shows through the 1px border. */
-  border: 1px solid transparent;
-  background:
-    linear-gradient(var(--card), var(--card)) padding-box,
-    linear-gradient(135deg, color-mix(in srgb, var(--accent) 60%, transparent), var(--border) 40%, var(--border) 60%, color-mix(in srgb, #06b6d4 50%, transparent)) border-box;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-/* A soft colored glow in the top-left corner, behind the title. */
-.blog-hero::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  top: -40%;
-  left: -10%;
-  width: 60%;
-  height: 140%;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 16%, transparent), transparent);
-  pointer-events: none;
+  background: var(--card);
 }
 
 .blog-hero__text {
@@ -1838,12 +1819,35 @@ main {
   position: sticky;
   top: var(--navbar-height, 64px);
   z-index: 10;
-  margin: 0 -16px 24px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  margin: 0 0 24px;
+  padding: 12px 0;
+  /* Its background is the ::before below. z-index above makes the bar its own layer,
+     so the ::before (z-index -1) stays behind the bar's content. */
+}
+
+/* The bar's background: a rounded patch of the page color, a little wider than the content
+   (a bit before "Blog" and after "← Home"), blurred so every edge and corner fades out softly,
+   like a rounded glow, with no lines. Its top is cut straight (it sits right under the navbar).
+   --bleed: how far it reaches past the content on each side (16px on phones, the space they have). */
+.blog-bar {
+  --bleed: clamp(16px, (100vw - 960px) / 2, 32px);
+}
+
+.blog-bar::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -40px;
+  bottom: -10px;
+  left: calc(-1 * var(--bleed));
+  right: calc(-1 * var(--bleed));
+  border-radius: 28px;
+  background: var(--bg);
+  filter: blur(12px);
+  /* Cut the blurred top off exactly at the bar's top edge (40px down), so the top stays solid
+     and nothing shows through under the navbar. The other sides keep their soft fade. */
+  clip-path: inset(40px -60px -60px -60px);
+  pointer-events: none;
 }
 
 .blog-bar .blog-filters {
