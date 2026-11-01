@@ -603,7 +603,7 @@ main {
 
 .timeline--posts .timeline__item.is-visible:hover::before {
   animation: none;
-  transform: scale(1.35);
+  transform: scale(1.1);
 }
 
 @keyframes dot-pop {
@@ -1079,7 +1079,15 @@ main {
   bottom: 8px;
   left: 5px;
   width: 2px;
-  background: var(--border);
+  border-radius: 2px;
+  /* A soft band of light (the gradient) slides down the plain line, then starts again from the top.
+     It waits above the line (-120px) until it moves, so with animations off the line is just plain. */
+  background: linear-gradient(transparent, color-mix(in srgb, var(--accent) 75%, transparent), transparent) 0 -120px / 100% 120px no-repeat var(--border);
+  animation: line-flow 4.5s ease-in-out infinite;
+}
+
+@keyframes line-flow {
+  to { background-position: 0 calc(100% + 120px); }
 }
 
 .timeline__item {
@@ -1095,10 +1103,10 @@ main {
 .timeline__item::before {
   content: '';
   position: absolute;
-  top: 24px;
-  left: 0;
-  width: 12px;
-  height: 12px;
+  top: 23px;
+  left: -1px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 0 4px var(--bg);
@@ -2152,13 +2160,42 @@ a {
   }
 }
 
-/* Timeline dots: grow when you hover their card */
+/* Timeline dots: grow gently when you hover their card, a bit more once clicked (selected),
+   with a soft glow. The click lands on an invisible button over the dot (.timeline__dot, see TimelineDot.tsx). */
 .timeline__item::before {
-  transition: transform 0.25s;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
 .timeline__item:hover::before {
-  transform: scale(1.35);
+  transform: scale(1.1);
+}
+
+.timeline__item.is-selected::before,
+.timeline--posts .timeline__item.is-visible.is-selected::before {
+  animation: none;
+  transform: scale(1.25);
+  box-shadow:
+    0 0 0 4px var(--bg),
+    0 0 12px 4px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.timeline__dot {
+  position: absolute;
+  top: 14px;
+  left: -10px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.timeline__dot:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Contact rows: slide a little on hover */

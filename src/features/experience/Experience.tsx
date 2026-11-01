@@ -3,6 +3,7 @@
 // Each job appears as you scroll down to it.
 
 import { experience } from '../../data/experience.ts'
+import TimelineDot from '../../components/TimelineDot.tsx'
 import { useReveal } from '../../utils/useReveal.ts'
 
 function Experience() {
@@ -16,6 +17,7 @@ function Experience() {
       <ol className="timeline timeline--reveal" ref={listRef}>
         {experience.map((job) => (
           <li className="timeline__item" key={job.company}>
+            <TimelineDot label={job.company} />
             <article className="card job">
               <h3>
                 {job.url ? (

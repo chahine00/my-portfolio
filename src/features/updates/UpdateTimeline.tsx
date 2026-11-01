@@ -9,6 +9,7 @@ import { Link } from 'react-router'
 import { formatDate, isRecent } from '../../data/updates.ts'
 import type { Update } from '../../data/updates.ts'
 import { fallbackTo, thumb } from '../../utils/asset.ts'
+import TimelineDot from '../../components/TimelineDot.tsx'
 import { useReveal } from '../../utils/useReveal.ts'
 
 interface UpdateTimelineProps {
@@ -29,6 +30,7 @@ function UpdateTimeline({ updates }: UpdateTimelineProps) {
 
         return (
           <li className="timeline__item" key={update.slug}>
+            <TimelineDot label={update.title} />
             <article className="card update-card card-clickable">
               <div className="update-card__meta">
                 {/* <time> tells browsers and search engines that this text is a date. */}
