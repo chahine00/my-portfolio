@@ -357,6 +357,9 @@ main {
 .hero__visual {
   position: relative;
   flex-shrink: 0;
+  /* Taps (see Hero.tsx) respond at once, without the grey flash phones add on tapped things. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   width: 260px;
   aspect-ratio: 4 / 5;
   margin-left: -70px;

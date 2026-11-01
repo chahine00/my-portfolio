@@ -1,7 +1,7 @@
 // The big welcome section at the top of the page.
 // The text comes from src/data/profile.ts.
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { profile } from '../../data/profile.ts'
 import Icon from '../../components/Icon.tsx'
 import SocialLinks from '../../components/SocialLinks.tsx'
@@ -226,6 +226,27 @@ function Hero() {
 
   useEffect(() => () => window.clearTimeout(hideTimer.current), [])
 
+  // Phones and tablets can't hover, so there a tap on the photo plays the drawing, and a second
+  // tap (on the photo or anywhere else) hides it. A mouse keeps the hover behavior.
+  // (A finger also fires "enter" and "leave" around every tap, which is why those skip touch.)
+  const visualRef = useRef<HTMLDivElement>(null)
+
+  function handleTap(event: ReactPointerEvent) {
+    if (event.pointerType !== 'touch') return
+    if (hovered) stopDrawing()
+    else startDrawing()
+  }
+
+  // While the drawing shows after a tap, a tap anywhere outside the photo hides it.
+  useEffect(() => {
+    if (!hovered) return
+    function handleTapOutside(event: PointerEvent) {
+      if (event.pointerType === 'touch' && !visualRef.current?.contains(event.target as Node)) stopDrawing()
+    }
+    document.addEventListener('pointerdown', handleTapOutside)
+    return () => document.removeEventListener('pointerdown', handleTapOutside)
+  }, [hovered])
+
   // Scrolling down runs the same color sweep as hovering: the further you scroll
   // (up to 40% of the screen's height), the further the colored band has moved across the name.
   // The page passes it to the CSS as --sweep (100% = not started, 0% = done).
@@ -298,10 +319,13 @@ function Hero() {
       {profile.photo && (
         // Hovering the photo plays a line drawing behind it (see PhotoArt above): mountains draw
         // themselves, then a flag goes up on the peak. Moving away fades it out; coming back redraws it.
+        // On touch screens a tap does the same (see handleTap).
         <div
           className={`hero__visual${hovered ? ' hero__visual--on' : ''}`}
-          onPointerEnter={startDrawing}
-          onPointerLeave={stopDrawing}
+          ref={visualRef}
+          onPointerEnter={(event) => event.pointerType !== 'touch' && startDrawing()}
+          onPointerLeave={(event) => event.pointerType !== 'touch' && stopDrawing()}
+          onPointerUp={handleTap}
         >
           {drawing && <PhotoArt key={run} cutout={profile.photoDark ? asset(profile.photoDark) : undefined} />}
           <div className={`hero__photo${profile.photoDark ? ' hero__photo--dual' : ''}`}>
