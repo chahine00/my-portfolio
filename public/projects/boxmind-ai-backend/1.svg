@@ -43,19 +43,19 @@
   <!-- The backend layers I designed -->
   <g font-size="25" font-weight="600">
     <rect x="80" y="346" width="1040" height="70" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
-    <text x="110" y="390" fill="#e8eef6">APIs · FastAPI / Flask</text>
-    <text x="1090" y="390" fill="#8fa6c0" font-size="19" font-weight="500" text-anchor="end">secure endpoints for the frontend</text>
+    <text x="110" y="390" fill="#e8eef6">APIs · FastAPI / Flask · Socket.IO</text>
+    <text x="1090" y="390" fill="#8fa6c0" font-size="19" font-weight="500" text-anchor="end">REST + live LLM streaming · stop generation</text>
 
     <rect x="80" y="430" width="1040" height="70" rx="14" fill="#2a2440" stroke="#8b6fd6"/>
     <text x="110" y="474" fill="#e8eef6">Security · JWT · roles &amp; permissions</text>
-    <text x="1090" y="474" fill="#b9a8ec" font-size="19" font-weight="500" text-anchor="end">per-user data isolation · private rooms</text>
+    <text x="1090" y="474" fill="#b9a8ec" font-size="19" font-weight="500" text-anchor="end">private data per user · private rooms</text>
 
     <rect x="80" y="514" width="1040" height="70" rx="14" fill="#173f3a" stroke="#3fae95"/>
     <text x="110" y="558" fill="#e8eef6">AI · LLM calls · RAG · agents</text>
     <text x="1090" y="558" fill="#9fdcc9" font-size="19" font-weight="500" text-anchor="end">predictions &amp; inference · prompts</text>
 
     <rect x="80" y="598" width="1040" height="70" rx="14" fill="#1e3a5c" stroke="#3b6ea5"/>
-    <text x="110" y="642" fill="#e8eef6">Data · MySQL · Milvus vectors</text>
+    <text x="110" y="642" fill="#e8eef6">Data · MySQL · Milvus (own vector DB per user)</text>
     <text x="1090" y="642" fill="#8fa6c0" font-size="19" font-weight="500" text-anchor="end">Docker · AWS</text>
   </g>
 </svg>

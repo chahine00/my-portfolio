@@ -54,26 +54,35 @@ export const projects: Project[] = [
     team: 'With the AI and frontend teams',
     status: 'In production',
     problem:
-      'boxMind, an early-stage enterprise AI company, builds AI products for education, banking and healthcare, and each one needed a secure, scalable backend to take its AI features into production.',
+      'boxMind, the AI arm of Allied Engineering Group, builds privacy-first AI for banks, government, telecoms, insurers and healthcare. Each product needed a secure backend to take its AI features into production.',
     result:
-      "Over almost three years, I built the backend behind many of the company's AI products, turning the AI team's work into secure APIs for the frontend.",
-    tech: ['Python', 'FastAPI', 'Flask', 'MySQL', 'Milvus', 'LLMs & RAG', 'Docker', 'AWS'],
-    images: ['/projects/boxmind-ai-backend/1.svg'],
-    overview: `boxMind is the AI arm of Allied Engineering Group. It builds privacy-first enterprise AI for sectors like banking, government, telecom and healthcare, where security and reliability are not optional.
+      "Over almost three years, I built the backend behind many of the company's AI products, turning the AI team's work into secure APIs and live-streamed AI answers for the frontend.",
+    tech: ['Python', 'FastAPI', 'Flask', 'Socket.IO', 'MySQL', 'Milvus', 'LLMs & RAG', 'Docker', 'AWS'],
+    images: [
+      '/projects/boxmind-ai-backend/1.svg',
+      '/projects/boxmind-ai-backend/2.jpg',
+      '/projects/boxmind-ai-backend/3.jpg',
+    ],
+    overview: `boxMind is the AI arm of Allied Engineering Group (AEG). It designs and deploys enterprise AI for organizations where data sovereignty, regulatory compliance and reliability are non-negotiable: banks, government entities, telecoms, insurers and healthcare providers across the Middle East and Africa. Its products combine large language models, computer vision and structured-data AI, with role-based access and full audit trails, and are often deployed on the client's own servers.
 
 I joined in the company's early days as its first hire, and for almost three years I was the backend developer working between the AI team and the frontend team. That meant taking care of the database, the APIs, security, testing and deployment.
 
-It wasn't one project but many, over almost three years: AI chatbots and RAG assistants that answer questions over an organization's own documents, AI models for predictions and inference, an education platform bringing new ways of learning into schools, and solutions for banks and hospitals.
+It wasn't one project but many: AI chatbots and RAG assistants that answer questions over an organization's own documents, AI models for predictions and inference, an AI learning platform for schools (boxMind Academy, which has its own page here), and solutions for banks and hospitals.
 
-My focus was the backend, but working next to the AI team gave me hands-on experience with AI: I connected their work to the products through LLM calls, retrieval-augmented generation (RAG) over a Milvus vector database, background AI workers and data pipelines, and I worked on prompts and AI agents along the way.
+My focus was the backend, but working next to the AI team gave me hands-on experience with AI: I connected their work to the products through LLM calls, retrieval-augmented generation (RAG) over Milvus vector databases, background AI workers and data pipelines, and I worked on prompts and AI agents along the way.
+
+To make the AI feel instant, I streamed the LLM's answers to the frontend in real time over Socket.IO, word by word as they were generated, with controls like stopping a generation mid-answer.
 
 The role went beyond code: I was part of the discussions and decisions on which features to build and how to grow the product.`,
     built: [
       'Architected the MySQL database from scratch: schema, relationships, data models and query tuning',
       'Built the APIs in FastAPI and Flask, with clear API, business-logic and data layers, and the folder structure and coding principles behind them',
+      'Streamed LLM answers to the frontend in real time with Socket.IO: tokens arrive as they are generated, with events for start, progress, done and errors',
+      'Added stream controls such as "stop generation", which cancels the running answer on the server and keeps what was already written',
       "Exposed the AI team's logic to the frontend through secure endpoints, with JWT authentication and middleware guards",
-      "Designed roles and permissions (RBAC) and strict data isolation: each user's data stays private, and private rooms are open only to their members",
-      'Integrated the AI team\'s LLM, RAG and inference features into the backend, with retrieval from a Milvus vector database that I managed',
+      'Designed strict data isolation: every user\'s data is private to them, with their own vector database for RAG, so documents and answers never mix between users',
+      'Designed roles and permissions (RBAC), with private rooms open only to their members',
+      "Integrated the AI team's LLM, RAG and inference features into the backend, with retrieval from Milvus vector databases that I managed",
       'Helped write and refine the prompts behind the AI features',
       'Set up background workers and data pipelines for long-running AI jobs',
       'Took care of QA: tested the APIs, tracked down bugs and fixed them before release',
@@ -81,19 +90,25 @@ The role went beyond code: I was part of the discussions and decisions on which 
     ],
     metrics: [
       { value: '~3 years', label: 'building AI products' },
-      { value: '3 fields', label: 'education, banking, healthcare' },
-      { value: '2 teams', label: 'AI and frontend, connected by the APIs' },
+      { value: 'Real-time', label: 'LLM answers streamed over Socket.IO' },
+      { value: '1 per user', label: 'private data and vector database' },
     ],
     challenges: [
       {
-        challenge: 'Users of the same platform held sensitive data (bank, patient and student records) that had to stay private, even from each other.',
+        challenge:
+          'Users held sensitive data (bank, patient and student records) and uploaded their own documents for the AI to search. None of it could ever leak to another user, not even through an AI answer.',
         solution:
-          'Scoped every query in the backend to the user and the rooms they belong to, on top of role permissions, so no one can reach another user\'s data or private room.',
+          "Gave every user their own private data and their own vector database, and scoped every query to that user and the rooms they belong to, on top of role permissions. The AI only ever retrieves from the asking user's own data.",
+      },
+      {
+        challenge: 'LLM answers can take many seconds to finish, and waiting for the full answer made the products feel slow.',
+        solution:
+          'Streamed each answer over Socket.IO as it was generated, with clear start, chunk, done and error events, and a "stop generation" action that cancels the work on the server instead of only hiding it in the browser.',
       },
       {
         challenge: "The AI team's logic had to reach the frontend without exposing the models, prompts or data behind it.",
         solution:
-          'Put it behind authenticated endpoints that check permissions and validate input, keeping prompts, keys and AI calls on the server.',
+          'Put it behind authenticated endpoints and socket connections that check permissions and validate input, keeping prompts, keys and AI calls on the server.',
       },
       {
         challenge: 'Different products needed different access-control models: some had fixed roles, others had custom roles with flexible permissions.',
@@ -108,12 +123,13 @@ The role went beyond code: I was part of the discussions and decisions on which 
     ],
     learnings: [
       'The first decisions (the schema, the folder structure, the conventions) shape everything a team builds afterwards.',
-      'Security belongs in the architecture from day one, not added at the end.',
+      'Security belongs in the architecture from day one, not added at the end. With AI, that includes the data the model can retrieve.',
+      'Streaming changes how fast an AI product feels, even when the model itself is not faster.',
       'Good AI features depend as much on retrieval, data and prompts as on the model itself.',
-      'One well-designed backend can serve products in very different fields, if security and data isolation are built into its core.',
       'Being in product decisions makes you build the right things, not only build things right.',
     ],
-    note: 'The code is in a private company repository, so it can\'t be shared.',
+    note: "The code is in a private company repository, so it can't be shared. The website images are from boxmind.ai.",
+    liveUrl: 'https://boxmind.ai/',
   },
   {
     slug: 'cinetwork',
@@ -182,5 +198,76 @@ Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos 
       'Freelancing teaches you to care about everything: the product, the code, the release and the relationship with the client.',
     ],
     liveUrl: 'https://www.thecinetwork.com',
+  },
+  {
+    slug: 'boxmind-academy',
+    title: 'boxMind Academy: AI Learning for Schools',
+    context: 'Company project (boxMind AI)',
+    role: 'Backend developer & database architect',
+    team: 'With the AI, frontend and education teams',
+    status: 'Live',
+    problem:
+      'Schools wanted to teach Generative AI and robotics, and to use AI to make learning itself better. They needed a platform that could run courses for whole schools, guide each student with AI, and handle school contracts and pricing.',
+    result:
+      'An online learning platform where AI guides students through courses, levels and chapters, used by schools under contract. I built its whole backend and designed its database.',
+    tech: ['Python', 'MySQL', 'LLMs', 'Socket.IO', 'Docker', 'AWS'],
+    images: [
+      '/projects/boxmind-academy/1.jpg',
+      '/projects/boxmind-academy/2.jpg',
+      '/projects/boxmind-academy/3.jpg',
+      '/projects/boxmind-academy/4.jpg',
+      '/projects/boxmind-academy/5.jpg',
+    ],
+    overview: `boxMind Academy is boxMind's online learning platform for schools. It teaches students Generative AI and robotics, and it uses AI to improve the learning experience itself: an AI tutor guides each student through the material, answers their questions on the selected subject, and helps them move forward at their own pace.
+
+The courses are built by boxMind's AI engineers together with experienced educators, and the program is accredited by the USA Accreditation Council and Approval Commission (USAAC). Students progress through levels made for their age, from Adventurer for beginners, to Explorer, to Mastermind for advanced learners, and the curriculum grows with them from the first grades up to 12th grade.
+
+I was the backend developer and database architect of the platform. I designed the database from scratch and built the whole backend behind it: schools and their contracts, pricing, courses, levels, chapters and lessons, students and teachers, progress tracking, and the AI features that create content and guide learning.
+
+It reuses what I built across boxMind's AI products: secure APIs, strict data privacy for every student, and AI answers streamed live to the screen.`,
+    built: [
+      'Designed the database from scratch: schools, contracts and pricing, courses, levels, chapters and lessons, students, teachers and their progress',
+      'Built the whole backend: the APIs, the business logic and the data layer behind every screen of the platform',
+      'Modeled school contracts and pricing, so each school gets access to the courses, levels and seats it signed up for',
+      'Built the course structure: courses split into levels (Adventurer, Explorer, Mastermind), chapters and content, with the right content for each grade',
+      'Integrated AI to help create courses and content, and to guide each student through it as a private tutor',
+      'Streamed the AI tutor\'s answers to students in real time, with controls like stopping a generation',
+      'Tracked every activity and assessment, so teachers can follow each student\'s progress and step in where needed',
+      'Secured the platform with authentication and roles (school admins, teachers, students), keeping each school\'s and each student\'s data private',
+    ],
+    features: [
+      'AI-guided learning: an AI tutor that explains the selected subject and answers each student\'s questions',
+      'Generative AI and Robotics programs (Arduino and Scratch), built with educators',
+      'Levels for every age: Adventurer, Explorer and Mastermind',
+      'Courses organized into levels, chapters and lessons',
+      'School accounts with contracts and pricing',
+      'Progress tracking on every activity and assessment',
+      'USAAC-accredited program with certificates',
+    ],
+    challenges: [
+      {
+        challenge:
+          'One platform had to serve many schools, each with its own contract, pricing, courses and students, without any school seeing another\'s data.',
+        solution:
+          'Designed the database around schools from the start: contracts, access and every record are tied to a school, and every query is scoped to it.',
+      },
+      {
+        challenge: 'The content had to fit very different ages, from young beginners to 12th grade.',
+        solution:
+          'Modeled a flexible structure (course → level → chapter → content), so the education team could add age-appropriate content without changes to the backend.',
+      },
+      {
+        challenge: 'An AI tutor for students has to stay on topic and be safe for young learners.',
+        solution:
+          'Kept every AI call on the server, with prompts scoped to the selected subject and course content, so the tutor guides learning instead of answering anything.',
+      },
+    ],
+    learnings: [
+      'In education, the data model is the product: schools, contracts, levels and chapters decide what every screen can do.',
+      'AI in learning works best as a guide that helps students think, not as an answer machine.',
+      'Designing for many schools from day one is much easier than splitting a single-school system later.',
+    ],
+    note: "The code is in a private company repository, so it can't be shared. The images are from boxmindacademy.ai.",
+    liveUrl: 'https://boxmindacademy.ai/',
   },
 ]

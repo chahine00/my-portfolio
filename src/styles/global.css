@@ -1938,14 +1938,15 @@ main {
 }
 
 /* Blog page banner: a flat card with a crisp 1px border, like the other cards. The title on the left
-   (the last word in a gradient), a mosaic of recent post photos on the right: one tall photo and two stacked beside it. */
+   (the last word in a gradient), a mosaic of recent post photos on the right: one tall photo and two stacked beside it.
+   Kept compact: visitors already met the blog on the home page, so the posts should show up quickly. */
 .blog-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 340px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 260px);
   align-items: center;
-  gap: 32px;
-  margin: 20px 0 28px;
-  padding: 36px;
+  gap: 24px;
+  margin: 12px 0 20px;
+  padding: 20px 24px;
   border: 1px solid var(--border);
   border-radius: 22px;
   background: var(--card);
@@ -1956,8 +1957,8 @@ main {
 }
 
 .blog-hero h1 {
-  margin: 8px 0 14px;
-  font-size: clamp(2rem, 5.2vw, 3rem);
+  margin: 4px 0 8px;
+  font-size: clamp(1.5rem, 3.6vw, 1.9rem);
   line-height: 1.08;
   letter-spacing: -0.02em;
 }
@@ -1980,8 +1981,8 @@ main {
   padding-left: 14px;
   border-left: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
   color: var(--muted);
-  font-size: 1.02rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 /* The mosaic: 2 columns, 2 rows. The first photo takes the whole left column. */
@@ -1989,8 +1990,8 @@ main {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 10px;
-  height: 240px;
+  gap: 8px;
+  height: 120px;
 }
 
 .blog-hero__mosaic .blog-hero__tile:first-child {
@@ -2048,12 +2049,12 @@ main {
 @media (max-width: 720px) {
   .blog-hero {
     grid-template-columns: 1fr;
-    gap: 24px;
-    padding: 26px 20px;
+    gap: 14px;
+    padding: 18px 16px;
   }
 
   .blog-hero__mosaic {
-    height: 200px;
+    height: 100px;
   }
 }
 
@@ -2071,8 +2072,8 @@ main {
   position: sticky;
   top: var(--navbar-height, 64px);
   z-index: 10;
-  margin: 0 0 24px;
-  padding: 12px 0;
+  margin: 0 0 20px;
+  padding: 8px 0;
   /* Its background is the ::before below. z-index above makes the bar its own layer,
      so the ::before (z-index -1) stays behind the bar's content. */
 }
@@ -2089,17 +2090,22 @@ main {
   content: '';
   position: absolute;
   z-index: -1;
-  top: -40px;
+  top: -10px;
   bottom: -10px;
   left: calc(-1 * var(--bleed));
   right: calc(-1 * var(--bleed));
   border-radius: 28px;
   background: var(--bg);
   filter: blur(12px);
-  /* Cut the blurred top off exactly at the bar's top edge (40px down), so the top stays solid
-     and nothing shows through under the navbar. The other sides keep their soft fade. */
-  clip-path: inset(40px -60px -60px -60px);
   pointer-events: none;
+}
+
+/* While the bar is stuck under the navbar (UpdatesPage.tsx adds the class): cut the blurred top off
+   exactly at the bar's top edge, so the top stays solid and no post shows through under the navbar.
+   Before that, all four sides and corners keep their soft, rounded fade. */
+.blog-bar--stuck::before {
+  top: -40px;
+  clip-path: inset(40px -60px -60px -60px);
 }
 
 .blog-bar .blog-filters {
@@ -2110,7 +2116,8 @@ main {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 0 10px;
+  margin: 0 0 6px;
+  font-size: 0.95rem;
   font-weight: 700;
 }
 
@@ -2134,18 +2141,8 @@ main {
   font-weight: 500;
 }
 
-/* Phones: the category buttons scroll sideways in one line, so the bar stays short. */
-@media (max-width: 640px) {
-  .blog-bar .blog-categories {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .blog-bar .blog-category {
-    flex-shrink: 0;
-  }
-}
+/* Phones: the category buttons wrap onto a second line when they don't fit,
+   so every category is in view without scrolling sideways. (.blog-categories wraps by default.) */
 
 /* Phones, on the Blog page only: the navbar scrolls away with the page instead of staying on top,
    and the Blog bar takes its place at the very top of the screen. One bar instead of two stacked
@@ -2158,7 +2155,7 @@ main {
   .blog-bar {
     top: 0;
     /* Clears the iPhone notch / status bar when the page runs full screen. */
-    padding-top: calc(12px + env(safe-area-inset-top));
+    padding-top: calc(8px + env(safe-area-inset-top));
   }
 }
 
@@ -2167,7 +2164,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px 16px;
+  gap: 8px 12px;
   margin-bottom: 28px;
 }
 
@@ -2176,9 +2173,9 @@ main {
   display: flex;
   flex: 1 1 260px;
   align-items: center;
-  gap: 10px;
-  max-width: 360px;
-  padding: 0 14px;
+  gap: 8px;
+  max-width: 280px;
+  padding: 0 12px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--card);
@@ -2194,39 +2191,40 @@ main {
 .blog-search input {
   flex: 1;
   min-width: 0;
-  padding: 10px 0;
+  padding: 6px 0;
   border: 0;
+  font-size: 0.9rem;
   outline: none;
   background: none;
   color: var(--text);
-  font: inherit;
+  font-family: inherit;
 }
 
 /* Category buttons: pills with a count; the chosen one is filled with the accent color. */
 .blog-categories {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .blog-category {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
+  gap: 5px;
+  padding: 4px 11px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--card);
   color: var(--text);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: border-color 0.2s, background-color 0.2s, color 0.2s;
 }
 
 .blog-category span {
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
 .blog-category:hover {
@@ -2765,6 +2763,66 @@ button.contact-tile__main {
   font-size: 0.875rem;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Phones: instead of five big separate boxes, one compact grouped list (like a phone's settings
+   screen): a single rounded frame, thin lines between the rows, smaller icons and tighter rows.
+   Same content and buttons, about half the height. */
+@media (max-width: 640px) {
+  .contact-tiles {
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--card);
+  }
+
+  .contact-tile {
+    padding-right: 10px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .contact-tile + .contact-tile {
+    border-top: 1px solid var(--border);
+  }
+
+  /* No lifting cards inside one frame. */
+  .contact-tile:hover {
+    box-shadow: none;
+    transform: none;
+  }
+
+  .contact-tile__main {
+    gap: 12px;
+    padding: 9px 0 9px 12px;
+    border-radius: 0;
+  }
+
+  .contact-tile__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .contact-tile__icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .contact-tile__text strong {
+    font-size: 0.9rem;
+  }
+
+  .contact-tile__text span {
+    font-size: 0.8rem;
+  }
+
+  .contact-tile__whatsapp {
+    width: 34px;
+    height: 34px;
+  }
 }
 
 /* "Or send me a message:" starts a new block, so more space above it than below. */
@@ -3381,6 +3439,12 @@ a {
 }
 
 /* Back links (← All updates…): the arrow slides left, the text gets an underline */
+/* Pages that open with a "Back" link (the blog, a post, a project) don't need the big gap
+   home-page sections have between them: the link sits just under the navbar. */
+.section:has(> .back-link:first-child) {
+  padding-top: 24px;
+}
+
 .back-link,
 .forward-link {
   display: inline-flex;

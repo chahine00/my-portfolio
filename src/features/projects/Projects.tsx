@@ -15,8 +15,9 @@ function Projects() {
           project={project} passes the data INTO the card. This is called a "prop".
           Props are how a parent component gives information to a child component.
         */}
-        {projects.map((project) => (
-          <ProjectCard key={project.slug} project={project} />
+        {/* "slideOffset" spreads the cards' photo slides over time, so they don't all move at once. */}
+        {projects.map((project, i) => (
+          <ProjectCard key={project.slug} project={project} slideOffset={i / projects.length} />
         ))}
       </div>
     </section>

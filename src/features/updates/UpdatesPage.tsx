@@ -3,7 +3,7 @@
 // The search and the category live in the address (/blog?q=aws&category=Engineering),
 // so a filtered list can be shared, and the home page can open the page already filtered.
 
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { filterUpdates, sortedUpdates } from '../../data/updates.ts'
 import { asset } from '../../utils/asset.ts'
@@ -21,6 +21,28 @@ function UpdatesPage() {
   // A new page should start at the top, not wherever the previous page was scrolled to.
   useEffect(() => {
     window.scrollTo(0, 0)
+  }, [])
+
+  // Whether the Blog bar is stuck under the navbar right now. It changes the shape of the bar's
+  // faded background (see .blog-bar--stuck in global.css).
+  const barRef = useRef<HTMLDivElement>(null)
+  const [stuck, setStuck] = useState(false)
+
+  useEffect(() => {
+    function handleScroll() {
+      const bar = barRef.current
+      if (!bar) return
+      // The bar is stuck when it sits at its "top" position (under the navbar, or the screen's top on phones).
+      const stickAt = parseFloat(getComputedStyle(bar).top) || 0
+      setStuck(window.scrollY > 0 && bar.getBoundingClientRect().top <= stickAt + 1)
+    }
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
+    }
   }, [])
 
   // Changes one value in the address. replace: typing doesn't add a "back" step for every letter.
@@ -67,7 +89,7 @@ function UpdatesPage() {
 
       {/* Sticks under the navbar while you scroll, so it's always clear you're on the Blog page.
           It holds the page name, how many posts are shown, the search and the categories. */}
-      <div className="blog-bar">
+      <div className={stuck ? 'blog-bar blog-bar--stuck' : 'blog-bar'} ref={barRef}>
         <p className="blog-bar__title">
           <span className="blog-bar__dot" aria-hidden="true" />
           Blog
