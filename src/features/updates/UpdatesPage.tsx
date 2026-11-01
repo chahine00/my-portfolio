@@ -45,6 +45,29 @@ function UpdatesPage() {
     }
   }, [])
 
+  // A new search or category shows a new list: bring its first post into view, right under the
+  // Blog bar. Only when you've scrolled past the list's start (otherwise it's already in view),
+  // and not on the page's first showing.
+  const resultsRef = useRef<HTMLDivElement>(null)
+  const firstShow = useRef(true)
+
+  useEffect(() => {
+    if (firstShow.current) {
+      firstShow.current = false
+      return
+    }
+    const results = resultsRef.current
+    const bar = barRef.current
+    if (!results || !bar) return
+    // Where the bar sticks (under the navbar, or at the screen's top on phones), plus its height.
+    const barBottom = (parseFloat(getComputedStyle(bar).top) || 0) + bar.offsetHeight
+    const target = results.getBoundingClientRect().top + window.scrollY - barBottom - 12
+    if (window.scrollY > target) {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.scrollTo({ top: target, behavior: reduceMotion ? 'auto' : 'smooth' })
+    }
+  }, [category, query])
+
   // Changes one value in the address. replace: typing doesn't add a "back" step for every letter.
   function update(key: string, value: string, empty: string) {
     const next = new URLSearchParams(params)
@@ -109,16 +132,18 @@ function UpdatesPage() {
         />
       </div>
 
-      {matches.length > 0 ? (
-        <UpdateTimeline updates={matches} />
-      ) : (
-        <div className="blog-empty">
-          <p>No posts match your search.</p>
-          <button type="button" className="button button-outline" onClick={() => setParams({}, { replace: true })}>
-            Clear filters
-          </button>
-        </div>
-      )}
+      <div ref={resultsRef}>
+        {matches.length > 0 ? (
+          <UpdateTimeline updates={matches} />
+        ) : (
+          <div className="blog-empty">
+            <p>No posts match your search.</p>
+            <button type="button" className="button button-outline" onClick={() => setParams({}, { replace: true })}>
+              Clear filters
+            </button>
+          </div>
+        )}
+      </div>
     </section>
   )
 }

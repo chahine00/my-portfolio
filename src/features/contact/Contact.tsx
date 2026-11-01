@@ -83,8 +83,8 @@ function Contact() {
       </p>
 
       {/* One box per contact, read from src/data/contact.ts. Clicking the box opens the contact
-          (email, LinkedIn…); on a phone box it copies the number. A number that's on WhatsApp also gets a round WhatsApp
-          button: only that button opens the chat. Links starting with https open in a new tab. */}
+          (email, LinkedIn…); on a phone box it copies the number. A number that's on WhatsApp also gets a small
+          "WhatsApp" button: only that button opens the chat. Links starting with https open in a new tab. */}
       <ul className="contact-tiles">
         {contacts.map((contact) => {
           const icon = contact.icon ?? (contact.href.startsWith('tel:') ? 'phone' : undefined)
@@ -141,7 +141,9 @@ function Contact() {
                   aria-label={`WhatsApp ${contact.value}`}
                   title="Chat on WhatsApp"
                 >
-                  <Icon name="whatsapp" size={20} />
+                  <Icon name="whatsapp" size={16} />
+                  {/* The visible word; screen readers get the fuller aria-label above. */}
+                  <span aria-hidden="true">WhatsApp</span>
                 </a>
               )}
             </li>

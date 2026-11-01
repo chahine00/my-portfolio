@@ -2757,22 +2757,54 @@ button.contact-tile__main {
   color: var(--accent);
 }
 
-/* The round WhatsApp button on a phone box, in WhatsApp green. Only it opens the chat. */
-.contact-tile__whatsapp {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: color-mix(in srgb, #25d366 15%, transparent);
-  color: #1da851;
-  transition: background-color 0.2s, transform 0.2s;
+/* The WhatsApp button on a phone box, in the same quiet outlined style as the rest of the page
+   (only the logo is green). Only it opens the chat. In a narrow box (desktop's three columns) it's
+   a round icon button; when the box has room (phones: one full-width row) it also shows its name. */
+.contact-tile {
+  container-type: inline-size;
 }
 
-.contact-tile__whatsapp:hover {
-  background: color-mix(in srgb, #25d366 28%, transparent);
-  transform: scale(1.08);
+.contact-tile__whatsapp {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.contact-tile__whatsapp svg {
+  color: #25d366;
+}
+
+.contact-tile__whatsapp span {
+  display: none;
+}
+
+@container (min-width: 320px) {
+  .contact-tile__whatsapp {
+    width: auto;
+    padding: 0 12px 0 10px;
+  }
+
+  .contact-tile__whatsapp span {
+    display: inline;
+  }
+}
+
+.contact-tile__whatsapp:hover,
+.contact-tile__whatsapp:focus-visible {
+  border-color: #25d366;
+  background: color-mix(in srgb, #25d366 10%, var(--bg));
 }
 
 .contact-tile__text {
@@ -2850,8 +2882,8 @@ button.contact-tile__main {
   }
 
   .contact-tile__whatsapp {
-    width: 34px;
-    height: 34px;
+    height: 30px;
+    font-size: 0.75rem;
   }
 }
 
@@ -3852,7 +3884,7 @@ a {
     transition: color 0.2s;
   }
 
-  /* The current section: accent color, and a soft pill behind its icon (instead of the underline). */
+  /* The current section: its icon and label simply take the accent color (like an app's tab bar). */
   .navbar__links a.active {
     color: var(--accent);
     font-weight: 600;
@@ -3865,14 +3897,7 @@ a {
   .navbar__icon {
     display: grid;
     place-items: center;
-    width: 40px;
-    height: 26px;
-    border-radius: 999px;
-    transition: background-color 0.2s;
-  }
-
-  .navbar__links a.active .navbar__icon {
-    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    height: 24px;
   }
 
   .navbar__label {
