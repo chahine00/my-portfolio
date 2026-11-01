@@ -7,16 +7,16 @@ import { stats } from '../../data/profile.ts'
 // How you work, in three short points. Keep each one to a title and one line.
 const principles = [
   {
-    title: 'Solid foundations',
-    text: 'The base and the logic: problem solving, data and system design. The core of every backend and AI project, and it outlasts every tool.',
+    title: 'Backend at my core',
+    text: 'Strong foundations in backend engineering, from APIs and databases to system architecture.',
   },
   {
-    title: 'Built to adapt',
-    text: 'New stack, new tool, new AI model? I learn it fast and put it to work, so projects keep moving forward.',
+    title: 'Adaptable by nature',
+    text: 'Always exploring new languages, frameworks, and tools. I believe the ability to learn and adapt matters more than mastering a single stack.',
   },
   {
-    title: 'Why before how',
-    text: 'AI can handle the how. My background in computer science and business keeps me focused on why a feature matters.',
+    title: 'Beyond the code',
+    text: 'With degrees in both computer science and business management, I focus on why a feature matters, not just how to build it.',
   },
 ]
 
@@ -29,11 +29,12 @@ function About() {
         About <span className="mindset__dot">·</span> The Mindset
       </p>
       <h2 className="mindset__title">
-        In the AI Era, tools change fast. <span>The foundations don't.</span>
+        Think bigger. <span>Adapt faster.</span>
       </h2>
-      {/* One personal line: the point behind the statement, not a list of skills. */}
+      {/* A short personal intro: the point behind the statement. */}
       <p className="mindset__lead">
-        I've learned that once you understand how things really work, every new tool is easy to pick up.
+        In the AI Era, writing code keeps getting easier. I believe what makes the difference now is how you think:
+        seeing the bigger picture and knowing how all the pieces fit together.
       </p>
 
       {/* Three cards side by side: a title and one line each. */}

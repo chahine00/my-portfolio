@@ -19,8 +19,13 @@ function HomePage() {
 
   // When the URL has a #section (for example coming back from /blog to /#skills),
   // scroll to that section once the page is on screen.
+  // "#home" (your name in the navbar) always goes to the very top of the page, so the whole hero
+  // shows below the menu. (Scrolling to the hero itself would hide its top under the taller
+  // phone navbar.)
   useEffect(() => {
-    if (hash) {
+    if (hash === '#home') {
+      window.scrollTo(0, 0)
+    } else if (hash) {
       document.getElementById(hash.slice(1))?.scrollIntoView()
     }
   }, [hash, key])

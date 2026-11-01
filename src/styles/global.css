@@ -641,8 +641,14 @@ main {
    No width limit, so it stays on one line on laptops and desktops (it wraps only on small screens). */
 .mindset__lead {
   margin: -16px 0 28px;
+  max-width: 72ch; /* long lines are hard to read */
   color: var(--muted);
   font-size: 1.1rem;
+}
+
+/* The second paragraph sits close under the first. */
+.mindset__lead + .mindset__lead {
+  margin-top: -16px;
 }
 
 .mindset__title span {
