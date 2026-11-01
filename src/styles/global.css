@@ -1945,7 +1945,7 @@ main {
   grid-template-columns: minmax(0, 1fr) minmax(0, 260px);
   align-items: center;
   gap: 24px;
-  margin: 12px 0 20px;
+  margin: 8px 0 20px;
   padding: 20px 24px;
   border: 1px solid var(--border);
   border-radius: 22px;
@@ -2063,6 +2063,15 @@ main {
   .blog-hero__caption {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Phones: no captions on the banner photos. The photos are too small for a post title (it was cut
+   off and squeezed), and the same posts are listed right below with their full titles.
+   Each photo still opens its post, and screen readers still hear its title (aria-label). */
+@media (max-width: 720px) {
+  .blog-hero__caption {
+    display: none;
   }
 }
 
@@ -2278,7 +2287,7 @@ p.blog-empty {
 }
 
 .post__header {
-  margin: 24px 0;
+  margin: 10px 0 24px;
 }
 
 .post__header h1 {
@@ -2341,7 +2350,7 @@ p.blog-empty {
 }
 
 .project-page__header {
-  margin: 24px 0 32px;
+  margin: 10px 0 32px;
 }
 
 .project-page__header h1 {
@@ -3442,7 +3451,15 @@ a {
 /* Pages that open with a "Back" link (the blog, a post, a project) don't need the big gap
    home-page sections have between them: the link sits just under the navbar. */
 .section:has(> .back-link:first-child) {
-  padding-top: 24px;
+  padding-top: 10px;
+}
+
+/* Phones: the link keeps a finger-sized tap area (44px tall, see above), but the negative margins
+   let that area overlap the empty space around it, so it doesn't push the page down. */
+@media (max-width: 720px) {
+  .section > .back-link:first-child {
+    margin-block: -8px;
+  }
 }
 
 .back-link,
@@ -3590,3 +3607,183 @@ a {
   }
 }
 
+
+/* ------------------------------------------------------------------------------------------------
+   Phones: more compact lists, so the home page needs less scrolling. Nothing is hidden: every
+   piece of text stays, the boxes are just tighter (and some are grouped into one frame, like the
+   contact list). Desktop is not affected.
+   ------------------------------------------------------------------------------------------------ */
+@media (max-width: 640px) {
+  /* Tech tags (projects, experience, skills): smaller pills, so most lists need a row less. */
+  .tags {
+    gap: 6px;
+  }
+
+  .tags li {
+    padding: 2px 9px;
+    font-size: 0.78rem;
+  }
+
+  /* About, "the mindset": the three cards become one grouped frame with lines between them. */
+  .mindset__list {
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--card);
+  }
+
+  .mindset__item {
+    padding: 14px 16px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .mindset__item + .mindset__item {
+    border-top: 1px solid var(--border);
+  }
+
+  .mindset__item:hover {
+    transform: none;
+  }
+
+  .mindset__item h3 {
+    margin-bottom: 4px;
+    font-size: 1rem;
+  }
+
+  .mindset__item p {
+    font-size: 0.9rem;
+  }
+
+  /* Project cards: a slightly shorter cover photo and a little less padding. */
+  .project-card {
+    padding: 16px;
+  }
+
+  .project-card__cover {
+    margin: -16px -16px 14px;
+    aspect-ratio: 2 / 1;
+  }
+
+  /* Experience: less padding inside each job and next to the timeline line, so the text gets
+     more width and wraps onto fewer lines. */
+  .timeline__item {
+    padding-left: 24px;
+  }
+
+  .job {
+    padding: 16px;
+  }
+
+  /* Education: degrees and certificates each become one grouped frame (like the contact list),
+     with smaller logos and tighter rows. */
+  .edu-degrees,
+  .edu-strip {
+    gap: 0;
+    grid-auto-rows: auto;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--card);
+  }
+
+  .edu-degree,
+  .edu-chip {
+    gap: 12px;
+    padding: 12px 14px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .edu-degree + .edu-degree,
+  .edu-chip + .edu-chip {
+    border-top: 1px solid var(--border);
+  }
+
+  .edu-degree:hover,
+  .edu-chip:hover {
+    transform: none;
+  }
+
+  .edu-degree .edu-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .edu-chip .edu-logo {
+    width: 34px;
+    height: 34px;
+    font-size: 0.75rem;
+  }
+
+  .edu-degree strong,
+  .edu-chip strong {
+    font-size: 0.95rem;
+  }
+
+  .edu-degree .edu-meta,
+  .edu-chip .edu-meta {
+    margin-top: 2px;
+    font-size: 0.8rem;
+  }
+
+  .edu-group:not(:first-of-type) {
+    margin-top: 24px;
+  }
+
+  /* Blog preview: the newest post keeps its big photo; the others become short rows with a small
+     photo on the left and the text on the right. The category and "New" labels stay on the photo. */
+  .blog-preview {
+    gap: 12px;
+  }
+
+  .blog-preview__item:not(.blog-preview__item--featured) {
+    flex-direction: row;
+  }
+
+  .blog-preview__item:not(.blog-preview__item--featured) .blog-preview__cover {
+    flex: 0 0 112px;
+    aspect-ratio: auto;
+    min-height: 104px;
+  }
+
+  .blog-preview__item:not(.blog-preview__item--featured) .blog-preview__placeholder {
+    min-height: 0;
+    font-size: 0.75rem;
+  }
+
+  .blog-preview__item:not(.blog-preview__item--featured) .blog-preview__category {
+    top: 6px;
+    left: 6px;
+    padding: 2px 7px;
+    font-size: 0.62rem;
+  }
+
+  /* Under the category instead of beside it: the small photo is too narrow for both on one line. */
+  .blog-preview__item:not(.blog-preview__item--featured) .blog-preview__new {
+    top: auto;
+    right: auto;
+    bottom: 6px;
+    left: 6px;
+  }
+
+  .blog-preview__item:not(.blog-preview__item--featured) .blog-preview__body {
+    gap: 4px;
+    padding: 10px 12px;
+  }
+
+  .blog-preview__item:not(.blog-preview__item--featured) h3 {
+    font-size: 0.92rem;
+  }
+
+  .blog-preview__item--featured .blog-preview__body {
+    padding: 16px;
+  }
+
+  .blog-preview__item--featured h3 {
+    font-size: 1.15rem;
+  }
+}
