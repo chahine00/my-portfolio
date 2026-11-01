@@ -4,7 +4,7 @@
 
 import { Link } from 'react-router'
 import { categories, sortedUpdates } from '../../data/updates.ts'
-import UpdateTimeline from './UpdateTimeline.tsx'
+import BlogPreview from './BlogPreview.tsx'
 
 // How many posts to preview on the home page.
 const PREVIEW_COUNT = 3
@@ -29,8 +29,8 @@ function Updates() {
         ))}
       </nav>
 
-      {/* .slice(0, 3) takes only the first 3 items (the newest ones). */}
-      <UpdateTimeline updates={sortedUpdates.slice(0, PREVIEW_COUNT)} />
+      {/* .slice(0, 3) takes only the first 3 items (the newest ones): one featured, two beside it. */}
+      <BlogPreview updates={sortedUpdates.slice(0, PREVIEW_COUNT)} />
 
       <div className="updates-footer">
         <Link to="/blog" className="button">

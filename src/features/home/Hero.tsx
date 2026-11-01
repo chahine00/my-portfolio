@@ -120,10 +120,14 @@ function Hero() {
       </div>
 
       {/* The photo blends into the page: its left edge (its bottom edge on phones) fades into the
-          background, and the text overlaps that faded part, so text and photo read as one piece. */}
+          background, and the text overlaps that faded part, so text and photo read as one piece.
+          In dark mode the CSS swaps in the cut-out photo (photoDark) and hides the normal one. */}
       {profile.photo && (
-        <div className="hero__photo">
-          <img src={asset(profile.photo)} alt={profile.name} />
+        <div className={`hero__photo${profile.photoDark ? ' hero__photo--dual' : ''}`}>
+          <img className="hero__photo-light" src={asset(profile.photo)} alt={profile.name} />
+          {profile.photoDark && (
+            <img className="hero__photo-dark" src={asset(profile.photoDark)} alt={profile.name} />
+          )}
         </div>
       )}
     </section>

@@ -285,7 +285,9 @@ main {
 
 /* The photo, blended into the page: a large rounded photo on the right whose left part fades
    to see-through (mask). The text column is pulled over that faded part (negative margin)
-   and sits above it (z-index), so the two overlap instead of standing side by side. */
+   and sits above it (z-index), so the two overlap instead of standing side by side.
+   There are two copies of the photo: the normal one for light mode, and a cut-out (no white
+   background) for dark mode. Only the one for the current theme is shown (see "Dark mode photo"). */
 .hero__text {
   position: relative;
   z-index: 1;
@@ -307,6 +309,10 @@ main {
   border-radius: 28px;
   object-fit: cover;
   object-position: center 30%;
+}
+
+.hero__photo-dark {
+  display: none;
 }
 
 @media (max-width: 720px) {
@@ -357,6 +363,61 @@ main {
     margin: 0 0 16px;
     -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
     mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  }
+}
+
+/* Dark mode photo: the normal photo has a white background, which turns into a grey haze on the
+   dark page. So dark mode shows the cut-out instead (when there is one: .hero__photo--dual), on a soft accent glow, fading on every side.
+   Written twice: once for "computer is dark", once for "picked dark with the toggle". */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .hero__photo--dual .hero__photo-light {
+    display: none;
+  }
+
+  :root:not([data-theme='light']) .hero__photo--dual .hero__photo-dark {
+    display: block;
+    border-radius: 0;
+  }
+
+  /* Sides and bottom fade out (two masks, kept where both show: "intersect"), with a soft accent glow behind the head. */
+  :root:not([data-theme='light']) .hero__photo--dual {
+    background: radial-gradient(ellipse 55% 45% at 55% 40%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%, #000 78%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent 0%, #000 38%, #000 78%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 100%);
+    mask-composite: intersect;
+  }
+
+  @media (max-width: 720px) {
+    :root:not([data-theme='light']) .hero__photo--dual {
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 30%, #000 70%, transparent), linear-gradient(to bottom, #000 55%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent, #000 30%, #000 70%, transparent), linear-gradient(to bottom, #000 55%, transparent 100%);
+    }
+  }
+}
+
+:root[data-theme='dark'] .hero__photo--dual .hero__photo-light {
+  display: none;
+}
+
+:root[data-theme='dark'] .hero__photo--dual .hero__photo-dark {
+  display: block;
+  border-radius: 0;
+}
+
+/* Sides and bottom fade out (two masks, kept where both show: "intersect"), with a soft accent glow behind the head. */
+:root[data-theme='dark'] .hero__photo--dual {
+  background: radial-gradient(ellipse 55% 45% at 55% 40%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%, #000 78%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent 0%, #000 38%, #000 78%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 100%);
+  mask-composite: intersect;
+}
+
+@media (max-width: 720px) {
+  :root[data-theme='dark'] .hero__photo--dual {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 30%, #000 70%, transparent), linear-gradient(to bottom, #000 55%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent, #000 30%, #000 70%, transparent), linear-gradient(to bottom, #000 55%, transparent 100%);
   }
 }
 
@@ -1423,6 +1484,205 @@ main {
 .blog-topics a:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+/* Home page Blog preview: a magazine layout, not a timeline (so it doesn't look like Experience).
+   The featured post takes the left column and both rows; the other two stack on the right. */
+.blog-preview {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 16px;
+}
+
+.blog-preview__item {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.blog-preview__item:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.12);
+}
+
+/* How the cards appear when you scroll to them (useReveal adds .is-visible and --reveal-delay):
+   a soft fade with a small rise, while the photo settles from a slight zoom. Kept subtle on purpose. */
+.blog-preview__item:not(.is-visible) {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.blog-preview__item.is-visible {
+  animation: blog-card-in 0.6s ease-out var(--reveal-delay, 0s) backwards;
+}
+
+.blog-preview__item.is-visible .blog-preview__cover img {
+  animation: blog-cover-settle 1s ease-out var(--reveal-delay, 0s) backwards;
+}
+
+@keyframes blog-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes blog-cover-settle {
+  from { transform: scale(1.06); }
+  to { transform: scale(1); }
+}
+
+/* Small cards: photo on the left, text on the right. */
+.blog-preview__cover {
+  position: relative;
+  flex: 0 0 40%;
+  overflow: hidden;
+  background: var(--border);
+}
+
+.blog-preview__cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.blog-preview__item:hover .blog-preview__cover img {
+  transform: scale(1.05);
+}
+
+.blog-preview__placeholder {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  min-height: 140px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 30%, var(--card)), color-mix(in srgb, #06b6d4 25%, var(--card)));
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+  font-weight: 700;
+}
+
+/* The category, on a frosted pill over the photo's top-left corner. */
+.blog-preview__category {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.blog-preview__new {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.blog-preview__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 18px;
+}
+
+.blog-preview__body h3 {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.35;
+}
+
+.blog-preview__body .card-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.blog-preview__meta {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.blog-preview__summary {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.blog-preview__body .card-cta {
+  margin-top: auto;
+}
+
+/* The featured post: big photo on top, text under it, spanning both rows. */
+.blog-preview__item--featured {
+  grid-row: span 2;
+  flex-direction: column;
+}
+
+.blog-preview__item--featured .blog-preview__cover {
+  flex: 1 1 auto;
+  min-height: 240px;
+}
+
+.blog-preview__item--featured .blog-preview__body {
+  padding: 22px;
+}
+
+.blog-preview__item--featured h3 {
+  font-size: 1.35rem;
+}
+
+/* Tablets and phones: one column, every card with its photo on top. */
+@media (max-width: 760px) {
+  .blog-preview {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+
+  .blog-preview__item {
+    flex-direction: column;
+  }
+
+  .blog-preview__item--featured {
+    grid-row: auto;
+  }
+
+
+  .blog-preview__cover {
+    flex: none;
+    aspect-ratio: 16 / 9;
+  }
+
+  .blog-preview__item--featured .blog-preview__cover {
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blog-preview__item,
+  .blog-preview__item:not(.is-visible),
+  .blog-preview__item.is-visible,
+  .blog-preview__item.is-visible .blog-preview__cover img {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    animation: none;
+  }
 }
 
 /* Blog page banner: a panel with a soft gradient edge. The title on the left (the last word in a
