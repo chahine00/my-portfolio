@@ -1,7 +1,7 @@
 // The big welcome section at the top of the page.
 // The text comes from src/data/profile.ts.
 
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { profile } from '../../data/profile.ts'
 import Icon from '../../components/Icon.tsx'
 import SocialLinks from '../../components/SocialLinks.tsx'
@@ -159,8 +159,8 @@ function PhotoArt({ cutout }: { cutout?: string }) {
           </filter>
           <mask id="hero-art-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="500" height="400">
             <rect width="500" height="400" fill="#fff" />
-            <image className="hero__art-cut--wide" href={cutout} x="46" y="71" width="329" height="329" filter="url(#hero-art-silhouette)" />
-            <image className="hero__art-cut--phone" href={cutout} x="83.3" y="66.7" width="333.3" height="333.3" filter="url(#hero-art-silhouette)" />
+            <image className="hero__art-cut--wide" href={cutout} x="22.7" y="21.2" width="378.8" height="378.8" filter="url(#hero-art-silhouette)" />
+            <image className="hero__art-cut--phone" href={cutout} x="38.5" y="15.4" width="384.6" height="384.6" filter="url(#hero-art-silhouette)" />
           </mask>
         </defs>
       )}
@@ -226,26 +226,27 @@ function Hero() {
 
   useEffect(() => () => window.clearTimeout(hideTimer.current), [])
 
-  // Phones and tablets can't hover, so there a tap on the photo plays the drawing, and a second
-  // tap (on the photo or anywhere else) hides it. A mouse keeps the hover behavior.
-  // (A finger also fires "enter" and "leave" around every tap, which is why those skip touch.)
-  const visualRef = useRef<HTMLDivElement>(null)
-
-  function handleTap(event: ReactPointerEvent) {
-    if (event.pointerType !== 'touch') return
-    if (hovered) stopDrawing()
-    else startDrawing()
-  }
-
-  // While the drawing shows after a tap, a tap anywhere outside the photo hides it.
+  // With a mouse, hovering the hero (name, text, photo) plays the drawing; leaving it hides it.
+  // Phones and tablets can't hover, so there a finger on the screen (e.g. to scroll down) plays it,
+  // and lifting the finger hides it. Touch events are used because they keep coming while the page
+  // scrolls (pointer events stop as soon as scrolling starts).
+  // (A finger also fires pointer "enter" and "leave", which is why the hover handlers skip touch.)
   useEffect(() => {
-    if (!hovered) return
-    function handleTapOutside(event: PointerEvent) {
-      if (event.pointerType === 'touch' && !visualRef.current?.contains(event.target as Node)) stopDrawing()
+    function handleFingerDown(event: TouchEvent) {
+      if (event.touches.length === 1) startDrawing() // the first finger only
     }
-    document.addEventListener('pointerdown', handleTapOutside)
-    return () => document.removeEventListener('pointerdown', handleTapOutside)
-  }, [hovered])
+    function handleFingerUp(event: TouchEvent) {
+      if (event.touches.length === 0) stopDrawing() // the last finger lifted
+    }
+    document.addEventListener('touchstart', handleFingerDown, { passive: true })
+    document.addEventListener('touchend', handleFingerUp, { passive: true })
+    document.addEventListener('touchcancel', handleFingerUp, { passive: true })
+    return () => {
+      document.removeEventListener('touchstart', handleFingerDown)
+      document.removeEventListener('touchend', handleFingerUp)
+      document.removeEventListener('touchcancel', handleFingerUp)
+    }
+  }, [])
 
   // Scrolling down runs the same color sweep as hovering: the further you scroll
   // (up to 40% of the screen's height), the further the colored band has moved across the name.
@@ -262,7 +263,13 @@ function Hero() {
 
   return (
     // id="home" lets the navbar link "/#home" scroll here.
-    <section id="home" className="section hero">
+    // Hovering anywhere in it plays the drawing behind the photo (see PhotoArt; phones: see above).
+    <section
+      id="home"
+      className="section hero"
+      onPointerEnter={(event) => event.pointerType !== 'touch' && startDrawing()}
+      onPointerLeave={(event) => event.pointerType !== 'touch' && stopDrawing()}
+    >
       <div className="hero__text">
         <p className="eyebrow">{profile.role}</p>
         {/* Hover the heading, or scroll down: a color sweep runs across the name. */}
@@ -317,16 +324,10 @@ function Hero() {
           background, and the text overlaps that faded part, so text and photo read as one piece.
           In dark mode the CSS swaps in the cut-out photo (photoDark) and hides the normal one. */}
       {profile.photo && (
-        // Hovering the photo plays a line drawing behind it (see PhotoArt above): mountains draw
-        // themselves, then a flag goes up on the peak. Moving away fades it out; coming back redraws it.
-        // On touch screens a tap does the same (see handleTap).
-        <div
-          className={`hero__visual${hovered ? ' hero__visual--on' : ''}`}
-          ref={visualRef}
-          onPointerEnter={(event) => event.pointerType !== 'touch' && startDrawing()}
-          onPointerLeave={(event) => event.pointerType !== 'touch' && stopDrawing()}
-          onPointerUp={handleTap}
-        >
+        // Behind the photo: a line drawing (see PhotoArt above) that plays while the hero is hovered
+        // (or a finger is on a phone's screen): mountains draw themselves, then a flag goes up on the peak.
+        // Moving away fades it out; coming back redraws it.
+        <div className={`hero__visual${hovered ? ' hero__visual--on' : ''}`}>
           {drawing && <PhotoArt key={run} cutout={profile.photoDark ? asset(profile.photoDark) : undefined} />}
           <div className={`hero__photo${profile.photoDark ? ' hero__photo--dual' : ''}`}>
             <img className="hero__photo-light" src={asset(profile.photo)} alt={profile.name} />

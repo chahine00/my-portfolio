@@ -357,9 +357,6 @@ main {
 .hero__visual {
   position: relative;
   flex-shrink: 0;
-  /* Taps (see Hero.tsx) respond at once, without the grey flash phones add on tapped things. */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
   width: 260px;
   aspect-ratio: 4 / 5;
   margin-left: -70px;
@@ -404,14 +401,14 @@ main {
 }
 
 /* Hover drawing: a line-art mountain range, then a flag planted on the peak (built in Hero.tsx).
-   It is wider than the photo and reaches above it, sits behind it, and ignores the pointer so only
-   the photo itself starts it. Each hover rebuilds it, so it draws again from the start; leaving
+   It is wider than the photo and reaches above it, sits behind it, and ignores the pointer (the whole hero
+   starts it, see Hero.tsx). Each hover rebuilds it, so it draws again from the start; leaving
    fades it out. Its bottom lines up with the photo's bottom; its height follows its width. */
 .hero__art {
   position: absolute;
-  left: -30%;
-  bottom: 0;
-  width: 190%;
+  left: -20%;
+  bottom: 0; /* the drawing's ground line sits on the photo's bottom edge */
+  width: 165%;
   height: auto;
   aspect-ratio: 5 / 4; /* the drawing's own shape (viewBox 500 x 400) */
   overflow: visible;
@@ -582,13 +579,13 @@ main {
     max-width: 220px;
     aspect-ratio: 1;
     align-self: center;
-    margin: 12px 0 0; /* a little room above for the flag */
+    margin: 0;
   }
 
-  /* Phones: a slightly narrower drawing, so the flag stays on screen. */
+  /* Phones: a smaller drawing, hugging the photo (the silhouette in Hero.tsx matches this size). */
   .hero__art {
-    left: -25%;
-    width: 150%;
+    left: -10%;
+    width: 130%;
   }
 
   .hero__art-cut--wide {
