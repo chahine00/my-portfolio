@@ -6,6 +6,11 @@ import { profile } from '../../data/profile.ts'
 import Icon from '../../components/Icon.tsx'
 import SocialLinks from '../../components/SocialLinks.tsx'
 import { asset } from '../../utils/asset.ts'
+import { BACK_AT_TOP_EVENT } from '../../components/BackToTop.tsx'
+
+// After the "back to top" button brings you up, the drawing plays on its own and stays this long
+// (in milliseconds; it takes about 1.6s to draw) before fading out.
+const SHOW_AFTER_BACK_TO_TOP_MS = 4000
 
 // Types each phrase from profile.building, waits, deletes it, then moves to the next one.
 // Returns the text typed so far.
@@ -211,9 +216,13 @@ function Hero() {
   const [drawing, setDrawing] = useState(false)
   const [run, setRun] = useState(0)
   const hideTimer = useRef<number | undefined>(undefined)
+  // True while a mouse is over the hero, so the back-to-top replay doesn't hide the drawing under it.
+  const pointerInside = useRef(false)
+  const replayTimer = useRef<number | undefined>(undefined)
 
   function startDrawing() {
     window.clearTimeout(hideTimer.current)
+    window.clearTimeout(replayTimer.current)
     setRun((n) => n + 1)
     setHovered(true)
     setDrawing(true)
@@ -225,6 +234,22 @@ function Hero() {
   }
 
   useEffect(() => () => window.clearTimeout(hideTimer.current), [])
+
+  // Arriving at the top via the "back to top" button replays the drawing, then fades it out
+  // after a few seconds (unless the mouse is on the hero by then: it then behaves like a hover).
+  useEffect(() => {
+    function handleBackAtTop() {
+      startDrawing()
+      replayTimer.current = window.setTimeout(() => {
+        if (!pointerInside.current) stopDrawing()
+      }, SHOW_AFTER_BACK_TO_TOP_MS)
+    }
+    window.addEventListener(BACK_AT_TOP_EVENT, handleBackAtTop)
+    return () => {
+      window.removeEventListener(BACK_AT_TOP_EVENT, handleBackAtTop)
+      window.clearTimeout(replayTimer.current)
+    }
+  }, [])
 
   // With a mouse, hovering the hero (name, text, photo) plays the drawing; leaving it hides it.
   // Phones and tablets can't hover, so there a finger on the screen (e.g. to scroll down) plays it,
@@ -248,13 +273,15 @@ function Hero() {
     }
   }, [])
 
-  // Scrolling down runs the same color sweep as hovering: the further you scroll
-  // (up to 40% of the screen's height), the further the colored band has moved across the name.
-  // The page passes it to the CSS as --sweep (100% = not started, 0% = done).
+  // Scrolling down runs the same color sweep as hovering: over the first 40% of the screen's
+  // height the colored band crosses the name, then comes back the opposite way.
+  // The page passes it to the CSS as --sweep (100% = band off one side, 0% = off the other).
   useEffect(() => {
     function handleScroll() {
       const progress = Math.min(window.scrollY / (window.innerHeight * 0.4), 1)
-      nameRef.current?.style.setProperty('--sweep', `${100 - progress * 100}%`)
+      // First half: 100% → 0% (across). Second half: 0% → 100% (back).
+      const sweep = progress < 0.5 ? 100 - progress * 200 : (progress - 0.5) * 200
+      nameRef.current?.style.setProperty('--sweep', `${sweep}%`)
     }
     handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -267,8 +294,16 @@ function Hero() {
     <section
       id="home"
       className="section hero"
-      onPointerEnter={(event) => event.pointerType !== 'touch' && startDrawing()}
-      onPointerLeave={(event) => event.pointerType !== 'touch' && stopDrawing()}
+      onPointerEnter={(event) => {
+        if (event.pointerType === 'touch') return
+        pointerInside.current = true
+        startDrawing()
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === 'touch') return
+        pointerInside.current = false
+        stopDrawing()
+      }}
     >
       <div className="hero__text">
         <p className="eyebrow">{profile.role}</p>

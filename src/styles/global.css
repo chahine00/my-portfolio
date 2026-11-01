@@ -3043,8 +3043,9 @@ a {
   /*
     The text is filled with a wide gradient: plain text color on both ends,
     accent → cyan in the middle. Only a third of it shows at a time.
-    On hover we slide it, so the colored band sweeps across the name.
-    Scrolling slides it too: Hero.tsx sets --sweep from how far the page is scrolled.
+    On hover we slide it across and back, so the colored band sweeps over the name
+    one way, then returns the opposite way.
+    Scrolling does the same: Hero.tsx sets --sweep from how far the page is scrolled.
   */
   background: linear-gradient(
     90deg,
@@ -3062,7 +3063,24 @@ a {
 }
 
 .hero__title:hover .hero__name {
-  background-position: 0% 0;
+  animation: hero-name-sweep 2.2s ease-in-out;
+}
+
+/* There (100% → 0%) and back (0% → 100%): two flashes, in opposite directions. */
+@keyframes hero-name-sweep {
+  0%,
+  100% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: 0% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__title:hover .hero__name {
+    animation: none;
+  }
 }
 
 /* Brand name: always shown as <Ali Chahine />, and always moving.

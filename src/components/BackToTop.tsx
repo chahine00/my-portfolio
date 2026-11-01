@@ -9,6 +9,9 @@ import Icon from './Icon.tsx'
 // How long the button stays after the last scroll, in milliseconds.
 const HIDE_AFTER_MS = 2000
 
+// Sent on window once the trip to the top arrives. The hero listens for it and replays its drawing.
+export const BACK_AT_TOP_EVENT = 'back-to-top:arrived'
+
 function BackToTop() {
   const [visible, setVisible] = useState(false)
   // True while the mouse is over the button: it then stays, so it can't vanish under the cursor.
@@ -49,7 +52,10 @@ function BackToTop() {
       window.clearTimeout(timer)
     }
     function releaseAtTop() {
-      if (window.scrollY <= 1) release()
+      if (window.scrollY <= 1) {
+        release()
+        window.dispatchEvent(new Event(BACK_AT_TOP_EVENT))
+      }
     }
     const timer = window.setTimeout(release, 1500)
     window.addEventListener('scroll', releaseAtTop, { passive: true })
