@@ -66,6 +66,8 @@ function Navbar() {
     function share() {
       const stays = getComputedStyle(header!).position === 'sticky'
       document.documentElement.style.setProperty('--navbar-height', `${stays ? header!.offsetHeight : 0}px`)
+      // Its full height either way: phones use it to make the home hero fill exactly the first screen.
+      document.documentElement.style.setProperty('--topbar-height', `${header!.offsetHeight}px`)
     }
     const observer = new ResizeObserver(share)
     observer.observe(header)
