@@ -54,108 +54,54 @@ function useTypingLoop(phrases: string[]) {
 // The longest phrase, used to reserve room for the typing line.
 const longestPhrase = profile.building.reduce((a, b) => (b.length > a.length ? b : a))
 
-// The flag's ripple: a wave that runs along the cloth, away from the pole. The pole edge stays put
-// and the free edge swings the most, like real fabric. Each "frame" is the cloth's outline at one
-// moment of the wave; the SVG <animate> tags below blend from frame to frame in a loop.
-const FLAG = { left: 330, width: 88, top: 22, bottom: 64 }
-// height = how far the free edge moves, length = size of one wave (both in SVG units),
-// seconds = how long one wave takes to run along the flag. Gentle and slow, so the word stays easy to read.
-const RIPPLE = { height: 3, length: 90, frames: 8, seconds: 2.6 }
+// The bubble's word, typed one character at a time (see ".hero__art-char" in global.css).
+// It's monospace and squeezed to an exact width (textLength), so every character is CHAR_W wide
+// and the cursor can step along with the typing.
+const GREETING = '<Welcome />'
+const CHAR_W = 9
+const BUBBLE = { x: 302, y: 22, padding: 14, height: 40 }
+const TEXT_X = BUBBLE.x + BUBBLE.padding
+const BUBBLE_W = BUBBLE.padding * 2 + GREETING.length * CHAR_W + 4 // + room for the cursor
 
-// How far the cloth is pushed up or down at x, at a given moment (phase) of the wave.
-function rippleAt(x: number, phase: number) {
-  const fromPole = (x - FLAG.left) / FLAG.width // 0 at the pole, 1 at the free edge
-  return RIPPLE.height * fromPole * Math.sin((2 * Math.PI * (x - FLAG.left)) / RIPPLE.length - phase)
-}
+// The code behind you: [indent, length] per line, in SVG units. Lines left of your head and lines
+// right of it; anything that runs behind you is hidden by the silhouette mask anyway.
+const CODE_LEFT: [number, number][] = [[0, 52], [12, 40], [12, 58], [24, 30], [12, 46], [0, 18], [0, 44], [12, 34]]
+// The right ones stay under ~140 units with their token, so they end inside the window (x 480).
+const CODE_RIGHT: [number, number][] = [[0, 96], [16, 70], [16, 70], [32, 80], [16, 56], [0, 30], [0, 88], [16, 72], [16, 64]]
+// Every few lines a short "token" in the accent color, like syntax highlighting.
+const ACCENT_LINES = new Set([1, 4, 7])
 
-// A wavy line across the flag at height y, as "x,y" points from the pole to the free edge.
-function ripplePoints(y: number, phase: number) {
-  const points: string[] = []
-  for (let i = 0; i <= 16; i++) {
-    const x = FLAG.left + (FLAG.width * i) / 16
-    points.push(`${x.toFixed(1)},${(y + rippleAt(x, phase)).toFixed(1)}`)
-  }
-  return points
-}
-
-// The same thing for every frame, joined the way <animate values="..."> wants it (";" between frames).
-// The last frame equals the first, so the loop has no jump.
-function rippleFrames(shape: (phase: number) => string) {
-  return Array.from({ length: RIPPLE.frames + 1 }, (_, i) => shape((2 * Math.PI * i) / RIPPLE.frames)).join(';')
-}
-
-const clothShape = (phase: number) =>
-  `M${ripplePoints(FLAG.top, phase).join(' L')} L${ripplePoints(FLAG.bottom, phase).reverse().join(' L')} Z`
-const textLine = (y: number) => (phase: number) => `M${ripplePoints(y, phase).join(' L')}`
-
-const clothFrames = rippleFrames(clothShape)
-// The word's baseline: a bit below the flag's middle, so the capitals look centered.
-const TEXT_Y = 48.5
-const textLineFrames = rippleFrames(textLine(TEXT_Y))
-
-// The drawing behind the photo: everything is thin lines in the muted text color, except the
-// flag, which is filled with the accent color. Both colors are CSS variables, so it follows the theme.
-// pathLength="1" lets the CSS "draw" every line the same way, whatever its real length.
-// The timing of each part lives in global.css (".hero__art").
+// The drawing behind the photo: a code editor window in thin lines (muted text color) with you in
+// front of it, and a speech bubble (accent color) that types "<Welcome />". Both colors are CSS
+// variables, so it follows the theme. pathLength="1" lets the CSS "draw" every line the same way,
+// whatever its real length. The timing of each part lives in global.css (".hero__art").
 //
 // The drawing stays BEHIND you: a mask cuts your silhouette out of it, made from the cut-out
 // photo turned solid black (the filter). The cut-out sits exactly where the photo is on screen,
 // which differs on wide screens (4:5 photo) and phones (square photo), so there are two copies
 // and the CSS shows one. Without a cut-out photo there is no mask (the white photo hides it anyway).
 function PhotoArt({ cutout }: { cutout?: string }) {
-  // People who turn off animations get a still flag (CSS can't stop <animate> tags, so we skip them).
-  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  // One <animate> that loops a shape through its frames. Starts on the first frame.
-  const ripple = (frames: string) =>
-    still ? null : <animate attributeName="d" values={frames} dur={`${RIPPLE.seconds}s`} repeatCount="indefinite" />
+  const codeLine = (x: number, y: number, [indent, length]: [number, number], i: number, side: string) => (
+    <g key={`${side}${i}`}>
+      <path
+        className="hero__art-line hero__art-code"
+        style={{ animationDelay: `${0.55 + i * 0.07}s` }}
+        pathLength={1}
+        d={`M${x + indent} ${y} h${length}`}
+      />
+      {ACCENT_LINES.has(i) && (
+        <path
+          className="hero__art-line hero__art-token"
+          style={{ animationDelay: `${0.65 + i * 0.07}s` }}
+          pathLength={1}
+          d={`M${x + indent + length + 8} ${y} h${Math.round(length * 0.45)}`}
+        />
+      )}
+    </g>
+  )
 
   return (
     <svg className="hero__art" viewBox="0 0 500 400" aria-hidden="true">
-      <defs>
-        {/* The word rides on this wavy line, so it ripples with the cloth. */}
-        <path id="hero-art-text-line" d={textLine(TEXT_Y)(0)}>
-          {ripple(textLineFrames)}
-        </path>
-        {/* Light and shadow bands on the cloth, rolling outward with the wave, so it looks folded. */}
-        <linearGradient
-          id="hero-art-folds"
-          gradientUnits="userSpaceOnUse"
-          x1={FLAG.left}
-          x2={FLAG.left + RIPPLE.length}
-          y1="0"
-          y2="0"
-          spreadMethod="repeat"
-        >
-          <stop offset="0" stopColor="#000" stopOpacity="0" />
-          <stop offset="0.25" stopColor="#000" stopOpacity="0.12" />
-          <stop offset="0.5" stopColor="#000" stopOpacity="0" />
-          <stop offset="0.75" stopColor="#fff" stopOpacity="0.12" />
-          <stop offset="1" stopColor="#000" stopOpacity="0" />
-          {!still && (
-            <animateTransform
-              attributeName="gradientTransform"
-              type="translate"
-              from="0 0"
-              to={`${RIPPLE.length} 0`}
-              dur={`${RIPPLE.seconds}s`}
-              repeatCount="indefinite"
-            />
-          )}
-        </linearGradient>
-        {/* The cloth's color: the accent, a little lighter at the pole and deeper at the tip.
-            The two colors are set in global.css (".hero__art-shade-*"), so they follow the theme. */}
-        <linearGradient
-          id="hero-art-cloth-fill"
-          gradientUnits="userSpaceOnUse"
-          x1={FLAG.left}
-          y1={FLAG.top}
-          x2={FLAG.left + FLAG.width}
-          y2={FLAG.bottom}
-        >
-          <stop offset="0" className="hero__art-shade-light" />
-          <stop offset="1" className="hero__art-shade-deep" />
-        </linearGradient>
-      </defs>
       {cutout && (
         <defs>
           <filter id="hero-art-silhouette">
@@ -169,38 +115,40 @@ function PhotoArt({ cutout }: { cutout?: string }) {
           </mask>
         </defs>
       )}
-      {/* The drawing's bottom (y=400) is the photo's bottom edge: the ground and the mountains' feet sit there. */}
+      {/* The drawing's bottom (y=400) is the photo's bottom edge: the editor window stands on it. */}
       <g mask={cutout ? 'url(#hero-art-mask)' : undefined}>
-        <path className="hero__art-line hero__art-ground" pathLength={1} d="M0 399 H500" />
-        <path className="hero__art-line hero__art-back" pathLength={1} d="M8 399 L50 268 L70 282 L110 160 L150 250" />
+        {/* The editor window: its outline, the title bar, the three window dots, then the code. */}
+        <path className="hero__art-line hero__art-window" pathLength={1} d="M40 399 V82 a12 12 0 0 1 12 -12 H468 a12 12 0 0 1 12 12 V399" />
+        <path className="hero__art-line hero__art-titlebar" pathLength={1} d="M40 96 H480" />
+        {[56, 70, 84].map((cx, i) => (
+          <circle key={cx} className="hero__art-dot" style={{ animationDelay: `${0.45 + i * 0.06}s` }} cx={cx} cy="83" r="3.2" />
+        ))}
+        {CODE_LEFT.map((line, i) => codeLine(56, 122 + i * 20, line, i, 'l'))}
+        {CODE_RIGHT.map((line, i) => codeLine(318, 122 + i * 20, line, i, 'r'))}
+      </g>
+      {/* The speech bubble, on top of everything (not masked): pops out from its tail, then types the word. */}
+      <g className="hero__art-bubble" style={{ transformOrigin: `${BUBBLE.x + 4}px ${BUBBLE.y + BUBBLE.height + 10}px` }}>
         <path
-          className="hero__art-line hero__art-main"
-          pathLength={1}
-          d="M170 399 L240 230 L262 246 L330 78 L388 185 L408 170 L492 399"
+          className="hero__art-bubble-shape"
+          d={`M${BUBBLE.x + 10} ${BUBBLE.y} H${BUBBLE.x + BUBBLE_W - 10} a10 10 0 0 1 10 10 V${BUBBLE.y + BUBBLE.height - 10} a10 10 0 0 1 -10 10 H${BUBBLE.x + 22} L${BUBBLE.x + 4} ${BUBBLE.y + BUBBLE.height + 10} L${BUBBLE.x + 8} ${BUBBLE.y + BUBBLE.height} a10 10 0 0 1 -8 -10 V${BUBBLE.y + 10} a10 10 0 0 1 10 -10 Z`}
         />
-        <path className="hero__art-line hero__art-snow" pathLength={1} d="M313 120 L322 111 L331 123 L341 110 L351 118" />
-        <path className="hero__art-line hero__art-bird" pathLength={1} d="M425 120 q6 -6 12 0 q6 -6 12 0" />
-        <path className="hero__art-line hero__art-bird" pathLength={1} d="M452 98 q5 -5 10 0 q5 -5 10 0" />
-        <path className="hero__art-line hero__art-pole" pathLength={1} d="M330 79 V20" />
-        {/* A small round cap on top of the pole. */}
-        <circle className="hero__art-finial" cx="330" cy="17.5" r="2.6" />
-        {/* Two groups: the outer one unrolls the flag from the pole, the inner one swings it
-            (the ripple inside the cloth comes from the <animate> tags). */}
-        <g className="hero__art-flag">
-          <g className="hero__art-wave">
-            <path className="hero__art-cloth" d={clothShape(0)}>
-              {ripple(clothFrames)}
-            </path>
-            <path d={clothShape(0)} fill="url(#hero-art-folds)">
-              {ripple(clothFrames)}
-            </path>
-            <text className="hero__art-text">
-              <textPath href="#hero-art-text-line" startOffset="50%">
-                Welcome
-              </textPath>
-            </text>
-          </g>
-        </g>
+        <text className="hero__art-text" x={TEXT_X} y={BUBBLE.y + 26} textLength={GREETING.length * CHAR_W} lengthAdjust="spacing">
+          {[...GREETING].map((char, i) => (
+            <tspan key={i} className="hero__art-char" style={{ animationDelay: `${1.45 + i * 0.07}s` }}>
+              {char}
+            </tspan>
+          ))}
+        </text>
+        {/* The cursor steps one character right each time one is typed, then blinks. */}
+        <rect
+          className="hero__art-cursor"
+          style={{ '--typed': `${GREETING.length * CHAR_W}px`, '--chars': GREETING.length } as React.CSSProperties}
+          x={TEXT_X + 1}
+          y={BUBBLE.y + 12}
+          width="2"
+          height="18"
+          rx="1"
+        />
       </g>
     </svg>
   )
