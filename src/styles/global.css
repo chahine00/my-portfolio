@@ -4110,3 +4110,41 @@ a {
     transition: opacity 0.2s;
   }
 }
+
+/* ------------------------------------------------------------------------------------------------
+   Phones: easier to tap and read.
+   - Small links get an invisible, larger touch area (an ::after around them), so they look the
+     same but a finger doesn't miss them (about 44px tall, Apple's guideline).
+   - The Blog search field and category buttons grow a little for real: they sit close together,
+     and invisible areas overlapping their neighbors would make taps land on the wrong one.
+   - The search text is 16px: below that, iPhone Safari zooms the page in when you tap the field.
+   ------------------------------------------------------------------------------------------------ */
+@media (max-width: 720px) {
+  .blog-bar__home,
+  .post__meta .update-card__category,
+  .job__company {
+    position: relative;
+  }
+
+  .blog-bar__home::after,
+  .post__meta .update-card__category::after,
+  .job__company::after {
+    content: '';
+    position: absolute;
+    inset: -11px -8px;
+  }
+
+  .blog-search input {
+    padding: 9px 0;
+    font-size: 16px;
+  }
+
+  .blog-category {
+    padding: 7px 12px;
+  }
+
+  /* The category label on the small blog preview cards (home page): up from 9.9px to about 11px. */
+  .blog-preview__item:not(.blog-preview__item--featured) .blog-preview__category {
+    font-size: 0.7rem;
+  }
+}
