@@ -4,6 +4,7 @@
 // It's an <h2>: the page has a single <h1>, your name in the hero.
 
 import type { ReactNode } from 'react'
+import GradientText from './GradientText.tsx'
 
 interface SectionTitleProps {
   label: string // e.g. 'Projects'
@@ -22,7 +23,9 @@ function SectionTitle({ label, title, accent, action }: SectionTitleProps) {
           {accent && (
             <>
               {' '}
-              <span className="section-title__accent">{accent}</span>
+              <span className="section-title__accent">
+                <GradientText text={accent} />
+              </span>
             </>
           )}
         </h2>

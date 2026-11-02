@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { profile } from '../../data/profile.ts'
 import Icon from '../../components/Icon.tsx'
 import SocialLinks from '../../components/SocialLinks.tsx'
+import GradientText from '../../components/GradientText.tsx'
 import { asset } from '../../utils/asset.ts'
 import { BACK_AT_TOP_EVENT } from '../../components/BackToTop.tsx'
 
@@ -223,13 +224,13 @@ function Hero() {
 
   // Scrolling down runs the same color sweep as hovering: over the first 40% of the screen's
   // height the colored band crosses the name, then comes back the opposite way.
-  // The page passes it to the CSS as --sweep (100% = band off one side, 0% = off the other).
+  // The page passes it to the CSS as --sweep (1 = band off one side, 0 = off the other).
   useEffect(() => {
     function handleScroll() {
       const progress = Math.min(window.scrollY / (window.innerHeight * 0.4), 1)
       // First half: 100% → 0% (across). Second half: 0% → 100% (back).
-      const sweep = progress < 0.5 ? 100 - progress * 200 : (progress - 0.5) * 200
-      nameRef.current?.style.setProperty('--sweep', `${sweep}%`)
+      const sweep = progress < 0.5 ? 1 - progress * 2 : (progress - 0.5) * 2
+      nameRef.current?.style.setProperty('--sweep', `${sweep}`)
     }
     handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -259,7 +260,7 @@ function Hero() {
         <h1 className="hero__title">
           Hi, I'm{' '}
           <span className="hero__name" ref={nameRef}>
-            {profile.name}
+            <GradientText text={profile.name} />
           </span>
         </h1>
         <p className="hero__tagline">{profile.tagline}</p>

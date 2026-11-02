@@ -9,6 +9,7 @@ import { filterUpdates, sortedUpdates } from '../../data/updates.ts'
 import { asset } from '../../utils/asset.ts'
 import BlogFilters from './BlogFilters.tsx'
 import UpdateTimeline from './UpdateTimeline.tsx'
+import GradientText from '../../components/GradientText.tsx'
 
 // For the banner: the main photo of the 3 newest posts that have one.
 const bannerPhotos = sortedUpdates.filter((post) => post.images.length > 0).slice(0, 3)
@@ -94,7 +95,9 @@ function UpdatesPage() {
         <div className="blog-hero__text">
           <p className="eyebrow">The blog</p>
           <h1>
-            Notes, ideas <span className="blog-hero__amp">&</span> <span className="blog-hero__accent">milestones</span>
+            Notes, ideas <span className="blog-hero__amp">&</span> <span className="blog-hero__accent">
+              <GradientText text="milestones" />
+            </span>
           </h1>
           <p>Lessons from real work, how I think about software, and the moments along the way.</p>
         </div>

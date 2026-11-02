@@ -16,6 +16,8 @@
   --accent-fill: #4f46e5;
   /* The cyan end of the gradient titles. Deeper on the white page so the last letters stay readable. */
   --accent-2: #0e7490;
+  /* Green text ("Open for opportunities", "Copied"). */
+  --success: #16a34a;
   /* Long reading text (post and project pages). Same as --text in light mode; softer in dark mode,
      where near-white on near-black glares in long text. Titles keep --text, so they stand out. */
   --text-body: var(--text);
@@ -44,7 +46,7 @@
 
 /* Picked with the toggle: the browser's own parts follow that choice too. */
 :root[data-theme='light'] {
-  color-scheme: light;
+  color-scheme: only light;
 }
 
 :root[data-theme='dark'] {
@@ -55,16 +57,22 @@
   Dark colors. They apply when:
   - the visitor's computer is in dark mode and they didn't pick light with the toggle, or
   - they picked dark with the toggle (data-theme="dark" on <html>).
+
+  Every TEXT color here is kept light enough (a "brightness" of about 155 or more out of 255,
+  brightness = 0.299 R + 0.587 G + 0.114 B). Some phones force their own dark mode on every website,
+  even ones with a dark theme, and that recolors any text darker than about 150, so text just under
+  the line (the old #818cf8 accent, the #06b6d4 cyan) turned muddy dark blue there.
 */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --bg: #0d1117;
     --text: #e6edf3;
-    --muted: #9198a1;
-    --accent: #818cf8;
+    --muted: #969da6;
+    --accent: #8b93f9;
     --card: #161b22;
     --border: #30363d;
-    --accent-2: #06b6d4;
+    --accent-2: #22d3ee;
+    --success: #4ade80;
     --text-body: #c9d1d9;
     /* Dark mode: deeper and dimmer, so they glow without washing out the dark. */
     --glow-1: rgb(99 102 241 / 0.26);
@@ -79,11 +87,12 @@
 :root[data-theme='dark'] {
   --bg: #0d1117;
   --text: #e6edf3;
-  --muted: #9198a1;
-  --accent: #818cf8;
+  --muted: #969da6;
+  --accent: #8b93f9;
   --card: #161b22;
   --border: #30363d;
-  --accent-2: #06b6d4;
+  --accent-2: #22d3ee;
+  --success: #4ade80;
   --text-body: #c9d1d9;
   --glow-1: rgb(99 102 241 / 0.26);
   --glow-2: rgb(34 211 238 / 0.12);
@@ -257,11 +266,24 @@ main {
   letter-spacing: -0.02em;
 }
 
-.section-title__accent {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* Words in the accent gradient (GradientText.tsx): each letter gets one solid color, from the accent
+   (first letter, --p: 0) to the cyan (last letter, --p: 1). Solid colors, not a gradient clipped to the
+   text: phones that force their own dark mode darken such gradients, but leave text colors alone. */
+.grad__l {
+  color: color-mix(in srgb, var(--accent-2) calc(var(--p) * 100%), var(--accent));
+}
+
+/* Hidden on screen, still read by screen readers. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* The big titles use Space Grotesk: the hero name, the home section titles, and the
@@ -363,7 +385,7 @@ main {
 }
 
 .hero__available {
-  color: #16a34a;
+  color: var(--success);
   font-weight: 500;
 }
 
@@ -604,10 +626,16 @@ main {
     white-space: nowrap;
   }
 
+  /* The divider is a thin drawn line, not a "|" character: phones that force their own dark mode
+     turn dark text (like a "|" in the border color) bright white, but leave a line's color alone. */
   .hero__meta li + li::before {
-    content: '|';
-    margin-right: 4px;
-    color: var(--border);
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 0.9em;
+    margin-right: 6px;
+    vertical-align: -0.1em;
+    background: var(--border);
   }
 
   /* Phones: the two buttons share a row, the icon links get their own row under them. */
@@ -919,13 +947,10 @@ main {
   margin-top: -16px;
 }
 
-.mindset__title span {
-  /* Always on its own line, so the contrast reads as two lines: what changes / what doesn't. */
+/* Always on its own line, so the contrast reads as two lines: what changes / what doesn't.
+   (Its letters are colored by GradientText.) */
+.mindset__title > span {
   display: block;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 .mindset__list {
@@ -2091,13 +2116,6 @@ main {
   color: var(--muted);
 }
 
-.blog-hero__accent {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 .blog-hero__text > p:not(.eyebrow) {
   max-width: 42ch;
   margin: 0;
@@ -2950,7 +2968,7 @@ button.contact-tile__main {
 }
 
 .contact-tile__text .contact-tile__copied {
-  color: #16a34a;
+  color: var(--success);
   font-weight: 600;
 }
 
@@ -3372,42 +3390,50 @@ a {
   transform: scaleX(1);
 }
 
-/* Hero heading: color sweep across the name on hover, and as you scroll down */
+/* Hero heading: color sweep across the name on hover, and as you scroll down.
+   A colored band (accent → cyan) slides across the name; outside the band the letters are the plain
+   text color. Each letter is its own solid color (GradientText.tsx), worked out here from:
+   --p: the letter's place in the name (0 = first, 1 = last), and
+   --sweep: where the band is (1 = off one side, 0 = off the other). Scrolling sets it (Hero.tsx);
+   hovering animates it there and back.
+   Solid letter colors, not a gradient clipped to the text: phones that force their own dark mode
+   darken such gradients (the name turned dark grey), but leave text colors alone. */
+@property --sweep {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
 .hero__name {
-  /*
-    The text is filled with a wide gradient: plain text color on both ends,
-    accent → cyan in the middle. Only a third of it shows at a time.
-    On hover we slide it across and back, so the colored band sweeps over the name
-    one way, then returns the opposite way.
-    Scrolling does the same: Hero.tsx sets --sweep from how far the page is scrolled.
-  */
-  background: linear-gradient(
-    90deg,
-    var(--text) 0% 35%,
-    var(--accent) 45%,
-    var(--accent-2) 55%,
-    var(--text) 65% 100%
+  --sweep: 1;
+  transition: --sweep 1.1s ease;
+}
+
+.hero__name .grad__l {
+  /* The letter's spot on the band: the band's middle is at 0.5, it fades out 0.15 either side. */
+  --g: calc((var(--p) + 2 * var(--sweep)) / 3);
+  /* How much band color the letter gets (1 in the middle, 0 outside), and accent → cyan across it. */
+  --w: clamp(0, (0.15 - max(var(--g) - 0.5, 0.5 - var(--g))) / 0.1, 1);
+  --h: clamp(0, (var(--g) - 0.45) / 0.1, 1);
+  color: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--accent-2) calc(var(--h) * 100%), var(--accent)) calc(var(--w) * 100%),
+    var(--text)
   );
-  background-size: 300% 100%;
-  background-position: var(--sweep, 100%) 0;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  transition: background-position 1.1s ease;
 }
 
 .hero__title:hover .hero__name {
   animation: hero-name-sweep 2.2s ease-in-out;
 }
 
-/* There (100% → 0%) and back (0% → 100%): two flashes, in opposite directions. */
+/* There (1 → 0) and back (0 → 1): two flashes, in opposite directions. */
 @keyframes hero-name-sweep {
   0%,
   100% {
-    background-position: 100% 0;
+    --sweep: 1;
   }
   50% {
-    background-position: 0% 0;
+    --sweep: 0;
   }
 }
 

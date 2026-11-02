@@ -3,6 +3,7 @@
 // The numbers come from "stats" in src/data/profile.ts.
 
 import { stats } from '../../data/profile.ts'
+import GradientText from '../../components/GradientText.tsx'
 
 // How you work, in three short points. Keep each one to a title and one line.
 const principles = [
@@ -29,7 +30,10 @@ function About() {
         About <span className="mindset__dot">·</span> The Mindset
       </p>
       <h2 className="mindset__title">
-        Think bigger. <span>Adapt faster.</span>
+        Think bigger.{' '}
+        <span>
+          <GradientText text="Adapt faster." />
+        </span>
       </h2>
       {/* A short personal intro: the point behind the statement. */}
       <p className="mindset__lead">
