@@ -154,7 +154,7 @@ function ProjectCard({ project, slideOffset }: ProjectCardProps) {
         )}
         {project.liveUrl && (
           <a href={project.liveUrl} target="_blank" rel="noreferrer">
-            Live demo
+            {project.liveLabel ?? 'Live demo'}
           </a>
         )}
       </div>

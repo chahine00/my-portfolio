@@ -72,7 +72,7 @@ function ProjectPage() {
           <div className="project-page__links">
             {project.liveUrl && (
               <a href={project.liveUrl} target="_blank" rel="noreferrer" className="button">
-                Live demo
+                {project.liveLabel ?? 'Live demo'}
               </a>
             )}
             {project.githubUrl && (

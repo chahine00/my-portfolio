@@ -961,27 +961,41 @@ main {
   transform: none;
 }
 
-/* Blog posts: each card slides in from the left, and its dot on the line pops in after it. */
+/* Blog posts: a plain list of cards, with NO line and NO dots. The line made the posts look like a
+   sequence, like the jobs in Experience. Each card slides in from the left as you scroll to it. */
+.timeline--posts::before,
+.timeline--posts .timeline__item::before {
+  display: none;
+}
+
 .timeline--posts .timeline__item {
+  padding-left: 0;
   transform: translateX(-48px);
 }
 
-.timeline--posts .timeline__item::before {
-  transform: scale(0);
+/* The little touch instead of the line: a thin accent stripe along a card's top edge, drawn in from
+   the left only while you hover that card. Hidden otherwise, so the list stays calm (and phones,
+   which can't hover, get plain cards). */
+/* It starts and ends 12px in, clear of the card's rounded corners. */
+.timeline--posts .update-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px 12px auto;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, var(--accent), #06b6d4);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
 }
 
-.timeline--posts .timeline__item.is-visible::before {
-  animation: dot-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  animation-delay: calc(var(--reveal-delay, 0s) + 0.3s);
+.timeline--posts .update-card:hover::before {
+  transform: scaleX(1);
 }
 
-.timeline--posts .timeline__item.is-visible:hover::before {
-  animation: none;
-}
-
-@keyframes dot-pop {
-  from { transform: scale(0); }
-  to { transform: scale(1); }
+/* Posts lift a little on hover. (Sliding right was for "moving along the line", now gone.) */
+.timeline--posts .update-card:hover {
+  transform: translateY(-2px);
 }
 
 /* No motion wanted: show the jobs and posts straight away. */
@@ -992,9 +1006,11 @@ main {
     transition: none;
   }
 
-  .timeline--posts .timeline__item::before,
-  .timeline--posts .timeline__item.is-visible::before {
-    animation: none;
+  .timeline--posts .update-card::before {
+    transition: none;
+  }
+
+  .timeline--posts .update-card:hover {
     transform: none;
   }
 }
@@ -1942,8 +1958,10 @@ main {
   }
 }
 
-/* Blog page banner: a flat card with a crisp 1px border, like the other cards. The title on the left
-   (the last word in a gradient), a mosaic of recent post photos on the right: one tall photo and two stacked beside it.
+/* Blog page banner: the page's header, so on purpose it does NOT look like a post card (no grey card
+   background, no border). Instead a soft wash of the accent colors fades out to the right, like the
+   page glow. The title on the left (the last word in a gradient), a mosaic of recent post photos on
+   the right: one tall photo and two stacked beside it.
    Kept compact: visitors already met the blog on the home page, so the posts should show up quickly. */
 .blog-hero {
   display: grid;
@@ -1951,10 +1969,15 @@ main {
   align-items: center;
   gap: 24px;
   margin: 8px 0 20px;
-  padding: 20px 24px;
-  border: 1px solid var(--border);
+  padding: 24px 24px;
   border-radius: 22px;
-  background: var(--card);
+  background:
+    linear-gradient(
+      120deg,
+      color-mix(in srgb, var(--accent) 14%, transparent),
+      color-mix(in srgb, #06b6d4 8%, transparent) 55%,
+      transparent
+    );
 }
 
 .blog-hero__text {
@@ -1963,7 +1986,7 @@ main {
 
 .blog-hero h1 {
   margin: 4px 0 8px;
-  font-size: clamp(1.5rem, 3.6vw, 1.9rem);
+  font-size: clamp(1.7rem, 4vw, 2.2rem);
   line-height: 1.08;
   letter-spacing: -0.02em;
 }

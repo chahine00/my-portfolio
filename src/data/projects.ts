@@ -38,7 +38,10 @@ export interface Project {
   note?: string // e.g. 'The code is private because this was a company project.'
 
   githubUrl?: string // the ? means this property is OPTIONAL (you can leave it out)
-  liveUrl?: string
+  liveUrl?: string // a link to the project online: the real app, or the product's website
+  // The text on that link's button. Leave it out for a real app you can try ('Live demo').
+  // For a company project whose link is only an information page, use e.g. 'Visit website'.
+  liveLabel?: string
 }
 
 // "Project[]" means "an array of Project objects".
@@ -130,6 +133,7 @@ The role went beyond code: I was part of the discussions and decisions on which 
     ],
     note: "The code is in a private company repository, so it can't be shared. The website images are from boxmind.ai.",
     liveUrl: 'https://boxmind.ai/',
+    liveLabel: 'Visit website',
   },
   {
     slug: 'cinetwork',
@@ -269,5 +273,6 @@ It reuses what I built across boxMind's AI products: secure APIs, strict data pr
     ],
     note: "The code is in a private company repository, so it can't be shared. The images are from boxmindacademy.ai.",
     liveUrl: 'https://boxmindacademy.ai/',
+    liveLabel: 'Visit website',
   },
 ]

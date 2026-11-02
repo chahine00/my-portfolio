@@ -1,4 +1,5 @@
-// A REUSABLE timeline of posts. The home page shows the newest few,
+// A REUSABLE list of posts (it started as a timeline, hence the name; the line and dots are gone
+// so it doesn't read like the Experience timeline). The home page shows the newest few,
 // and the Blog page shows all of them, using this same component.
 // Each card links to the post's own page (/blog/<slug>).
 // Posts appear one by one as you scroll down to them (see src/utils/useReveal.ts).
@@ -9,7 +10,6 @@ import { Link } from 'react-router'
 import { formatDate, isRecent } from '../../data/updates.ts'
 import type { Update } from '../../data/updates.ts'
 import { fallbackTo, thumb } from '../../utils/asset.ts'
-import TimelineDot from '../../components/TimelineDot.tsx'
 import { useReveal } from '../../utils/useReveal.ts'
 
 interface UpdateTimelineProps {
@@ -31,7 +31,6 @@ function UpdateTimeline({ updates }: UpdateTimelineProps) {
 
         return (
           <li className="timeline__item" key={update.slug}>
-            <TimelineDot label={update.title} />
             <article className="card update-card card-clickable">
               <div className="update-card__meta">
                 {/* <time> tells browsers and search engines that this text is a date. */}
