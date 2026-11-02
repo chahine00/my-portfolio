@@ -1,7 +1,8 @@
 // The navigation bar at the top of the page.
-// On phones every link shows an icon with a small label (so all seven fit on one row), and on the
-// home page the menu "moves" to the bottom of the screen once you scroll: the top bar scrolls away
-// with the page and a matching bar slides up at the bottom (the "tab bar", see the end of this file).
+// On phones every link shows an icon with a small label (so all seven fit on one row), and the menu
+// "moves" to the bottom of the screen once you scroll: the top bar scrolls away with the page and a
+// matching bar slides up at the bottom (the "tab bar", see the end of this file). Same on every
+// page, except the Blog list, where the Blog bar (search + categories) sticks at the top instead.
 
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
@@ -45,10 +46,15 @@ function Navbar() {
   const [activeSection, setActiveSection] = useState('')
   // True once the page is scrolled a little: the navbar then gets a soft shadow.
   const [scrolled, setScrolled] = useState(false)
-  // Phones, home page: true once the top bar has scrolled out of view, which brings up the tab bar.
+  // Phones: true once the top bar's row of links starts scrolling out of view, which brings up the
+  // tab bar. (Not waiting for the whole bar to leave: a half-hidden row of links is hard to tap,
+  // so there's always one usable menu on screen.)
   const [pastTopBar, setPastTopBar] = useState(false)
   const headerRef = useRef<HTMLElement>(null)
+  const linksRowRef = useRef<HTMLElement>(null)
   const onHome = pathname === '/'
+  // The Blog list has its own sticky bar at the top; a tab bar too would leave too little room for the posts.
+  const showTabbar = pathname !== '/blog'
 
   // Share the navbar's height with the CSS (--navbar-height), so section links stop right
   // under the bar. It changes with the screen size (on phones the links get their own row).
@@ -73,7 +79,10 @@ function Navbar() {
   useEffect(() => {
     function handleScroll() {
       setScrolled(window.scrollY > 8)
-      setPastTopBar(window.scrollY > (headerRef.current?.offsetHeight ?? 0))
+      // Where the row of links starts on the page (the header sits at the very top of the page).
+      const row = linksRowRef.current
+      const rowTop = row ? row.getBoundingClientRect().top + window.scrollY : (headerRef.current?.offsetHeight ?? 0)
+      setPastTopBar(window.scrollY > rowTop)
     }
     handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -161,14 +170,16 @@ function Navbar() {
             </span>
           </Link>
         </div>
-        <nav className="navbar__nav">{linkList}</nav>
+        <nav className="navbar__nav" ref={linksRowRef}>
+          {linkList}
+        </nav>
         <ThemeToggle />
       </header>
 
-      {/* The tab bar: the same links at the bottom of the screen. Only on the home page, and only
-          shown on phones (CSS), once the top bar has scrolled away. While hidden, "inert" keeps it
-          out of reach of the keyboard and screen readers. */}
-      {onHome && (
+      {/* The tab bar: the same links at the bottom of the screen. On every page but the Blog list,
+          and only shown on phones (CSS), once the top bar has scrolled away. While hidden, "inert"
+          keeps it out of reach of the keyboard and screen readers. */}
+      {showTabbar && (
         <nav
           className={pastTopBar ? 'tabbar tabbar--visible' : 'tabbar'}
           aria-label="Sections"

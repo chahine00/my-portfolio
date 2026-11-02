@@ -2216,8 +2216,6 @@ main {
   font-weight: 500;
 }
 
-/* Phones: the category buttons wrap onto a second line when they don't fit,
-   so every category is in view without scrolling sideways. (.blog-categories wraps by default.) */
 
 /* Phones, on the Blog page only: the navbar scrolls away with the page instead of staying on top,
    and the Blog bar takes its place at the very top of the screen. One bar instead of two stacked
@@ -2338,6 +2336,33 @@ p.blog-empty {
   .blog-search {
     max-width: none;
     flex-basis: 100%;
+  }
+}
+
+/* Phones: the category buttons stay on ONE row you can swipe sideways, instead of wrapping onto a
+   second row (which made the sticky Blog bar much taller). The row reaches the screen's edges
+   (the negative margins undo main's 16px padding), and its right end fades out, a hint that
+   there's more to swipe to. BlogFilters.tsx scrolls the chosen category into view. */
+@media (max-width: 720px) {
+  .blog-categories {
+    flex-wrap: nowrap;
+    width: calc(100% + 32px);
+    margin: 0 -16px;
+    /* 32px on the right, so at the end of the swipe the last button is clear of the fade. */
+    padding: 0 32px 0 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
+
+  .blog-categories::-webkit-scrollbar {
+    display: none;
+  }
+
+  .blog-category {
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 }
 
@@ -3960,8 +3985,9 @@ a {
 /* ------------------------------------------------------------------------------------------------
    Menu icons and the phone tab bar (see Navbar.tsx).
    Desktop and tablets: text links, no icons. Phones: every link is an icon with a small label under
-   it, so all seven fit on one row. On the home page, the top bar scrolls away with the page and the
-   same row comes back as a "tab bar" fixed to the bottom of the screen, within easy reach of the thumb.
+   it, so all seven fit on one row. On every page but the Blog list, the top bar scrolls away with
+   the page and the same row comes back as a "tab bar" fixed to the bottom of the screen, within
+   easy reach of the thumb.
    ------------------------------------------------------------------------------------------------ */
 .navbar__icon {
   display: none;
@@ -4034,7 +4060,7 @@ a {
     margin: 0 -8px;
   }
 
-  /* Home page: the top bar scrolls away with the page (the tab bar takes over). */
+  /* Pages with a tab bar: the top bar scrolls away with the page (the tab bar takes over). */
   body:has(.tabbar) .navbar {
     position: relative;
   }
