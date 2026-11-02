@@ -381,6 +381,11 @@ export function filterUpdates(posts: Update[], query: string, category: string) 
 export const hasRecentUpdate = sortedUpdates.length > 0 && isRecent(sortedUpdates[0].date)
 
 // Turns '2026-10-26' into something readable like 'October 26, 2026'.
+// How long a post takes to read: about 200 words a minute, rounded up, at least 1.
+export function readingTime(text: string) {
+  return Math.max(1, Math.ceil(text.trim().split(/\s+/).length / 200))
+}
+
 export function formatDate(date: string) {
   return new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
     year: 'numeric',

@@ -1,10 +1,71 @@
 // The page for ONE post, at /blog/<slug>.
 // The <slug> part of the URL tells us which post to show.
 
-import { useLayoutEffect } from 'react'
+import { Fragment, useLayoutEffect } from 'react'
+import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router'
-import { formatDate, sortedUpdates } from '../../data/updates.ts'
+import { formatDate, readingTime, sortedUpdates } from '../../data/updates.ts'
 import Gallery from '../../components/Gallery.tsx'
+
+// Turns one paragraph of a post into what the page shows.
+// Lines starting with "- " become a real bulleted list, so a long point that wraps lines up
+// under its own text instead of under the dash. A short line ending with ":" right before a
+// list ("What I used:") becomes a small bold label for that list. A short first line with no
+// punctuation and more text under it ("💡 Key takeaway") becomes a section title. Everything
+// else stays a normal paragraph, keeping its single line breaks.
+function renderParagraph(paragraph: string, key: number) {
+  const lines = paragraph.split('\n')
+  const parts: ReactNode[] = []
+
+  const first = lines[0].trim()
+  if (lines.length > 1 && first.length <= 50 && !/[.!?:,;]/.test(first) && !first.startsWith('- ')) {
+    parts.push(<h2 key="title" className="post__subhead">{first}</h2>)
+    lines.shift()
+  }
+
+  let text: string[] = []
+  let items: string[] = []
+
+  function flushText(beforeList: boolean) {
+    if (text.length === 0) return
+    const last = text[text.length - 1].trim()
+    // The label is only the LAST line before the list; any lines above it stay a paragraph.
+    if (beforeList && last.endsWith(':') && last.length <= 80) {
+      if (text.length > 1) parts.push(<p key={parts.length}>{text.slice(0, -1).join('\n')}</p>)
+      parts.push(<p key={parts.length} className="post__lead-in">{last}</p>)
+    } else {
+      parts.push(<p key={parts.length}>{text.join('\n')}</p>)
+    }
+    text = []
+  }
+
+  function flushList() {
+    if (items.length === 0) return
+    parts.push(
+      <ul key={parts.length} className="post__list">
+        {items.map((item, i) => (
+          <li key={i}>{item}</li>
+        ))}
+      </ul>,
+    )
+    items = []
+  }
+
+  for (const line of lines) {
+    const bullet = line.match(/^\s*- (.*)$/)
+    if (bullet) {
+      flushText(true)
+      items.push(bullet[1])
+    } else {
+      flushList()
+      text.push(line)
+    }
+  }
+  flushText(false)
+  flushList()
+
+  return <Fragment key={key}>{parts}</Fragment>
+}
 
 function UpdatePost() {
   // useParams reads the ":slug" part of the URL (see the <Route> in App.tsx).
@@ -54,6 +115,7 @@ function UpdatePost() {
           <time dateTime={post.date} className="post__date">
             {formatDate(post.date)}
           </time>
+          <span className="post__date">· {readingTime(post.content)} min read</span>
         </div>
         <h1>{post.title}</h1>
         {post.tags && (
@@ -69,9 +131,7 @@ function UpdatePost() {
       {post.images.length > 0 && <Gallery key={post.slug} images={post.images} title={post.title} />}
 
       <div className="post__body">
-        {paragraphs.map((paragraph, i) => (
-          <p key={i}>{paragraph}</p>
-        ))}
+        {paragraphs.map(renderParagraph)}
       </div>
 
       <nav className="post__nav" aria-label="More posts">

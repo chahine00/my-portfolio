@@ -5,18 +5,13 @@
 // The WHOLE card is clickable: the title link is stretched over the card (see .card-link in global.css).
 
 import { Link } from 'react-router'
-import { formatDate, isRecent } from '../../data/updates.ts'
+import { formatDate, isRecent, readingTime } from '../../data/updates.ts'
 import type { Update } from '../../data/updates.ts'
 import { asset } from '../../utils/asset.ts'
 import { useReveal } from '../../utils/useReveal.ts'
 
 interface BlogPreviewProps {
   updates: Update[]
-}
-
-// About 200 words a minute, rounded up, at least 1.
-function readingTime(text: string) {
-  return Math.max(1, Math.ceil(text.trim().split(/\s+/).length / 200))
 }
 
 function BlogPreview({ updates }: BlogPreviewProps) {
