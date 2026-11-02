@@ -11,6 +11,14 @@
   --accent: #4f46e5;
   --card: #f6f8fa;
   --border: #d1d9e0;
+  /* Filled accent shapes with white text (buttons, "New" badges, the chosen category): a deep
+     indigo in BOTH themes, so the white text stays readable (dark mode's lighter accent was too pale). */
+  --accent-fill: #4f46e5;
+  /* The cyan end of the gradient titles. Deeper on the white page so the last letters stay readable. */
+  --accent-2: #0e7490;
+  /* Long reading text (post and project pages). Same as --text in light mode; softer in dark mode,
+     where near-white on near-black glares in long text. Titles keep --text, so they stand out. */
+  --text-body: var(--text);
   /* Background glows (see BackgroundGlow.tsx): indigo, cyan and pink, kept light so text stays easy to read. */
   --glow-1: rgb(99 102 241 / 0.16);
   --glow-2: rgb(6 182 212 / 0.13);
@@ -41,6 +49,8 @@
     --accent: #818cf8;
     --card: #161b22;
     --border: #30363d;
+    --accent-2: #06b6d4;
+    --text-body: #c9d1d9;
     /* Dark mode: deeper and dimmer, so they glow without washing out the dark. */
     --glow-1: rgb(99 102 241 / 0.26);
     --glow-2: rgb(34 211 238 / 0.12);
@@ -58,6 +68,8 @@
   --accent: #818cf8;
   --card: #161b22;
   --border: #30363d;
+  --accent-2: #06b6d4;
+  --text-body: #c9d1d9;
   --glow-1: rgb(99 102 241 / 0.26);
   --glow-2: rgb(34 211 238 / 0.12);
   --glow-3: rgb(168 85 247 / 0.18);
@@ -231,7 +243,7 @@ main {
 }
 
 .section-title__accent {
-  background: linear-gradient(135deg, var(--accent), #06b6d4);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -837,7 +849,7 @@ main {
 .mindset__title span {
   /* Always on its own line, so the contrast reads as two lines: what changes / what doesn't. */
   display: block;
-  background: linear-gradient(135deg, var(--accent), #06b6d4);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -968,7 +980,9 @@ main {
 }
 
 /* Blog posts: a plain list of cards, with NO line and NO dots. The line made the posts look like a
-   sequence, like the jobs in Experience. Each card slides in from the left as you scroll to it. */
+   sequence, like the jobs in Experience.
+   As you scroll to a card it fades in with a small rise, the same calm reveal as the home page's
+   Blog preview (no sideways slide: text moving sideways pulls the eye while reading). */
 .timeline--posts::before,
 .timeline--posts .timeline__item::before {
   display: none;
@@ -976,7 +990,9 @@ main {
 
 .timeline--posts .timeline__item {
   padding-left: 0;
-  transform: translateX(-48px);
+  transform: translateY(16px);
+  /* Half the usual gap between cards appearing together (0.1s instead of 0.2s, see useReveal.ts). */
+  transition-delay: calc(var(--reveal-delay, 0s) / 2);
 }
 
 /* The little touch instead of the line: a thin accent stripe along a card's top edge, drawn in from
@@ -1225,7 +1241,7 @@ main {
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
-  background: var(--accent);
+  background: var(--accent-fill);
   color: #fff;
   font: inherit;
   cursor: pointer;
@@ -1671,7 +1687,7 @@ main {
 .badge-new {
   padding: 1px 8px;
   border-radius: 999px;
-  background: var(--accent);
+  background: var(--accent-fill);
   color: #fff;
   font-size: 0.75rem;
   font-weight: 600;
@@ -2003,7 +2019,7 @@ main {
 }
 
 .blog-hero__accent {
-  background: linear-gradient(90deg, var(--accent), #06b6d4);
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -2292,7 +2308,7 @@ main {
 
 .blog-category[aria-pressed='true'] {
   border-color: var(--accent);
-  background: var(--accent);
+  background: var(--accent-fill);
   color: #fff;
 }
 
@@ -2360,6 +2376,19 @@ p.blog-empty {
 
 .post__body p {
   white-space: pre-line; /* keeps single line breaks from the text */
+}
+
+/* The reading text (not the titles or bold labels) uses the softer body color (see --text-body). */
+.post__body p:not(.post__lead-in),
+.post__body li,
+.project-page__block > p,
+.project-page__block > .check-list li,
+.challenges p {
+  color: var(--text-body);
+}
+
+.challenges strong {
+  color: var(--text);
 }
 
 /* Lists written with "- " in a post (see renderParagraph in UpdatePost.tsx): real bullets, and a
@@ -3209,7 +3238,7 @@ a {
 }
 
 .button-outline:hover {
-  background: var(--accent);
+  background: var(--accent-fill);
   color: #fff;
 }
 
@@ -3258,7 +3287,7 @@ a {
     90deg,
     var(--text) 0% 35%,
     var(--accent) 45%,
-    #06b6d4 55%,
+    var(--accent-2) 55%,
     var(--text) 65% 100%
   );
   background-size: 300% 100%;
