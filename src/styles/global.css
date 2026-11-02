@@ -146,10 +146,16 @@ a {
   text-decoration: none;
 }
 
+/* main is as wide as the screen; its padding centers the content in a 928px column (16px on
+   small screens), the same as a 960px box with 16px padding.
+   Being full-width, it clips anything poking out sideways right at the screen's edge (the hero
+   photo's drawing reaches past it). body's overflow-x: clip isn't enough on iPads and phones:
+   Safari still widened the page while the drawing showed (a finger on the photo counts as hover),
+   and the fixed back-to-top button jumped to the right edge. "clip", not "hidden", so the sticky
+   Blog bar keeps working. */
 main {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 max(16px, (100% - 928px) / 2);
+  overflow-x: clip;
 }
 
 .section {
