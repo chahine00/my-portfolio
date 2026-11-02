@@ -1,7 +1,7 @@
 // The page for ONE post, at /blog/<slug>.
 // The <slug> part of the URL tells us which post to show.
 
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { Link, useParams } from 'react-router'
 import { formatDate, sortedUpdates } from '../../data/updates.ts'
 import Gallery from '../../components/Gallery.tsx'
@@ -13,8 +13,10 @@ function UpdatePost() {
   const post = sortedUpdates[postIndex]
 
   // Start at the top whenever you open a post (including via Older/Newer links).
-  useEffect(() => {
-    window.scrollTo(0, 0)
+  useLayoutEffect(() => {
+    // 'instant': skip the smooth scrolling set in global.css, so the page opens at the top
+    // instead of gliding up from where the previous page was.
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }, [slug])
 
   // If the URL doesn't match any post (a typo, or a deleted post), say so.

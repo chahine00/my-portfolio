@@ -1,7 +1,7 @@
 // The page for ONE project (a "case study"), at /projects/<slug>.
 // Every part below only appears if that project has the data for it.
 
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { Link, useParams } from 'react-router'
 import { projects } from '../../data/projects.ts'
 import Gallery from '../../components/Gallery.tsx'
@@ -13,8 +13,10 @@ function ProjectPage() {
   const project = projects[index]
 
   // Start at the top whenever you open a project (including via Previous/Next links).
-  useEffect(() => {
-    window.scrollTo(0, 0)
+  useLayoutEffect(() => {
+    // 'instant': skip the smooth scrolling set in global.css, so the page opens at the top
+    // instead of gliding up from where the previous page was.
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }, [slug])
 
   if (!project) {

@@ -3,7 +3,7 @@
 // The search and the category live in the address (/blog?q=aws&category=Engineering),
 // so a filtered list can be shared, and the home page can open the page already filtered.
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { filterUpdates, sortedUpdates } from '../../data/updates.ts'
 import { asset } from '../../utils/asset.ts'
@@ -19,8 +19,10 @@ function UpdatesPage() {
   const category = params.get('category') ?? 'All'
 
   // A new page should start at the top, not wherever the previous page was scrolled to.
-  useEffect(() => {
-    window.scrollTo(0, 0)
+  useLayoutEffect(() => {
+    // 'instant': skip the smooth scrolling set in global.css, so the page opens at the top
+    // instead of gliding up from where the previous page was.
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }, [])
 
   // Whether the Blog bar is stuck under the navbar right now. It changes the shape of the bar's
