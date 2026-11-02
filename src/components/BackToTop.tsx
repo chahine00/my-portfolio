@@ -1,6 +1,7 @@
 // A round "back to top" button that floats near the bottom of every page.
 // It appears while you scroll (once you're past the top of the page) and fades out
 // 2 seconds after you stop, so it doesn't sit on top of what you're reading.
+// It never shows over the Skills section.
 
 import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent, PointerEvent } from 'react'
@@ -11,6 +12,16 @@ const HIDE_AFTER_MS = 2000
 
 // Sent on window once the trip to the top arrives. The hero listens for it and replays its drawing.
 export const BACK_AT_TOP_EVENT = 'back-to-top:arrived'
+
+// True while the Skills section (home page) is under the button, near the bottom of the screen.
+// The button stays hidden there.
+function isOverSkills() {
+  const skills = document.getElementById('skills')
+  if (!skills) return false
+  const { top, bottom } = skills.getBoundingClientRect()
+  const buttonZone = window.innerHeight - 80 // roughly where the button sits
+  return top < buttonZone && bottom > buttonZone
+}
 
 function BackToTop() {
   const [visible, setVisible] = useState(false)
@@ -23,8 +34,9 @@ function BackToTop() {
     function handleScroll() {
       window.clearTimeout(hideTimer.current)
       // React only re-draws when the value actually changes, so this stays cheap while scrolling.
-      setVisible(window.scrollY > 400)
-      if (window.scrollY > 400) {
+      const show = window.scrollY > 400 && !isOverSkills()
+      setVisible(show)
+      if (show) {
         hideTimer.current = window.setTimeout(() => setVisible(false), HIDE_AFTER_MS)
       }
     }
@@ -83,7 +95,7 @@ function BackToTop() {
   return (
     <button
       type="button"
-      className={visible || hovered ? 'back-to-top back-to-top--visible' : 'back-to-top'}
+      className={visible || (hovered && !isOverSkills()) ? 'back-to-top back-to-top--visible' : 'back-to-top'}
       onPointerDown={handlePointerDown}
       // Only a real mouse keeps it shown; a finger tap on a phone shouldn't make it stick.
       onPointerEnter={(event) => event.pointerType === 'mouse' && setHovered(true)}
