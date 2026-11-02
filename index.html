@@ -6,6 +6,9 @@
     <!-- iPhones and iPads use this PNG when the site is added to the home screen (they ignore SVG icons). -->
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Tells browsers the site has its own light AND dark colors, so phones (e.g. Chrome on Android)
+         don't "auto-darken" it on their own, which recolors the text and breaks the dark theme. -->
+    <meta name="color-scheme" content="light dark" />
     <title>Ali Chahine</title>
     <meta name="description" content="Software engineer building scalable backends and AI-powered features. Python, FastAPI, Node.js, AWS, LLMs." />
 
@@ -23,12 +26,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
 
-    <!-- Applies the saved light/dark choice BEFORE the page is drawn, so it doesn't flash. -->
+    <!-- Applies a light/dark choice made with the toggle BEFORE the page is drawn, so it doesn't flash.
+         The choice is saved with the device's mode at that moment ("system"). Once the device switches
+         mode (e.g. the phone goes dark at night), the choice is dropped and the site follows the device again.
+         Older saves (just "light" or "dark") are dropped too, so everyone starts following their device. -->
     <script>
       try {
-        const theme = localStorage.getItem('theme')
-        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme
-      } catch {}
+        const saved = JSON.parse(localStorage.getItem('theme') || 'null')
+        const system = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        if (saved && (saved.theme === 'light' || saved.theme === 'dark') && saved.system === system) {
+          document.documentElement.dataset.theme = saved.theme
+        } else {
+          localStorage.removeItem('theme')
+        }
+      } catch {
+        try { localStorage.removeItem('theme') } catch {}
+      }
     </script>
   </head>
   <body>

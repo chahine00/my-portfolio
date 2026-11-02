@@ -34,6 +34,21 @@
   line-height: 1.6;
   color: var(--text);
   background: var(--bg);
+  /* The site has its own light and dark colors (see below): browsers then leave them alone instead of
+     auto-darkening the page, and draw their own parts (scrollbars, form fields) to match. */
+  color-scheme: light dark;
+  /* Phones keep the text at the sizes set here (no automatic "font boosting"). */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Picked with the toggle: the browser's own parts follow that choice too. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 /*
