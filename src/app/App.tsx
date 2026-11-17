@@ -7,7 +7,6 @@ import Navbar from '../components/Navbar.tsx'
 import BackgroundGlow from '../components/BackgroundGlow.tsx'
 import Footer from '../components/Footer.tsx'
 import BackToTop from '../components/BackToTop.tsx'
-import RubberDuck from '../components/RubberDuck.tsx'
 import HomePage from '../features/home/HomePage.tsx'
 import UpdatesPage from '../features/updates/UpdatesPage.tsx'
 import UpdatePost from '../features/updates/UpdatePost.tsx'
@@ -56,8 +55,6 @@ function App() {
       <Footer />
       {/* Outside <Routes>, so it shows on every page. */}
       <BackToTop />
-      {/* A little pet that walks around the page (see RubberDuck.tsx). */}
-      <RubberDuck />
     </>
   )
 }

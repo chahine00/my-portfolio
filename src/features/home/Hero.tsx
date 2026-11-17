@@ -8,8 +8,9 @@ import SocialLinks from '../../components/SocialLinks.tsx'
 import GradientText from '../../components/GradientText.tsx'
 import { asset } from '../../utils/asset.ts'
 import { BACK_AT_TOP_EVENT } from '../../components/BackToTop.tsx'
-import { callDuckOut, useDuckHome } from '../../components/duckStore.ts'
-import DuckSprite from '../../components/DuckSprite.tsx'
+import { callRobotOut, useRobotHome } from '../../components/robotStore.ts'
+import RobotSprite from '../../components/RobotSprite.tsx'
+import HeroRobot from '../../components/HeroRobot.tsx'
 
 // After the "back to top" button brings you up, the drawing plays on its own and stays this long
 // (in milliseconds; it takes about 1.6s to draw) before fading out.
@@ -88,15 +89,16 @@ const ACCENT_LINES = new Set([1, 4, 7])
 // photo turned solid black (the filter). The cut-out sits exactly where the photo is on screen,
 // which differs on wide screens (4:5 photo) and phones (square photo), so there are two copies
 // and the CSS shows one. Without a cut-out photo there is no mask (the white photo hides it anyway).
-// duckHome: the rubber duck is at home on the "<Welcome />" box (before it's ever been let out,
-// or after its "×" sent it back). It pops up there once the word is typed and walks a little along
-// the box, but only comes out (RubberDuck.tsx) when hovered or clicked there.
-function PhotoArt({ cutout, duckHome }: { cutout?: string; duckHome: boolean }) {
+// robotHome: the tiny robot is at home on the "<Welcome />" box (before it's ever been let out,
+// or after its "×" beamed it back). It pops up there once the word is typed and patrols along the
+// box, but only comes out into the hero (HeroRobot.tsx) when clicked or tapped there.
+function PhotoArt({ cutout, robotHome }: { cutout?: string; robotHome: boolean }) {
   // Pointer down (not click): on phones a touch also restarts the drawing, which would rebuild
-  // the box before a click could land. The duck comes out from where it sits.
-  function letDuckOut(event: React.PointerEvent<SVGGElement> | React.KeyboardEvent<SVGGElement>) {
+  // the box before a click could land. The robot comes out from where it stands.
+  function letRobotOut(event: React.PointerEvent<SVGGElement> | React.KeyboardEvent<SVGGElement>) {
     event.stopPropagation()
-    callDuckOut(event.currentTarget.getBoundingClientRect())
+    const robot = event.currentTarget.querySelector('.hero__art-robot-body') ?? event.currentTarget
+    callRobotOut(robot.getBoundingClientRect())
   }
 
   const codeLine = (x: number, y: number, [indent, length]: [number, number], i: number, side: string) => (
@@ -157,45 +159,44 @@ function PhotoArt({ cutout, duckHome }: { cutout?: string; duckHome: boolean }) 
             </tspan>
           ))}
         </text>
-        {duckHome && (
+        {robotHome && (
           <g
-            className="hero__art-duck"
+            className="hero__art-robot"
             role="button"
             tabIndex={0}
-            aria-label="Rubber duck. Click to let it out."
-            // A mouse hovering it lets it out too (a finger can't hover: it taps).
-            onPointerEnter={(event) => event.pointerType === 'mouse' && letDuckOut(event)}
-            onPointerDown={letDuckOut}
-            onKeyDown={(event) => (event.key === 'Enter' || event.key === ' ') && letDuckOut(event)}
+            aria-label="Tiny robot. Click to let it out."
+            onPointerDown={letRobotOut}
+            onKeyDown={(event) => (event.key === 'Enter' || event.key === ' ') && letRobotOut(event)}
           >
-            {/* Standing on the top edge of the box, near its right end, facing left. The inner group
-                walks it a little along the box and back (see .hero__art-duck-walk in global.css). */}
-            {/* Touch screens: a bigger, invisible tap area around the duck (fingers are less precise
-                than a mouse): the duck, the tag and the space above them, the welcome box, and the
-                top of the avatar next to it. Hidden with a mouse (hovering would let it out by accident). */}
+            {/* Standing on the top edge of the box, near its right end. The inner group patrols it
+                along the box and back in robot steps (see .hero__art-robot-patrol in global.css). */}
+            {/* Touch screens: a bigger, invisible tap area around the robot (fingers are less precise
+                than a mouse): the robot, the tag and the space above them, the welcome box, and the
+                top of the avatar next to it. */}
             <rect
-              className="hero__art-duck-hitbox"
+              className="hero__art-robot-hitbox"
               x={BUBBLE.x - 80}
               y={BUBBLE.y - 92}
               width={BUBBLE_W + 94}
               height={BUBBLE.height + 92}
             />
             {/* A small tag above the box that invites a click (it says "tap me!" on touch screens).
-                Clicking it lets the duck out too, so it's easier to hit. */}
-            <g className="hero__art-duck-hint">
+                Clicking it lets the robot out too, so it's easier to hit. */}
+            <g className="hero__art-robot-hint">
               <rect x={BUBBLE.x + BUBBLE_W / 2 - 34} y={BUBBLE.y - 56} width={68} height={20} rx={10} />
-              <text className="hero__art-duck-hint--mouse" x={BUBBLE.x + BUBBLE_W / 2} y={BUBBLE.y - 42}>
+              <text className="hero__art-robot-hint--mouse" x={BUBBLE.x + BUBBLE_W / 2} y={BUBBLE.y - 42}>
                 click me!
               </text>
-              <text className="hero__art-duck-hint--touch" x={BUBBLE.x + BUBBLE_W / 2} y={BUBBLE.y - 42}>
+              <text className="hero__art-robot-hint--touch" x={BUBBLE.x + BUBBLE_W / 2} y={BUBBLE.y - 42}>
                 tap me!
               </text>
             </g>
-            <g className="hero__art-duck-walk">
-              {/* A soft ring pulsing out from under the duck: "you can tap this". */}
-              <circle className="hero__art-duck-pulse" cx={BUBBLE.x + BUBBLE_W - 28} cy={BUBBLE.y - 13} r={16} />
-              <g className="hero__art-duck-waddle">
-                <DuckSprite facing="left" x={BUBBLE.x + BUBBLE_W - 44} y={BUBBLE.y - 29} width={32} height={32} />
+            <g className="hero__art-robot-patrol">
+              {/* A soft ring pulsing out from under the robot: "you can tap this". */}
+              <circle className="hero__art-robot-pulse" cx={BUBBLE.x + BUBBLE_W - 28} cy={BUBBLE.y - 13} r={16} />
+              {/* data-robot="walk": its legs and arms step while it patrols (same CSS as HeroRobot). */}
+              <g className="hero__art-robot-body" data-robot="walk">
+                <RobotSprite x={BUBBLE.x + BUBBLE_W - 44} y={BUBBLE.y - 31} width={32} height={32} />
               </g>
             </g>
           </g>
@@ -228,8 +229,8 @@ function Hero() {
   // True while a mouse is over the hero, so the back-to-top replay doesn't hide the drawing under it.
   const pointerInside = useRef(false)
   const replayTimer = useRef<number | undefined>(undefined)
-  // The rubber duck is at home on the welcome box (see PhotoArt).
-  const duckHome = useDuckHome()
+  // The tiny robot is at home on the welcome box (see PhotoArt).
+  const robotHome = useRobotHome()
 
   function startDrawing() {
     window.clearTimeout(hideTimer.current)
@@ -267,7 +268,7 @@ function Hero() {
   // With a mouse, hovering the hero (name, text, photo) plays the drawing; leaving it hides it.
   // Touch screens (phones, tablets) can't hover, so there the drawing plays BY ITSELF when the photo
   // comes into view, and STAYS while it's on screen: no finger needs to stay down, fast scrolling
-  // can't cut it short, and there's time to read "<Welcome />" and tap the duck on the box.
+  // can't cut it short, and there's time to read "<Welcome />" and tap the robot on the box.
   // Once the photo has left the screen completely, coming back plays it again from the start.
   // A tap on the photo (or around it, the drawing's area) replays it.
   // (A finger also fires pointer "enter" and "leave", which is why the hover handlers skip touch.)
@@ -296,8 +297,8 @@ function Hero() {
 
     function handleTap(event: TouchEvent) {
       if (!(event.target instanceof Element)) return
-      // A tap on the duck waiting on the welcome box lets it out (PhotoArt): don't restart.
-      if (event.target.closest('.hero__art-duck')) return
+      // A tap on the robot waiting on the welcome box lets it out (PhotoArt): don't restart.
+      if (event.target.closest('.hero__art-robot')) return
       if (event.target.closest('.hero__visual')) {
         showing = true
         startDrawing()
@@ -401,10 +402,10 @@ function Hero() {
         <div className={`hero__visual${hovered ? ' hero__visual--on' : ''}`}>
           {/* An invisible area exactly where the drawing appears (it's bigger than the photo,
               and reaches past the hero on the right): hovering or touching anywhere in it plays the
-              drawing too, not only the photo. It sits under the drawing, so the duck on the
+              drawing too, not only the photo. It sits under the drawing, so the robot on the
               welcome box stays clickable. */}
           <span className="hero__hit" aria-hidden="true" />
-          {drawing && <PhotoArt key={run} cutout={profile.photoDark ? asset(profile.photoDark) : undefined} duckHome={duckHome} />}
+          {drawing && <PhotoArt key={run} cutout={profile.photoDark ? asset(profile.photoDark) : undefined} robotHome={robotHome} />}
           <div className={`hero__photo${profile.photoDark ? ' hero__photo--dual' : ''}`}>
             {/* The first big picture on the page: "high" priority makes the browser fetch it before
                 anything less important, and width/height reserve its space so nothing jumps. */}
@@ -430,6 +431,9 @@ function Hero() {
           </div>
         </div>
       )}
+
+      {/* The tiny robot, once it's out of the welcome box: it lives in here (HeroRobot.tsx). */}
+      <HeroRobot />
     </section>
   )
 }

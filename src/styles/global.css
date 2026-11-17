@@ -480,7 +480,7 @@ main {
 }
 
 /* The invisible hover / touch area for the drawing (Hero.tsx): the same box as .hero__art, plus
-   some extra room around it (the padding): above the welcome box and the duck that may sit on it,
+   some extra room around it (the padding): above the welcome box and the robot that may stand on it,
    and a little on the sides. content-box keeps the padding outside the drawing's box. */
 .hero__hit {
   --hit-top: 70px;
@@ -534,133 +534,119 @@ main {
   animation: hero-art-pop 0.25s cubic-bezier(0.34, 1.6, 0.64, 1) both;
 }
 
-/* The rubber duck waiting on the welcome box after being sent home (Hero.tsx, PhotoArt): it pops
-   up once the word is typed, faces left, bobs gently, and can be clicked to come out. The drawing
-   ignores the mouse (pointer-events: none above), so the duck turns it back on for itself. */
-.hero__art-duck {
+/* The tiny robot patrolling the welcome box (Hero.tsx, PhotoArt): it pops up once the word is
+   typed and patrols along the box in robot steps until it's clicked or tapped (then it comes out
+   into the hero: HeroRobot.tsx). Its parts move with the "tiny robot" styles further down
+   (data-robot="walk"). The drawing ignores the mouse (pointer-events: none above), so the robot
+   turns it back on for itself. */
+.hero__art-robot {
   pointer-events: auto;
   cursor: pointer;
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation:
-    hero-art-duck-in 0.4s cubic-bezier(0.34, 1.6, 0.64, 1) 2.2s both,
-    hero-art-duck-bob 1.6s ease-in-out 2.6s infinite alternate;
+  animation: hero-art-robot-in 0.4s cubic-bezier(0.34, 1.6, 0.64, 1) 2.2s both;
   outline: none;
 }
 
-.hero__art-duck svg {
+.hero__art-robot svg {
   overflow: visible;
 }
 
-/* On the box it walks a little: a few steps left along its top edge, turns around, walks back,
-   turns again, and repeats (it starts once it has popped up). It waddles while it walks. */
-.hero__art-duck-walk {
+/* The patrol: a few servo steps left along the box (steps(), so it moves in jerks like a
+   machine), a quick turn, steps back, turns again, and repeats. It starts facing left. */
+.hero__art-robot-patrol {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: hero-art-duck-walk 4s ease-in-out 2.6s infinite; /* one walk there and back */
+  animation: hero-art-robot-patrol 5s steps(7, end) 2.6s infinite both;
 }
 
-/* Hints that it can be clicked (it gets no hover effect: hovering it lets it out at once).
-   A ring pulses out from under it, and a small tag above the box says "click me!" ("tap me!" on
-   touch screens). Both start once the duck has popped up. */
-.hero__art-duck-pulse {
+@keyframes hero-art-robot-patrol {
+  0%, 10% { transform: translateX(0) scaleX(-1); }
+  42% { transform: translateX(-64px) scaleX(-1); }
+  46%, 56% { transform: translateX(-64px) scaleX(1); }
+  88% { transform: translateX(0) scaleX(1); }
+  92%, 100% { transform: translateX(0) scaleX(-1); }
+}
+
+/* Hints that it can be clicked: a ring pulses out from under it, and a small tag above the box
+   says "click me!" ("tap me!" on touch screens). Both start once the robot has popped up. */
+.hero__art-robot-pulse {
   fill: none;
   stroke: var(--accent);
   stroke-width: 2;
   transform-box: fill-box;
   transform-origin: center;
   opacity: 0;
-  animation: hero-art-duck-pulse 1.6s ease-out 2.7s infinite;
+  animation: hero-art-robot-pulse 1.6s ease-out 2.7s infinite;
 }
 
-@keyframes hero-art-duck-pulse {
+@keyframes hero-art-robot-pulse {
   0% { transform: scale(0.6); opacity: 0.6; }
   100% { transform: scale(1.7); opacity: 0; }
 }
 
-.hero__art-duck-hint {
+.hero__art-robot-hint {
   transform-box: fill-box;
   transform-origin: 50% 100%;
   animation:
     hero-art-pop 0.35s cubic-bezier(0.34, 1.6, 0.64, 1) 3s both,
-    hero-art-duck-bob 1.2s ease-in-out 3.4s infinite alternate;
+    hero-art-robot-bob 1.2s ease-in-out 3.4s infinite alternate;
 }
 
-.hero__art-duck-hint rect {
+.hero__art-robot-hint rect {
   fill: var(--bg);
   stroke: var(--accent);
   stroke-width: 1.2;
 }
 
-.hero__art-duck-hint text {
+.hero__art-robot-hint text {
   fill: var(--accent);
   font: 700 11px ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   text-anchor: middle;
 }
 
-/* The bigger tap area around the duck (Hero.tsx): touch screens only, and invisible. */
-.hero__art-duck-hitbox {
+/* The bigger tap area around the robot (Hero.tsx): touch screens only, and invisible. */
+.hero__art-robot-hitbox {
   display: none;
   fill: transparent;
 }
 
 /* Touch screens (no hover): "tap me!"; mouse: "click me!". */
-.hero__art-duck-hint--touch {
+.hero__art-robot-hint--touch {
   display: none;
 }
 
 @media (hover: none) {
-  .hero__art-duck-hint--mouse {
+  .hero__art-robot-hint--mouse {
     display: none;
   }
 
-  .hero__art-duck-hint--touch {
+  .hero__art-robot-hint--touch {
     display: inline;
   }
 
-  .hero__art-duck-hitbox {
+  .hero__art-robot-hitbox {
     display: inline;
   }
 
   /* The avatar sits on top of the drawing; let taps pass through it (it isn't clickable), so the
-     tap area around the duck also works where it overlaps the avatar. */
+     tap area around the robot also works where it overlaps the avatar. */
   .hero__photo {
     pointer-events: none;
   }
 }
 
-/* The waddle rocks it from side to side around its feet. (On a group around the drawing: rotating
-   the drawing's own <svg> inside the bigger drawing uses the wrong pivot and makes it jump.) */
-.hero__art-duck-waddle {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: hero-art-duck-waddle 0.25s ease-in-out 2.6s infinite alternate;
-}
-
-@keyframes hero-art-duck-waddle {
-  from { transform: rotate(-6deg); }
-  to { transform: rotate(6deg); }
-}
-
-@keyframes hero-art-duck-walk {
-  0%, 8% { transform: translateX(0) scaleX(1); } /* facing left */
-  40% { transform: translateX(-64px) scaleX(1); }
-  46%, 54% { transform: translateX(-64px) scaleX(-1); } /* turned around, facing right */
-  86% { transform: translateX(0) scaleX(-1); }
-  92%, 100% { transform: translateX(0) scaleX(1); }
-}
-
-.hero__art-duck:hover,
-.hero__art-duck:focus-visible {
+.hero__art-robot:hover,
+.hero__art-robot:focus-visible {
   filter: drop-shadow(0 0 4px var(--accent));
 }
 
-@keyframes hero-art-duck-in {
+@keyframes hero-art-robot-in {
   from { transform: scale(0); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
 
-@keyframes hero-art-duck-bob {
+@keyframes hero-art-robot-bob {
   from { transform: translateY(0); }
   to { transform: translateY(-2px); }
 }
@@ -807,7 +793,7 @@ main {
     aspect-ratio: 1;
     align-self: center;
     /* Room above for the welcome drawing's "tap me!" tag (about 28px above the photo), plus some
-       breathing space under the navbar, so the tag, the duck and the welcome box don't feel cramped. */
+       breathing space under the navbar, so the tag, the robot and the welcome box don't feel cramped. */
     margin: 34px 0 0;
   }
 
@@ -4435,224 +4421,372 @@ a {
 
 
 /* ------------------------------------------------------------------------------------------------
-   The rubber duck (RubberDuck.tsx): a little pet that walks around the page.
-   It sits under the navbar (z-index 15) and the back-to-top button (20), above everything else.
+   The tiny robot (HeroRobot.tsx, drawn by RobotSprite.tsx): patrols the welcome box, and once
+   clicked there it lives in the hero. Its colors follow the theme: a white body with indigo lines
+   in light mode, a dark body with lavender lines in dark mode; cyan eyes and lights in both.
+   It moves like a machine: most moves use steps() (jerky, servo-like) instead of smooth easing.
+   It sits above the hero's text and photo, under the navbar.
    ------------------------------------------------------------------------------------------------ */
-.duck {
-  --duck-size: 40px;
-  position: fixed;
+:root {
+  --robot-size: 28px;
+  --robot-shell: #ffffff;
+  --robot-line: #4f46e5;
+  --robot-visor: #1e1b4b;
+  --robot-eye: #22d3ee;
+  --robot-led: #06b6d4;
+  --robot-core: #4f46e5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --robot-shell: #1c2230;
+    --robot-line: #8b93f9;
+    --robot-visor: #05070d;
+    --robot-led: #22d3ee;
+    --robot-core: #8b93f9;
+  }
+}
+
+:root[data-theme='dark'] {
+  --robot-shell: #1c2230;
+  --robot-line: #8b93f9;
+  --robot-visor: #05070d;
+  --robot-led: #22d3ee;
+  --robot-core: #8b93f9;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --robot-size: 24px;
+  }
+}
+
+/* The robot is placed inside the hero (HeroRobot.tsx moves it with a transform from here). */
+.hero {
+  position: relative;
+}
+
+.robot {
+  position: absolute;
   top: 0;
   left: 0;
-  z-index: 14;
-  width: var(--duck-size);
-  height: var(--duck-size);
-  cursor: grab;
-  touch-action: none; /* dragging it on a phone doesn't scroll the page */
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  will-change: transform;
+  z-index: 6;
+  width: var(--robot-size);
+  height: var(--robot-size);
 }
 
-.duck[data-mode='drag'] {
-  cursor: grabbing;
+/* Hidden for the moment before HeroRobot.tsx has placed it. */
+.robot:not([data-robot]) {
+  visibility: hidden;
 }
 
-.duck:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 8px;
-}
-
-.duck__flip {
+.robot__hit {
   display: block;
   width: 100%;
   height: 100%;
-  /* --duck-dir: 1 faces right, -1 mirrors it to face left (turning around squeezes it through,
-     like a real turn). --duck-fit: smaller where the text above is close (RubberDuck.tsx, fit()).
-     Scaled from its feet, so it stays standing on the line. */
-  transform: scale(calc(var(--duck-dir, 1) * var(--duck-fit, 1)), var(--duck-fit, 1));
-  transform-origin: 50% 100%;
-  transition: transform 0.25s ease;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
 }
 
-.duck__sprite {
+.robot__hit:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* --robot-dir: 1 faces right, -1 mirrors it to face left. It turns in 3 jerky steps. */
+.robot__flip {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(var(--robot-dir, 1));
+  transition: transform 0.24s steps(3, end);
+}
+
+.robot__sprite {
   display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
-  transform-origin: 50% 95%;
-  transition: transform 0.15s;
 }
 
-.duck__body {
-  fill: #fcd34d;
-  stroke: #d97706;
-  stroke-width: 1;
+/* The drawing's parts (RobotSprite.tsx), in the theme's colors. */
+.robot__shell,
+.robot__arm,
+.robot__leg {
+  fill: var(--robot-shell);
+  stroke: var(--robot-line);
+  stroke-width: 1.3;
 }
 
-.duck__wing {
-  fill: #fbbf24;
-  stroke: #d97706;
-  stroke-width: 0.8;
+.robot__visor {
+  fill: var(--robot-visor);
 }
 
-.duck__beak {
-  fill: #f97316;
+.robot__eye {
+  fill: var(--robot-eye);
+  filter: drop-shadow(0 0 1.2px var(--robot-eye));
 }
 
-.duck__eye {
-  fill: #1f2328;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: duck-blink 4s infinite;
+.robot__antenna {
+  stroke: var(--robot-line);
+  stroke-width: 1.4;
+  stroke-linecap: round;
 }
 
-.duck__shadow {
-  fill: rgb(0 0 0 / 0.15);
+.robot__trim,
+.robot__neck {
+  fill: var(--robot-line);
 }
 
-.duck__wing,
-.duck__head {
-  transform-box: fill-box;
+/* The antenna light blinks like a status light; the chest light glows softly. */
+.robot__led {
+  fill: var(--robot-led);
+  animation: robot-led 1.4s steps(1, end) infinite;
 }
 
-.duck__wing {
-  transform-origin: 15% 30%;
+.robot__core {
+  fill: var(--robot-core);
+  animation: robot-core 2.4s ease-in-out infinite;
 }
 
-.duck__head {
-  transform-origin: 30% 90%;
+.robot__shadow {
+  fill: var(--text);
+  opacity: 0.12;
 }
 
-/* Walking: a waddle from side to side (faster when it runs). */
-.duck[data-mode='walk'] .duck__sprite {
-  animation: duck-waddle 0.3s ease-in-out infinite alternate;
-}
-
-.duck[data-run='true'] .duck__sprite {
-  animation-duration: 0.14s;
-}
-
-/* Getting ready to jump: squashed down. Landing: a quick squash, then back to normal. */
-.duck[data-mode='crouch'] .duck__sprite {
-  transform: scale(1.12, 0.84);
-}
-
-.duck[data-mode='land'] .duck__sprite {
-  animation: duck-land 0.16s ease-out;
-}
-
-/* In the air: stretched a little, wings up (jumping) or tilted (falling, being carried). */
-.duck[data-mode='jump'] .duck__sprite {
-  transform: scale(0.92, 1.1);
-}
-
-.duck[data-mode='jump'] .duck__wing,
-.duck[data-mode='fly'] .duck__wing,
-.duck[data-mode='fall'] .duck__wing,
-.duck[data-mode='drag'] .duck__wing,
-.duck[data-mode='flap'] .duck__wing {
-  animation: duck-flap 0.12s ease-in-out infinite alternate;
-}
-
-/* Popping out of the welcome bubble: it grows from nothing with a little spin and bounce. */
-.duck[data-mode='emerge'] .duck__sprite {
-  animation: duck-emerge 0.6s cubic-bezier(0.34, 1.6, 0.64, 1) both;
-}
-
-.duck[data-mode='emerge'] .duck__shadow {
+/* Only seen while it flies (the flame) and scans (the beam): cyan, like its eyes. */
+.robot__flame,
+.robot__beam {
+  fill: var(--robot-eye);
   opacity: 0;
 }
 
-@keyframes duck-emerge {
-  0% { transform: scale(0) rotate(-40deg); opacity: 0; }
-  40% { opacity: 1; }
-  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+.robot__leg,
+.robot__legs,
+.robot__arm,
+.robot__head,
+.robot__eyes,
+.robot__body,
+.robot__flame,
+.robot__eye {
+  transform-box: fill-box;
 }
 
-/* Flying: leaning forward into the flight, wings beating fast. */
-.duck[data-mode='fly'] .duck__sprite {
-  transform: rotate(-10deg) scale(1.04);
+.robot__arm {
+  transform-origin: 50% 10%;
 }
 
-.duck[data-mode='fly'] .duck__wing {
-  animation-duration: 0.08s;
+.robot__head,
+.robot__body {
+  transform-origin: 50% 100%;
 }
 
-/* Pecking at the ground. */
-.duck[data-mode='peck'] .duck__head {
-  animation: duck-peck 0.45s ease-in-out infinite;
+.robot__flame {
+  transform-origin: 50% 0;
 }
 
-/* Flapping: a little hop on the spot too. */
-.duck[data-mode='flap'] .duck__sprite {
-  animation: duck-hop 0.3s ease-in-out infinite alternate;
+.robot__eyes,
+.robot__eye {
+  transform-origin: center;
 }
 
-/* A "!", "?" or "♪" that pops up above its head. */
-.duck__mark {
+/* Walking (also on the welcome box): its legs lift in turn, its arms swing, its body bobs, each
+   as two fixed positions (steps), like a servo. */
+[data-robot='walk'] .robot__leg--back {
+  animation: robot-step 0.38s steps(1, end) infinite;
+}
+
+[data-robot='walk'] .robot__leg--front {
+  animation: robot-step 0.38s steps(1, end) -0.19s infinite;
+}
+
+[data-robot='walk'] .robot__arm--back {
+  animation: robot-swing 0.38s steps(1, end) infinite;
+}
+
+[data-robot='walk'] .robot__arm--front {
+  animation: robot-swing 0.38s steps(1, end) -0.19s infinite;
+}
+
+[data-robot='walk'] .robot__body {
+  animation: robot-bob 0.38s steps(1, end) infinite;
+}
+
+/* Scanning: the eyes sweep the visor in steps, the head tilts, a light beam flickers ahead. */
+[data-robot='scan'] .robot__eyes {
+  animation: robot-scan 0.9s steps(4, end) infinite alternate;
+}
+
+[data-robot='scan'] .robot__head {
+  animation: robot-tilt 1.8s steps(3, end) infinite alternate;
+}
+
+[data-robot='scan'] .robot__beam {
+  animation: robot-beam 0.45s ease-in-out infinite alternate;
+}
+
+[data-robot='scan'] .robot__led {
+  animation-duration: 0.3s;
+}
+
+/* Flying: the jet flame flickers, legs tucked, arms out. */
+[data-robot='jet'] .robot__flame {
+  opacity: 0.9;
+  animation: robot-flame 0.08s steps(2, end) infinite alternate;
+}
+
+[data-robot='jet'] .robot__legs {
+  transform: translateY(-1.5px);
+}
+
+[data-robot='jet'] .robot__arm {
+  transform: rotate(-30deg);
+}
+
+[data-robot='jet'] .robot__shadow {
+  opacity: 0.04;
+}
+
+/* Landing: a small clunk. */
+[data-robot='land'] .robot__body {
+  animation: robot-land 0.22s steps(2, end);
+}
+
+/* Booting up where it came out: drawn from the bottom up in scan lines, then the eyes flicker on. */
+[data-robot='boot'] .robot__sprite {
+  animation: robot-boot 0.7s steps(7, end) both;
+}
+
+[data-robot='boot'] .robot__eye {
+  animation: robot-eyes-on 0.7s steps(1, end) both;
+}
+
+/* Standby (nobody moved the mouse for a while): eyes half closed and dim, lights low. */
+[data-robot='standby'] .robot__eye {
+  transform: scaleY(0.25);
+  opacity: 0.45;
+}
+
+[data-robot='standby'] .robot__led {
+  animation: none;
+  opacity: 0.25;
+}
+
+[data-robot='standby'] .robot__core {
+  opacity: 0.45;
+}
+
+/* Beaming back to the welcome box: squeezed into a thin line of light, then gone. */
+[data-robot='leave'] .robot__flip {
+  animation: robot-leave 0.55s steps(6, end) forwards;
+}
+
+[data-robot='leave'] .robot__home,
+[data-robot='leave'] .robot__bubble {
+  display: none;
+}
+
+@keyframes robot-led {
+  0% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes robot-core {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@keyframes robot-step {
+  0% { transform: translateY(-1.6px); }
+  50% { transform: translateY(0); }
+}
+
+@keyframes robot-swing {
+  0% { transform: rotate(-14deg); }
+  50% { transform: rotate(10deg); }
+}
+
+@keyframes robot-bob {
+  0% { transform: translateY(-0.8px); }
+  50% { transform: translateY(0); }
+}
+
+@keyframes robot-scan {
+  from { transform: translateX(-4px); }
+  to { transform: translateX(1px); }
+}
+
+@keyframes robot-tilt {
+  from { transform: rotate(-5deg); }
+  to { transform: rotate(5deg); }
+}
+
+@keyframes robot-beam {
+  from { opacity: 0.04; }
+  to { opacity: 0.26; }
+}
+
+@keyframes robot-flame {
+  from { transform: scaleY(0.7); }
+  to { transform: scaleY(1.25); }
+}
+
+@keyframes robot-land {
+  0% { transform: translateY(1.5px) scale(1.06, 0.92); }
+  100% { transform: none; }
+}
+
+@keyframes robot-boot {
+  from { clip-path: inset(100% 0 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes robot-eyes-on {
+  0%, 40% { opacity: 0; }
+  50% { opacity: 1; }
+  60% { opacity: 0.2; }
+  70%, 100% { opacity: 1; }
+}
+
+@keyframes robot-leave {
+  0% { transform: scaleX(var(--robot-dir, 1)); opacity: 1; }
+  60% { transform: scale(calc(var(--robot-dir, 1) * 0.15), 1.3); opacity: 1; }
+  100% { transform: scale(0, 1.6); opacity: 0; }
+}
+
+/* A "!", "♪", "01" or "?" that pops up above it when it beeps. */
+.robot__mark {
   position: absolute;
-  top: -16px;
+  top: -18px;
   left: 50%;
   color: var(--accent);
-  font: 800 15px/1 ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font: 800 13px/1 ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  white-space: nowrap;
   opacity: 0;
   transform: translateX(-50%);
   pointer-events: none;
 }
 
-.duck__mark.is-on {
-  animation: duck-mark 0.9s ease-out;
+.robot__mark.is-on {
+  animation: robot-mark 0.9s steps(6, end);
 }
 
-.duck[data-mode='fall'] .duck__sprite,
-.duck[data-mode='drag'] .duck__sprite {
-  transform: rotate(-14deg);
+@keyframes robot-mark {
+  0% { opacity: 0; transform: translate(-50%, 4px); }
+  20% { opacity: 1; transform: translate(-50%, -2px); }
+  80% { opacity: 1; transform: translate(-50%, -2px); }
+  100% { opacity: 0; transform: translate(-50%, -6px); }
 }
 
-.duck[data-mode='jump'] .duck__shadow,
-.duck[data-mode='fly'] .duck__shadow,
-.duck[data-mode='fall'] .duck__shadow,
-.duck[data-mode='drag'] .duck__shadow {
-  opacity: 0;
-}
-
-/* Napping: eyes closed, a slow breathing bob, and floating "zz". */
-.duck[data-mode='sleep'] .duck__eye {
-  animation: none;
-  transform: scaleY(0.15);
-}
-
-.duck[data-mode='sleep'] .duck__sprite {
-  animation: duck-breathe 2.4s ease-in-out infinite;
-}
-
-.duck__zzz {
+/* The "×" that beams it home: a small round button at its top corner. Hidden until the mouse is
+   on it, it has keyboard focus, or it's talking (after a tap on a phone). */
+.robot__home {
   position: absolute;
-  top: -12px;
-  right: -4px;
-  color: var(--muted);
-  font: 700 12px ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.duck__zzz small {
-  font-size: 9px;
-  margin-left: 1px;
-}
-
-.duck[data-mode='sleep'] .duck__zzz {
-  animation: duck-zzz 2.4s ease-out infinite;
-}
-
-/* The "×" that sends the duck home: a small round button at its top corner. Hidden until the
-   mouse is on the duck, it has keyboard focus, or it's talking (after a tap on a phone). */
-.duck__home {
-  position: absolute;
-  top: -6px;
-  right: -10px;
+  top: -8px;
+  right: -12px;
   display: grid;
   place-items: center;
   width: 20px;
@@ -4671,61 +4805,40 @@ a {
   transition: opacity 0.15s, transform 0.15s, color 0.15s;
 }
 
-.duck:hover .duck__home,
-.duck:focus-within .duck__home,
-.duck[data-talking='true'] .duck__home {
+.robot:hover .robot__home,
+.robot:focus-within .robot__home,
+.robot[data-talking='true'] .robot__home {
   opacity: 1;
   transform: none;
   pointer-events: auto;
 }
 
-/* No "×" right as it comes out of the welcome box (until the mouse has left it once, see
-   RubberDuck.tsx), nor while it's popping out, jumping or flying. */
-.duck[data-fresh='true'] .duck__home,
-.duck[data-mode='emerge'] .duck__home,
-.duck[data-mode='crouch'] .duck__home,
-.duck[data-mode='jump'] .duck__home,
-.duck[data-mode='fly'] .duck__home,
-.duck[data-mode='fall'] .duck__home {
+/* Not while it boots up or flies. */
+[data-robot='boot'] .robot__home,
+[data-robot='jet'] .robot__home {
   opacity: 0;
-  transform: scale(0.6);
   pointer-events: none;
 }
 
-.duck__home:hover,
-.duck__home:focus-visible {
+.robot__home:hover,
+.robot__home:focus-visible {
   color: var(--text);
   border-color: var(--accent);
 }
 
 /* Bigger tap target on touch screens, same small look. */
 @media (pointer: coarse) {
-  .duck__home::after {
+  .robot__home::after {
     content: '';
     position: absolute;
     inset: -12px;
   }
 }
 
-/* Going home: a little hop up, shrinking and fading away. */
-.duck--leaving .duck__flip {
-  animation: duck-leave 0.5s ease-in forwards;
-}
-
-.duck--leaving .duck__home {
-  display: none;
-}
-
-@keyframes duck-leave {
-  0% { transform: translateY(0) scale(1); opacity: 1; }
-  30% { transform: translateY(-14px) scale(1.05); opacity: 1; }
-  100% { transform: translateY(-40px) scale(0.2); opacity: 0; }
-}
-
-/* The speech bubble: opens toward the middle of the screen (data-side). */
-.duck__bubble {
+/* The speech bubble: opens toward the middle of the hero (data-side). */
+.robot__bubble {
   position: absolute;
-  bottom: calc(100% + 10px);
+  bottom: calc(100% + 12px);
   left: 0;
   width: max-content;
   max-width: min(240px, 70vw);
@@ -4739,91 +4852,33 @@ a {
   font-size: 0.85rem;
   line-height: 1.4;
   pointer-events: none;
-  animation: duck-bubble-in 0.2s ease-out;
+  animation: robot-bubble-in 0.2s steps(3, end);
 }
 
-.duck__bubble[data-side='right'] {
+.robot__bubble[data-side='right'] {
   left: auto;
   right: 0;
 }
 
-@keyframes duck-waddle {
-  from { transform: rotate(-7deg); }
-  to { transform: rotate(7deg) translateY(-1.5px); }
-}
-
-@keyframes duck-land {
-  0% { transform: scale(1.18, 0.8); }
-  100% { transform: scale(1, 1); }
-}
-
-@keyframes duck-flap {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(-35deg); }
-}
-
-@keyframes duck-peck {
-  0%, 100% { transform: rotate(0deg); }
-  45% { transform: rotate(38deg) translateY(2px); }
-}
-
-@keyframes duck-hop {
-  from { transform: translateY(0); }
-  to { transform: translateY(-4px); }
-}
-
-@keyframes duck-mark {
-  0% { opacity: 0; transform: translate(-50%, 4px) scale(0.6); }
-  20% { opacity: 1; transform: translate(-50%, -2px) scale(1.15); }
-  35% { transform: translate(-50%, 0) scale(1); }
-  80% { opacity: 1; }
-  100% { opacity: 0; transform: translate(-50%, -4px); }
-}
-
-@keyframes duck-breathe {
-  0%, 100% { transform: scale(1, 1); }
-  50% { transform: scale(1.03, 0.96); }
-}
-
-@keyframes duck-blink {
-  0%, 94%, 100% { transform: scaleY(1); }
-  97% { transform: scaleY(0.1); }
-}
-
-@keyframes duck-zzz {
-  0% { opacity: 0; transform: translate(0, 4px); }
-  30% { opacity: 1; }
-  100% { opacity: 0; transform: translate(6px, -10px); }
-}
-
-@keyframes duck-bubble-in {
+@keyframes robot-bubble-in {
   from { opacity: 0; transform: translateY(4px) scale(0.96); }
   to { opacity: 1; transform: none; }
 }
 
-@media print {
-  .duck {
-    display: none;
+/* People who turn off animations: a still robot (it still talks). */
+@media (prefers-reduced-motion: reduce) {
+  .robot__led,
+  .robot__core,
+  .hero__art-robot-patrol,
+  [data-robot] .robot__leg,
+  [data-robot] .robot__arm,
+  [data-robot] .robot__body {
+    animation: none;
   }
 }
 
-/* Footer: "Bring the duck back", a button that looks like the footer's links. */
-.footer__duck {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--accent);
-  font: inherit;
-  cursor: pointer;
-}
-
-.footer__duck:hover {
-  text-decoration: underline;
-}
-
-/* Phones: no "Bring the duck back" in the footer (the duck waits on the welcome box instead). */
-@media (max-width: 720px) {
-  .footer__duck-link {
+@media print {
+  .robot {
     display: none;
   }
 }
@@ -4834,7 +4889,7 @@ a {
    back down. avatarGuidePlacement.ts picks a spot where it covers nothing.
    Its box sits right on top of that edge, and only its bottom edge cuts the picture, so the
    avatar seems to come out from behind it. Its height (how much comes out) is set inline.
-   Same layer as the duck: under the navbar (15) and back-to-top (20).
+   Under the navbar (15) and back-to-top (20).
    ------------------------------------------------------------------------------------------------ */
 :root {
   --guide-w: 104px; /* the visible width (about the shoulders) */
