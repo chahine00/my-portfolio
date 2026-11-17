@@ -13,7 +13,7 @@ const principles = [
   },
   {
     title: 'Adaptable by nature',
-    text: 'Always exploring new languages, frameworks, and tools. I believe the ability to learn and adapt matters more than mastering a single stack.',
+    text: 'Always exploring new frameworks and tools. I believe the ability to learn and adapt matters more than mastering a single stack.',
   },
   {
     title: 'Beyond the code',
