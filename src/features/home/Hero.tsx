@@ -15,6 +15,11 @@ import DuckSprite from '../../components/DuckSprite.tsx'
 // (in milliseconds; it takes about 1.6s to draw) before fading out.
 const SHOW_AFTER_BACK_TO_TOP_MS = 4000
 
+// Phones and tablets: no mouse to hover with (checked when needed, a tablet can get a mouse).
+function isTouchScreen() {
+  return window.matchMedia('(hover: none)').matches
+}
+
 // Types each phrase from profile.building, waits, deletes it, then moves to the next one.
 // Returns the text typed so far.
 function useTypingLoop(phrases: string[]) {
@@ -231,11 +236,13 @@ function Hero() {
 
   useEffect(() => () => window.clearTimeout(hideTimer.current), [])
 
-  // Arriving at the top via the "back to top" button replays the drawing, then fades it out
+  // Arriving at the top via the "back to top" button replays the drawing. With a mouse it fades out
   // after a few seconds (unless the mouse is on the hero by then: it then behaves like a hover).
+  // On touch screens it stays: there it's shown while the photo is on screen (see below).
   useEffect(() => {
     function handleBackAtTop() {
       startDrawing()
+      if (isTouchScreen()) return
       replayTimer.current = window.setTimeout(() => {
         if (!pointerInside.current) stopDrawing()
       }, SHOW_AFTER_BACK_TO_TOP_MS)
@@ -248,35 +255,48 @@ function Hero() {
   }, [])
 
   // With a mouse, hovering the hero (name, text, photo) plays the drawing; leaving it hides it.
-  // Phones and tablets can't hover, so there a finger on the screen (e.g. to scroll down) plays it,
-  // and lifting the finger hides it. Touch events are used because they keep coming while the page
-  // scrolls (pointer events stop as soon as scrolling starts).
+  // Touch screens (phones, tablets) can't hover, so there the drawing plays BY ITSELF when the photo
+  // comes into view, and STAYS while it's on screen: no finger needs to stay down, fast scrolling
+  // can't cut it short, and there's time to read "<Welcome />" and tap the duck on the box.
+  // Once the photo has left the screen completely, coming back plays it again from the start.
+  // A tap on the photo (or around it, the drawing's area) replays it.
   // (A finger also fires pointer "enter" and "leave", which is why the hover handlers skip touch.)
   useEffect(() => {
-    // A tap on the photo or around it (the drawing's area) plays the whole drawing, like after
-    // "back to top", instead of hiding it again as soon as the finger lifts.
-    let touchOnPhoto = false
-    function handleFingerDown(event: TouchEvent) {
-      // A touch on the duck waiting on the welcome box lets it out (PhotoArt); don't restart the drawing.
-      if (event.target instanceof Element && event.target.closest('.hero__art-duck')) return
-      if (event.touches.length !== 1) return // the first finger only
-      touchOnPhoto = event.target instanceof Element && event.target.closest('.hero__visual') !== null
-      startDrawing()
+    if (!isTouchScreen()) return
+    const visual = document.querySelector('.hero__visual')
+    if (!visual) return
+
+    let showing = false
+    const watcher = new IntersectionObserver(
+      ([entry]) => {
+        // Mostly on screen: play (once per visit to the screen).
+        if (entry.intersectionRatio >= 0.6 && !showing) {
+          showing = true
+          startDrawing()
+        }
+        // Completely off screen: hide it, so it plays fresh next time.
+        else if (!entry.isIntersecting && showing) {
+          showing = false
+          stopDrawing()
+        }
+      },
+      { threshold: [0, 0.6] },
+    )
+    watcher.observe(visual)
+
+    function handleTap(event: TouchEvent) {
+      if (!(event.target instanceof Element)) return
+      // A tap on the duck waiting on the welcome box lets it out (PhotoArt): don't restart.
+      if (event.target.closest('.hero__art-duck')) return
+      if (event.target.closest('.hero__visual')) {
+        showing = true
+        startDrawing()
+      }
     }
-    function handleFingerUp(event: TouchEvent) {
-      if (event.touches.length !== 0) return // wait for the last finger
-      if (touchOnPhoto) {
-        window.clearTimeout(replayTimer.current)
-        replayTimer.current = window.setTimeout(stopDrawing, SHOW_AFTER_BACK_TO_TOP_MS)
-      } else stopDrawing()
-    }
-    document.addEventListener('touchstart', handleFingerDown, { passive: true })
-    document.addEventListener('touchend', handleFingerUp, { passive: true })
-    document.addEventListener('touchcancel', handleFingerUp, { passive: true })
+    document.addEventListener('touchstart', handleTap, { passive: true })
     return () => {
-      document.removeEventListener('touchstart', handleFingerDown)
-      document.removeEventListener('touchend', handleFingerUp)
-      document.removeEventListener('touchcancel', handleFingerUp)
+      watcher.disconnect()
+      document.removeEventListener('touchstart', handleTap)
     }
   }, [])
 
