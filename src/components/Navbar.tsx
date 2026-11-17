@@ -155,7 +155,16 @@ function Navbar() {
         <div className="navbar__lane">
           {/* draggable={false}: a press that moves a little (easy on a moving target) would
               otherwise start dragging the link, and the click would be lost. */}
-          <Link to="/#home" className="navbar__brand" aria-label={profile.name} draggable={false}>
+          <Link to="/#home" className="navbar__brand" aria-label={`${profile.name}, home`} draggable={false}>
+            {/* A small house on top of the name, like a crown: it draws itself every few seconds and
+                on hover, to show the name is a link to the home page (see .brand__home in
+                global.css). It's its own layer: the letters' wave and hover color don't change. */}
+            <svg className="brand__home" viewBox="0 0 24 24" aria-hidden="true">
+              <path pathLength={1} d="M2.5 11.5 L12 3.5 L21.5 11.5" />
+              <path pathLength={1} d="M16.5 7.2 V4.5 H18.8 V9.1" />
+              <path pathLength={1} d="M5 9.6 V20.5 H19 V9.6" />
+              <path pathLength={1} d="M10 20.5 V15 a2 2 0 0 1 4 0 V20.5" />
+            </svg>
             <span className="brand__bracket" aria-hidden="true">
               &lt;
             </span>
