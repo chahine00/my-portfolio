@@ -569,7 +569,14 @@ main {
 }
 
 /* Hints that it can be clicked: a ring pulses out from under it, and a small tag above the box
-   says "click me!" ("tap me!" on touch screens). Both start once the robot has popped up. */
+   says "click me!" ("tap me!" on touch screens). Both start once the robot has popped up, and
+   only when it's waiting there after its "×" sent it home (data-waiting); otherwise it comes
+   out by itself before anyone needs a hint. */
+.hero__art-robot:not([data-waiting]) .hero__art-robot-pulse,
+.hero__art-robot:not([data-waiting]) .hero__art-robot-hint {
+  display: none;
+}
+
 .hero__art-robot-pulse {
   fill: none;
   stroke: var(--accent);

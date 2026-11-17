@@ -8,9 +8,13 @@ import SocialLinks from '../../components/SocialLinks.tsx'
 import GradientText from '../../components/GradientText.tsx'
 import { asset } from '../../utils/asset.ts'
 import { BACK_AT_TOP_EVENT } from '../../components/BackToTop.tsx'
-import { callRobotOut, useRobotHome } from '../../components/robotStore.ts'
+import { callRobotOut, isRobotDismissed, useRobotDismissed, useRobotHome } from '../../components/robotStore.ts'
 import RobotSprite from '../../components/RobotSprite.tsx'
 import HeroRobot from '../../components/HeroRobot.tsx'
+
+// The robot pops up on the welcome box when the word is typed (~2.2s, see .hero__art-robot in
+// global.css), then comes out by itself this long after the drawing starts.
+const ROBOT_OUT_AFTER_MS = 2900
 
 // After the "back to top" button brings you up, the drawing plays on its own and stays this long
 // (in milliseconds; it takes about 1.6s to draw) before fading out.
@@ -89,10 +93,23 @@ const ACCENT_LINES = new Set([1, 4, 7])
 // photo turned solid black (the filter). The cut-out sits exactly where the photo is on screen,
 // which differs on wide screens (4:5 photo) and phones (square photo), so there are two copies
 // and the CSS shows one. Without a cut-out photo there is no mask (the white photo hides it anyway).
-// robotHome: the tiny robot is at home on the "<Welcome />" box (before it's ever been let out,
-// or after its "×" beamed it back). It pops up there once the word is typed and patrols along the
-// box, but only comes out into the hero (HeroRobot.tsx) when clicked or tapped there.
-function PhotoArt({ cutout, robotHome }: { cutout?: string; robotHome: boolean }) {
+// robotHome: the tiny robot is at home on the "<Welcome />" box. It pops up there once the word is
+// typed, and a moment later comes out into the hero by itself (HeroRobot.tsx). After its "×" beamed
+// it back (robotDismissed), it stays on the box, patrolling with a "click me!" tag, until clicked.
+function PhotoArt({ cutout, robotHome, robotDismissed }: { cutout?: string; robotHome: boolean; robotDismissed: boolean }) {
+  const robotRef = useRef<SVGGElement>(null)
+
+  // Comes out by itself after the welcome (unless it was sent home with its "×"). If the drawing
+  // goes away first (the mouse left the hero), this is cancelled and tried again next time.
+  useEffect(() => {
+    if (!robotHome || robotDismissed) return
+    const timer = window.setTimeout(() => {
+      const robot = robotRef.current
+      if (robot && !isRobotDismissed()) callRobotOut(robot.getBoundingClientRect())
+    }, ROBOT_OUT_AFTER_MS)
+    return () => window.clearTimeout(timer)
+  }, [robotHome, robotDismissed])
+
   // Pointer down (not click): on phones a touch also restarts the drawing, which would rebuild
   // the box before a click could land. The robot comes out from where it stands.
   function letRobotOut(event: React.PointerEvent<SVGGElement> | React.KeyboardEvent<SVGGElement>) {
@@ -165,6 +182,7 @@ function PhotoArt({ cutout, robotHome }: { cutout?: string; robotHome: boolean }
             role="button"
             tabIndex={0}
             aria-label="Tiny robot. Click to let it out."
+            data-waiting={robotDismissed ? 'true' : undefined}
             onPointerDown={letRobotOut}
             onKeyDown={(event) => (event.key === 'Enter' || event.key === ' ') && letRobotOut(event)}
           >
@@ -195,7 +213,7 @@ function PhotoArt({ cutout, robotHome }: { cutout?: string; robotHome: boolean }
               {/* A soft ring pulsing out from under the robot: "you can tap this". */}
               <circle className="hero__art-robot-pulse" cx={BUBBLE.x + BUBBLE_W - 28} cy={BUBBLE.y - 13} r={16} />
               {/* data-robot="walk": its legs and arms step while it patrols (same CSS as HeroRobot). */}
-              <g className="hero__art-robot-body" data-robot="walk">
+              <g ref={robotRef} className="hero__art-robot-body" data-robot="walk">
                 <RobotSprite x={BUBBLE.x + BUBBLE_W - 44} y={BUBBLE.y - 31} width={32} height={32} />
               </g>
             </g>
@@ -231,6 +249,8 @@ function Hero() {
   const replayTimer = useRef<number | undefined>(undefined)
   // The tiny robot is at home on the welcome box (see PhotoArt).
   const robotHome = useRobotHome()
+  // Sent home with its "×": it then waits on the welcome box for a click (see PhotoArt).
+  const robotDismissed = useRobotDismissed()
 
   function startDrawing() {
     window.clearTimeout(hideTimer.current)
@@ -405,7 +425,7 @@ function Hero() {
               drawing too, not only the photo. It sits under the drawing, so the robot on the
               welcome box stays clickable. */}
           <span className="hero__hit" aria-hidden="true" />
-          {drawing && <PhotoArt key={run} cutout={profile.photoDark ? asset(profile.photoDark) : undefined} robotHome={robotHome} />}
+          {drawing && <PhotoArt key={run} cutout={profile.photoDark ? asset(profile.photoDark) : undefined} robotHome={robotHome} robotDismissed={robotDismissed} />}
           <div className={`hero__photo${profile.photoDark ? ' hero__photo--dual' : ''}`}>
             {/* The first big picture on the page: "high" priority makes the browser fetch it before
                 anything less important, and width/height reserve its space so nothing jumps. */}

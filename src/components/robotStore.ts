@@ -3,15 +3,19 @@
 //
 // The robot's steps:
 // 1. At home on the "<Welcome />" box of the drawing behind the profile photo: it pops up there
-//    once the box has typed its word, and patrols along it. It doesn't leave by itself.
-// 2. Clicked (or tapped) there: it boots up and flies out into the hero, and stays in the hero.
-// Its "×" beams it back home to the welcome box (step 1).
+//    once the box has typed its word.
+// 2. A moment later it comes out BY ITSELF: it boots up, flies out into the hero, and plays there
+//    (it stays in the hero).
+// Its "×" beams it back home to the welcome box. Then it was "dismissed": it stays on the box
+// (patrolling, with a "click me!" tag) and only comes out again when clicked or tapped there.
+// A reload starts over (it comes out by itself again).
 
 import { useSyncExternalStore } from 'react'
 
 const CHANGE_EVENT = 'robot:change'
 
 let home = true // on the welcome box (step 1); false while it's out in the hero
+let dismissed = false // sent home with its "×": it waits for a click instead of coming out by itself
 let origin: DOMRect | null = null // where it comes out from (the robot on the welcome box)
 
 function changed() {
@@ -28,16 +32,29 @@ export function useRobotHome() {
   return useSyncExternalStore(subscribe, () => home, () => true)
 }
 
-// Clicked on the welcome box: it comes out. `from` is where it's standing, so it starts right there.
+// True once its "×" sent it home: it then waits on the welcome box for a click.
+export function useRobotDismissed() {
+  return useSyncExternalStore(subscribe, () => dismissed, () => false)
+}
+
+export function isRobotDismissed() {
+  return dismissed
+}
+
+// It comes out (by itself after the welcome, or clicked on the welcome box). `from` is where it's
+// standing on the box, so it starts right there.
 export function callRobotOut(from: DOMRect | null) {
   home = false
+  dismissed = false
   origin = from
   changed()
 }
 
-// Beams it back home (its "×"), once its goodbye animation is over.
+// Beams it back home (its "×"), once its goodbye animation is over. It won't come out by itself
+// again until the page is reloaded; a click on the welcome box still brings it out.
 export function sendRobotHome() {
   home = true
+  dismissed = true
   changed()
 }
 
