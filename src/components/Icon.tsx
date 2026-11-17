@@ -9,6 +9,8 @@ export type IconName =
   | 'moon'
   | 'pin'
   | 'arrow-up'
+  | 'arrow-right'
+  | 'external'
   | 'phone'
   | 'search'
   // The menu's section icons (shown on phones, see Navbar.tsx):
@@ -62,6 +64,19 @@ function Icon({ name, size = 20 }: IconProps) {
       return (
         <svg {...stroke}>
           <path d="M12 19V5M5 12l7-7 7 7" />
+        </svg>
+      )
+    case 'arrow-right':
+      return (
+        <svg {...stroke}>
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      )
+    // A box with an arrow leaving it: "opens another website".
+    case 'external':
+      return (
+        <svg {...stroke}>
+          <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
         </svg>
       )
     case 'sun':

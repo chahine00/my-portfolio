@@ -11,7 +11,12 @@ function Footer() {
     <footer className="footer">
       <SocialLinks />
       {/* {year} inserts the value of the "year" variable into the text. */}
-      <p>© {year} Ali Chahine. All rights reserved.</p>
+      <p>
+        © {year} Ali Chahine · Built with React &amp; TypeScript · Hosted on AWS ·{' '}
+        <a href="https://github.com/chahine00/my-portfolio" target="_blank" rel="noreferrer">
+          View source
+        </a>
+      </p>
     </footer>
   )
 }

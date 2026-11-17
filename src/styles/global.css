@@ -858,14 +858,12 @@ main {
 @media (max-width: 720px) {
   /* Bigger tap areas for the small text links. */
   .back-link,
-  .forward-link,
-  .card__links a {
+  .forward-link {
     min-height: 44px;
   }
 
-  .card__links a {
-    display: inline-flex;
-    align-items: center;
+  .card-pill {
+    min-height: 40px;
   }
 }
 
@@ -1496,8 +1494,51 @@ main {
 
 .card__links {
   display: flex;
-  align-items: center; /* "View project →", "Live demo" and "GitHub" share one line */
-  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center; /* "View project", "Visit website" and "GitHub" share one line */
+  gap: 10px;
+}
+
+/* The small pill buttons at the bottom of a project card. */
+.card-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.card-pill svg {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+/* "View project": tinted with the accent color, the arrow slides on card hover. */
+.card-pill--primary {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+}
+
+.card-clickable:hover .card-pill--primary svg {
+  transform: translateX(3px);
+}
+
+/* The outside links light up on their own hover. */
+a.card-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+a.card-pill:hover svg {
+  transform: translate(2px, -2px);
 }
 
 /* Tags (project tech + skills) */
@@ -3888,6 +3929,8 @@ a {
   .forward-link:hover span,
   .post__nav a:hover,
   .card-clickable:hover .card-cta span,
+  .card-clickable:hover .card-pill--primary svg,
+  a.card-pill:hover svg,
   .stats li:hover strong,
   .timeline__item:hover::before {
     transform: none;

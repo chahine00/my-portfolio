@@ -9,6 +9,7 @@ import { Link } from 'react-router'
 // "import type" imports only a TypeScript type (it disappears when the app runs).
 import type { Project } from '../../data/projects.ts'
 import { fallbackTo, thumb } from '../../utils/asset.ts'
+import Icon from '../../components/Icon.tsx'
 
 // This describes the PROPS this component accepts.
 // Here it's just one prop, called "project", of type Project.
@@ -141,20 +142,21 @@ function ProjectCard({ project, slideOffset }: ProjectCardProps) {
         ))}
       </ul>
 
+      {/* Two separate pill buttons: "View project" (filled) and the outside links (outlined). */}
       <div className="card__links">
-        {/* Looks like a link, but the whole card is the link. */}
-        <span className="card-cta" aria-hidden="true">
-          View project <span>→</span>
+        {/* Looks like a button, but the whole card is the link. */}
+        <span className="card-pill card-pill--primary" aria-hidden="true">
+          View project <Icon name="arrow-right" size={16} />
         </span>
         {/* target="_blank" opens the link in a new tab. */}
         {project.githubUrl && (
-          <a href={project.githubUrl} target="_blank" rel="noreferrer">
-            GitHub
+          <a className="card-pill" href={project.githubUrl} target="_blank" rel="noreferrer">
+            <Icon name="github" size={15} /> GitHub
           </a>
         )}
         {project.liveUrl && (
-          <a href={project.liveUrl} target="_blank" rel="noreferrer">
-            {project.liveLabel ?? 'Live demo'}
+          <a className="card-pill" href={project.liveUrl} target="_blank" rel="noreferrer">
+            {project.liveLabel ?? 'Live demo'} <Icon name="external" size={15} />
           </a>
         )}
       </div>
