@@ -598,6 +598,12 @@ main {
   text-anchor: middle;
 }
 
+/* The bigger tap area around the duck (Hero.tsx): touch screens only, and invisible. */
+.hero__art-duck-hitbox {
+  display: none;
+  fill: transparent;
+}
+
 /* Touch screens (no hover): "tap me!"; mouse: "click me!". */
 .hero__art-duck-hint--touch {
   display: none;
@@ -610,6 +616,16 @@ main {
 
   .hero__art-duck-hint--touch {
     display: inline;
+  }
+
+  .hero__art-duck-hitbox {
+    display: inline;
+  }
+
+  /* The avatar sits on top of the drawing; let taps pass through it (it isn't clickable), so the
+     tap area around the duck also works where it overlaps the avatar. */
+  .hero__photo {
+    pointer-events: none;
   }
 }
 

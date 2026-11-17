@@ -170,6 +170,16 @@ function PhotoArt({ cutout, duckHome }: { cutout?: string; duckHome: boolean }) 
           >
             {/* Standing on the top edge of the box, near its right end, facing left. The inner group
                 walks it a little along the box and back (see .hero__art-duck-walk in global.css). */}
+            {/* Touch screens: a bigger, invisible tap area around the duck (fingers are less precise
+                than a mouse): the duck, the tag and the space above them, the welcome box, and the
+                top of the avatar next to it. Hidden with a mouse (hovering would let it out by accident). */}
+            <rect
+              className="hero__art-duck-hitbox"
+              x={BUBBLE.x - 80}
+              y={BUBBLE.y - 92}
+              width={BUBBLE_W + 94}
+              height={BUBBLE.height + 92}
+            />
             {/* A small tag above the box that invites a click (it says "tap me!" on touch screens).
                 Clicking it lets the duck out too, so it's easier to hit. */}
             <g className="hero__art-duck-hint">
