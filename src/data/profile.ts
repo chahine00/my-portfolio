@@ -4,7 +4,6 @@
 export const profile = {
   name: 'Ali Chahine',
   role: 'Software Engineer',
-  tagline: 'I build end-to-end software solutions.',
   location: 'Beirut, Lebanon',
   availability: 'Open for opportunities', // set to '' to hide it
   // Your photo in /public, e.g. '/photo.jpg'. Until you add one, your initials are shown.
@@ -12,7 +11,7 @@ export const profile = {
   // The same photo with its background removed (transparent), shown in dark mode instead,
   // because a white background looks like a grey block on the dark page. '' = use "photo" in both.
   photoDark: '/photo-cutout.webp',
-  // Typed out one by one under the tagline, like code being written. Keep each one short.
+  // Typed out one by one under your name, like code being written. Keep each one short.
   building: [
     'secure APIs & databases',
     'cross-platform mobile apps',         // Focus on business/internal use

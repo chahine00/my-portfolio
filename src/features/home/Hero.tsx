@@ -263,7 +263,6 @@ function Hero() {
             <GradientText text={profile.name} />
           </span>
         </h1>
-        <p className="hero__tagline">{profile.tagline}</p>
 
         {/* A line of "code" that keeps typing what you build. Screen readers get the full list once instead. */}
         <p className="hero__code" aria-label={`I build ${profile.building.join(', ')}`}>
