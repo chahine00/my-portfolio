@@ -9,15 +9,16 @@
 // - it scans: its eyes sweep the visor while a light beam goes over what's in front of it
 // - it flies to another spot with its jet: straight up, straight across, straight down, and lands
 //   with a small clunk
-// - it beeps now and then (a "!", "♪", "01" or "?" above it), turns to face your mouse, and jets
-//   off when you tap or click right next to it
+// - it beeps now and then (a "!", "♪", "01" or "?" above it), turns to face your mouse, and holds
+//   still when the mouse comes close, so it's easy to click (it never runs away from it)
+// - a click or tap right next to it counts as a click on it
 // - left alone for a while, it goes on standby (eyes dim, light off) until the mouse moves again
 // Clicking (or tapping) it makes it say something in a speech bubble. The bubble has a labeled
-// "Hide me" button that beams it back to the welcome box (a "×" there looked like it only
+// "Hide" button that beams it back to the welcome box (a "×" there looked like it only
 // closed the message). It sits on the bubble's side away from the robot, so a tap meant for the
 // robot can't hit it by accident. The bubble closes when the page scrolls; with a mouse, also when
 // the pointer leaves the robot and its bubble; on touch screens (no hover), also on any tap (except
-// "Hide me"), and by itself after 2 seconds. Visitors who turned off animations get a robot that stands still on
+// "Hide"), and by itself after 3 seconds. Visitors who turned off animations get a robot that stands still on
 // your name (and still talks).
 //
 // One requestAnimationFrame loop moves it with a transform, so React doesn't re-draw while it
@@ -39,34 +40,75 @@ type Mode =
   | 'standby' // asleep until the mouse moves
   | 'leave' // beaming back to the welcome box
 
-// What it can stand on: your name (on top of the letters), the buttons, the row of social icons.
-const PERCHES = '.hero__name, .hero-actions .button, .hero-actions .social-links'
+// What it can stand on: every item of the hero. The role label, your name (on top of the letters),
+// the typing code line, the location and availability, the buttons, the social icons (not the photo).
+const PERCHES = [
+  '.hero__text > .eyebrow',
+  '.hero__name',
+  '.hero__code',
+  '.hero__meta li',
+  '.hero-actions .button',
+  '.hero-actions .social-links',
+].join(', ')
+// Lines of text: it stands on the text itself (its first line), not on the whole block.
+const TEXT_PERCHES = '.eyebrow, .hero__meta li'
 
 const STEP_MS = 260 // one servo step: it moves for the first part, then stops (same as robot-step in global.css)
 const MOVE_SHARE = 0.55
-const SPEED = 65 // px per second, on average
+const SPEED = 38 // px per second, on average (slow: easy to catch)
+const CALM_NEAR = 90 // a mouse this close: it holds still, so it's easy to click
 const BOOT_MS = 700
 const TURN_MS = 200
 const SCAN_MS = 1100
 const LAND_MS = 160
 const LEAVE_MS = 550
 // Touch screens (and keyboard): the bubble closes by itself after this long.
-const READ_MS = 2000
+const READ_MS = 3000
 const HOVER_OUT_MS = 350 // mouse: the bubble closes this long after the pointer leaves it and the robot
 const SCROLL_CLOSE_PX = 4 // the bubble closes once the page has scrolled this far
 const STANDBY_AFTER_MS = 25000 // no mouse movement for this long → standby
-const CLOSE_GUARD_MS = 500 // "Hide me" ignores taps this long after it appears (no hiding by a double tap)
+const CLOSE_GUARD_MS = 500 // "Hide" ignores taps this long after it appears (no hiding by a double tap)
 const NEAR_TAP = 44 // touch: a tap this close to it counts as a tap on it (it's small, and moves)
 const SCREEN_MARGIN = 16 // the bubble stays this far inside the screen
 
 const LINES = [
-  "Beep boop! I'm Ali's tiny helper bot.",
-  'Scanning… this portfolio is 100% handmade.',
+  "Beep boop! I'm Ali's tiny helper bot. Unpaid, obviously.",
+  'Scanning… this portfolio is 100% AI. Ali just pressed Enter. 🤖',
   'Try “View my work”: that’s where the good stuff is.',
-  '01001000 01101001! (That’s “Hi” in binary.)',
+  '01001000 01101001! (That’s “Hi” in binary. You’re welcome.)',
   'Compiling coffee… ☕ please wait.',
-  'Need a developer? My human is open for opportunities.',
+  'Need a developer? My human is open for opportunities. And snacks.',
+  'I asked Ali for a raise. He gave me a bigger font size.',
+  'It works on my machine. I AM the machine.',
+  'Fun fact: I’m held together by 3 divs and a prayer.',
+  'Don’t look at the CSS. Seriously. Don’t.',
+  'I tried to fix a bug once. Now there are two of me.',
+  'Ali writes the code. I take the credit.',
+  'My battery is 4%. Hire Ali so I can retire.',
+  'Warning: excessive clicking may cause robot dizziness. 😵',
+  'I’m not lazy, I’m in power-saving mode.',
+  'Ctrl+C, Ctrl+V… sorry, I mean “highly optimized engineering”.',
+  'Fun fact: I have zero bugs. I call them “features”.',
+  'I jumped on every button here. Quality assurance: done ✅',
+  'Error 404: my motivation not found. Click again?',
+  'Ali’s code is so clean, I use it as a mirror.',
+  'This website was reviewed by a robot. 10/10, very biased.',
+  'I run on JavaScript and pure optimism.',
+  'Psst… the “Download CV” button is my favorite trampoline.',
+  'Stop poking me! …okay, one more time.',
+  'Loading a joke… 99%… 99%… 99%…',
+  'I’d tell you a UDP joke, but you might not get it.',
+  'There are 10 kinds of people: those who get binary, and you.',
+  'My therapist says I should stop jumping on people’s names.',
 ]
+
+// After a few seconds without being clicked, it invites you to (two words at most).
+const INVITES = ['Click me!', 'Psst!', 'Hey you!', 'Poke me!', 'Over here!', 'Boop me?', 'Hello?', 'Pick me!']
+const TOUCH_INVITES = ['Tap me!', 'Psst!', 'Hey you!', 'Poke me!', 'Over here!', 'Boop me?', 'Hello?', 'Pick me!']
+const INVITE_FIRST_MS = 6000 // the first invite, this long after it came out
+const INVITE_EVERY_MS = 25000 // again, as long as it was never clicked…
+const INVITE_AFTER_TALK_MS = 60000 // …and much less often once it has been
+const INVITE_SHOW_MS = 2400 // how long an invite stays (same as robot-invite in global.css)
 
 const MARKS = ['!', '♪', '01', '?']
 
@@ -81,7 +123,10 @@ function spanOf(el: Element, hero: HTMLElement) {
   let sink = 0 // how far below the box's top it stands (the letters start below their line box)
   let pad = 10 // keeps it off rounded corners and the ends of the text
   if (el.matches('.hero__name')) {
-    rect = (el.lastElementChild ?? el).getBoundingClientRect()
+    // Only the name's first line: when the name wraps, standing on the lower line would put it
+    // in the gap between the lines, on top of the letters above.
+    const letters = el.lastElementChild ?? el
+    rect = letters.getClientRects()[0] ?? letters.getBoundingClientRect()
     sink = rect.height * 0.16
     pad = 14
     // The "SOFTWARE ENGINEER" label sits just above your name: stay right of where its letters end.
@@ -92,6 +137,20 @@ function spanOf(el: Element, hero: HTMLElement) {
       const labelEnd = range.getBoundingClientRect().right + 18
       if (labelEnd > rect.left + pad) rect = new DOMRect(labelEnd - pad, rect.top, rect.right - labelEnd + pad, rect.height)
     }
+  } else if (el.matches(TEXT_PERCHES)) {
+    const range = document.createRange()
+    range.selectNodeContents(el)
+    rect = range.getClientRects()[0] ?? rect
+    pad = 6
+  } else if (el.matches('.hero__code')) {
+    // The longest phrase's invisible copy: the line doesn't change while it types.
+    const ghost = el.querySelector('.hero__code-ghost')
+    if (ghost) {
+      const range = document.createRange()
+      range.selectNodeContents(ghost)
+      rect = range.getClientRects()[0] ?? rect
+    }
+    pad = 8
   } else if (el.matches('.social-links')) {
     const icons = el.querySelectorAll('a')
     if (icons.length) {
@@ -104,9 +163,33 @@ function spanOf(el: Element, hero: HTMLElement) {
   return { left: rect.left - h.left + pad, right: rect.right - h.left - pad, top: rect.top - h.top + sink }
 }
 
+const MIN_SIZE = 22 // it shrinks down to this when there's little room above a spot
+
+// The free height above a spot (in the hero's coordinates), up to the nearest line of text or box
+// over it in the hero's text column, so the robot can be sized to fit without covering any text.
+function roomAbove(span: { left: number; right: number; top: number }, hero: HTMLElement) {
+  const text = hero.querySelector('.hero__text')
+  if (!text) return Infinity
+  const h = hero.getBoundingClientRect()
+  const range = document.createRange()
+  range.selectNodeContents(text)
+  let room = Infinity
+  for (const r of range.getClientRects()) {
+    if (!r.width || !r.height) continue
+    const left = r.left - h.left
+    const right = r.right - h.left
+    const bottom = r.bottom - h.top
+    if (right < span.left - 4 || left > span.right + 4) continue // not over this spot
+    if (bottom > span.top + 1) continue // its own line, or something below
+    room = Math.min(room, span.top - bottom)
+  }
+  return room
+}
+
 function Robot() {
   const rootRef = useRef<HTMLDivElement>(null)
   const markRef = useRef<HTMLSpanElement>(null)
+  const inviteRef = useRef<HTMLSpanElement>(null)
   const brain = useRef<{ talk: () => void; leave: () => void } | null>(null)
   const [line, setLine] = useState<string | null>(null)
   const [side, setSide] = useState<'left' | 'right'>('left')
@@ -147,22 +230,39 @@ function Robot() {
       talking: false,
       hovered: false, // a mouse is on the robot or its bubble
       talkScrollY: 0, // where the page was scrolled when the bubble opened
-      talkedAt: 0, // when it last started talking (the "Hide me" button appears then)
+      talkedAt: 0, // when it last started talking (the "Hide" button appears then)
       noTalkUntil: 0, // touch: the tap that just closed the bubble mustn't open it again
       talkAfterLanding: false, // tapped while flying: it talks once it has landed
       line: -1,
+      order: [] as number[], // the sentences still to say, shuffled (no repeats until all are said)
+      clicked: false, // it was clicked at least once: fewer invites
+      nextInvite: performance.now() + INVITE_FIRST_MS,
     }
     let frame = 0
     let last = performance.now()
     let talkTimer = 0
 
     const size = () => parseFloat(getComputedStyle(robot).getPropertyValue('--robot-size')) || 28
+    // Its full size (from the CSS). On each spot it may be shrunk to fit the room above (fitTo).
+    const fullSize = size()
+    function fitTo(perch: HTMLElement) {
+      const room = roomAbove(spanOf(perch, heroEl), heroEl) - 2
+      const sz = Math.round(clamp(room, Math.min(MIN_SIZE, fullSize), fullSize))
+      robot.style.setProperty('--robot-size', `${sz}px`)
+    }
     // The spots it can use now: on screen, with room to stand.
-    const perches = () =>
-      [...heroEl.querySelectorAll<HTMLElement>(PERCHES)].filter((el) => {
+    // Every spot with room above for at least its smallest size (MIN_SIZE): on each one it is as
+    // big as the room allows (fitTo), up to its full size, so it never covers text. Only spots
+    // too cramped even for that are skipped. If none has room, it uses them all, shrunk.
+    const perches = () => {
+      const all = [...heroEl.querySelectorAll<HTMLElement>(PERCHES)].filter((el) => {
         const span = spanOf(el, heroEl)
         return el.getBoundingClientRect().width > 0 && span.right - span.left >= 12
       })
+      const minFit = Math.min(MIN_SIZE, fullSize)
+      const roomy = all.filter((el) => roomAbove(spanOf(el, heroEl), heroEl) - 2 >= minFit)
+      return roomy.length ? roomy : all
+    }
     const name = () => heroEl.querySelector<HTMLElement>('.hero__name')
 
     function setMode(mode: Mode, ms = 0) {
@@ -194,7 +294,7 @@ function Robot() {
       const span = spanOf(to, heroEl)
       const x1 = random(span.left, Math.max(span.left, span.right))
       const distance = Math.hypot(x1 - s.x, span.top - s.y)
-      s.jet = { x0: s.x, y0: s.y, x1, y1: span.top, start: performance.now(), duration: clamp(distance * 2.1, 450, 950), to }
+      s.jet = { x0: s.x, y0: s.y, x1, y1: span.top, start: performance.now(), duration: clamp(distance * 3.2, 750, 1500), to }
       setDir(x1 >= s.x ? 1 : -1)
       setMode('jet')
     }
@@ -204,13 +304,19 @@ function Robot() {
       setMode('turn', TURN_MS)
     }
 
-    function rest(min = 350, max = 900) {
+    function rest(min = 900, max = 2000) {
       setMode('idle', random(min, max))
     }
 
     // What to do next, standing on its spot.
     function decide() {
       if (!s.perch) return
+      // Your mouse is coming close: it stays put (and faces it), so it's easy to click.
+      if (s.pointer && Math.hypot(s.pointer.x - s.x, s.pointer.y - (s.y - size() / 2)) < CALM_NEAR) {
+        if (Math.sign(s.pointer.x - s.x) !== s.dir && Math.abs(s.pointer.x - s.x) > 8) turn(s.pointer.x > s.x ? 1 : -1)
+        else rest(300, 500)
+        return
+      }
       const span = spanOf(s.perch, heroEl)
       const roll = Math.random()
       // Your mouse is in the hero, behind it: it turns to look at it, now and then.
@@ -218,7 +324,7 @@ function Robot() {
         turn(s.pointer.x > s.x ? 1 : -1)
         return
       }
-      if (roll < 0.45 && span.right - span.left > 40) {
+      if (roll < 0.35 && span.right - span.left > 40) {
         let to = random(span.left, span.right)
         if (Math.abs(to - s.x) < 24) to = clamp(s.x + s.dir * 48, span.left, span.right)
         s.walkTo = to
@@ -229,11 +335,11 @@ function Robot() {
         } else setMode('walk')
         return
       }
-      if (roll < 0.62) {
+      if (roll < 0.47) {
         setMode('scan', SCAN_MS)
         return
       }
-      if (roll < 0.74) {
+      if (roll < 0.55) {
         beep()
         rest(600, 1000)
         return
@@ -264,6 +370,7 @@ function Robot() {
             s.y = j.y1
             s.perch = j.to
             s.jet = null
+            fitTo(j.to)
             setMode('land', LAND_MS)
           } else if (p < 0.3) {
             // Straight up…
@@ -285,6 +392,11 @@ function Robot() {
         case 'walk': {
           if (!s.perch) break
           s.y = spanOf(s.perch, heroEl).top
+          // The mouse came close: it stops, so it's easy to click.
+          if (s.pointer && Math.hypot(s.pointer.x - s.x, s.pointer.y - (s.y - size() / 2)) < CALM_NEAR) {
+            rest(300, 500)
+            break
+          }
           // Servo steps: it only moves during the first part of each step.
           if ((now % STEP_MS) / STEP_MS < MOVE_SHARE) s.x += (s.dir * SPEED * dt) / MOVE_SHARE
           if (s.dir > 0 ? s.x >= s.walkTo : s.x <= s.walkTo) {
@@ -330,8 +442,37 @@ function Robot() {
           }
           break
       }
+      maybeInvite(now)
       place()
       frame = requestAnimationFrame(tick)
+    }
+
+    // Now and then, when nobody has clicked it for a while, it calls you: "Click me!", "Psst!"…
+    function maybeInvite(now: number) {
+      if (now < s.nextInvite) return
+      if (s.talking || !['idle', 'walk', 'scan', 'turn'].includes(s.mode)) return
+      const el = inviteRef.current
+      if (!el) return
+      const touch = window.matchMedia('(hover: none), (any-pointer: coarse)').matches
+      el.textContent = pick(touch ? TOUCH_INVITES : INVITES)
+      el.classList.remove('is-on')
+      void el.offsetWidth // restart its animation
+      el.classList.add('is-on')
+      s.nextInvite = now + INVITE_SHOW_MS + (s.clicked ? INVITE_AFTER_TALK_MS : INVITE_EVERY_MS)
+    }
+
+    function hideInvite() {
+      inviteRef.current?.classList.remove('is-on')
+    }
+
+    // The next sentence: a shuffled round of all of them, so none repeats until all were said.
+    function nextLine() {
+      if (!s.order.length) {
+        s.order = LINES.map((_, i) => i).sort(() => Math.random() - 0.5)
+        if (s.order[0] === s.line && s.order.length > 1) s.order.push(s.order.shift()!)
+      }
+      s.line = s.order.shift()!
+      return LINES[s.line]
     }
 
     // Start where it came out of the welcome box (or on your name).
@@ -353,6 +494,7 @@ function Robot() {
       // Animations off: it just stands on your name.
       const span = spanOf(nameEl, heroEl)
       s.perch = nameEl
+      fitTo(nameEl)
       s.x = (span.left + span.right) / 2
       s.y = span.top
       setMode('idle')
@@ -372,14 +514,14 @@ function Robot() {
       if (s.mode === 'standby') setMode('scan', 600)
     }
 
-    // A click right next to it (not on it) startles it: "!" and it jets off. With a finger, a tap
+    // A click right next to it (not on it) counts as a click on it. With a finger, a tap
     // that close is a tap that just missed it (it's small and moving): it counts as a tap on it.
     function onPointerDown(event: PointerEvent) {
       s.lastPointer = performance.now()
       const target = event.target instanceof Element ? event.target : null
       if (event.pointerType !== 'mouse') {
         // Touch, bubble open: ANY tap closes it (on the bubble, on the robot, anywhere), except
-        // "Hide me" itself. A tap on the robot doesn't open it again right away (noTalkUntil):
+        // "Hide" itself. A tap on the robot doesn't open it again right away (noTalkUntil):
         // the next tap does, with its next sentence.
         if (s.talking) {
           if (target?.closest('.robot__home')) return
@@ -401,12 +543,8 @@ function Robot() {
         quiet()
         return
       }
-      if (reduceMotion || !['idle', 'walk', 'scan', 'turn'].includes(s.mode)) return
-      const others = perches().filter((p) => p !== s.perch)
-      if (distance < 56 && others.length) {
-        beep('!')
-        jetTo(pick(others))
-      }
+      // A click that just missed it counts as a click on it (it never runs away from the mouse).
+      if (distance < NEAR_TAP) talk()
     }
 
     function talk() {
@@ -417,13 +555,15 @@ function Robot() {
         return
       }
       s.talking = true
+      s.clicked = true
+      hideInvite()
+      s.nextInvite = performance.now() + INVITE_AFTER_TALK_MS
       s.talkedAt = performance.now()
       s.lastPointer = performance.now()
-      // It stops while it talks, so its bubble (and the "Hide me" button) stays put.
+      // It stops while it talks, so its bubble (and the "Hide" button) stays put.
       if (s.mode === 'walk' || s.mode === 'standby' || s.mode === 'turn') setMode('idle')
       s.thenWalk = false
-      s.line = (s.line + 1) % LINES.length
-      setLine(LINES[s.line])
+      setLine(nextLine())
       // The bubble opens toward the middle of the hero.
       setSide(s.x > heroEl.clientWidth / 2 ? 'right' : 'left')
       s.talkScrollY = window.scrollY
@@ -474,7 +614,7 @@ function Robot() {
     brain.current = {
       talk,
       leave() {
-        // Just appeared: that tap was meant for the robot (a double tap), not for "Hide me".
+        // Just appeared: that tap was meant for the robot (a double tap), not for "Hide".
         if (performance.now() - s.talkedAt < CLOSE_GUARD_MS) return
         window.clearTimeout(talkTimer)
         s.talking = false
@@ -511,11 +651,13 @@ function Robot() {
             aria-label="Hide the robot (it goes back to the welcome box)"
             onClick={() => brain.current?.leave()}
           >
-            Hide me
+            Hide
           </button>
         </div>
       )}
       <span ref={markRef} className="robot__mark" aria-hidden="true" />
+      {/* "Click me!" and friends: a small call above it, now and then (see maybeInvite). */}
+      <span ref={inviteRef} className="robot__invite" aria-hidden="true" />
       <button
         type="button"
         className="robot__hit"

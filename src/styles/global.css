@@ -4525,7 +4525,8 @@ a {
    It sits above the hero's text and photo, under the navbar.
    ------------------------------------------------------------------------------------------------ */
 :root {
-  --robot-size: 28px;
+  /* Its full size; on a spot with little room above it shrinks to fit (HeroRobot.tsx, fitTo). */
+  --robot-size: 38px;
   --robot-shell: #ffffff;
   --robot-line: #4f46e5;
   --robot-visor: #1e1b4b;
@@ -4554,7 +4555,7 @@ a {
 
 @media (max-width: 720px) {
   :root {
-    --robot-size: 24px;
+    --robot-size: 36px;
   }
 }
 
@@ -4879,6 +4880,55 @@ a {
   100% { opacity: 0; transform: translate(-50%, -6px); }
 }
 
+/* "Click me!", "Psst!"…: a little call above its head when nobody has clicked it for a while
+   (HeroRobot.tsx, maybeInvite). Two words at most. It pops in, wiggles, and fades away. */
+.robot__invite {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  padding: 3px 9px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--accent);
+  font: 700 12px/1.2 ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.robot__invite.is-on {
+  animation: robot-invite 2.4s ease both;
+}
+
+[data-robot='jet'] .robot__invite,
+[data-robot='leave'] .robot__invite,
+.robot:has(.robot__bubble) .robot__invite {
+  display: none;
+}
+
+@keyframes robot-invite {
+  0% { opacity: 0; transform: translate(-50%, 6px) scale(0.7); }
+  10% { opacity: 1; transform: translate(-50%, 0) scale(1.08); }
+  16% { transform: translate(-50%, 0) scale(1) rotate(-5deg); }
+  22% { transform: translate(-50%, 0) rotate(5deg); }
+  28% { transform: translate(-50%, 0) rotate(0); }
+  85% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .robot__invite.is-on {
+    animation: robot-invite-still 2.4s steps(1, end) both;
+  }
+
+  @keyframes robot-invite-still {
+    0%, 99% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+}
+
 /* Touch screens: easier to tap the robot. It gets an invisible 16px margin all around that counts
    as tapping it. (Same test for touch screens as the welcome drawing: some phones claim they
    can hover.) */
@@ -4891,7 +4941,7 @@ a {
 }
 
 /* The speech bubble: opens toward the middle of the hero (data-side). It only shows after the robot
-   is clicked or tapped, and closes by itself (HeroRobot.tsx). Under the text: "Hide me". */
+   is clicked or tapped, and closes by itself (HeroRobot.tsx). Under the text: "Hide". */
 .robot__bubble {
   position: absolute;
   bottom: calc(100% + 12px);
@@ -4924,7 +4974,7 @@ a {
   right: 0;
 }
 
-/* "Hide me": a small labeled pill (a "×" looked like it only closed the message). It sits on
+/* "Hide": a small labeled pill (a "×" looked like it only closed the message). It sits on
    the side of the bubble away from the robot: the bubble opens away from it (data-side), so the
    far end of its bottom row is the farthest point from the robot. */
 .robot__home {
@@ -5029,13 +5079,14 @@ a {
 }
 
 .avatar-guide {
-  position: fixed;
+  /* In page coordinates (it's on <body>), so it scrolls with the page by itself, without shaking. */
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 14;
   width: var(--guide-w);
   height: var(--guide-h);
-  /* --x and --y are set from its spot's position on every frame (AvatarGuide.tsx). */
+  /* --x and --y are its spot's place on the page (AvatarGuide.tsx). */
   transform: translate(var(--x, -999px), var(--y, -999px));
   pointer-events: none;
 }

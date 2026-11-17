@@ -23,6 +23,7 @@
 //   The animations are in global.css under "avatar guide".
 
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { asset } from '../utils/asset.ts'
 import { guideTips, type GuideTip } from '../data/guide.ts'
 import { edgeOf, findPlacements, fitsOnScreen, type Placement } from './avatarGuidePlacement.ts'
@@ -35,15 +36,18 @@ const SINK_MS = 450 // same as the guide-sink animation
 const TYPE_MS = 30 // per letter
 const READ_MS = 4500 // how long it stays once the sentence is typed…
 const READ_PER_LETTER_MS = 55 // …plus this much per letter, so longer sentences stay longer
-const DWELL_MS = 300 // how long you stay on a section before it comes out
+const DWELL_MS = 600 // how long you stay on a section before it comes out…
+const SETTLE_MS = 350 // …and the page must have stopped scrolling this long (fast scrolling up and down doesn't call it)
+const REPEAT_MS = 20000 // a section's tip plays again at the earliest this long after it last came out
 const COOLDOWN_MS = 500 // the pause after a tip ends by itself (none when a new section takes over)
 const AWAY_MS = 1500 // how long its spot can be off screen before it leaves
 const LOWEST = 0.75 // the spot's edge must be in the top 75% of the screen (where you're reading)
 const PLACES_TTL = 2000 // spots are measured again after this long (images load, cards reveal…)
 
-// The sections whose tip was shown, with the element it hid behind. A section is removed once
-// that element has fully left the screen, so its tip can play again when you come back.
-const seen = new Map<string, HTMLElement>()
+// The sections whose tip was shown, with the element it hid behind and when. A section is removed
+// once that element has left the screen and REPEAT_MS has passed, so its tip can play again when
+// you come back (but not every time you scroll past it).
+const seen = new Map<string, { anchor: HTMLElement; at: number; left: boolean }>()
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -85,6 +89,7 @@ function AvatarGuide() {
     let cooldownUntil = 0
     let frame = 0
     let recheck = 0
+    let scrolledAt = 0
 
     function spotsFor(tip: GuideTip, section: HTMLElement) {
       const now = Date.now()
@@ -104,14 +109,17 @@ function AvatarGuide() {
       frame = 0
       // Sections you scrolled away from can show their tip again next time. Not the one that's
       // out right now: it handles being scrolled away itself (see step 2).
-      for (const [section, anchor] of seen) {
+      const now = Date.now()
+      for (const [section, entry] of seen) {
         if (section === shownRef.current?.tip.section) continue
-        const rect = anchor.getBoundingClientRect()
-        if (rect.bottom < 0 || rect.top > window.innerHeight) seen.delete(section)
+        const rect = entry.anchor.getBoundingClientRect()
+        if (rect.bottom < 0 || rect.top > window.innerHeight) entry.left = true
+        if (entry.left && now - entry.at > REPEAT_MS) seen.delete(section)
       }
 
-      const now = Date.now()
       if (now < cooldownUntil) return later(cooldownUntil - now + 20)
+      // Still scrolling: wait until the page rests, so it doesn't pop in and out while you fly by.
+      if (now - scrolledAt < SETTLE_MS) return later(SETTLE_MS - (now - scrolledAt) + 20)
       const nav = navBottom()
 
       for (const tip of guideTips) {
@@ -136,7 +144,7 @@ function AvatarGuide() {
           return
         }
         candidate = null
-        seen.set(tip.section, spot.anchor)
+        seen.set(tip.section, { anchor: spot.anchor, at: now, left: false })
         unreadRef.current = false
         setShown({ tip, spot })
         setPhase('in')
@@ -148,6 +156,11 @@ function AvatarGuide() {
     }
 
     function onScroll() {
+      scrolledAt = Date.now()
+      if (!frame) frame = requestAnimationFrame(check)
+    }
+
+    function recheckSoon() {
       if (!frame) frame = requestAnimationFrame(check)
     }
 
@@ -158,21 +171,21 @@ function AvatarGuide() {
         unreadRef.current = true
         setPhase('out')
       }
-      onScroll()
+      recheckSoon()
     }
 
     // A tip is over (step 4). If another section is waiting (it was sent away for it), that one
     // comes out straight away; otherwise wait a little before the next.
     function onDone() {
       cooldownUntil = candidate ? 0 : Date.now() + COOLDOWN_MS
-      onScroll()
+      recheckSoon()
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onResize)
     window.addEventListener('avatar-guide:done', onDone)
     // A section may already be on screen when the page opens (e.g. a link to /#projects).
-    onScroll()
+    recheckSoon()
     return () => {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onResize)
@@ -182,8 +195,11 @@ function AvatarGuide() {
     }
   }, [])
 
-  // 2. While it's out, keep it on its spot as the page scrolls. The spot comes from the layout
-  //    (edgeOf), so it doesn't move when the post under the mouse lifts on hover.
+  // 2. While it's out, keep it on its spot. It's placed in page coordinates (position: absolute on
+  //    <body>), so the browser scrolls it together with the page: no lag, no shaking while
+  //    scrolling. This loop only moves it if the layout itself shifts (images load…), and only by
+  //    whole pixels. The spot comes from the layout (edgeOf), so it doesn't move when the post
+  //    under the mouse lifts on hover.
   //    When half of the avatar is off screen (under the navbar, or below the bottom), it's
   //    "away": the reading time waits, and only if it stays away for AWAY_MS does it leave.
   useEffect(() => {
@@ -191,15 +207,20 @@ function AvatarGuide() {
     const { spot } = shown
     let frame = 0
     let awaySince = 0 // 0 while it's on screen
+    let placed: { x: number; y: number } | null = null
     function follow() {
       const root = rootRef.current
       if (root) {
         const edge = edgeOf(spot)
-        const x = edge.x - window.scrollX
-        const y = edge.y - window.scrollY
-        root.style.setProperty('--x', `${Math.round(x + spot.dx)}px`)
-        root.style.setProperty('--y', `${Math.round(y - spot.rise)}px`)
-        const middle = y - spot.rise / 2
+        const x = Math.round(edge.x + spot.dx)
+        const y = Math.round(edge.y - spot.rise)
+        // Sub-pixel noise from scrolling is ignored, so it never twitches.
+        if (!placed || Math.abs(placed.x - x) > 1 || Math.abs(placed.y - y) > 1) {
+          placed = { x, y }
+          root.style.setProperty('--x', `${x}px`)
+          root.style.setProperty('--y', `${y}px`)
+        }
+        const middle = edge.y - window.scrollY - spot.rise / 2
         const offScreen = middle < navBottom() || middle > window.innerHeight
         const now = Date.now()
         if (offScreen && !awaySince) {
@@ -251,7 +272,7 @@ function AvatarGuide() {
   const { tip, spot } = shown
   const talking = phase === 'talk'
 
-  return (
+  return createPortal(
     <div
       ref={rootRef}
       className="avatar-guide"
@@ -288,7 +309,8 @@ function AvatarGuide() {
           <img src={asset('/avatar-wave.webp')} alt="" draggable={false} />
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
