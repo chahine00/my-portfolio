@@ -4790,8 +4790,9 @@ a {
   100% { opacity: 0; transform: translate(-50%, -6px); }
 }
 
-/* The "×" that beams it home: a small round button at its top corner. Hidden until the mouse is
-   on it, it has keyboard focus, or it's talking (after a tap on a phone). */
+/* The "×" that beams it home: a small round button at its top corner, always there while it's
+   out (walking, scanning, flying…), so it can be closed right away on a phone too (no hover there).
+   Only hidden while it boots up and while it beams out. */
 .robot__home {
   position: absolute;
   top: -8px;
@@ -4808,24 +4809,13 @@ a {
   color: var(--muted);
   font: 600 14px/1 system-ui, sans-serif;
   cursor: pointer;
-  opacity: 0;
-  transform: scale(0.6);
-  pointer-events: none;
   transition: opacity 0.15s, transform 0.15s, color 0.15s;
 }
 
-.robot:hover .robot__home,
-.robot:focus-within .robot__home,
-.robot[data-talking='true'] .robot__home {
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
-}
-
-/* Not while it boots up or flies. */
-[data-robot='boot'] .robot__home,
-[data-robot='jet'] .robot__home {
+/* Not while it boots up. */
+[data-robot='boot'] .robot__home {
   opacity: 0;
+  transform: scale(0.6);
   pointer-events: none;
 }
 

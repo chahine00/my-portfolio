@@ -12,8 +12,8 @@
 // - it beeps now and then (a "!", "♪", "01" or "?" above it), turns to face your mouse, and jets
 //   off when you tap or click right next to it
 // - left alone for a while, it goes on standby (eyes dim, light off) until the mouse moves again
-// Clicking it makes it say something. Its "×" (on hover, keyboard focus, or while it talks) beams
-// it back to the welcome box. Visitors who turned off animations get a robot that stands still on
+// Clicking it makes it say something. Its "×" (always shown while it's out) beams it back to the
+// welcome box. Visitors who turned off animations get a robot that stands still on
 // your name (and still talks).
 //
 // One requestAnimationFrame loop moves it with a transform, so React doesn't re-draw while it
