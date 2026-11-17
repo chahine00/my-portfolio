@@ -23,7 +23,7 @@ export const experience: Job[] = [
         period: '2025 – present',
         points: [
           'I take client ideas from zero to live: API, database, web, mobile and cloud',
-          'Latest: Cinetwork, live on Google Play, the App Store and the web. I even helped price it',
+          'Latest: Cinetwork, live on Google Play, the App Store and the web',
         ],
       },
     ],
