@@ -4820,3 +4820,10 @@ a {
 .footer__duck:hover {
   text-decoration: underline;
 }
+
+/* Phones: no "Bring the duck back" in the footer (the duck waits on the welcome box instead). */
+@media (max-width: 720px) {
+  .footer__duck-link {
+    display: none;
+  }
+}

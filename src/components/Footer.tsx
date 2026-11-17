@@ -20,13 +20,15 @@ function Footer() {
         <a href="https://github.com/chahine00/my-portfolio" target="_blank" rel="noreferrer">
           View source
         </a>
+        {/* Hidden on phones (see .footer__duck-link in global.css): there the duck comes back from
+            the welcome box above the photo instead. */}
         {duckHome && (
-          <>
+          <span className="footer__duck-link">
             {' · '}
             <button type="button" className="footer__duck" onClick={() => callDuckOut(null)}>
               Bring the duck back 🦆
             </button>
-          </>
+          </span>
         )}
       </p>
     </footer>
