@@ -36,7 +36,7 @@ export const guideTips: GuideTip[] = [
   {
     // Over the third "mindset" card, on its right (the text above it stops before that).
     section: 'about',
-    text: "Hi, I'm Ali! This is the short version of me: how I think, and a few numbers.",
+    text: "Hi, I'm Ali! This is the short version of me: how I think.",
     anchor: '.mindset__item',
     index: 2,
     align: 'right',
@@ -58,7 +58,7 @@ export const guideTips: GuideTip[] = [
   {
     // Standing beside the first job, in the empty column right of the timeline.
     section: 'experience',
-    text: "Where I've worked, newest first, with what I did at each place.",
+    text: "Where I've worked, with what I did at each place.",
     anchor: '.card.job',
     edge: 'beside',
     bubble: 'above',
@@ -93,7 +93,7 @@ export const guideTips: GuideTip[] = [
   {
     // Over the post in the right column, on its left (clear of "See all" on the far right).
     section: 'blog',
-    text: 'My latest posts: hackathons, events and things I learned along the way.',
+    text: 'My latest posts, events and things I learned along the way.',
     anchor: '.blog-preview__item',
     index: 1,
     align: 'left',
