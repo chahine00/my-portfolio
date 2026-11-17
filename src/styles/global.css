@@ -411,12 +411,12 @@ main {
   margin-left: -70px;
 }
 
+/* The picture is a full-body avatar on a transparent background, so it needs no fades or
+   vignettes: it stands on the page as it is, in light and dark mode. */
 .hero__photo {
   position: relative; /* sits above the drawing */
   width: 100%;
   height: 100%;
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%);
-  mask-image: linear-gradient(to right, transparent 0%, #000 38%);
 }
 
 .hero__photo img {
@@ -716,18 +716,20 @@ main {
   .hero {
     flex-direction: column-reverse;
     align-items: stretch;
-    gap: 8px;
-    /* Same space above and below, so the content sits truly centered on the first screen. */
-    padding-top: 24px;
+    /* About the same space under the avatar's feet as above its head (see .hero__visual). */
+    gap: 30px;
+    padding-top: 22px;
     padding-bottom: 24px;
-    /* The hero fills exactly the first screen (below the top bar), with its content centered, so the
-       first view is only the intro and the About section starts right below the screen's edge
-       instead of a half-cut heading peeking in. "svh" is the screen height with Safari's bars
-       showing; "vh" is the fallback for older browsers. On short phones, where the content is
-       taller than the screen, this has no effect. */
+    /* The hero fills exactly the first screen (below the top bar), so the first view is only the
+       intro and the About section starts right below the screen's edge instead of a half-cut
+       heading peeking in. The content sits at the TOP of it (any spare height goes below the
+       buttons), so there's no big empty gap between the navbar and the avatar. "svh" is the screen
+       height with Safari's bars showing; "vh" is the fallback for older browsers. On short phones,
+       where the content is taller than the screen, this has no effect. */
     min-height: calc(100vh - var(--topbar-height, 110px));
     min-height: calc(100svh - var(--topbar-height, 110px));
-    justify-content: center;
+    /* "flex-end" = the top here: the column is reversed (photo first), so its end is the top. */
+    justify-content: flex-end;
   }
 
   /* Stops the long text from making the page wider than the phone screen. */
@@ -775,7 +777,9 @@ main {
     max-width: 220px;
     aspect-ratio: 1;
     align-self: center;
-    margin: 0;
+    /* Room above for the welcome drawing's "tap me!" tag (about 28px above the photo), plus some
+       breathing space under the navbar, so the tag, the duck and the welcome box don't feel cramped. */
+    margin: 20px 0 0;
   }
 
   /* Phones: a smaller drawing, hugging the photo (the silhouette in Hero.tsx matches this size). */
@@ -797,13 +801,6 @@ main {
     display: inline;
   }
 
-  /* Phones: the photo fades out in an oval (one radial mask) instead of hard straight edges, so
-     the black t-shirt's shoulders taper off softly into the page on every side, like a vignette. */
-  .hero__photo {
-    -webkit-mask-image: radial-gradient(ellipse 56% 70% at 50% 30%, #000 50%, transparent 100%);
-    mask-image: radial-gradient(ellipse 56% 70% at 50% 30%, #000 50%, transparent 100%);
-  }
-
   /* Phones, light mode: the cut-out (no white box) instead of the normal photo, so nothing but you
      sits on the tinted page. The normal photo stays in place but invisible, so screen readers still
      get its alt text. Dark mode has its own rules below, which win. */
@@ -816,21 +813,10 @@ main {
     border-radius: 0;
   }
 
-  /* Black on white fades through grey. So a soft accent gradient is laid over the lower part with
-     "screen" blending, which only lightens: the black t-shirt turns into a light accent tint toward the
-     bottom (the face, higher up, is untouched), and the oval mask then fades that tint into the page. */
-  .hero__photo--dual::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(to bottom, transparent 66%, color-mix(in srgb, var(--accent) 45%, #fff) 100%);
-    mix-blend-mode: screen;
-  }
 }
 
 /* Dark mode photo: the normal photo has a white background, which turns into a grey haze on the
-   dark page. So dark mode shows the cut-out instead (when there is one: .hero__photo--dual), on a soft accent glow, fading on every side.
+   dark page. So dark mode shows the cut-out instead (when there is one: .hero__photo--dual), on a soft accent glow.
    Written twice: once for "computer is dark", once for "picked dark with the toggle". */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .hero__photo--dual::after {
@@ -850,24 +836,13 @@ main {
     filter: drop-shadow(0 0 1px rgb(255 255 255 / 0.35)) drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 28%, transparent));
   }
 
-  /* Sides and bottom fade out (two masks, kept where both show: "intersect"), with a soft accent glow behind the head. */
+  /* A soft accent glow behind the avatar (the glows fade out on their own, no mask needed). */
   :root:not([data-theme='light']) .hero__photo--dual {
-    /* Two glows: the original one behind the head, and a wider, lower one behind the shoulders,
-       so the black t-shirt has something lit to stand against instead of melting into the dark page. */
+    /* Two glows: one behind the head, and a wider one behind the body, so the black t-shirt and
+       jeans have something lit to stand against instead of melting into the dark page. */
     background:
-      radial-gradient(ellipse 55% 45% at 55% 40%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%),
-      radial-gradient(ellipse 95% 30% at 50% 70%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 75%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%, #000 78%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 100%);
-    -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(to right, transparent 0%, #000 38%, #000 78%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 100%);
-    mask-composite: intersect;
-  }
-
-  @media (max-width: 720px) {
-    :root:not([data-theme='light']) .hero__photo--dual {
-      -webkit-mask-image: linear-gradient(to right, transparent, #000 30%, #000 70%, transparent), linear-gradient(to bottom, #000 55%, transparent 100%);
-      mask-image: linear-gradient(to right, transparent, #000 30%, #000 70%, transparent), linear-gradient(to bottom, #000 55%, transparent 100%);
-    }
+      radial-gradient(ellipse 45% 30% at 50% 24%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%),
+      radial-gradient(ellipse 60% 45% at 50% 62%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 75%);
   }
 }
 
@@ -887,24 +862,12 @@ main {
   filter: drop-shadow(0 0 1px rgb(255 255 255 / 0.35)) drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 28%, transparent));
 }
 
-/* Sides and bottom fade out (two masks, kept where both show: "intersect"), with a soft accent glow behind the head. */
+/* A soft accent glow behind the avatar, as above. */
 :root[data-theme='dark'] .hero__photo--dual {
-  /* Two glows: the original one behind the head, and a wider, lower one behind the shoulders,
-     so the black t-shirt has something lit to stand against instead of melting into the dark page. */
+  /* Two glows: behind the head and behind the body, as above. */
   background:
-    radial-gradient(ellipse 55% 45% at 55% 40%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%),
-    radial-gradient(ellipse 95% 30% at 50% 70%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 75%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%, #000 78%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 100%);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to right, transparent 0%, #000 38%, #000 78%, transparent 100%), linear-gradient(to bottom, #000 72%, transparent 100%);
-  mask-composite: intersect;
-}
-
-@media (max-width: 720px) {
-  :root[data-theme='dark'] .hero__photo--dual {
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 30%, #000 70%, transparent), linear-gradient(to bottom, #000 55%, transparent 100%);
-    mask-image: linear-gradient(to right, transparent, #000 30%, #000 70%, transparent), linear-gradient(to bottom, #000 55%, transparent 100%);
-  }
+    radial-gradient(ellipse 45% 30% at 50% 24%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%),
+    radial-gradient(ellipse 60% 45% at 50% 62%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 75%);
 }
 
 /* The bar is a grid of three columns: name | links | theme button. The two outer columns

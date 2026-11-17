@@ -336,7 +336,7 @@ function Hero() {
         <p className="eyebrow">{profile.role}</p>
         {/* Hover the heading, or scroll down: a color sweep runs across the name. */}
         <h1 className="hero__title">
-          Hi, I'm{' '}
+          Meet{' '}
           <span className="hero__name" ref={nameRef}>
             <GradientText text={profile.name} />
           </span>

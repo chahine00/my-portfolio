@@ -7,10 +7,12 @@ export const profile = {
   location: 'Beirut, Lebanon',
   availability: 'Open for opportunities', // set to '' to hide it
   // Your photo in /public, e.g. '/photo.jpg'. Until you add one, your initials are shown.
-  photo: '/photo.jpg',
-  // The same photo with its background removed (transparent), shown in dark mode instead,
-  // because a white background looks like a grey block on the dark page. '' = use "photo" in both.
-  photoDark: '/photo-cutout.webp',
+  // Now your 3D avatar, already on a transparent background, so it suits light AND dark mode.
+  photo: '/avatar.png',
+  // The same picture with its background removed (transparent), shown in dark mode, because a
+  // white background looks like a grey block on the dark page. It also cuts your silhouette out
+  // of the welcome drawing, so the drawing stays behind you. '' = use "photo" in both.
+  photoDark: '/avatar.png',
   // Typed out one by one under your name, like code being written. Keep each one short.
   building: [
     'secure APIs & databases',
