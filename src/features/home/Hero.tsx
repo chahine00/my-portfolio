@@ -406,9 +406,26 @@ function Hero() {
           <span className="hero__hit" aria-hidden="true" />
           {drawing && <PhotoArt key={run} cutout={profile.photoDark ? asset(profile.photoDark) : undefined} duckHome={duckHome} />}
           <div className={`hero__photo${profile.photoDark ? ' hero__photo--dual' : ''}`}>
-            <img className="hero__photo-light" src={asset(profile.photo)} alt={profile.name} />
+            {/* The first big picture on the page: "high" priority makes the browser fetch it before
+                anything less important, and width/height reserve its space so nothing jumps. */}
+            <img
+              className="hero__photo-light"
+              src={asset(profile.photo)}
+              alt={profile.name}
+              width={1024}
+              height={1024}
+              fetchPriority="high"
+            />
             {profile.photoDark && (
-              <img className="hero__photo-dark" src={asset(profile.photoDark)} alt="" aria-hidden="true" />
+              <img
+                className="hero__photo-dark"
+                src={asset(profile.photoDark)}
+                alt=""
+                aria-hidden="true"
+                width={1024}
+                height={1024}
+                fetchPriority="high"
+              />
             )}
           </div>
         </div>
