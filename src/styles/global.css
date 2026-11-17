@@ -792,7 +792,7 @@ main {
     align-self: center;
     /* Room above for the welcome drawing's "tap me!" tag (about 28px above the photo), plus some
        breathing space under the navbar, so the tag, the duck and the welcome box don't feel cramped. */
-    margin: 20px 0 0;
+    margin: 34px 0 0;
   }
 
   /* Phones: a smaller drawing, hugging the photo (the silhouette in Hero.tsx matches this size). */
