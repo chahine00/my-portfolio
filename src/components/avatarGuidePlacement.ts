@@ -209,18 +209,25 @@ export function findPlacements(section: HTMLElement, tip: GuideTip): Placement[]
   const sides: Side[] = ['left', 'above', 'right']
   // Phones have their own spot when the section sets one (the layout is one column there).
   const spot = tip.phone && window.matchMedia(`(max-width: ${PHONE_MAX}px)`).matches ? tip.phone : tip
-  const chosen = spot.anchor ? section.querySelectorAll<HTMLElement>(spot.anchor)[spot.index ?? 0] : undefined
-  if (chosen) {
-    const box = pageBox(chosen)
-    const preferred = spot.bubble ? [spot.bubble, ...sides.filter((s) => s !== spot.bubble)] : sides
+  // The chosen post first, then the section's other posts of the same kind after it (the ones
+  // further down), so scrolling quickly past the chosen one still finds a post on screen to come
+  // out at (a long section like Projects).
+  const matches = spot.anchor ? [...section.querySelectorAll<HTMLElement>(spot.anchor)] : []
+  const first = spot.index ?? 0
+  const chosen = matches[first]
+  const posts = chosen ? [chosen, ...matches.slice(first + 1)] : []
+  const preferred = spot.bubble ? [spot.bubble, ...sides.filter((s) => s !== spot.bubble)] : sides
+  for (const post of posts) {
+    const box = pageBox(post)
     if (spot.edge === 'beside') {
       // Standing in the empty space on the post's right, on the line of its bottom.
       const from = box.r + BESIDE_GAP + width * HAND
-      edges.push({ anchor: chosen, edge: 'bottom', from, to: contentRight - width, align: 'left', sides: preferred })
+      edges.push({ anchor: post, edge: 'bottom', from, to: contentRight - width, align: 'left', sides: preferred })
     } else {
-      edges.push({ anchor: chosen, edge: 'top', from: box.l + width * HAND + 12, to: box.r - width - 12, align: spot.align ?? 'right', sides: preferred })
+      edges.push({ anchor: post, edge: 'top', from: box.l + width * HAND + 12, to: box.r - width - 12, align: spot.align ?? 'right', sides: preferred })
     }
   }
+  const postEdges = edges.length
   // The fallback: above the heading and the first few blocks.
   for (const el of [...section.children].slice(0, 4)) {
     if (!(el instanceof HTMLElement) || !el.offsetHeight) continue
@@ -230,9 +237,9 @@ export function findPlacements(section: HTMLElement, tip: GuideTip): Placement[]
 
   const found: Placement[] = []
   for (const [i, { anchor, edge, from, to, align, sides }] of edges.entries()) {
-    // The section's chosen spot fits at this screen size: use only that one (it waits for it
-    // to be on screen), instead of whichever fallback reaches the screen first.
-    if (chosen && i === 1 && found.length) break
+    // The section's chosen posts fit at this screen size: use only those (it waits for one to
+    // be on screen), instead of whichever fallback reaches the screen first.
+    if (postEdges && i === postEdges && found.length) break
     const box = pageBox(anchor)
     const y = edge === 'top' ? box.t : box.b
     for (const rise of [height, Math.round(height * 0.8)]) {

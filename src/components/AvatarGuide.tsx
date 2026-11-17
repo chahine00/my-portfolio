@@ -31,19 +31,19 @@ import { edgeOf, findPlacements, fitsOnScreen, type Placement } from './avatarGu
 // "in": rising. "talk": typing and showing the bubble. "out": sinking back.
 type Phase = 'in' | 'talk' | 'out'
 
-const RISE_MS = 600 // same as the guide-rise animation in global.css
+const RISE_MS = 450 // same as the guide-rise animation in global.css
 const SINK_MS = 450 // same as the guide-sink animation
 const TYPE_MS = 30 // per letter
 const READ_MS = 4500 // how long it stays once the sentence is typed…
 const READ_PER_LETTER_MS = 55 // …plus this much per letter, so longer sentences stay longer
-const DWELL_MS = 400 // how long a section stays in view before it comes out (counted while scrolling too)…
-const SETTLE_MS = 200 // …and the page must have stopped scrolling this long (fast scrolling up and down doesn't call it)
+const DWELL_MS = 250 // how long a section stays in view before it comes out (counted while scrolling too)…
+const SETTLE_MS = 120 // …and the page must have stopped scrolling this long (fast scrolling up and down doesn't call it)
 const REPEAT_MS = 6000 // a section's tip plays again at the earliest this long after it last came out
 const COOLDOWN_MS = 500 // the pause after a tip ends by itself (none when a new section takes over)
 const AWAY_MS = 2000 // how long its spot can be off screen before it leaves…
 const AWAY_AT_TOP_MS = 300 // …or this long when you're back at the top of the page
 const TAKEOVER_MS = 800 // while it's talking, another section must stay in view this long to send it away
-const LOWEST = 0.75 // the spot's edge must be in the top 75% of the screen (where you're reading)
+const LOWEST = 0.85 // the spot's edge must be in the top 85% of the screen (where you're reading)
 const PLACES_TTL = 2000 // spots are measured again after this long (images load, cards reveal…)
 
 // The sections whose tip was shown, with the element it hid behind and when. A section is removed

@@ -5240,7 +5240,7 @@ a {
 }
 
 .avatar-guide[data-phase='in'] .avatar-guide__body {
-  animation: guide-rise 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: guide-rise 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .avatar-guide[data-phase='talk'] .avatar-guide__body {
