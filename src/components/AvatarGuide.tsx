@@ -36,9 +36,9 @@ const SINK_MS = 450 // same as the guide-sink animation
 const TYPE_MS = 30 // per letter
 const READ_MS = 4500 // how long it stays once the sentence is typed…
 const READ_PER_LETTER_MS = 55 // …plus this much per letter, so longer sentences stay longer
-const DWELL_MS = 600 // how long you stay on a section before it comes out…
-const SETTLE_MS = 350 // …and the page must have stopped scrolling this long (fast scrolling up and down doesn't call it)
-const REPEAT_MS = 20000 // a section's tip plays again at the earliest this long after it last came out
+const DWELL_MS = 400 // how long a section stays in view before it comes out (counted while scrolling too)…
+const SETTLE_MS = 200 // …and the page must have stopped scrolling this long (fast scrolling up and down doesn't call it)
+const REPEAT_MS = 6000 // a section's tip plays again at the earliest this long after it last came out
 const COOLDOWN_MS = 500 // the pause after a tip ends by itself (none when a new section takes over)
 const AWAY_MS = 1500 // how long its spot can be off screen before it leaves
 const LOWEST = 0.75 // the spot's edge must be in the top 75% of the screen (where you're reading)
@@ -118,8 +118,6 @@ function AvatarGuide() {
       }
 
       if (now < cooldownUntil) return later(cooldownUntil - now + 20)
-      // Still scrolling: wait until the page rests, so it doesn't pop in and out while you fly by.
-      if (now - scrolledAt < SETTLE_MS) return later(SETTLE_MS - (now - scrolledAt) + 20)
       const nav = navBottom()
 
       for (const tip of guideTips) {
@@ -132,11 +130,11 @@ function AvatarGuide() {
         const spot = spotsFor(tip, section).find((s) => fitsOnScreen(s, nav, LOWEST))
         if (!spot) continue
 
-        if (candidate?.section !== tip.section) {
-          candidate = { section: tip.section, since: now }
-          return later(DWELL_MS + 20)
-        }
-        if (now - candidate.since < DWELL_MS) return later(DWELL_MS - (now - candidate.since) + 20)
+        // The section has to stay in view a moment (DWELL_MS), and the page has to rest (SETTLE_MS),
+        // so it doesn't pop in and out while you fly by. Both are counted at the same time.
+        if (candidate?.section !== tip.section) candidate = { section: tip.section, since: now }
+        const wait = Math.max(DWELL_MS - (now - candidate.since), SETTLE_MS - (now - scrolledAt))
+        if (wait > 0) return later(wait + 20)
 
         if (shownRef.current) {
           // Still talking about another section: it leaves now, and this one starts right after.
