@@ -48,6 +48,8 @@ const LAND_MS = 220
 const LEAVE_MS = 550
 const TALK_MS = 4500
 const STANDBY_AFTER_MS = 25000 // no mouse movement for this long → standby
+const CLOSE_GUARD_MS = 500 // the "×" ignores taps this long after it appears (no closing by a double tap)
+const NEAR_TAP = 44 // touch: a tap this close to it counts as a tap on it (it's small, and moves)
 
 const LINES = [
   "Beep boop! I'm Ali's tiny helper bot.",
@@ -121,6 +123,8 @@ function Robot() {
       pointer: null as null | { x: number; y: number },
       lastPointer: performance.now(),
       talking: false,
+      talkedAt: 0, // when it last started talking (the "×" appears then)
+      talkAfterLanding: false, // tapped while flying: it talks once it has landed
       line: -1,
     }
     let frame = 0
@@ -150,6 +154,8 @@ function Robot() {
     function place() {
       const sz = size()
       robot.style.transform = `translate(${Math.round(s.x - sz / 2)}px, ${Math.round(s.y - sz)}px)`
+      // On touch screens the "×" sits beside it: on its left when it's near the right edge.
+      robot.dataset.close = s.x > heroEl.clientWidth - 70 ? 'left' : 'right'
     }
 
     function beep(mark = pick(MARKS)) {
@@ -274,7 +280,13 @@ function Robot() {
           break
         case 'land':
         case 'scan':
-          if (done) rest()
+          if (done) {
+            rest()
+            if (s.talkAfterLanding) {
+              s.talkAfterLanding = false
+              talk()
+            }
+          }
           break
         case 'idle':
         case 'standby':
@@ -337,41 +349,58 @@ function Robot() {
       if (s.mode === 'standby') setMode('scan', 900)
     }
 
-    // A click or tap right next to it (not on it) startles it: "!" and it jets off.
+    // A click right next to it (not on it) startles it: "!" and it jets off. With a finger, a tap
+    // that close is a tap that just missed it (it's small and moving): it counts as a tap on it.
     function onPointerDown(event: PointerEvent) {
       s.lastPointer = performance.now()
-      if (robot.contains(event.target as Node) || reduceMotion) return
-      if (!['idle', 'walk', 'scan', 'turn'].includes(s.mode) || s.talking) return
+      if (robot.contains(event.target as Node)) return
       const r = heroEl.getBoundingClientRect()
-      const near = Math.hypot(event.clientX - r.left - s.x, event.clientY - r.top - (s.y - size() / 2)) < 56
+      const distance = Math.hypot(event.clientX - r.left - s.x, event.clientY - r.top - (s.y - size() / 2))
+      if (event.pointerType !== 'mouse') {
+        if (distance < NEAR_TAP) talk()
+        return
+      }
+      if (reduceMotion || !['idle', 'walk', 'scan', 'turn'].includes(s.mode) || s.talking) return
       const others = perches().filter((p) => p !== s.perch)
-      if (near && others.length) {
+      if (distance < 56 && others.length) {
         beep('!')
         jetTo(pick(others))
       }
+    }
+
+    function talk() {
+      if (s.mode === 'leave') return
+      // Tapped while booting up or flying: it answers once it has landed.
+      if (s.mode === 'boot' || s.mode === 'jet') {
+        s.talkAfterLanding = true
+        return
+      }
+      s.talking = true
+      s.talkedAt = performance.now()
+      s.lastPointer = performance.now()
+      // It stops while it talks, so the "×" next to it stays put.
+      if (s.mode === 'walk' || s.mode === 'standby' || s.mode === 'turn') setMode('idle')
+      s.thenWalk = false
+      s.line = (s.line + 1) % LINES.length
+      setLine(LINES[s.line])
+      // The bubble opens toward the middle of the hero.
+      setSide(s.x > heroEl.clientWidth / 2 ? 'right' : 'left')
+      window.clearTimeout(talkTimer)
+      talkTimer = window.setTimeout(() => {
+        s.talking = false
+        setLine(null)
+        s.until = performance.now() + 800
+      }, TALK_MS)
     }
 
     window.addEventListener('pointermove', onPointerMove, { passive: true })
     window.addEventListener('pointerdown', onPointerDown, { passive: true })
 
     brain.current = {
-      talk() {
-        if (s.mode === 'leave' || s.mode === 'boot' || s.mode === 'jet') return
-        s.talking = true
-        s.lastPointer = performance.now()
-        if (s.mode === 'walk' || s.mode === 'standby') setMode('idle')
-        s.line = (s.line + 1) % LINES.length
-        setLine(LINES[s.line])
-        // The bubble opens toward the middle of the hero.
-        setSide(s.x > heroEl.clientWidth / 2 ? 'right' : 'left')
-        window.clearTimeout(talkTimer)
-        talkTimer = window.setTimeout(() => {
-          s.talking = false
-          setLine(null)
-          s.until = performance.now() + 800
-        }, TALK_MS)
-      },
+      talk,
       leave() {
+        // Just appeared: that tap was meant for the robot (a double tap), not for the "×".
+        if (performance.now() - s.talkedAt < CLOSE_GUARD_MS) return
         window.clearTimeout(talkTimer)
         s.talking = false
         setLine(null)

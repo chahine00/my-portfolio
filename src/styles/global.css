@@ -4490,6 +4490,7 @@ a {
 }
 
 .robot__hit {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
@@ -4827,12 +4828,36 @@ a {
   border-color: var(--accent);
 }
 
-/* Bigger tap target on touch screens, same small look. */
-@media (pointer: coarse) {
+/* Touch screens: easier to tap the robot, and hard to hit the "×" by mistake.
+   - The robot gets an invisible 16px margin all around that counts as tapping it.
+   - The "×" moves to its side (data-close: on the left near the right edge, set by HeroRobot.tsx)
+     with a clear gap, so the two tap areas don't overlap; its own tap area is a bit bigger too.
+   (Same test for touch screens as the welcome drawing: some phones claim they can hover.) */
+@media (hover: none), (any-pointer: coarse) {
+  .robot__hit::before {
+    content: '';
+    position: absolute;
+    inset: -16px;
+  }
+
+  .robot__home {
+    top: 50%;
+    right: auto;
+    left: calc(100% + 22px);
+    width: 24px;
+    height: 24px;
+    margin-top: -12px;
+  }
+
+  .robot[data-close='left'] .robot__home {
+    left: auto;
+    right: calc(100% + 22px);
+  }
+
   .robot__home::after {
     content: '';
     position: absolute;
-    inset: -12px;
+    inset: -5px;
   }
 }
 
