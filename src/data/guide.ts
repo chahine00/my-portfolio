@@ -41,7 +41,9 @@ export const guideTips: GuideTip[] = [
     index: 2,
     align: 'right',
     bubble: 'above',
-    phone: PHONE_FIRST_POST('.mindset__item'),
+    // Phones: the intro paragraph runs the full width right above the first card, so it stands on
+    // that paragraph instead, on the right, next to the short "Think bigger. / Adapt faster." title.
+    phone: PHONE_FIRST_POST('.mindset__lead'),
   },
   {
     // Over the second project card, on its left, under the empty right side of the title.

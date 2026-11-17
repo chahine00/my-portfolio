@@ -618,12 +618,14 @@ main {
   fill: transparent;
 }
 
-/* Touch screens (no hover): "tap me!"; mouse: "click me!". */
+/* Touch screens: "tap me!"; mouse: "click me!". */
 .hero__art-robot-hint--touch {
   display: none;
 }
 
-@media (hover: none) {
+/* Touch screens: "(hover: none)", or a finger-sized pointer (some phones claim they can hover;
+   same test as isTouchScreen() in Hero.tsx). */
+@media (hover: none), (any-pointer: coarse) {
   .hero__art-robot-hint--mouse {
     display: none;
   }

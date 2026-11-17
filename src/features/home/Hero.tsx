@@ -21,8 +21,16 @@ const ROBOT_OUT_AFTER_MS = 2900
 const SHOW_AFTER_BACK_TO_TOP_MS = 4000
 
 // Phones and tablets: no mouse to hover with (checked when needed, a tablet can get a mouse).
+// "(hover: none)" alone isn't enough: many phones (Samsung and other Android browsers, phones with
+// a stylus) claim they CAN hover, and then the welcome never started there, by itself or with a
+// tap. So any sign of a touch screen counts: a finger-sized pointer, or touch points.
+// (Same test as the "touch screens" styles of the welcome drawing in global.css.)
 function isTouchScreen() {
-  return window.matchMedia('(hover: none)').matches
+  return (
+    window.matchMedia('(hover: none)').matches ||
+    window.matchMedia('(any-pointer: coarse)').matches ||
+    navigator.maxTouchPoints > 0
+  )
 }
 
 // Types each phrase from profile.building, waits, deletes it, then moves to the next one.
