@@ -11,6 +11,7 @@ import Education from '../education/Education.tsx'
 import Updates from '../updates/Updates.tsx'
 import Testimonials from '../testimonials/Testimonials.tsx'
 import Contact from '../contact/Contact.tsx'
+import AvatarGuide from '../../components/AvatarGuide.tsx'
 
 function HomePage() {
   // useLocation tells us the current URL. "hash" is the #part, e.g. '#skills'.
@@ -42,6 +43,8 @@ function HomePage() {
       {/* The blog sits just before Contact: the latest news, then a way to get in touch. */}
       <Updates />
       <Contact />
+      {/* The avatar peeks out at each section to say what it is (see AvatarGuide.tsx). */}
+      <AvatarGuide />
     </>
   )
 }

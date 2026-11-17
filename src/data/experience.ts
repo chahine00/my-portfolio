@@ -57,7 +57,7 @@ export const experience: Job[] = [
       {
         title: 'Mobile Developer & Intern',
         period: 'Jul 2022 – Nov 2022',
-        points: ['Where it started: React Native and Xamarin apps, published on Google Play'],
+        points: ['Where it studied: React Native and Xamarin apps, published on Google Play'],
       },
     ],
     tech: ['C#', 'ASP.NET Core', 'Node.js', 'Angular', 'React Native', 'AWS Lambda'],
