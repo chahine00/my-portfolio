@@ -1,23 +1,22 @@
-// Remembers whether the visitor sent the rubber duck home (RubberDuck.tsx), and lets the footer
-// bring it back. Only for this page load: a reload (on phones and computers) brings the duck back.
+// Where the rubber duck is (RubberDuck.tsx), shared with the hero (Hero.tsx) and the footer.
+// Everything is kept in memory only, so a reload (on phones and computers) starts over.
+//
+// The duck's steps:
+// 1. At home on the "<Welcome />" box: it pops up there once the welcome drawing behind the
+//    profile photo has typed its word, and walks a little along the box. It doesn't leave by itself.
+// 2. Hovered or clicked there: it hops out onto your name, then explores the whole website.
+// Its "×" sends it back home to the welcome box (step 1). The footer can also call it back out.
 
 import { useSyncExternalStore } from 'react'
 
 const CHANGE_EVENT = 'duck:change'
 
-// Kept in memory only, so it resets whenever the page is reloaded.
-let home = false
+let home = true // on the welcome box (step 1); false once it's out on the page
+let wasOut = false // it has been out at least once (then the footer offers to bring it back)
+let origin: DOMRect | null = null // where it comes out from (the duck on the welcome box)
 
-export function isDuckHome() {
-  return home
-}
-
-// The page reacts after `delayMs` (time for the goodbye animation).
-export function setDuckHome(value: boolean, delayMs = 0) {
-  window.setTimeout(() => {
-    home = value
-    window.dispatchEvent(new Event(CHANGE_EVENT))
-  }, delayMs)
+function changed() {
+  window.dispatchEvent(new Event(CHANGE_EVENT))
 }
 
 function subscribe(onChange: () => void) {
@@ -25,52 +24,51 @@ function subscribe(onChange: () => void) {
   return () => window.removeEventListener(CHANGE_EVENT, onChange)
 }
 
-// True while the duck is at home (hidden). Components using this re-draw when it changes.
+export function isDuckHome() {
+  return home
+}
+
+// True while the duck is at home on the welcome box. Components using this re-draw when it changes.
 export function useDuckHome() {
-  return useSyncExternalStore(subscribe, isDuckHome, () => false)
+  return useSyncExternalStore(subscribe, isDuckHome, () => true)
 }
 
-// The duck only shows up once the visitor has discovered the welcome drawing behind the profile
-// photo (hover it, touch it on a phone, or use "back to top"): when the "<Welcome />" bubble has
-// typed its word, the duck pops out of the bubble (Hero.tsx calls releaseDuck). Per page load.
-let released = false
-let origin: DOMRect | null = null // where it pops out: the welcome bubble, on screen
+// True when the footer should offer "Bring the duck back": it was out, and got sent home.
+export function useDuckSentHome() {
+  return useSyncExternalStore(subscribe, () => home && wasOut, () => false)
+}
 
-export function releaseDuck(from: DOMRect) {
-  if (released) return
-  released = true
+// Sends it home (its "×"). The page reacts after `delayMs` (time for the goodbye animation).
+export function sendDuckHome(delayMs = 0) {
+  window.setTimeout(() => {
+    home = true
+    changed()
+  }, delayMs)
+}
+
+// Hovered or clicked on the welcome box (or called back from the footer): it comes out.
+// `from` is where it's sitting, so it appears right there; without it, it drops in from the top.
+export function callDuckOut(from: DOMRect | null) {
+  home = false
+  wasOut = true
   origin = from
-  window.dispatchEvent(new Event(CHANGE_EVENT))
+  exploring = true // out of the box, it's free to explore the whole website right away
+  changed()
 }
 
-export function isDuckReleased() {
-  return released
-}
-
-// Where it pops out from (read once by the duck when it appears).
+// Where it comes out from (read once by the duck when it appears).
 export function duckOrigin() {
   return origin
 }
 
-export function useDuckReleased() {
-  return useSyncExternalStore(subscribe, isDuckReleased, () => false)
-}
-
-// Calm or exploring: a new visit starts calm; a click on the duck lets it explore, for this visit.
-const EXPLORE_KEY = 'duck-explore'
+// Exploring the whole website (true as soon as it's out of the box). RubberDuck.tsx still has a
+// calm, hero-only mode for when this is false; it isn't used at the moment.
+let exploring = false
 
 export function isDuckExploring() {
-  try {
-    return sessionStorage.getItem(EXPLORE_KEY) === '1'
-  } catch {
-    return false
-  }
+  return exploring
 }
 
 export function setDuckExploring() {
-  try {
-    sessionStorage.setItem(EXPLORE_KEY, '1')
-  } catch {
-    // storage blocked: it explores until the page is reloaded
-  }
+  exploring = true
 }

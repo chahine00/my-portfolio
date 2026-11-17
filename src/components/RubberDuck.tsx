@@ -1,27 +1,30 @@
 // A little rubber duck that lives on the page, like the old desktop pets.
 // ("Rubber duck debugging": explaining your code to a duck until you spot the bug yourself.)
 //
-// It isn't there at first: it appears once the visitor discovers the welcome drawing behind the
-// profile photo (hover, touch, or "back to top"). When the "<Welcome />" bubble has typed its word,
-// the duck pops out of the bubble and hops onto your name (see releaseDuck in duckStore.ts).
-// It starts CALM: it potters about the hero (walks along
-// your name, the code line, the location line and the buttons, hops between them, looks around,
-// pecks, naps), and rides along out of view when you scroll down.
-// On pages without the hero it sits quietly in the bottom-left corner.
-// Click it once and it starts EXPLORING (for the rest of the visit), with a small "brain" that
-// picks what to do next from what's around it:
+// It isn't on the page at first. It lives on the "<Welcome />" box of the welcome drawing behind
+// the profile photo (Hero.tsx): it pops up there once the box has typed its word, and walks a
+// little along it. Each next step waits for the visitor (see duckStore.ts):
+// Hovered or clicked on the box: it pops out of there (this component), hops onto your name, and
+// then EXPLORES the whole website, with a small "brain" that picks what to do next from what's
+// around it:
 // - it explores: waddles, hops onto cards and section titles, walks along their top edge,
 //   and at the end of one it may hop to the next, step off and fall, or turn back
 // - it's curious: it watches your mouse, walks over to it, and hops onto the card you're hovering
 // - it gets startled: a fast mouse rush or a tap right next to it makes it jump ("!") and run off
 // - it gets tired: the more it does, the sooner it naps; if you leave the page alone it falls
 //   asleep, and wakes up happy when you're back
-// - it reacts to scrolling: it holds on (flapping) while its card moves fast, falls when its card
-//   scrolls away, and lands with a little squash
+// - it flies: long trips across the screen are flights (wings flapping, a wavy path), not hops
+// - it watches the page: when cards and titles scroll into view, it notices ("!") and flies over
+//   to check them out; when its own card scrolls away, it takes off to another one on screen
+//   (or falls, now and then), instead of always dropping to the bottom
+// - it reacts to scrolling: it holds on (flapping) while its card moves fast, and lands with a
+//   little squash
 // - it fidgets: looks around, pecks, flaps
 // It only talks when clicked (never on its own). You can drag it anywhere (it falls when you let go).
-// The little "×" next to it (on hover, or after a tap) sends it home: it disappears until the
-// visitor brings it back from the footer, or reloads the page (see duckStore.ts).
+// The little "×" next to it (on hover, or after a tap) sends it home to the welcome box: back to
+// the start, waiting there until hovered or clicked. The footer link also brings it back out.
+// (There's also a CALM mode, kept for later: it then stays in the hero, walking along your name,
+// the code line, the location line and the buttons, until hovered or clicked. See duckStore.ts.)
 //
 // Everything runs in one requestAnimationFrame loop that moves the duck with a transform, so React
 // doesn't re-draw while it moves. Only the speech bubble uses React state.
@@ -29,7 +32,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent } from 'react'
-import { duckOrigin, isDuckExploring, setDuckExploring, setDuckHome, useDuckHome, useDuckReleased } from './duckStore.ts'
+import DuckSprite from './DuckSprite.tsx'
+import { duckOrigin, isDuckExploring, sendDuckHome, setDuckExploring, useDuckHome } from './duckStore.ts'
 
 type Mode =
   | 'walk' // walking (data-run: faster)
@@ -39,6 +43,7 @@ type Mode =
   | 'sleep'
   | 'crouch' // getting ready to jump
   | 'jump'
+  | 'fly' // a longer trip through the air, wings flapping
   | 'fall'
   | 'land' // a little squash after landing
   | 'drag'
@@ -73,8 +78,10 @@ const SECTION_LINES: Record<string, string> = {
 }
 
 const GRAVITY = 2400 // px per second², for falling
-const WALK_SPEED = 40 // px per second
-const RUN_SPEED = 120
+const WALK_SPEED = 55 // px per second
+const RUN_SPEED = 160
+const FLY_SPEED = 650 // px per second, roughly, for flights across the screen
+const FLY_AFTER = 260 // px: trips longer than this are flights, shorter ones are hops
 const SLEEPY_AFTER = 30 // seconds with no mouse, scroll or touch before it dozes off
 const CALM_GROUND_WIDTH = 160 // calm and not on your name: it stays this close to the bottom-left corner
 
@@ -85,6 +92,7 @@ interface Jump {
   offset: number // where on the target it lands, from its left edge (or the screen x for the bottom)
   t: number
   duration: number
+  fly: boolean // a flight (wavy, higher, wings flapping) instead of a hop
 }
 
 interface State {
@@ -128,12 +136,11 @@ function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-// Shown unless the visitor sent it home. Coming back mounts a fresh duck, which drops in again.
+// Only on the page once it's been let out of the welcome box. Each time it comes out, a fresh duck
+// starts from where it sat on the box.
 function RubberDuck() {
   const home = useDuckHome()
-  // Hidden until the visitor discovers the welcome drawing: then it pops out of its bubble.
-  const released = useDuckReleased()
-  return released && !home ? <Duck /> : null
+  return home ? null : <Duck />
 }
 
 function Duck() {
@@ -357,7 +364,7 @@ function Duck() {
 
     // 1 = full size; smaller when standing under text that's close above (never below 0.55).
     function fit() {
-      if (!state.perch || ['jump', 'fall', 'drag'].includes(state.mode)) return 1
+      if (!state.perch || ['jump', 'fly', 'fall', 'drag'].includes(state.mode)) return 1
       const rect = edge(state.perch)
       if (!rect) return 1
       const room = headroom(state.perch, rect.top, state.x + 4, state.x + size() - 4)
@@ -449,9 +456,67 @@ function Duck() {
       return choices.length ? weighted(choices) : null
     }
 
+    // Cards and titles that just came into view (scrolling, or the page changing): the duck notices
+    // them. Each one is remembered with the moment it appeared; leaving the screen forgets it.
+    const appeared = new Map<Element, number>()
+    const mountedAt = now()
+    const viewWatcher = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          // Ignore what was already on screen when the duck came out: that's not "new".
+          if (entry.isIntersecting && now() - mountedAt > 1) appeared.set(entry.target, now())
+          else if (!entry.isIntersecting) appeared.delete(entry.target)
+        }
+      },
+      // "In view" = inside the middle 80% of the screen's height.
+      { rootMargin: '-10% 0px -10% 0px' },
+    )
+    const watched = new WeakSet<Element>()
+    function watchPerches() {
+      for (const el of document.querySelectorAll(PERCHES)) {
+        if (watched.has(el)) continue
+        watched.add(el)
+        viewWatcher.observe(el)
+      }
+    }
+
+    // Anywhere on screen it could fly to (no distance limit), preferring what just appeared,
+    // what's close, and what it hasn't visited lately. `freshOnly`: only things that just appeared.
+    function visiblePerch(freshOnly = false) {
+      const s = size()
+      const t = now()
+      const options: [Element, number][] = []
+      for (const el of document.querySelectorAll(PERCHES)) {
+        if (el === state.perch || el === state.leftFrom) continue
+        const seenAt = appeared.get(el)
+        const fresh = seenAt !== undefined && t - seenAt < 4
+        if (freshOnly && !fresh) continue
+        const rect = edge(el)
+        if (!rect || !standable(rect)) continue
+        const distance = Math.hypot(rect.left + rect.width / 2 - (state.x + s / 2), rect.top - (state.y + s))
+        let score = 1 / (1 + distance / 400)
+        if (fresh) score *= 3
+        if (state.recent.includes(el)) score *= 0.3
+        options.push([el, score])
+      }
+      return options.length ? weighted(options) : null
+    }
+
+    // Its perch is gone (scrolled away): take off to another spot on screen, or fall now and then.
+    function perchLost() {
+      state.leftFrom = state.perch
+      state.perch = null
+      const next = Math.random() < 0.8 ? visiblePerch() : null
+      if (next) {
+        mark('!')
+        startJump(next, undefined, true)
+      } else startFall()
+    }
+
     // ---- Actions ---------------------------------------------------------------------------
 
-    function startJump(target: Element | null, landX?: number) {
+    // A hop, or a flight when it's far (or `fly` asks for one).
+    function startJump(target: Element | null, landX?: number, fly = false) {
       const s = size()
       let offset: number
       let toX: number
@@ -470,11 +535,15 @@ function Duck() {
         toY = groundY()
       }
       const distance = Math.hypot(toX - state.x, toY - state.y)
-      state.jump = { fromX: state.x, fromY: state.y, target, offset, t: 0, duration: Math.min(0.75, 0.38 + distance / 1500) }
+      const flight = fly || distance > FLY_AFTER
+      const duration = flight
+        ? Math.min(1.8, Math.max(0.6, 0.35 + distance / FLY_SPEED))
+        : Math.min(0.6, 0.3 + distance / 1800)
+      state.jump = { fromX: state.x, fromY: state.y, target, offset, t: 0, duration, fly: flight }
       state.dir = toX >= state.x ? 1 : -1
       state.mode = 'crouch'
-      state.timer = 0.14
-      state.energy -= 0.04
+      state.timer = flight ? 0.1 : 0.12
+      state.energy -= flight ? 0.06 : 0.04
       lastJumpAt = now()
     }
 
@@ -497,7 +566,7 @@ function Duck() {
 
     // Something made it jump: hop away from where the scare came from, or run off.
     function startle(fromX: number) {
-      if (['jump', 'fall', 'drag', 'crouch', 'emerge'].includes(state.mode) || state.held) return
+      if (['jump', 'fly', 'fall', 'drag', 'crouch', 'emerge'].includes(state.mode) || state.held) return
       mark('!')
       // Calm: just a flinch and a flap, it stays where it is.
       if (!state.explore) {
@@ -522,7 +591,7 @@ function Duck() {
     // The brain: what to do next, when the current action ends.
     // Hops right after a hop look restless: the urge to hop again builds back up over ~8 seconds.
     let lastJumpAt = -Infinity
-    const hopUrge = () => Math.min(1, Math.max(0.15, (now() - lastJumpAt) / 8))
+    const hopUrge = () => Math.min(1, Math.max(0.15, (now() - lastJumpAt) / 5))
 
     // During the first walk along your name it turns around at the ends instead of leaving
     // (on phones the name is short, so it would reach the end in a few seconds).
@@ -575,8 +644,15 @@ function Duck() {
       const mouseOnLevel = Math.abs(cursor.y - (state.y + s / 2)) < 120
       const hovered = cursor.hovered
 
-      type Choice = 'wander' | 'rest' | 'peck' | 'flap' | 'explore' | 'follow' | 'visit-hovered' | 'hop-down' | 'nap'
+      const newThing = visiblePerch(true)
+      type Choice =
+        | 'wander' | 'rest' | 'peck' | 'flap' | 'explore' | 'fly-far' | 'visit-new'
+        | 'follow' | 'visit-hovered' | 'hop-down' | 'nap'
       const choice = weighted<Choice>([
+        // Something just scrolled into view: it wants to go and see.
+        ['visit-new', newThing ? 4 : 0],
+        // Now and then a long flight to somewhere else on the screen.
+        ['fly-far', 1.1 * hopUrge()],
         ['wander', 3],
         ['rest', 2.2],
         ['peck', 1],
@@ -606,6 +682,16 @@ function Duck() {
         case 'explore': {
           const target = bestPerch()
           if (target) startJump(target)
+          else walk()
+          break
+        }
+        case 'visit-new':
+          if (Math.random() < 0.6) mark('!')
+          startJump(newThing!)
+          break
+        case 'fly-far': {
+          const target = visiblePerch()
+          if (target) startJump(target, undefined, true)
           else walk()
           break
         }
@@ -776,7 +862,7 @@ function Duck() {
 
         case 'crouch':
           state.timer -= dt
-          if (state.timer <= 0) state.mode = 'jump'
+          if (state.timer <= 0) state.mode = state.jump?.fly ? 'fly' : 'jump'
           // Stay on its spot while crouching (the spot may be scrolling).
           if (state.perch) {
             const ground = surface()
@@ -785,21 +871,38 @@ function Duck() {
               state.y = ground.y
             }
           }
-          if (state.jump && state.mode === 'jump') {
+          if (state.jump && (state.mode === 'jump' || state.mode === 'fly')) {
             state.jump.fromX = state.x
             state.jump.fromY = state.y
           }
           break
 
-        case 'jump': {
+        case 'jump':
+        case 'fly': {
           const jump = state.jump!
           let toX: number
           let toY: number
           if (jump.target) {
             const rect = edge(jump.target)
-            // The target scrolled away mid-air: fall instead.
+            // The target scrolled away mid-air: exploring, it turns toward another spot on screen
+            // (from where it is now); otherwise it falls.
             if (!rect || !standable(rect)) {
-              startFall()
+              const next = state.explore ? visiblePerch() : null
+              const nextRect = next ? edge(next) : null
+              if (!next || !nextRect) {
+                startFall()
+                break
+              }
+              Object.assign(jump, {
+                fromX: state.x,
+                fromY: state.y,
+                target: next,
+                offset: random(0, Math.max(0, nextRect.width - s)),
+                t: 0,
+                duration: Math.min(1.4, Math.max(0.5, 0.3 + Math.hypot(nextRect.left - state.x, nextRect.top - state.y) / FLY_SPEED)),
+                fly: true,
+              })
+              state.mode = 'fly'
               break
             }
             toX = rect.left + jump.offset
@@ -810,10 +913,16 @@ function Duck() {
           }
           jump.t += dt
           const p = Math.min(jump.t / jump.duration, 1)
-          // A curved hop: a quadratic curve whose middle point sits above the higher end.
-          const peak = Math.min(jump.fromY, toY) - 55
-          state.x = jump.fromX + (toX - jump.fromX) * p
+          // A curve whose middle point sits above the higher end: a small arc for a hop, a big
+          // one for a flight, which also bobs up and down a little as the wings beat.
+          const distance = Math.hypot(toX - jump.fromX, toY - jump.fromY)
+          const lift = jump.fly ? 40 + Math.min(140, distance * 0.18) : 55
+          const peak = Math.min(jump.fromY, toY) - lift
+          const ease = jump.fly ? p * p * (3 - 2 * p) : p // flights speed up, then slow down to land
+          state.x = jump.fromX + (toX - jump.fromX) * ease
           state.y = (1 - p) * (1 - p) * jump.fromY + 2 * (1 - p) * p * peak + p * p * toY
+          if (jump.fly) state.y += Math.sin(p * Math.PI * 4) * 5 * (1 - p)
+          state.dir = toX >= state.x ? 1 : -1
           if (p >= 1) {
             state.perch = jump.target
             state.offset = jump.target ? jump.offset : 0
@@ -853,8 +962,21 @@ function Duck() {
           // On a surface: walk / idle / peck / flap / sleep / land. The surface may move (scrolling).
           const ground = surface()
           if (!ground) {
-            startFall()
+            if (state.explore) perchLost()
+            else startFall()
             break
+          }
+
+          // Exploring and something just scrolled into view: it notices right away (not only
+          // when its current action ends), about half a second later on average, a bit later
+          // when it has only just landed from a hop (hopUrge), so it doesn't look hyperactive.
+          if (state.explore && !state.held && ['idle', 'walk', 'peck'].includes(state.mode) && Math.random() < dt * 2 * hopUrge()) {
+            const newThing = visiblePerch(true)
+            if (newThing) {
+              if (Math.random() < 0.6) mark('!')
+              startJump(newThing)
+              break
+            }
           }
 
           // Its card is scrolling fast: it holds on, flapping.
@@ -946,6 +1068,10 @@ function Duck() {
       state.x = random(8, 8 + CALM_GROUND_WIDTH - size()) // calm: it drops into its corner
     }
 
+    watchPerches()
+    // New cards appear when the page changes (another page, a filter…): look for them now and then.
+    const watchTimer = window.setInterval(watchPerches, 2000)
+
     apply()
     frame = requestAnimationFrame(tick)
     document.addEventListener('visibilitychange', handleVisibility)
@@ -955,6 +1081,8 @@ function Duck() {
     window.addEventListener('keydown', noteInput)
     return () => {
       cancelAnimationFrame(frame)
+      window.clearInterval(watchTimer)
+      viewWatcher.disconnect()
       document.removeEventListener('visibilitychange', handleVisibility)
       window.removeEventListener('pointermove', handleMouseMove)
       window.removeEventListener('pointerdown', handlePointerDownAnywhere)
@@ -965,32 +1093,41 @@ function Duck() {
     // say() and mark() only use refs and a state setter, so the loop can keep using the first ones.
   }, [])
 
+  // A calm duck (in the hero) that's hovered or clicked starts exploring the whole website.
+  // Returns false when it was already exploring.
+  function startExploring() {
+    const state = stateRef.current
+    if (!state || state.explore) return false
+    state.explore = true
+    setDuckExploring()
+    mark('♪', 1200)
+    say("Quack! Let's explore. 🦆")
+    return true
+  }
+
   // Clicked: it stops, and says something (about its section, sometimes).
-  // The first click on a calm duck lets it explore the page, for the rest of this visit.
+  // A calm duck starts exploring instead.
   function speak() {
     const state = stateRef.current
     if (!state) return
     listenRef.current()
-    if (!state.explore) {
-      state.explore = true
-      setDuckExploring()
-      mark('♪', 1200)
-      say("Quack! Let's explore. 🦆")
-      return
-    }
+    if (startExploring()) return
     const section = state.perch?.closest('section[id]')?.id
     const sectionLine = section ? SECTION_LINES[section] : undefined
     say(sectionLine && Math.random() < 0.5 ? sectionLine : pick(LINES))
   }
 
-  // The "×": it waves and shrinks away, until the visitor brings it back (footer) or reloads the page.
+  // The "×": it waves and shrinks away, back home to the welcome box.
   function sendHome() {
     window.clearTimeout(bubbleTimer.current)
     setBubble(null)
     mark('👋', 600)
     setLeaving(true)
-    setDuckHome(true, 550) // hidden once the goodbye animation is over
+    sendDuckHome(550) // gone once the goodbye animation is over
   }
+
+  // False until the mouse has left the duck once (see onPointerEnter below).
+  const hoverCounts = useRef(false)
 
   // A mouse on the duck: it stops walking, so the "×" stays under the cursor.
   function hold(held: boolean) {
@@ -1001,7 +1138,13 @@ function Duck() {
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
     const state = stateRef.current
     if (!state) return
-    event.currentTarget.setPointerCapture(event.pointerId)
+    // Keep getting the pointer's moves while dragging, even outside the duck. Some browsers refuse
+    // this for unusual pointers; the duck then still works, just without capture.
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // ignore
+    }
     drag.current = { dx: event.clientX - state.x, dy: event.clientY - state.y, startX: event.clientX, startY: event.clientY, moved: false }
   }
 
@@ -1037,8 +1180,18 @@ function Duck() {
       aria-label="Rubber duck. Click it to hear what it says."
       // While it talks (after a tap on a phone), the "×" shows too.
       data-talking={bubble ? 'true' : undefined}
-      onPointerEnter={(event) => event.pointerType === 'mouse' && hold(true)}
-      onPointerLeave={() => hold(false)}
+      // A mouse on it: it stops walking (so the "×" stays put), and a calm duck starts exploring.
+      // It just came out of the box under the mouse, so hovering only counts once the mouse has
+      // left it at least once; otherwise it would skip its calm time in the hero.
+      onPointerEnter={(event) => {
+        if (event.pointerType !== 'mouse') return
+        hold(true)
+        if (hoverCounts.current) startExploring()
+      }}
+      onPointerLeave={() => {
+        hold(false)
+        hoverCounts.current = true
+      }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -1073,19 +1226,7 @@ function Duck() {
       </span>
       {/* The duck faces right; data-dir="-1" mirrors it to face left. */}
       <span className="duck__flip">
-        <svg className="duck__sprite" viewBox="0 0 40 40" aria-hidden="true">
-          <ellipse className="duck__shadow" cx="20" cy="38.5" rx="13" ry="1.5" />
-          {/* Body, with a raised tail on the left */}
-          <path className="duck__body" d="M5 22c-1-4 1-7 3-6 2 1 3 3 5 3h10c6 0 11 3 11 9 0 6-6 9-14 9S6 34 5 22z" />
-          {/* Wing */}
-          <path className="duck__wing" d="M12 26c3-2 9-2 12 1-2 4-9 5-12-1z" />
-          {/* Head (it moves on its own when pecking) */}
-          <g className="duck__head">
-            <circle className="duck__body" cx="26" cy="13" r="8" />
-            <path className="duck__beak" d="M32.5 13.5c3-1.5 6-1 6.5.5s-3 3-6.5 2.5z" />
-            <circle className="duck__eye" cx="28.5" cy="11" r="1.4" />
-          </g>
-        </svg>
+        <DuckSprite className="duck__sprite" />
       </span>
     </div>
   )

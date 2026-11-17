@@ -1,15 +1,15 @@
 // The footer at the bottom of the page.
 
 import SocialLinks from './SocialLinks.tsx'
-import { setDuckHome, useDuckHome } from './duckStore.ts'
+import { callDuckOut, useDuckSentHome } from './duckStore.ts'
 
 // Normal JavaScript works in a component file too.
 // This gets the current year (for example 2026) so the footer never goes out of date.
 const year = new Date().getFullYear()
 
 function Footer() {
-  // The visitor sent the rubber duck home: offer to bring it back.
-  const duckHome = useDuckHome()
+  // The visitor let the rubber duck out, then sent it home with its "×": offer to bring it back.
+  const duckHome = useDuckSentHome()
 
   return (
     <footer className="footer">
@@ -23,7 +23,7 @@ function Footer() {
         {duckHome && (
           <>
             {' · '}
-            <button type="button" className="footer__duck" onClick={() => setDuckHome(false)}>
+            <button type="button" className="footer__duck" onClick={() => callDuckOut(null)}>
               Bring the duck back 🦆
             </button>
           </>

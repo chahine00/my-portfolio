@@ -8,23 +8,12 @@ import SocialLinks from '../../components/SocialLinks.tsx'
 import GradientText from '../../components/GradientText.tsx'
 import { asset } from '../../utils/asset.ts'
 import { BACK_AT_TOP_EVENT } from '../../components/BackToTop.tsx'
-import { releaseDuck } from '../../components/duckStore.ts'
+import { callDuckOut, useDuckHome } from '../../components/duckStore.ts'
+import DuckSprite from '../../components/DuckSprite.tsx'
 
 // After the "back to top" button brings you up, the drawing plays on its own and stays this long
 // (in milliseconds; it takes about 1.6s to draw) before fading out.
 const SHOW_AFTER_BACK_TO_TOP_MS = 4000
-
-// The rubber duck (RubberDuck.tsx) pops out of the "<Welcome />" bubble once it has typed its word
-// (the last letter appears ~2.2s into the drawing). If the drawing is closed earlier, the duck still
-// comes out as long as the bubble had already appeared (~1.5s), so a short look counts too.
-const DUCK_OUT_AFTER_MS = 2300
-const DUCK_OUT_IF_SEEN_MS = 1500
-
-// Lets the duck out of the welcome bubble (only the first time; later calls do nothing).
-function releaseDuckFromBubble() {
-  const bubble = document.querySelector('.hero__art-bubble')
-  if (bubble) releaseDuck(bubble.getBoundingClientRect())
-}
 
 // Types each phrase from profile.building, waits, deletes it, then moves to the next one.
 // Returns the text typed so far.
@@ -94,7 +83,17 @@ const ACCENT_LINES = new Set([1, 4, 7])
 // photo turned solid black (the filter). The cut-out sits exactly where the photo is on screen,
 // which differs on wide screens (4:5 photo) and phones (square photo), so there are two copies
 // and the CSS shows one. Without a cut-out photo there is no mask (the white photo hides it anyway).
-function PhotoArt({ cutout }: { cutout?: string }) {
+// duckHome: the rubber duck is at home on the "<Welcome />" box (before it's ever been let out,
+// or after its "×" sent it back). It pops up there once the word is typed and walks a little along
+// the box, but only comes out (RubberDuck.tsx) when hovered or clicked there.
+function PhotoArt({ cutout, duckHome }: { cutout?: string; duckHome: boolean }) {
+  // Pointer down (not click): on phones a touch also restarts the drawing, which would rebuild
+  // the box before a click could land. The duck comes out from where it sits.
+  function letDuckOut(event: React.PointerEvent<SVGGElement> | React.KeyboardEvent<SVGGElement>) {
+    event.stopPropagation()
+    callDuckOut(event.currentTarget.getBoundingClientRect())
+  }
+
   const codeLine = (x: number, y: number, [indent, length]: [number, number], i: number, side: string) => (
     <g key={`${side}${i}`}>
       <path
@@ -153,6 +152,39 @@ function PhotoArt({ cutout }: { cutout?: string }) {
             </tspan>
           ))}
         </text>
+        {duckHome && (
+          <g
+            className="hero__art-duck"
+            role="button"
+            tabIndex={0}
+            aria-label="Rubber duck. Click to let it out."
+            // A mouse hovering it lets it out too (a finger can't hover: it taps).
+            onPointerEnter={(event) => event.pointerType === 'mouse' && letDuckOut(event)}
+            onPointerDown={letDuckOut}
+            onKeyDown={(event) => (event.key === 'Enter' || event.key === ' ') && letDuckOut(event)}
+          >
+            {/* Standing on the top edge of the box, near its right end, facing left. The inner group
+                walks it a little along the box and back (see .hero__art-duck-walk in global.css). */}
+            {/* A small tag above the box that invites a click (it says "tap me!" on touch screens).
+                Clicking it lets the duck out too, so it's easier to hit. */}
+            <g className="hero__art-duck-hint">
+              <rect x={BUBBLE.x + BUBBLE_W / 2 - 34} y={BUBBLE.y - 56} width={68} height={20} rx={10} />
+              <text className="hero__art-duck-hint--mouse" x={BUBBLE.x + BUBBLE_W / 2} y={BUBBLE.y - 42}>
+                click me!
+              </text>
+              <text className="hero__art-duck-hint--touch" x={BUBBLE.x + BUBBLE_W / 2} y={BUBBLE.y - 42}>
+                tap me!
+              </text>
+            </g>
+            <g className="hero__art-duck-walk">
+              {/* A soft ring pulsing out from under the duck: "you can tap this". */}
+              <circle className="hero__art-duck-pulse" cx={BUBBLE.x + BUBBLE_W - 28} cy={BUBBLE.y - 13} r={16} />
+              <g className="hero__art-duck-waddle">
+                <DuckSprite facing="left" x={BUBBLE.x + BUBBLE_W - 44} y={BUBBLE.y - 29} width={32} height={32} />
+              </g>
+            </g>
+          </g>
+        )}
         {/* The cursor steps one character right each time one is typed, then blinks. */}
         <rect
           className="hero__art-cursor"
@@ -181,37 +213,23 @@ function Hero() {
   // True while a mouse is over the hero, so the back-to-top replay doesn't hide the drawing under it.
   const pointerInside = useRef(false)
   const replayTimer = useRef<number | undefined>(undefined)
-  // When the current drawing started, and the timer that lets the duck out of the bubble.
-  const drawingSince = useRef(0)
-  const duckTimer = useRef<number | undefined>(undefined)
+  // The rubber duck is at home on the welcome box (see PhotoArt).
+  const duckHome = useDuckHome()
 
   function startDrawing() {
     window.clearTimeout(hideTimer.current)
     window.clearTimeout(replayTimer.current)
-    window.clearTimeout(duckTimer.current)
-    drawingSince.current = performance.now()
-    duckTimer.current = window.setTimeout(releaseDuckFromBubble, DUCK_OUT_AFTER_MS)
     setRun((n) => n + 1)
     setHovered(true)
     setDrawing(true)
   }
 
   function stopDrawing() {
-    window.clearTimeout(duckTimer.current)
-    // Closed after the bubble showed up: the duck comes out now (the bubble is still fading out).
-    if (drawingSince.current && performance.now() - drawingSince.current >= DUCK_OUT_IF_SEEN_MS) releaseDuckFromBubble()
-    drawingSince.current = 0 // no drawing running now
     setHovered(false)
     hideTimer.current = window.setTimeout(() => setDrawing(false), 300) // after the fade-out
   }
 
-  useEffect(
-    () => () => {
-      window.clearTimeout(hideTimer.current)
-      window.clearTimeout(duckTimer.current)
-    },
-    [],
-  )
+  useEffect(() => () => window.clearTimeout(hideTimer.current), [])
 
   // Arriving at the top via the "back to top" button replays the drawing, then fades it out
   // after a few seconds (unless the mouse is on the hero by then: it then behaves like a hover).
@@ -235,11 +253,22 @@ function Hero() {
   // scrolls (pointer events stop as soon as scrolling starts).
   // (A finger also fires pointer "enter" and "leave", which is why the hover handlers skip touch.)
   useEffect(() => {
+    // A tap on the photo or around it (the drawing's area) plays the whole drawing, like after
+    // "back to top", instead of hiding it again as soon as the finger lifts.
+    let touchOnPhoto = false
     function handleFingerDown(event: TouchEvent) {
-      if (event.touches.length === 1) startDrawing() // the first finger only
+      // A touch on the duck waiting on the welcome box lets it out (PhotoArt); don't restart the drawing.
+      if (event.target instanceof Element && event.target.closest('.hero__art-duck')) return
+      if (event.touches.length !== 1) return // the first finger only
+      touchOnPhoto = event.target instanceof Element && event.target.closest('.hero__visual') !== null
+      startDrawing()
     }
     function handleFingerUp(event: TouchEvent) {
-      if (event.touches.length === 0) stopDrawing() // the last finger lifted
+      if (event.touches.length !== 0) return // wait for the last finger
+      if (touchOnPhoto) {
+        window.clearTimeout(replayTimer.current)
+        replayTimer.current = window.setTimeout(stopDrawing, SHOW_AFTER_BACK_TO_TOP_MS)
+      } else stopDrawing()
     }
     document.addEventListener('touchstart', handleFingerDown, { passive: true })
     document.addEventListener('touchend', handleFingerUp, { passive: true })
@@ -340,7 +369,12 @@ function Hero() {
         // (or a finger is on a phone's screen): mountains draw themselves, then a flag goes up on the peak.
         // Moving away fades it out; coming back redraws it.
         <div className={`hero__visual${hovered ? ' hero__visual--on' : ''}`}>
-          {drawing && <PhotoArt key={run} cutout={profile.photoDark ? asset(profile.photoDark) : undefined} />}
+          {/* An invisible area exactly where the drawing appears (it's bigger than the photo,
+              and reaches past the hero on the right): hovering or touching anywhere in it plays the
+              drawing too, not only the photo. It sits under the drawing, so the duck on the
+              welcome box stays clickable. */}
+          <span className="hero__hit" aria-hidden="true" />
+          {drawing && <PhotoArt key={run} cutout={profile.photoDark ? asset(profile.photoDark) : undefined} duckHome={duckHome} />}
           <div className={`hero__photo${profile.photoDark ? ' hero__photo--dual' : ''}`}>
             <img className="hero__photo-light" src={asset(profile.photo)} alt={profile.name} />
             {profile.photoDark && (
