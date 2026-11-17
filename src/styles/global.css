@@ -4778,6 +4778,95 @@ a {
   opacity: 0.45;
 }
 
+/* Its eyes follow the mouse (HeroRobot.tsx sets --robot-look-x/y, from -1 to 1). "translate"
+   adds to the scan animation's "transform" instead of replacing it. */
+.robot .robot__eyes {
+  translate: calc(var(--robot-look-x, 0) * 1.6px) calc(var(--robot-look-y, 0) * 1px);
+  transition: translate 0.15s steps(2, end);
+}
+
+/* Gestures (to greet you, react to the buttons, or invite you to click it).
+   Wave: the front arm goes up and waves in servo steps, the antenna light blinks. */
+[data-robot='wave'] .robot__arm--front {
+  animation: robot-wave 0.25s steps(1, end) 4;
+}
+
+[data-robot='wave'] .robot__led {
+  animation: robot-led 0.25s steps(1, end) infinite;
+}
+
+@keyframes robot-wave {
+  0% { transform: rotate(-150deg); }
+  50% { transform: rotate(-115deg); }
+}
+
+/* Hop: a crouch, a little jump, a landing squash. */
+[data-robot='hop'] .robot__sprite {
+  animation: robot-hop 0.52s steps(8, end);
+}
+
+@keyframes robot-hop {
+  0% { transform: none; }
+  15% { transform: translateY(4%) scale(1.06, 0.92); }
+  45% { transform: translateY(-28%); }
+  80% { transform: translateY(2%) scale(1.05, 0.94); }
+  100% { transform: none; }
+}
+
+/* Inviting you to click it: a soft pulsing glow around it (HeroRobot.tsx, glow). A light, not a
+   box, so it never hides any text. */
+.robot--glow .robot__hit {
+  animation: robot-glow 1.6s ease-out;
+}
+
+@keyframes robot-glow {
+  0%, 100% { filter: none; }
+  25%, 75% { filter: drop-shadow(0 0 6px var(--accent)) drop-shadow(0 0 2px var(--robot-eye)); }
+  50% { filter: drop-shadow(0 0 2px var(--accent)); }
+}
+
+/* Dance (the mouse is on it, or about to click it): it sways side to side in robot steps, arms
+   pumping up in turn, head bobbing, feet tapping, antenna light blinking. */
+[data-robot='dance'] .robot__sprite {
+  animation: robot-dance-sway 0.6s steps(1, end) infinite;
+}
+
+[data-robot='dance'] .robot__arm--front {
+  animation: robot-dance-arm 0.3s steps(1, end) infinite;
+}
+
+[data-robot='dance'] .robot__arm--back {
+  animation: robot-dance-arm 0.3s steps(1, end) -0.15s infinite;
+}
+
+[data-robot='dance'] .robot__head {
+  animation: robot-tilt 0.3s steps(1, end) infinite alternate;
+}
+
+[data-robot='dance'] .robot__leg--back {
+  animation: robot-step 0.3s steps(1, end) infinite;
+}
+
+[data-robot='dance'] .robot__leg--front {
+  animation: robot-step 0.3s steps(1, end) -0.15s infinite;
+}
+
+[data-robot='dance'] .robot__led {
+  animation: robot-led 0.3s steps(1, end) infinite;
+}
+
+@keyframes robot-dance-sway {
+  0% { transform: translate(-7%, 0) rotate(-7deg); }
+  25% { transform: translate(0, -6%); }
+  50% { transform: translate(7%, 0) rotate(7deg); }
+  75% { transform: translate(0, -6%); }
+}
+
+@keyframes robot-dance-arm {
+  0% { transform: rotate(-150deg); }
+  50% { transform: rotate(-30deg); }
+}
+
 /* Beaming back to the welcome box: squeezed into a thin line of light, then gone. */
 [data-robot='leave'] .robot__flip {
   animation: robot-leave 0.55s steps(6, end) forwards;
@@ -4880,12 +4969,13 @@ a {
   100% { opacity: 0; transform: translate(-50%, -6px); }
 }
 
-/* "Click me!", "Psst!"…: a little call above its head when nobody has clicked it for a while
-   (HeroRobot.tsx, maybeInvite). Two words at most. It pops in, wiggles, and fades away. */
+/* "Click me!", "Psst!"…: a little call above or beside it, rarely, when nobody has clicked it
+   (HeroRobot.tsx, maybeInvite). Two words at most. HeroRobot.tsx sets left/top to a place where it
+   covers no text. It pops in, wiggles, and fades away. */
 .robot__invite {
   position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
+  top: 0;
+  left: 0;
   padding: 3px 9px;
   border: 1px solid var(--accent);
   border-radius: 999px;
@@ -4894,8 +4984,16 @@ a {
   font: 700 12px/1.2 ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   white-space: nowrap;
   opacity: 0;
-  transform: translateX(-50%);
+  transform-origin: 50% 100%;
   pointer-events: none;
+}
+
+.robot__invite[data-place='left'] {
+  transform-origin: 100% 50%;
+}
+
+.robot__invite[data-place='right'] {
+  transform-origin: 0 50%;
 }
 
 .robot__invite.is-on {
@@ -4909,13 +5007,13 @@ a {
 }
 
 @keyframes robot-invite {
-  0% { opacity: 0; transform: translate(-50%, 6px) scale(0.7); }
-  10% { opacity: 1; transform: translate(-50%, 0) scale(1.08); }
-  16% { transform: translate(-50%, 0) scale(1) rotate(-5deg); }
-  22% { transform: translate(-50%, 0) rotate(5deg); }
-  28% { transform: translate(-50%, 0) rotate(0); }
-  85% { opacity: 1; transform: translate(-50%, 0); }
-  100% { opacity: 0; transform: translate(-50%, -6px); }
+  0% { opacity: 0; transform: scale(0.7); }
+  10% { opacity: 1; transform: scale(1.08); }
+  16% { transform: scale(1) rotate(-5deg); }
+  22% { transform: rotate(5deg); }
+  28% { transform: rotate(0); }
+  85% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: scale(0.9); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4972,6 +5070,12 @@ a {
 .robot__bubble[data-side='right'] {
   left: auto;
   right: 0;
+}
+
+/* No room above it (it stands high, right under the navbar): the bubble opens below it. */
+.robot__bubble[data-below] {
+  top: calc(100% + 12px);
+  bottom: auto;
 }
 
 /* "Hide": a small labeled pill (a "×" looked like it only closed the message). It sits on
