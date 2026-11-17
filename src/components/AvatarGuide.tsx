@@ -40,7 +40,9 @@ const DWELL_MS = 400 // how long a section stays in view before it comes out (co
 const SETTLE_MS = 200 // …and the page must have stopped scrolling this long (fast scrolling up and down doesn't call it)
 const REPEAT_MS = 6000 // a section's tip plays again at the earliest this long after it last came out
 const COOLDOWN_MS = 500 // the pause after a tip ends by itself (none when a new section takes over)
-const AWAY_MS = 1500 // how long its spot can be off screen before it leaves
+const AWAY_MS = 2000 // how long its spot can be off screen before it leaves…
+const AWAY_AT_TOP_MS = 300 // …or this long when you're back at the top of the page
+const TAKEOVER_MS = 800 // while it's talking, another section must stay in view this long to send it away
 const LOWEST = 0.75 // the spot's edge must be in the top 75% of the screen (where you're reading)
 const PLACES_TTL = 2000 // spots are measured again after this long (images load, cards reveal…)
 
@@ -75,11 +77,13 @@ function AvatarGuide() {
   const unreadRef = useRef(false)
   const shownRef = useRef<Shown | null>(null)
   const phaseRef = useRef<Phase>('in')
+  const awayRef = useRef(false)
 
   useEffect(() => {
     phaseRef.current = phase
     shownRef.current = shown
-  }, [phase, shown])
+    awayRef.current = away
+  }, [phase, shown, away])
 
   // 1. Watch the scroll and pick the section to talk about.
   useEffect(() => {
@@ -137,6 +141,10 @@ function AvatarGuide() {
         if (wait > 0) return later(wait + 20)
 
         if (shownRef.current) {
+          // A quick scroll up or down past another section doesn't send it away: while it's still
+          // on screen, the new section has to stay in view longer (TAKEOVER_MS).
+          const hold = awayRef.current ? 0 : TAKEOVER_MS - (now - candidate.since)
+          if (hold > 0) return later(hold + 20)
           // Still talking about another section: it leaves now, and this one starts right after.
           if (phaseRef.current !== 'out') setPhase('out')
           return
@@ -199,7 +207,8 @@ function AvatarGuide() {
   //    whole pixels. The spot comes from the layout (edgeOf), so it doesn't move when the post
   //    under the mouse lifts on hover.
   //    When half of the avatar is off screen (under the navbar, or below the bottom), it's
-  //    "away": the reading time waits, and only if it stays away for AWAY_MS does it leave.
+  //    "away": the reading time waits, and only if it stays away for AWAY_MS does it leave
+//    (almost at once, AWAY_AT_TOP_MS, when you're back at the top of the page).
   useEffect(() => {
     if (!shown) return
     const { spot } = shown
@@ -220,6 +229,7 @@ function AvatarGuide() {
         }
         const middle = edge.y - window.scrollY - spot.rise / 2
         const offScreen = middle < navBottom() || middle > window.innerHeight
+        const atTop = window.scrollY < window.innerHeight / 2
         const now = Date.now()
         if (offScreen && !awaySince) {
           awaySince = now
@@ -227,7 +237,7 @@ function AvatarGuide() {
         } else if (!offScreen && awaySince) {
           awaySince = 0
           setAway(false)
-        } else if (awaySince && now - awaySince > AWAY_MS && phaseRef.current !== 'out') {
+        } else if (awaySince && now - awaySince > (atTop ? AWAY_AT_TOP_MS : AWAY_MS) && phaseRef.current !== 'out') {
           unreadRef.current = true
           setPhase('out')
         }
