@@ -16,8 +16,8 @@
 // "Hide me" button that beams it back to the welcome box (a "×" there looked like it only
 // closed the message). It sits on the bubble's side away from the robot, so a tap meant for the
 // robot can't hit it by accident. The bubble closes when the page scrolls; with a mouse, also when
-// the pointer leaves the robot and its bubble; on touch screens (no hover), also when you tap
-// anywhere else, or after a few seconds. Visitors who turned off animations get a robot that stands still on
+// the pointer leaves the robot and its bubble; on touch screens (no hover), also on any tap (except
+// "Hide me"), and by itself after 2 seconds. Visitors who turned off animations get a robot that stands still on
 // your name (and still talks).
 //
 // One requestAnimationFrame loop moves it with a transform, so React doesn't re-draw while it
@@ -42,17 +42,18 @@ type Mode =
 // What it can stand on: your name (on top of the letters), the buttons, the row of social icons.
 const PERCHES = '.hero__name, .hero-actions .button, .hero-actions .social-links'
 
-const STEP_MS = 380 // one servo step: it moves for the first part, then stops
+const STEP_MS = 260 // one servo step: it moves for the first part, then stops (same as robot-step in global.css)
 const MOVE_SHARE = 0.55
-const SPEED = 30 // px per second, on average
+const SPEED = 65 // px per second, on average
 const BOOT_MS = 700
-const TURN_MS = 300
-const SCAN_MS = 1800
-const LAND_MS = 220
+const TURN_MS = 200
+const SCAN_MS = 1100
+const LAND_MS = 160
 const LEAVE_MS = 550
-const TALK_MS = 6000 // touch screens: the bubble closes by itself after this long
+// Touch screens (and keyboard): the bubble closes by itself after this long.
+const READ_MS = 2000
 const HOVER_OUT_MS = 350 // mouse: the bubble closes this long after the pointer leaves it and the robot
-const SCROLL_CLOSE_PX = 12 // the bubble closes once the page has scrolled this far
+const SCROLL_CLOSE_PX = 4 // the bubble closes once the page has scrolled this far
 const STANDBY_AFTER_MS = 25000 // no mouse movement for this long → standby
 const CLOSE_GUARD_MS = 500 // "Hide me" ignores taps this long after it appears (no hiding by a double tap)
 const NEAR_TAP = 44 // touch: a tap this close to it counts as a tap on it (it's small, and moves)
@@ -146,7 +147,8 @@ function Robot() {
       talking: false,
       hovered: false, // a mouse is on the robot or its bubble
       talkScrollY: 0, // where the page was scrolled when the bubble opened
-      talkedAt: 0, // when it last started talking (the "×" appears then)
+      talkedAt: 0, // when it last started talking (the "Hide me" button appears then)
+      noTalkUntil: 0, // touch: the tap that just closed the bubble mustn't open it again
       talkAfterLanding: false, // tapped while flying: it talks once it has landed
       line: -1,
     }
@@ -192,7 +194,7 @@ function Robot() {
       const span = spanOf(to, heroEl)
       const x1 = random(span.left, Math.max(span.left, span.right))
       const distance = Math.hypot(x1 - s.x, span.top - s.y)
-      s.jet = { x0: s.x, y0: s.y, x1, y1: span.top, start: performance.now(), duration: clamp(distance * 3.2, 700, 1500), to }
+      s.jet = { x0: s.x, y0: s.y, x1, y1: span.top, start: performance.now(), duration: clamp(distance * 2.1, 450, 950), to }
       setDir(x1 >= s.x ? 1 : -1)
       setMode('jet')
     }
@@ -202,7 +204,7 @@ function Robot() {
       setMode('turn', TURN_MS)
     }
 
-    function rest(min = 700, max = 1600) {
+    function rest(min = 350, max = 900) {
       setMode('idle', random(min, max))
     }
 
@@ -233,7 +235,7 @@ function Robot() {
       }
       if (roll < 0.74) {
         beep()
-        rest(1000, 1600)
+        rest(600, 1000)
         return
       }
       const others = perches().filter((p) => p !== s.perch)
@@ -367,22 +369,33 @@ function Robot() {
       const inside = event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom
       s.pointer = inside ? { x: event.clientX - r.left, y: event.clientY - r.top } : null
       // Waking up from standby: a quick scan to look around.
-      if (s.mode === 'standby') setMode('scan', 900)
+      if (s.mode === 'standby') setMode('scan', 600)
     }
 
     // A click right next to it (not on it) startles it: "!" and it jets off. With a finger, a tap
     // that close is a tap that just missed it (it's small and moving): it counts as a tap on it.
     function onPointerDown(event: PointerEvent) {
       s.lastPointer = performance.now()
-      if (robot.contains(event.target as Node)) return
-      const r = heroEl.getBoundingClientRect()
-      const distance = Math.hypot(event.clientX - r.left - s.x, event.clientY - r.top - (s.y - size() / 2))
+      const target = event.target instanceof Element ? event.target : null
       if (event.pointerType !== 'mouse') {
-        // Touch: a near miss is a tap on it; any other tap elsewhere closes its bubble.
-        if (distance < NEAR_TAP) talk()
-        else if (s.talking) quiet()
+        // Touch, bubble open: ANY tap closes it (on the bubble, on the robot, anywhere), except
+        // "Hide me" itself. A tap on the robot doesn't open it again right away (noTalkUntil):
+        // the next tap does, with its next sentence.
+        if (s.talking) {
+          if (target?.closest('.robot__home')) return
+          quiet()
+          s.noTalkUntil = performance.now() + 450
+          return
+        }
+        if (target && robot.contains(target)) return // a tap on it: its own click makes it talk
+        // A near miss is a tap on it (it's small, and moves).
+        const r = heroEl.getBoundingClientRect()
+        if (Math.hypot(event.clientX - r.left - s.x, event.clientY - r.top - (s.y - size() / 2)) < NEAR_TAP) talk()
         return
       }
+      if (target && robot.contains(target)) return
+      const r = heroEl.getBoundingClientRect()
+      const distance = Math.hypot(event.clientX - r.left - s.x, event.clientY - r.top - (s.y - size() / 2))
       // Mouse: a click elsewhere closes its bubble too.
       if (s.talking) {
         quiet()
@@ -397,7 +410,7 @@ function Robot() {
     }
 
     function talk() {
-      if (s.mode === 'leave') return
+      if (s.mode === 'leave' || performance.now() < s.noTalkUntil) return
       // Tapped while booting up or flying: it answers once it has landed.
       if (s.mode === 'boot' || s.mode === 'jet') {
         s.talkAfterLanding = true
@@ -417,7 +430,9 @@ function Robot() {
       window.clearTimeout(talkTimer)
       // With a mouse on it, the bubble stays until the pointer leaves (see onPointerLeave);
       // otherwise (touch, keyboard) it closes by itself after a while.
-      if (!s.hovered) talkTimer = window.setTimeout(quiet, TALK_MS)
+      if (!s.hovered) {
+        talkTimer = window.setTimeout(quiet, READ_MS)
+      }
     }
 
     // Closes its speech bubble (it goes back to what it was doing a moment later).
