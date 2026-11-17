@@ -4679,6 +4679,19 @@ a {
   pointer-events: auto;
 }
 
+/* No "×" right as it comes out of the welcome box (until the mouse has left it once, see
+   RubberDuck.tsx), nor while it's popping out, jumping or flying. */
+.duck[data-fresh='true'] .duck__home,
+.duck[data-mode='emerge'] .duck__home,
+.duck[data-mode='crouch'] .duck__home,
+.duck[data-mode='jump'] .duck__home,
+.duck[data-mode='fly'] .duck__home,
+.duck[data-mode='fall'] .duck__home {
+  opacity: 0;
+  transform: scale(0.6);
+  pointer-events: none;
+}
+
 .duck__home:hover,
 .duck__home:focus-visible {
   color: var(--text);

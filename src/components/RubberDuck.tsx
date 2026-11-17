@@ -1180,6 +1180,9 @@ function Duck() {
       aria-label="Rubber duck. Click it to hear what it says."
       // While it talks (after a tap on a phone), the "×" shows too.
       data-talking={bubble ? 'true' : undefined}
+      // Just out of the welcome box (under the mouse that let it out): its "×" stays hidden until
+      // the mouse has moved off it once, so it doesn't pop up the moment the duck appears.
+      data-fresh="true"
       // A mouse on it: it stops walking (so the "×" stays put), and a calm duck starts exploring.
       // It just came out of the box under the mouse, so hovering only counts once the mouse has
       // left it at least once; otherwise it would skip its calm time in the hero.
@@ -1188,9 +1191,10 @@ function Duck() {
         hold(true)
         if (hoverCounts.current) startExploring()
       }}
-      onPointerLeave={() => {
+      onPointerLeave={(event) => {
         hold(false)
         hoverCounts.current = true
+        event.currentTarget.removeAttribute('data-fresh') // the "×" can show from now on
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
