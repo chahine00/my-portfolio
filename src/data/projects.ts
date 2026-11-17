@@ -57,9 +57,9 @@ export const projects: Project[] = [
     team: 'With the AI and frontend teams',
     status: 'In production',
     problem:
-      'boxMind, the AI arm of Allied Engineering Group, builds privacy-first AI for banks, government, telecoms, insurers and healthcare. Each product needed a secure backend to take its AI features into production.',
+      "boxMind, Allied Engineering Group's AI arm, builds privacy-first AI for banks, government, telecoms, insurers and healthcare. Each product needed a secure backend for production.",
     result:
-      "Over almost three years, I built the backend behind many of the company's AI products, turning the AI team's work into secure APIs and live-streamed AI answers for the frontend.",
+      "For almost three years, I built the backend behind many of its AI products, turning the AI team's work into secure APIs and live-streamed answers.",
     tech: ['Python', 'FastAPI', 'Flask', 'Socket.IO', 'MySQL', 'Milvus', 'LLMs & RAG', 'Docker', 'AWS'],
     images: [
       '/projects/boxmind-ai-backend/1.svg',
@@ -144,7 +144,7 @@ The role went beyond code: I was part of the discussions and decisions on which 
     team: 'Freelance, with the client',
     status: 'Live',
     problem:
-      'End-to-end cross-platform app (React Native, Flask, MySQL, AWS) enabling film community networking.',
+      'End-to-end cross-platform app for film community networking.',
     result: 'Monetized with subscriptions & AdMob; featured at the Byblos International Film Festival.',
     tech: ['React Native', 'Flask', 'MySQL', 'AWS', 'Nginx', 'AdMob'],
     images: [
@@ -211,9 +211,9 @@ Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos 
     team: 'With the AI, frontend and education teams',
     status: 'Live',
     problem:
-      'Schools wanted to teach Generative AI and robotics, and to use AI to make learning itself better. They needed a platform that could run courses for whole schools, guide each student with AI, and handle school contracts and pricing.',
+      'Schools wanted to teach Generative AI and robotics, and use AI to improve learning. They needed a platform to run school-wide courses, guide each student with AI, and handle contracts and pricing.',
     result:
-      'An online learning platform where AI guides students through courses, levels and chapters, used by schools under contract. I built its whole backend and designed its database.',
+      'An AI-guided learning platform (courses, levels, chapters) used by schools under contract. I built its entire backend and designed its database.',
     tech: ['Python', 'MySQL', 'LLMs', 'Socket.IO', 'Docker', 'AWS'],
     images: [
       '/projects/boxmind-academy/1.jpg',

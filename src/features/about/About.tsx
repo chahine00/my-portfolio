@@ -13,7 +13,7 @@ const principles = [
   },
   {
     title: 'Adaptable by nature',
-    text: 'Always exploring new frameworks and tools. I believe the ability to learn and adapt matters more than mastering a single stack.',
+    text: 'Now that AI is everywhere, building and achieving matter more than being labeled by a single tool or framework.',
   },
   {
     title: 'Beyond the code',
@@ -37,8 +37,8 @@ function About() {
       </h2>
       {/* A short personal intro: the point behind the statement. */}
       <p className="mindset__lead">
-        In the AI Era, writing code keeps getting easier. I believe what makes the difference now is how you think:
-        seeing the bigger picture and knowing how all the pieces fit together.
+        In the AI era, writing code keeps getting easier. I believe what makes the difference now is how you think:
+        seeing the bigger picture, knowing how all the pieces fit together, and adapting quickly as things change.
       </p>
 
       {/* Three cards side by side: a title and one line each. */}
