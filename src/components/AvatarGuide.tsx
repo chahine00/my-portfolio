@@ -14,6 +14,8 @@
 //   and comes out again for the new section, so it always talks about what you're looking at.
 // - Each section's tip shows once while you're there; once the spot has left the screen, it can
 //   show again when you come back.
+// - Scrolling on inside the same section (a long one like Projects) moves it to a post that's
+//   still on screen there, and it carries on with its sentence.
 // - Scrolling it off screen doesn't send it away at once (on phones you often scroll past, then
 //   back up to it): it waits AWAY_MS, with its reading time paused, and stays if you come back.
 //   If it did leave before you could read it, it comes out again when you return to that spot.
@@ -78,6 +80,9 @@ function AvatarGuide() {
   const shownRef = useRef<Shown | null>(null)
   const phaseRef = useRef<Phase>('in')
   const awayRef = useRef(false)
+  // Where it goes next when it moves to another post in the same section (you scrolled on, but
+  // you're still in that section): it sinks, then rises there and carries on with its sentence.
+  const moveRef = useRef<Placement | null>(null)
 
   useEffect(() => {
     phaseRef.current = phase
@@ -123,6 +128,28 @@ function AvatarGuide() {
 
       if (now < cooldownUntil) return later(cooldownUntil - now + 20)
       const nav = navBottom()
+
+      // It's out, its post has scrolled away, but you're still in the same section (a long one
+      // like Projects): once the page rests, it moves to a post of that section that's on screen.
+      const current = shownRef.current
+      if (current && awayRef.current && phaseRef.current !== 'out' && !moveRef.current) {
+        const section = document.getElementById(current.tip.section)
+        const rect = section?.getBoundingClientRect()
+        const middle = window.innerHeight / 2
+        if (section && rect && rect.top < middle && rect.bottom > middle) {
+          const rest = SETTLE_MS - (now - scrolledAt)
+          if (rest > 0) return later(rest + 20)
+          places.delete(current.tip.section) // measured afresh: the posts may have moved since
+          const spot = spotsFor(current.tip, section).find((s) => fitsOnScreen(s, nav, LOWEST))
+          if (spot) {
+            moveRef.current = spot
+            seen.set(current.tip.section, { anchor: spot.anchor, at: now, left: false })
+            setPhase('out')
+            return
+          }
+          return
+        }
+      }
 
       for (const tip of guideTips) {
         if (seen.has(tip.section)) continue
@@ -192,12 +219,14 @@ function AvatarGuide() {
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onResize)
     window.addEventListener('avatar-guide:done', onDone)
+    window.addEventListener('avatar-guide:away', recheckSoon)
     // A section may already be on screen when the page opens (e.g. a link to /#projects).
     recheckSoon()
     return () => {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onResize)
       window.removeEventListener('avatar-guide:done', onDone)
+      window.removeEventListener('avatar-guide:away', recheckSoon)
       cancelAnimationFrame(frame)
       window.clearTimeout(recheck)
     }
@@ -239,7 +268,11 @@ function AvatarGuide() {
         const now = Date.now()
         if (offScreen && !awaySince) {
           awaySince = now
+          awayRef.current = true
           setAway(true)
+          // Look again now for a post on screen to move to (the scroll that got it here may
+          // already have been checked).
+          window.dispatchEvent(new Event('avatar-guide:away'))
         } else if (!offScreen && awaySince) {
           awaySince = 0
           setAway(false)
@@ -271,6 +304,17 @@ function AvatarGuide() {
       // 4. Gone: free the spot for the next section. Not read? Let it come out there again.
       timer = window.setTimeout(
         () => {
+          // Moving to another post of the same section: it rises there and goes on with the
+          // sentence where it was (no new typing from the start).
+          const next = moveRef.current
+          if (next) {
+            moveRef.current = null
+            unreadRef.current = false
+            setShown({ tip: shown.tip, spot: next })
+            setPhase('in')
+            setAway(false)
+            return
+          }
           if (unreadRef.current) seen.delete(shown.tip.section)
           setShown(null)
           window.dispatchEvent(new Event('avatar-guide:done'))
@@ -306,6 +350,8 @@ function AvatarGuide() {
       >
         <p>
           {tip.text.slice(0, typed)}
+          {/* A blinking cursor while it types. It takes no space, so the bubble's size doesn't change. */}
+          {typed < tip.text.length && <span className="avatar-guide__caret" />}
           {/* The rest is there but invisible, so the bubble has its full size from the start. */}
           <span className="avatar-guide__rest">{tip.text.slice(typed)}</span>
         </p>

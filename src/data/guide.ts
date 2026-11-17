@@ -36,7 +36,7 @@ export const guideTips: GuideTip[] = [
   {
     // Over the third "mindset" card, on its right (the text above it stops before that).
     section: 'about',
-    text: "This is the short version of me: how I think.",
+    text: "This is how I think and work.",
     anchor: '.mindset__item',
     index: 2,
     align: 'right',
@@ -48,7 +48,7 @@ export const guideTips: GuideTip[] = [
   {
     // Over the second project card, on its left, under the empty right side of the title.
     section: 'projects',
-    text: 'Things I actually shipped. Open a card for the full story.',
+    text: 'Real projects I shipped. Click a card for details.',
     anchor: '.project-card',
     index: 1,
     align: 'left',
@@ -58,7 +58,7 @@ export const guideTips: GuideTip[] = [
   {
     // Standing beside the first job, in the empty column right of the timeline.
     section: 'experience',
-    text: "Where I've worked, with what I did at each place.",
+    text: 'My jobs and what I delivered at each one.',
     anchor: '.card.job',
     edge: 'beside',
     bubble: 'above',
@@ -67,7 +67,7 @@ export const guideTips: GuideTip[] = [
   {
     // Over the middle of the stack card.
     section: 'skills',
-    text: 'My everyday stack: the tools I reach for first.',
+    text: 'The tools I use every day.',
     anchor: '.stack',
     align: 'center',
     bubble: 'right',
@@ -76,7 +76,7 @@ export const guideTips: GuideTip[] = [
   {
     // Over the second degree card, on its right.
     section: 'education',
-    text: 'Where I studied, plus the languages I speak.',
+    text: 'My degrees and the languages I speak.',
     anchor: '.edu-degree',
     index: 1,
     align: 'right',
@@ -86,7 +86,7 @@ export const guideTips: GuideTip[] = [
   {
     // Over the post in the right column, on its left (clear of "See all" on the far right).
     section: 'blog',
-    text: 'My latest posts, events and things I learned along the way.',
+    text: 'My latest posts and events.',
     anchor: '.blog-preview__item',
     index: 1,
     align: 'left',
@@ -96,7 +96,7 @@ export const guideTips: GuideTip[] = [
   {
     // Standing beside the contact form, in the empty space on its right.
     section: 'contact',
-    text: 'Got a project or a role in mind? Drop me a message here.',
+    text: 'Want to work together? Message me here.',
     anchor: '.contact-form',
     edge: 'beside',
     bubble: 'above',

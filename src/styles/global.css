@@ -5282,14 +5282,19 @@ a {
   right: calc(100% + var(--guide-w) * 0.25 + 8px);
   bottom: 25%;
   width: max-content; /* its max width is set inline (avatarGuidePlacement.ts picks it) */
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--card);
+  padding: 12px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: 16px;
+  background: var(--bg);
   color: var(--text);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 500;
   line-height: 1.45;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.14);
+  letter-spacing: -0.005em;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent),
+    0 12px 32px -8px rgb(15 23 42 / 0.28),
+    0 2px 6px rgb(15 23 42 / 0.08);
   opacity: 0;
   transform: scale(0.85);
   transform-origin: 100% 70%;
@@ -5310,16 +5315,42 @@ a {
   bottom: 14px;
   width: 12px;
   height: 12px;
-  border-top: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  background: var(--card);
+  border-top: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-right: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-top-right-radius: 3px;
+  background: var(--bg);
   transform: rotate(45deg);
+}
+
+/* The blinking cursor while it types (no width, so the text never shifts). */
+.avatar-guide__caret {
+  position: relative;
+  display: inline-block;
+  width: 0;
+}
+
+.avatar-guide__caret::after {
+  content: '';
+  position: absolute;
+  left: 1px;
+  bottom: -0.15em;
+  width: 2px;
+  height: 1.1em;
+  border-radius: 1px;
+  background: var(--accent);
+  animation: guide-caret 0.9s steps(1) infinite;
+}
+
+@keyframes guide-caret {
+  50% {
+    opacity: 0;
+  }
 }
 
 @media (max-width: 720px) {
   .avatar-guide__bubble {
-    padding: 8px 12px;
-    font-size: 0.85rem;
+    padding: 10px 13px;
+    font-size: 0.88rem;
   }
 }
 
