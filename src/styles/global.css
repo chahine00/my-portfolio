@@ -1412,26 +1412,6 @@ main {
   font-size: 0.85rem;
 }
 
-/* Testimonials */
-.quote {
-  margin: 0;
-}
-
-.quote blockquote {
-  margin: 0 0 16px;
-  font-style: italic;
-}
-
-.quote figcaption {
-  display: flex;
-  flex-direction: column;
-}
-
-.quote figcaption span {
-  color: var(--muted);
-  font-size: 0.875rem;
-}
-
 /* 404 page */
 .not-found {
   text-align: center;
@@ -3820,7 +3800,6 @@ a {
 /* Cards: lift and accent border on hover */
 .project-card,
 .job,
-.quote,
 .challenges .card,
 .metrics li {
   transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
@@ -3828,7 +3807,6 @@ a {
 
 .project-card:hover,
 .job:hover,
-.quote:hover,
 .challenges .card:hover,
 .metrics li:hover {
   transform: translateY(-4px);
@@ -4146,7 +4124,6 @@ a {
   .button:hover:not(:disabled),
   .project-card:hover,
   .job:hover,
-  .quote:hover,
   .challenges .card:hover,
   .metrics li:hover,
   .tags li:hover,
@@ -5119,6 +5096,30 @@ a {
 @keyframes robot-bubble-in {
   from { opacity: 0; transform: translateY(4px) scale(0.96); }
   to { opacity: 1; transform: none; }
+}
+
+/* The footer robot (FooterRobot.tsx): it stands on top of the footer's last line and walks along
+   it. The track is the line's text, so it never walks past the words. */
+.footer__line {
+  /* Room above the text for the robot to stand in, clear of the social icons. */
+  padding-top: calc(var(--robot-size) + 6px);
+}
+
+.footer__track {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.footer-robot {
+  top: auto;
+  bottom: calc(100% - 4px);
+  z-index: 3;
+}
+
+/* Its bubble opens above it, centered on the line's side it stands on (data-side). */
+.footer-robot .robot__bubble {
+  text-align: left;
 }
 
 /* People who turn off animations: a still robot (it still talks). */

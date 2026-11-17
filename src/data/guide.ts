@@ -48,7 +48,7 @@ export const guideTips: GuideTip[] = [
   {
     // Over the second project card, on its left, under the empty right side of the title.
     section: 'projects',
-    text: 'Things I actually shipped. Open any card for the full story and screenshots.',
+    text: 'Things I actually shipped. Open a card for the full story.',
     anchor: '.project-card',
     index: 1,
     align: 'left',
@@ -82,13 +82,6 @@ export const guideTips: GuideTip[] = [
     align: 'right',
     bubble: 'left',
     phone: PHONE_FIRST_POST('.edu-degree'),
-  },
-  {
-    section: 'testimonials',
-    text: "Don't just take my word for it: here's what people I've worked with say.",
-    anchor: '.card.quote',
-    index: 1,
-    align: 'left',
   },
   {
     // Over the post in the right column, on its left (clear of "See all" on the far right).

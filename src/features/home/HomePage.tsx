@@ -9,7 +9,6 @@ import Projects from '../projects/Projects.tsx'
 import Skills from '../skills/Skills.tsx'
 import Education from '../education/Education.tsx'
 import Updates from '../updates/Updates.tsx'
-import Testimonials from '../testimonials/Testimonials.tsx'
 import Contact from '../contact/Contact.tsx'
 import AvatarGuide from '../../components/AvatarGuide.tsx'
 
@@ -39,7 +38,6 @@ function HomePage() {
       <Experience />
       <Skills />
       <Education />
-      <Testimonials />
       {/* The blog sits just before Contact: the latest news, then a way to get in touch. */}
       <Updates />
       <Contact />
