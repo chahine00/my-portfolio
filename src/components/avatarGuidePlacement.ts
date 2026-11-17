@@ -39,6 +39,7 @@ const GAP = 4 // the empty space kept around texts and cards
 const MARGIN = 8 // the space kept from the screen's left and right edges
 const HAND = 0.25 // the waving hand sticks out on the left by this much of the avatar's width
 const BESIDE_GAP = 16 // between a post and the avatar standing beside it
+const PHONE_MAX = 720 // up to this width, a tip's "phone" spot is used (same breakpoint as --guide-w in global.css)
 
 // Same numbers as the bubble's position in global.css ("avatar guide").
 const BUBBLE_GAP = 8 // between the avatar (or its hand) and the bubble
@@ -206,16 +207,18 @@ export function findPlacements(section: HTMLElement, tip: GuideTip): Placement[]
   // The edges to try, best first.
   const edges: { anchor: HTMLElement; edge: 'top' | 'bottom'; from: number; to: number; align: 'left' | 'center' | 'right'; sides: Side[] }[] = []
   const sides: Side[] = ['left', 'above', 'right']
-  const chosen = tip.anchor ? section.querySelectorAll<HTMLElement>(tip.anchor)[tip.index ?? 0] : undefined
+  // Phones have their own spot when the section sets one (the layout is one column there).
+  const spot = tip.phone && window.matchMedia(`(max-width: ${PHONE_MAX}px)`).matches ? tip.phone : tip
+  const chosen = spot.anchor ? section.querySelectorAll<HTMLElement>(spot.anchor)[spot.index ?? 0] : undefined
   if (chosen) {
     const box = pageBox(chosen)
-    const preferred = tip.bubble ? [tip.bubble, ...sides.filter((s) => s !== tip.bubble)] : sides
-    if (tip.edge === 'beside') {
+    const preferred = spot.bubble ? [spot.bubble, ...sides.filter((s) => s !== spot.bubble)] : sides
+    if (spot.edge === 'beside') {
       // Standing in the empty space on the post's right, on the line of its bottom.
       const from = box.r + BESIDE_GAP + width * HAND
       edges.push({ anchor: chosen, edge: 'bottom', from, to: contentRight - width, align: 'left', sides: preferred })
     } else {
-      edges.push({ anchor: chosen, edge: 'top', from: box.l + width * HAND + 12, to: box.r - width - 12, align: tip.align ?? 'right', sides: preferred })
+      edges.push({ anchor: chosen, edge: 'top', from: box.l + width * HAND + 12, to: box.r - width - 12, align: spot.align ?? 'right', sides: preferred })
     }
   }
   // The fallback: above the heading and the first few blocks.

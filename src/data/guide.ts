@@ -9,18 +9,28 @@
 //         'beside' → it stands in the empty space on the post's right, level with its bottom.
 //   align: for 'top', where along the edge: 'left', 'center' or 'right' (the default).
 //   bubble: where its speech bubble goes first: 'left', 'right' or 'above' of it.
-// If that spot would cover any text or part of a post (on a phone, for example), the nearest free
-// spot is used instead, so you can change these without checking every screen size.
+//   phone: the same settings for phones (screens up to 720px wide), where posts are stacked in one
+//     column. There the free space is usually on the right of the short section title, just
+//     above the first post. Without it, phones try the desktop spot.
+// If that spot would cover any text or part of a post, the nearest free spot is used instead (the
+// space above the section's heading), so you can change these without checking every screen size.
 
-export interface GuideTip {
-  section: string
-  text: string
+export interface GuideSpot {
   anchor?: string
   index?: number
   edge?: 'top' | 'beside'
   align?: 'left' | 'center' | 'right'
   bubble?: 'left' | 'right' | 'above'
 }
+
+export interface GuideTip extends GuideSpot {
+  section: string
+  text: string
+  phone?: GuideSpot
+}
+
+// On phones: over the first post, on the right (next to the short title), bubble above it.
+const PHONE_FIRST_POST = (anchor: string): GuideSpot => ({ anchor, index: 0, align: 'right', bubble: 'above' })
 
 export const guideTips: GuideTip[] = [
   {
@@ -31,6 +41,7 @@ export const guideTips: GuideTip[] = [
     index: 2,
     align: 'right',
     bubble: 'above',
+    phone: PHONE_FIRST_POST('.mindset__item'),
   },
   {
     // Over the second project card, on its left, under the empty right side of the title.
@@ -40,6 +51,7 @@ export const guideTips: GuideTip[] = [
     index: 1,
     align: 'left',
     bubble: 'right',
+    phone: PHONE_FIRST_POST('.project-card'),
   },
   {
     // Standing beside the first job, in the empty column right of the timeline.
@@ -48,6 +60,7 @@ export const guideTips: GuideTip[] = [
     anchor: '.card.job',
     edge: 'beside',
     bubble: 'above',
+    phone: PHONE_FIRST_POST('.card.job'),
   },
   {
     // Over the middle of the stack card.
@@ -56,6 +69,7 @@ export const guideTips: GuideTip[] = [
     anchor: '.stack',
     align: 'center',
     bubble: 'right',
+    phone: PHONE_FIRST_POST('.stack'),
   },
   {
     // Over the second degree card, on its right.
@@ -65,6 +79,7 @@ export const guideTips: GuideTip[] = [
     index: 1,
     align: 'right',
     bubble: 'left',
+    phone: PHONE_FIRST_POST('.edu-degree'),
   },
   {
     section: 'testimonials',
@@ -81,6 +96,7 @@ export const guideTips: GuideTip[] = [
     index: 1,
     align: 'left',
     bubble: 'right',
+    phone: PHONE_FIRST_POST('.blog-preview__item'),
   },
   {
     // Standing beside the contact form, in the empty space on its right.
@@ -89,5 +105,6 @@ export const guideTips: GuideTip[] = [
     anchor: '.contact-form',
     edge: 'beside',
     bubble: 'above',
+    phone: PHONE_FIRST_POST('.contact-tile'),
   },
 ]

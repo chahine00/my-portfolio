@@ -14,6 +14,9 @@
 //   and comes out again for the new section, so it always talks about what you're looking at.
 // - Each section's tip shows once while you're there; once the spot has left the screen, it can
 //   show again when you come back.
+// - Scrolling it off screen doesn't send it away at once (on phones you often scroll past, then
+//   back up to it): it waits AWAY_MS, with its reading time paused, and stays if you come back.
+//   If it did leave before you could read it, it comes out again when you return to that spot.
 // - It stays about 9 to 11 seconds (longer for longer sentences); clicking it sends it away.
 // - It uses avatar-wave.webp: the avatar waving, cut out from "Friendly Waving Chibi Avatar.png"
 //   and cropped to the upper body. It's one picture, so it moves as a whole (rises, tilts, bobs).
@@ -34,6 +37,7 @@ const READ_MS = 4500 // how long it stays once the sentence is typed…
 const READ_PER_LETTER_MS = 55 // …plus this much per letter, so longer sentences stay longer
 const DWELL_MS = 300 // how long you stay on a section before it comes out
 const COOLDOWN_MS = 500 // the pause after a tip ends by itself (none when a new section takes over)
+const AWAY_MS = 1500 // how long its spot can be off screen before it leaves
 const LOWEST = 0.75 // the spot's edge must be in the top 75% of the screen (where you're reading)
 const PLACES_TTL = 2000 // spots are measured again after this long (images load, cards reveal…)
 
@@ -58,8 +62,13 @@ function AvatarGuide() {
   const [shown, setShown] = useState<Shown | null>(null)
   const [phase, setPhase] = useState<Phase>('in')
   const [typed, setTyped] = useState(0)
+  // True while its spot is scrolled off screen (the reading time waits).
+  const [away, setAway] = useState(false)
 
   const rootRef = useRef<HTMLDivElement>(null)
+  // True when it leaves before it was read (scrolled away, or the screen was resized): then the
+  // section isn't counted as shown, and it comes out again there.
+  const unreadRef = useRef(false)
   const shownRef = useRef<Shown | null>(null)
   const phaseRef = useRef<Phase>('in')
 
@@ -93,8 +102,10 @@ function AvatarGuide() {
 
     function check() {
       frame = 0
-      // Sections you scrolled away from can show their tip again next time.
+      // Sections you scrolled away from can show their tip again next time. Not the one that's
+      // out right now: it handles being scrolled away itself (see step 2).
       for (const [section, anchor] of seen) {
+        if (section === shownRef.current?.tip.section) continue
         const rect = anchor.getBoundingClientRect()
         if (rect.bottom < 0 || rect.top > window.innerHeight) seen.delete(section)
       }
@@ -126,9 +137,11 @@ function AvatarGuide() {
         }
         candidate = null
         seen.set(tip.section, spot.anchor)
+        unreadRef.current = false
         setShown({ tip, spot })
         setPhase('in')
         setTyped(0)
+        setAway(false)
         return
       }
       candidate = null
@@ -141,7 +154,10 @@ function AvatarGuide() {
     function onResize() {
       places.clear()
       // Its spot was measured for the old size: let it go, a new one is found after.
-      if (shownRef.current && phaseRef.current !== 'out') setPhase('out')
+      if (shownRef.current && phaseRef.current !== 'out') {
+        unreadRef.current = true
+        setPhase('out')
+      }
       onScroll()
     }
 
@@ -166,13 +182,15 @@ function AvatarGuide() {
     }
   }, [])
 
-  // 2. While it's out, keep it on its spot as the page scrolls, and send it away if the spot
-  //    goes under the navbar or off the bottom of the screen. The spot comes from the layout
+  // 2. While it's out, keep it on its spot as the page scrolls. The spot comes from the layout
   //    (edgeOf), so it doesn't move when the post under the mouse lifts on hover.
+  //    When half of the avatar is off screen (under the navbar, or below the bottom), it's
+  //    "away": the reading time waits, and only if it stays away for AWAY_MS does it leave.
   useEffect(() => {
     if (!shown) return
     const { spot } = shown
     let frame = 0
+    let awaySince = 0 // 0 while it's on screen
     function follow() {
       const root = rootRef.current
       if (root) {
@@ -181,8 +199,19 @@ function AvatarGuide() {
         const y = edge.y - window.scrollY
         root.style.setProperty('--x', `${Math.round(x + spot.dx)}px`)
         root.style.setProperty('--y', `${Math.round(y - spot.rise)}px`)
-        const gone = y - spot.reach < navBottom() || y > window.innerHeight
-        if (gone && phaseRef.current !== 'out') setPhase('out')
+        const middle = y - spot.rise / 2
+        const offScreen = middle < navBottom() || middle > window.innerHeight
+        const now = Date.now()
+        if (offScreen && !awaySince) {
+          awaySince = now
+          setAway(true)
+        } else if (!offScreen && awaySince) {
+          awaySince = 0
+          setAway(false)
+        } else if (awaySince && now - awaySince > AWAY_MS && phaseRef.current !== 'out') {
+          unreadRef.current = true
+          setPhase('out')
+        }
       }
       frame = requestAnimationFrame(follow)
     }
@@ -200,13 +229,14 @@ function AvatarGuide() {
     } else if (phase === 'talk' && typed < text.length) {
       // People who turn off animations get the whole sentence at once.
       timer = window.setTimeout(() => setTyped(reducedMotion() ? text.length : typed + 1), TYPE_MS)
-    } else if (phase === 'talk') {
-      // Reading time grows with the sentence.
+    } else if (phase === 'talk' && !away) {
+      // Reading time grows with the sentence. It starts over when you come back to it.
       timer = window.setTimeout(() => setPhase('out'), READ_MS + text.length * READ_PER_LETTER_MS)
     } else if (phase === 'out') {
-      // 4. Gone: free the spot for the next section.
+      // 4. Gone: free the spot for the next section. Not read? Let it come out there again.
       timer = window.setTimeout(
         () => {
+          if (unreadRef.current) seen.delete(shown.tip.section)
           setShown(null)
           window.dispatchEvent(new Event('avatar-guide:done'))
         },
@@ -214,7 +244,7 @@ function AvatarGuide() {
       )
     }
     return () => window.clearTimeout(timer)
-  }, [shown, phase, typed])
+  }, [shown, phase, typed, away])
 
   if (!shown) return null
 

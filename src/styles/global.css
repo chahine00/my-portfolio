@@ -4841,10 +4841,12 @@ a {
   --guide-h: 150px; /* the most of it that comes out: the head and the top of the chest */
 }
 
+/* Phones: a bit smaller, so it fits in the space beside the short section titles, right on the
+   first post (see "phone" in src/data/guide.ts). Same breakpoint as PHONE_MAX there. */
 @media (max-width: 720px) {
   :root {
-    --guide-w: 80px;
-    --guide-h: 116px;
+    --guide-w: 72px;
+    --guide-h: 104px;
   }
 }
 
