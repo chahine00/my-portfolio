@@ -429,7 +429,9 @@ main {
 
 /* The cut-out photo sits exactly on top of the normal one, hidden. Dark mode always shows it;
    light mode fades it in while the drawing shows, because the normal photo's white background
-   would hide the mountains behind it. On the white page the swap is nearly invisible. */
+   would hide the mountains behind it. On the white page the swap is nearly invisible.
+   (With the avatar both are the same transparent picture, so it's always shown, see below: no
+   swap, which would dim it for a moment mid-fade.) */
 .hero__photo-light,
 .hero__photo-dark {
   transition: opacity 0.4s ease;
@@ -447,6 +449,17 @@ main {
 
 .hero__visual--on .hero__photo--dual .hero__photo-dark {
   opacity: 1;
+}
+
+/* The avatar is the same transparent picture in both: always show it, in every theme, with no fade. */
+.hero__photo--dual .hero__photo-light {
+  opacity: 0;
+  transition: none;
+}
+
+.hero__photo--dual .hero__photo-dark {
+  opacity: 1;
+  transition: none;
 }
 
 /* Hover drawing: a code editor window, drawn in thin lines behind you, then a speech bubble that
@@ -831,9 +844,8 @@ main {
     display: block;
     opacity: 1;
     border-radius: 0;
-    /* A faint rim light that follows the outline (the cut-out's transparent edges): a thin light
-       edge plus a soft indigo halo, so the shoulders read clearly against the dark page. */
-    filter: drop-shadow(0 0 1px rgb(255 255 255 / 0.35)) drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 28%, transparent));
+    /* No filter: the avatar keeps its own colors and brightness. The glow behind it (below) is
+       enough to make the black clothes stand out on the dark page. */
   }
 
   /* A soft accent glow behind the avatar (the glows fade out on their own, no mask needed). */
@@ -858,8 +870,7 @@ main {
   display: block;
   opacity: 1;
   border-radius: 0;
-  /* Rim light, as above. */
-  filter: drop-shadow(0 0 1px rgb(255 255 255 / 0.35)) drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 28%, transparent));
+  /* No filter, as above. */
 }
 
 /* A soft accent glow behind the avatar, as above. */
