@@ -60,17 +60,33 @@ function BackToTop() {
     function release() {
       window.removeEventListener('wheel', ignoreGlide)
       window.removeEventListener('touchmove', ignoreGlide)
-      window.removeEventListener('scroll', releaseAtTop)
-      window.clearTimeout(timer)
+      window.clearTimeout(glideTimer)
     }
-    function releaseAtTop() {
-      if (window.scrollY <= 1) {
+    const glideTimer = window.setTimeout(release, 1500)
+
+    // Separately, watch for the arrival at the top, and tell the hero (it replays its drawing).
+    // This waits longer than the glide guard above: from far down a long page, the smooth trip
+    // up can take more than 1.5 seconds. It stops watching if you scroll back down on the way.
+    let lastY = window.scrollY
+    function stopWatching() {
+      window.removeEventListener('scroll', watchArrival)
+      window.removeEventListener('scrollend', watchArrival)
+      window.clearTimeout(giveUpTimer)
+    }
+    function watchArrival() {
+      const y = window.scrollY
+      if (y <= 2) {
+        stopWatching()
         release()
         window.dispatchEvent(new Event(BACK_AT_TOP_EVENT))
+      } else if (y > lastY + 2) {
+        stopWatching() // the visitor scrolled down again: no replay
       }
+      lastY = y
     }
-    const timer = window.setTimeout(release, 1500)
-    window.addEventListener('scroll', releaseAtTop, { passive: true })
+    const giveUpTimer = window.setTimeout(stopWatching, 6000)
+    window.addEventListener('scroll', watchArrival, { passive: true })
+    window.addEventListener('scrollend', watchArrival, { passive: true })
 
     // Smooth scrolling, unless the visitor turned on "reduce motion" in their system settings.
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches

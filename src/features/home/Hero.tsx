@@ -8,10 +8,23 @@ import SocialLinks from '../../components/SocialLinks.tsx'
 import GradientText from '../../components/GradientText.tsx'
 import { asset } from '../../utils/asset.ts'
 import { BACK_AT_TOP_EVENT } from '../../components/BackToTop.tsx'
+import { releaseDuck } from '../../components/duckStore.ts'
 
 // After the "back to top" button brings you up, the drawing plays on its own and stays this long
 // (in milliseconds; it takes about 1.6s to draw) before fading out.
 const SHOW_AFTER_BACK_TO_TOP_MS = 4000
+
+// The rubber duck (RubberDuck.tsx) pops out of the "<Welcome />" bubble once it has typed its word
+// (the last letter appears ~2.2s into the drawing). If the drawing is closed earlier, the duck still
+// comes out as long as the bubble had already appeared (~1.5s), so a short look counts too.
+const DUCK_OUT_AFTER_MS = 2300
+const DUCK_OUT_IF_SEEN_MS = 1500
+
+// Lets the duck out of the welcome bubble (only the first time; later calls do nothing).
+function releaseDuckFromBubble() {
+  const bubble = document.querySelector('.hero__art-bubble')
+  if (bubble) releaseDuck(bubble.getBoundingClientRect())
+}
 
 // Types each phrase from profile.building, waits, deletes it, then moves to the next one.
 // Returns the text typed so far.
@@ -168,21 +181,37 @@ function Hero() {
   // True while a mouse is over the hero, so the back-to-top replay doesn't hide the drawing under it.
   const pointerInside = useRef(false)
   const replayTimer = useRef<number | undefined>(undefined)
+  // When the current drawing started, and the timer that lets the duck out of the bubble.
+  const drawingSince = useRef(0)
+  const duckTimer = useRef<number | undefined>(undefined)
 
   function startDrawing() {
     window.clearTimeout(hideTimer.current)
     window.clearTimeout(replayTimer.current)
+    window.clearTimeout(duckTimer.current)
+    drawingSince.current = performance.now()
+    duckTimer.current = window.setTimeout(releaseDuckFromBubble, DUCK_OUT_AFTER_MS)
     setRun((n) => n + 1)
     setHovered(true)
     setDrawing(true)
   }
 
   function stopDrawing() {
+    window.clearTimeout(duckTimer.current)
+    // Closed after the bubble showed up: the duck comes out now (the bubble is still fading out).
+    if (drawingSince.current && performance.now() - drawingSince.current >= DUCK_OUT_IF_SEEN_MS) releaseDuckFromBubble()
+    drawingSince.current = 0 // no drawing running now
     setHovered(false)
     hideTimer.current = window.setTimeout(() => setDrawing(false), 300) // after the fade-out
   }
 
-  useEffect(() => () => window.clearTimeout(hideTimer.current), [])
+  useEffect(
+    () => () => {
+      window.clearTimeout(hideTimer.current)
+      window.clearTimeout(duckTimer.current)
+    },
+    [],
+  )
 
   // Arriving at the top via the "back to top" button replays the drawing, then fades it out
   // after a few seconds (unless the mouse is on the hero by then: it then behaves like a hover).
