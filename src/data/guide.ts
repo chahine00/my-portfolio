@@ -36,7 +36,7 @@ export const guideTips: GuideTip[] = [
   {
     // Over the third "mindset" card, on its right (the text above it stops before that).
     section: 'about',
-    text: "Hi, I'm Ali! This is the short version of me: how I think.",
+    text: "This is the short version of me: how I think.",
     anchor: '.mindset__item',
     index: 2,
     align: 'right',
