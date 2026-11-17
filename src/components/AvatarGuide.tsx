@@ -199,7 +199,12 @@ function AvatarGuide() {
       if (!frame) frame = requestAnimationFrame(check)
     }
 
+    // Phones change the screen's height while you scroll (the address bar slides in and out):
+    // that's not a new layout, so only a change of width counts.
+    let lastWidth = window.innerWidth
     function onResize() {
+      if (window.innerWidth === lastWidth) return recheckSoon()
+      lastWidth = window.innerWidth
       places.clear()
       // Its spot was measured for the old size: let it go, a new one is found after.
       if (shownRef.current && phaseRef.current !== 'out') {
