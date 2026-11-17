@@ -46,7 +46,7 @@ function ProjectPage() {
   const paragraphs = project.overview ? project.overview.split(/\n\s*\n/) : []
 
   return (
-    <article className="section project-page">
+    <article className="section project-page page-enter" key={project.slug}>
       {/* Goes back to the home page and scrolls to the Projects section. */}
       <Link to="/#projects" className="back-link">
         <span aria-hidden="true">←</span> All projects

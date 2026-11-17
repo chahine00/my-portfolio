@@ -1,7 +1,7 @@
 // The newest posts on the home page, laid out like a magazine instead of a timeline
 // (so the Blog section doesn't look like the Experience section):
 // the newest post is a big "featured" card with a large photo, the next ones are smaller photo cards beside it.
-// The cards animate in every time you scroll down to them (useReveal's "repeat").
+// The cards fade in once as you scroll down to them (see src/utils/useReveal.ts).
 // The WHOLE card is clickable: the title link is stretched over the card (see .card-link in global.css).
 
 import { Link } from 'react-router'
@@ -15,7 +15,7 @@ interface BlogPreviewProps {
 }
 
 function BlogPreview({ updates }: BlogPreviewProps) {
-  const listRef = useReveal<HTMLDivElement>('.blog-preview__item', updates.map((update) => update.slug).join(), true)
+  const listRef = useReveal<HTMLDivElement>('.blog-preview__item', updates.map((update) => update.slug).join())
 
   return (
     <div className="blog-preview" ref={listRef}>

@@ -4,12 +4,16 @@
 import { projects } from '../../data/projects.ts'
 import ProjectCard from './ProjectCard.tsx'
 import SectionTitle from '../../components/SectionTitle.tsx'
+import { useReveal } from '../../utils/useReveal.ts'
 
 function Projects() {
+  // The cards fade in one after another as you scroll to them (see src/utils/useReveal.ts).
+  const gridRef = useReveal<HTMLDivElement>('.project-card')
+
   return (
     <section id="projects" className="section">
       <SectionTitle label="Projects" title="Things I've" accent="built" />
-      <div className="grid">
+      <div className="grid" ref={gridRef}>
         {/*
           For each project in the list, render a <ProjectCard />.
           project={project} passes the data INTO the card. This is called a "prop".

@@ -101,7 +101,7 @@ function UpdatePost() {
   const paragraphs = post.content.split(/\n\s*\n/)
 
   return (
-    <article className="section post">
+    <article className="section post page-enter" key={post.slug}>
       <Link to="/blog" className="back-link">
         <span aria-hidden="true">←</span> All posts
       </Link>
