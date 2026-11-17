@@ -4839,6 +4839,27 @@ a {
 :root {
   --guide-w: 104px; /* the visible width (about the shoulders) */
   --guide-h: 150px; /* the most of it that comes out: the head and the top of the chest */
+  /* Light theme: the light skin would melt into the white page, so a thin soft outline traces
+     the cutout, with a clearer shadow; and only a short fade at the bottom (a long one looks
+     washed out on white). */
+  --guide-edge: drop-shadow(0 0 0.5px rgb(15 23 42 / 0.6)) drop-shadow(0 0 1.5px rgb(15 23 42 / 0.22));
+  --guide-shadow: drop-shadow(0 6px 12px rgb(15 23 42 / 0.2));
+  --guide-fade: 8px;
+}
+
+/* Dark theme (picked in the OS settings, or with the toggle): no outline needed, a longer fade. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --guide-edge: drop-shadow(0 0 0 transparent);
+    --guide-shadow: drop-shadow(0 6px 10px rgb(0 0 0 / 0.18));
+    --guide-fade: 18px;
+  }
+}
+
+:root[data-theme='dark'] {
+  --guide-edge: drop-shadow(0 0 0 transparent);
+  --guide-shadow: drop-shadow(0 6px 10px rgb(0 0 0 / 0.18));
+  --guide-fade: 18px;
 }
 
 /* Phones: a bit smaller, so it fits in the space beside the short section titles, right on the
@@ -4864,13 +4885,13 @@ a {
 
 .avatar-guide__peek {
   /* Bigger than the avatar on the top and sides (the hand sticks out on the left), so the only
-     cut is at the bottom: the edge it hides behind. The last 18px fade out, so it looks like it
-     comes out from behind something even where there's no visible edge. */
+     cut is at the bottom: the edge it hides behind. The last few pixels fade out (--guide-fade),
+     so it looks like it comes out from behind something even where there's no visible edge. */
   position: absolute;
   inset: -40px -40px 0 -40px;
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to top, transparent, #000 18px);
-  mask-image: linear-gradient(to top, transparent, #000 18px);
+  -webkit-mask-image: linear-gradient(to top, transparent, #000 var(--guide-fade));
+  mask-image: linear-gradient(to top, transparent, #000 var(--guide-fade));
 }
 
 .avatar-guide__body {
@@ -4902,7 +4923,7 @@ a {
   height: auto;
   translate: -50% 0;
   user-select: none;
-  filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.18));
+  filter: var(--guide-edge) var(--guide-shadow);
 }
 
 .avatar-guide[data-phase='in'] .avatar-guide__body {
