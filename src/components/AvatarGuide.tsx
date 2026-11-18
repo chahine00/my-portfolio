@@ -456,68 +456,74 @@ function AvatarGuide() {
   }
 
   return createPortal(
-    <div
-      ref={rootRef}
-      className="avatar-guide"
-      data-phase={phase}
-      data-dock={spot.dock ? '' : undefined}
-      data-quick={quick ? '' : undefined}
-      data-revealed={revealed ? '' : undefined}
-      style={{ height: spot.rise }}
-    >
-      {/* Read out once, in full, by screen readers (the letter-by-letter text is hidden from them). */}
-      <span className="sr-only" aria-live="polite">
-        {talking ? tip.text : ''}
-      </span>
-
+    // A layer as wide as the screen that cuts off whatever sticks out past its right edge. Without
+    // it, the guide's picture box (wider than the avatar, for the waving hand) could reach past the
+    // screen's edge near the right, which made the page wider than the screen: phones then zoomed
+    // the whole page out to fit, and the bottom tab bar looked shrunk until the guide left.
+    <div className="avatar-guide-layer">
       <div
-        className="avatar-guide__bubble"
-        data-side={spot.side}
-        style={{ maxWidth: spot.bubbleWidth }}
-        onClick={tapGuide}
+        ref={rootRef}
+        className="avatar-guide"
+        data-phase={phase}
+        data-dock={spot.dock ? '' : undefined}
+        data-quick={quick ? '' : undefined}
+        data-revealed={revealed ? '' : undefined}
+        style={{ height: spot.rise }}
       >
-        {/* Closes it for this section; twice, and it's off until a reload (guideStore.ts). */}
-        <button
-          type="button"
-          className="avatar-guide__close"
-          aria-label="Close the guide"
-          title="Close"
-          tabIndex={talking ? 0 : -1}
-          onClick={(event) => {
-            event.stopPropagation() // not a tap on the bubble
-            hide()
-            guideClosed()
-          }}
-        >
-          <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">
-            <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
-        </button>
-        <p aria-hidden="true">
-          {tip.text.slice(0, typed)}
-          {/* A blinking cursor while it types. It takes no space, so the bubble's size doesn't change. */}
-          {typed < tip.text.length && <span className="avatar-guide__caret" />}
-          {/* The rest is there but invisible, so the bubble has its full size from the start. */}
-          <span className="avatar-guide__rest">{tip.text.slice(typed)}</span>
-        </p>
-      </div>
+        {/* Read out once, in full, by screen readers (the letter-by-letter text is hidden from them). */}
+        <span className="sr-only" aria-live="polite">
+          {talking ? tip.text : ''}
+        </span>
 
-      {/* Only the bottom of this box cuts the picture: that's the edge it rises from. */}
-      <div className="avatar-guide__peek">
-        <button
-          type="button"
-          className="avatar-guide__body"
-          aria-label="Hide the guide"
-          tabIndex={talking ? 0 : -1}
-          // Mouse: a click sends it away. Phones: the first tap shows the ×, like a tap on the bubble.
-          onClick={() => (canHover() ? hide() : tapGuide())}
+        <div
+          className="avatar-guide__bubble"
+          data-side={spot.side}
+          style={{ maxWidth: spot.bubbleWidth }}
+          onClick={tapGuide}
         >
-          {tip.by === 'robot' ? (
-            <RobotSprite className="avatar-guide__robot" />
-          ) : (
-            <img src={asset(POSE_SRC[tip.pose ?? 'wave'])} alt="" draggable={false} />
-          )}
-        </button>
+          {/* Closes it for this section; twice, and it's off until a reload (guideStore.ts). */}
+          <button
+            type="button"
+            className="avatar-guide__close"
+            aria-label="Close the guide"
+            title="Close"
+            tabIndex={talking ? 0 : -1}
+            onClick={(event) => {
+              event.stopPropagation() // not a tap on the bubble
+              hide()
+              guideClosed()
+            }}
+          >
+            <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">
+              <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </button>
+          <p aria-hidden="true">
+            {tip.text.slice(0, typed)}
+            {/* A blinking cursor while it types. It takes no space, so the bubble's size doesn't change. */}
+            {typed < tip.text.length && <span className="avatar-guide__caret" />}
+            {/* The rest is there but invisible, so the bubble has its full size from the start. */}
+            <span className="avatar-guide__rest">{tip.text.slice(typed)}</span>
+          </p>
+        </div>
+
+        {/* Only the bottom of this box cuts the picture: that's the edge it rises from. */}
+        <div className="avatar-guide__peek">
+          <button
+            type="button"
+            className="avatar-guide__body"
+            aria-label="Hide the guide"
+            tabIndex={talking ? 0 : -1}
+            // Mouse: a click sends it away. Phones: the first tap shows the ×, like a tap on the bubble.
+            onClick={() => (canHover() ? hide() : tapGuide())}
+          >
+            {tip.by === 'robot' ? (
+              <RobotSprite className="avatar-guide__robot" />
+            ) : (
+              <img src={asset(POSE_SRC[tip.pose ?? 'wave'])} alt="" draggable={false} />
+            )}
+          </button>
+        </div>
       </div>
     </div>,
     document.body,

@@ -5523,6 +5523,22 @@ a {
   }
 }
 
+/* Holds the guide (AvatarGuide.tsx): at the page's top-left like before, so the guide keeps its
+   page coordinates, as wide as the screen, and no height. "clip" cuts off only sideways: nothing
+   the guide shows can make the page wider than the screen (phones would zoom the whole page out to
+   fit, shrinking the bottom tab bar). Up and down it shows everything. The corner spot (data-dock)
+   is fixed to the screen, so it isn't affected. */
+.avatar-guide-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 14;
+  width: 100%;
+  height: 0;
+  overflow-x: clip;
+  pointer-events: none;
+}
+
 .avatar-guide {
   /* In page coordinates (it's on <body>), so it scrolls with the page by itself, without shaking. */
   position: absolute;
