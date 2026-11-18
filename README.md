@@ -18,19 +18,23 @@ While `npm run dev` is running, saving a file updates the browser right away.
 
 ```
 index.html                  The single HTML page. It has an empty <div id="root">.
+public/                     Files served as they are: photos, logos, the CV, icons.
+scripts/make-thumbs.sh      Makes the small card photos (run it after adding photos).
+apps-script/contact-form.gs The Google Apps Script that emails contact-form messages.
 src/
   main.tsx                  Entry point: puts <App /> inside #root.
-  app/App.tsx               Puts all the sections together in order.
-  components/               Pieces shared by the whole page (Navbar, Footer).
-  features/                 One folder per page section:
-    home/Hero.tsx
-    about/About.tsx
-    projects/Projects.tsx   The list of projects...
-    projects/ProjectCard.tsx  ...and the card used for each one.
-    skills/Skills.tsx
-    contact/Contact.tsx     The contact form (uses state).
-  data/projects.ts          Your project list (plain data, no JSX).
-  services/api.ts           Code that talks to a server.
+  app/App.tsx               The pages and their addresses (routes).
+  components/               Pieces shared by the whole site (Navbar, Footer, Icon,
+                            the avatar guide, the robots, the photo gallery…).
+  features/                 One folder per section or page:
+    home/                   The home page and its top part (Hero).
+    about/, experience/, skills/, education/, contact/
+    projects/               The project list, its cards, and each project's page.
+    updates/                The blog: preview on the home page, list page, post page.
+    not-found/              The "page not found" page.
+  data/                     The content (projects, jobs, posts, guide tips…): plain data, no JSX.
+  services/api.ts           Code that talks to a server (sends the contact form).
+  utils/                    Small helpers (public file paths, reveal-on-scroll).
   styles/global.css         All the styles.
 ```
 
@@ -55,13 +59,8 @@ Try these yourself, using the existing files as examples:
 
 1. **Easy:** Write your real introduction in `About.tsx` and add your own skills in `Skills.tsx`.
 2. **Easy:** Add a real project to `data/projects.ts` with a `liveUrl`. Check that the "Live demo" link shows up.
-3. **Medium:** Add an `image?: string` property to the `Project` interface and show it in `ProjectCard.tsx`
-   only when it exists (look at how `githubUrl` is handled).
-4. **Medium:** Create a new section, for example `features/experience/Experience.tsx`, add it to `App.tsx`,
-   and add a link to it in the `links` array in `Navbar.tsx`.
-5. **Medium:** Move the skills array into `data/skills.ts` (like `projects.ts`) and import it in `Skills.tsx`.
-6. **Harder:** Make a reusable `<Section id="..." title="...">` component in `components/` that uses the
+3. **Medium:** Move the skills array into `data/skills.ts` (like `projects.ts`) and import it in `Skills.tsx`.
+4. **Harder:** Make a reusable `<Section id="..." title="...">` component in `components/` that uses the
    `children` prop, then use it in every section to remove the repeated `<section>` + `<h2>` code.
-7. **Harder:** In `Projects.tsx`, add buttons for each technology (React, Node.js…) and use `useState` to
+5. **Harder:** In `Projects.tsx`, add buttons for each technology (React, Node.js…) and use `useState` to
    show only the projects that use the selected technology. Hint: `projects.filter(...)`.
-8. **Harder:** Add a dark/light mode toggle button in the Navbar using `useState`.

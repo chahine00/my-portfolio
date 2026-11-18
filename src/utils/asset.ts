@@ -1,6 +1,6 @@
-// Turns a path to a file in /public (like '/photo.jpg') into a path that works wherever
+// Turns a path to a file in /public (like '/avatar.webp') into a path that works wherever
 // the site is hosted. On GitHub Pages the site lives in a sub-folder
-// (chahine00.github.io/my-portfolio/), so '/photo.jpg' alone would point to the wrong place.
+// (chahine00.github.io/my-portfolio/), so '/avatar.webp' alone would point to the wrong place.
 // import.meta.env.BASE_URL is that sub-folder ('/my-portfolio/'), set by "base" in vite.config.ts.
 
 export function asset(path: string) {

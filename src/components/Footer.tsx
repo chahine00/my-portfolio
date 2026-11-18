@@ -13,7 +13,7 @@ function Footer() {
       <SocialLinks />
       {/* {year} inserts the value of the "year" variable into the text. */}
       {/* The last line, with a tiny robot patrolling on top of it (FooterRobot.tsx). */}
-      <p className="footer__line">
+      <div className="footer__line">
         <span className="footer__track">
           <FooterRobot />
           © {year} Ali Chahine · Built with React &amp; TypeScript · Hosted on AWS ·{' '}
@@ -21,7 +21,7 @@ function Footer() {
             View source
           </a>
         </span>
-      </p>
+      </div>
     </footer>
   )
 }

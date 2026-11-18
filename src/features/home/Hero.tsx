@@ -420,42 +420,21 @@ function Hero() {
         </div>
       </div>
 
-      {/* The photo blends into the page: its left edge (its bottom edge on phones) fades into the
-          background, and the text overlaps that faded part, so text and photo read as one piece.
-          In dark mode the CSS swaps in the cut-out photo (photoDark) and hides the normal one. */}
+      {/* The avatar, on a transparent background, so it suits light and dark mode as it is. */}
       {profile.photo && (
-        // Behind the photo: a line drawing (see PhotoArt above) that plays while the hero is hovered
-        // (or a finger is on a phone's screen): mountains draw themselves, then a flag goes up on the peak.
-        // Moving away fades it out; coming back redraws it.
+        // Behind it: a line drawing (see PhotoArt above) that plays while the hero is hovered (or a
+        // finger is on a phone's screen). Moving away fades it out; coming back redraws it.
         <div className={`hero__visual${hovered ? ' hero__visual--on' : ''}`}>
           {/* An invisible area exactly where the drawing appears (it's bigger than the photo,
               and reaches past the hero on the right): hovering or touching anywhere in it plays the
               drawing too, not only the photo. It sits under the drawing, so the robot on the
               welcome box stays clickable. */}
           <span className="hero__hit" aria-hidden="true" />
-          {drawing && <PhotoArt key={run} cutout={profile.photoDark ? asset(profile.photoDark) : undefined} robotHome={robotHome} robotDismissed={robotDismissed} />}
-          <div className={`hero__photo${profile.photoDark ? ' hero__photo--dual' : ''}`}>
+          {drawing && <PhotoArt key={run} cutout={asset(profile.photo)} robotHome={robotHome} robotDismissed={robotDismissed} />}
+          <div className="hero__photo">
             {/* The first big picture on the page: "high" priority makes the browser fetch it before
                 anything less important, and width/height reserve its space so nothing jumps. */}
-            <img
-              className="hero__photo-light"
-              src={asset(profile.photo)}
-              alt={profile.name}
-              width={1024}
-              height={1024}
-              fetchPriority="high"
-            />
-            {profile.photoDark && (
-              <img
-                className="hero__photo-dark"
-                src={asset(profile.photoDark)}
-                alt=""
-                aria-hidden="true"
-                width={1024}
-                height={1024}
-                fetchPriority="high"
-              />
-            )}
+            <img src={asset(profile.photo)} alt={profile.name} width={1024} height={1024} fetchPriority="high" />
           </div>
         </div>
       )}

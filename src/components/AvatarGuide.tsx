@@ -16,8 +16,7 @@
 //   still on screen there, and it carries on with its sentence.
 // - Each section's tip shows once while you're there; after you leave, it can show again when
 //   you come back.
-// - It uses avatar-wave.webp: the avatar waving, cut out from "Friendly Waving Chibi Avatar.png"
-//   and cropped to the upper body. It's one picture, so it moves as a whole (rises, tilts, bobs).
+// - It uses avatar-wave.webp: the avatar waving, cropped to the upper body. It's one picture, so it moves as a whole (rises, tilts, bobs).
 //   The animations are in global.css under "avatar guide".
 
 import { useEffect, useRef, useState } from 'react'

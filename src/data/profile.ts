@@ -6,14 +6,10 @@ export const profile = {
   role: 'Software Engineer',
   location: 'Beirut, Lebanon',
   availability: 'Open for opportunities', // set to '' to hide it
-  // Your photo in /public, e.g. '/photo.jpg'. Until you add one, your initials are shown.
-  // Now your 3D avatar, already on a transparent background, so it suits light AND dark mode.
-  // WebP (77 KB instead of the 670 KB PNG it was made from, same quality), so it loads fast.
+  // Your picture in /public: the 3D avatar, on a transparent background so it suits light AND
+  // dark mode. WebP (77 KB instead of the 670 KB PNG it was made from), so it loads fast. Its
+  // outline also cuts your silhouette out of the welcome drawing, so the drawing stays behind you.
   photo: '/avatar.webp',
-  // The same picture with its background removed (transparent), shown in dark mode, because a
-  // white background looks like a grey block on the dark page. It also cuts your silhouette out
-  // of the welcome drawing, so the drawing stays behind you. '' = use "photo" in both.
-  photoDark: '/avatar.webp',
   // Typed out one by one under your name, like code being written. Keep each one short.
   building: [
     'secure APIs & databases',

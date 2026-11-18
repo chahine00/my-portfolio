@@ -422,44 +422,8 @@ main {
 .hero__photo img {
   width: 100%;
   height: 100%;
-  border-radius: 28px;
   object-fit: cover;
   object-position: center 30%;
-}
-
-/* The cut-out photo sits exactly on top of the normal one, hidden. Dark mode always shows it;
-   light mode fades it in while the drawing shows, because the normal photo's white background
-   would hide the mountains behind it. On the white page the swap is nearly invisible.
-   (With the avatar both are the same transparent picture, so it's always shown, see below: no
-   swap, which would dim it for a moment mid-fade.) */
-.hero__photo-light,
-.hero__photo-dark {
-  transition: opacity 0.4s ease;
-}
-
-.hero__photo-dark {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-}
-
-.hero__visual--on .hero__photo--dual .hero__photo-light {
-  opacity: 0;
-}
-
-.hero__visual--on .hero__photo--dual .hero__photo-dark {
-  opacity: 1;
-}
-
-/* The avatar is the same transparent picture in both: always show it, in every theme, with no fade. */
-.hero__photo--dual .hero__photo-light {
-  opacity: 0;
-  transition: none;
-}
-
-.hero__photo--dual .hero__photo-dark {
-  opacity: 1;
-  transition: none;
 }
 
 /* Hover drawing: a code editor window, drawn in thin lines behind you, then a speech bubble that
@@ -825,68 +789,21 @@ main {
     display: inline;
   }
 
-  /* Phones, light mode: the cut-out (no white box) instead of the normal photo, so nothing but you
-     sits on the tinted page. The normal photo stays in place but invisible, so screen readers still
-     get its alt text. Dark mode has its own rules below, which win. */
-  .hero__visual .hero__photo--dual .hero__photo-light {
-    opacity: 0;
-  }
-
-  .hero__visual .hero__photo--dual .hero__photo-dark {
-    opacity: 1;
-    border-radius: 0;
-  }
-
 }
 
-/* Dark mode photo: the normal photo has a white background, which turns into a grey haze on the
-   dark page. So dark mode shows the cut-out instead (when there is one: .hero__photo--dual), on a soft accent glow.
-   Written twice: once for "computer is dark", once for "picked dark with the toggle". */
+/* Dark mode: a soft accent glow behind the avatar. Two glows: one behind the head, and a wider
+   one behind the body, so the black t-shirt and jeans have something lit to stand against
+   instead of melting into the dark page. Written twice: once for "computer is dark", once for
+   "picked dark with the toggle". */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .hero__photo--dual::after {
-    display: none;
-  }
-
-  :root:not([data-theme='light']) .hero__photo--dual .hero__photo-light {
-    display: none;
-  }
-
-  :root:not([data-theme='light']) .hero__photo--dual .hero__photo-dark {
-    display: block;
-    opacity: 1;
-    border-radius: 0;
-    /* No filter: the avatar keeps its own colors and brightness. The glow behind it (below) is
-       enough to make the black clothes stand out on the dark page. */
-  }
-
-  /* A soft accent glow behind the avatar (the glows fade out on their own, no mask needed). */
-  :root:not([data-theme='light']) .hero__photo--dual {
-    /* Two glows: one behind the head, and a wider one behind the body, so the black t-shirt and
-       jeans have something lit to stand against instead of melting into the dark page. */
+  :root:not([data-theme='light']) .hero__photo {
     background:
       radial-gradient(ellipse 45% 30% at 50% 24%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%),
       radial-gradient(ellipse 60% 45% at 50% 62%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 75%);
   }
 }
 
-:root[data-theme='dark'] .hero__photo--dual::after {
-  display: none;
-}
-
-:root[data-theme='dark'] .hero__photo--dual .hero__photo-light {
-  display: none;
-}
-
-:root[data-theme='dark'] .hero__photo--dual .hero__photo-dark {
-  display: block;
-  opacity: 1;
-  border-radius: 0;
-  /* No filter, as above. */
-}
-
-/* A soft accent glow behind the avatar, as above. */
-:root[data-theme='dark'] .hero__photo--dual {
-  /* Two glows: behind the head and behind the body, as above. */
+:root[data-theme='dark'] .hero__photo {
   background:
     radial-gradient(ellipse 45% 30% at 50% 24%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%),
     radial-gradient(ellipse 60% 45% at 50% 62%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 75%);
@@ -5190,6 +5107,7 @@ a {
 /* The footer robot (FooterRobot.tsx): it stands on top of the footer's last line and walks along
    it. The track is the line's text, so it never walks past the words. */
 .footer__line {
+  margin: 1em 0; /* the spacing it had as a paragraph */
   /* Room above the text for the robot to stand in, clear of the social icons. */
   padding-top: calc(var(--robot-size) + 6px);
 }
