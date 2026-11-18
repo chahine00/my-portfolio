@@ -19,6 +19,8 @@ function HomePage() {
   const { hash, key, state } = useLocation()
   // Set by the navbar's Home link: the welcome drawing plays once the page is at the top.
   const replayWelcome = (state as { replayWelcome?: boolean } | null)?.replayWelcome === true
+  // Set by a project page's "All projects" links: the project whose card to come back to.
+  const returnToProject = (state as { returnToProject?: string } | null)?.returnToProject
 
   // When the URL has a #section (for example coming back from /blog to /#skills),
   // scroll to that section once the page is on screen.
@@ -30,9 +32,13 @@ function HomePage() {
       window.scrollTo(0, 0)
       if (replayWelcome) window.dispatchEvent(new Event(BACK_AT_TOP_EVENT))
     } else if (hash) {
-      document.getElementById(hash.slice(1))?.scrollIntoView()
+      // Back from a project's page: straight to that project's card (no glide past the sections
+      // above), so you carry on from the project you were looking at.
+      const card = returnToProject && document.querySelector(`[data-project-slug="${CSS.escape(returnToProject)}"]`)
+      if (card) card.scrollIntoView({ block: 'start', behavior: 'instant' })
+      else document.getElementById(hash.slice(1))?.scrollIntoView()
     }
-  }, [hash, key, replayWelcome])
+  }, [hash, key, replayWelcome, returnToProject])
 
   return (
     <>

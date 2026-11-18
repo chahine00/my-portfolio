@@ -7,6 +7,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { filterUpdates, formatDate, readingTime, sortedUpdates } from '../../data/updates.ts'
 import { readListSpot } from './listSpot.ts'
 import Gallery from '../../components/Gallery.tsx'
+import ScrollUpBack from '../../components/ScrollUpBack.tsx'
 
 // Turns one paragraph of a post into what the page shows.
 // Lines starting with "- " become a real bulleted list, so a long point that wraps lines up
@@ -179,6 +180,9 @@ function UpdatePost() {
           <span aria-hidden="true">←</span> All posts
         </button>
       </div>
+
+      {/* Phones, in the middle of the post: the same way back, under the thumb when you scroll up. */}
+      <ScrollUpBack key={post.slug} label="All posts" onClick={goBack} />
     </article>
   )
 }

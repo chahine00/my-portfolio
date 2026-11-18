@@ -2,15 +2,23 @@
 // Every part below only appears if that project has the data for it.
 
 import { useLayoutEffect } from 'react'
-import { Link, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { projects } from '../../data/projects.ts'
 import Gallery from '../../components/Gallery.tsx'
+import ScrollUpBack from '../../components/ScrollUpBack.tsx'
 
 function ProjectPage() {
   // useParams reads the ":slug" part of the URL (see the <Route> in App.tsx).
   const { slug } = useParams()
   const index = projects.findIndex((project) => project.slug === slug)
   const project = projects[index]
+  const navigate = useNavigate()
+
+  // "All projects" (top, bottom, and the button that shows when you scroll up on phones): back to
+  // the Projects section of the home page, at this project's card, so you carry on from here.
+  function goBack() {
+    navigate('/#projects', { state: { returnToProject: slug } })
+  }
 
   // Start at the top whenever you open a project (including via Previous/Next links).
   useLayoutEffect(() => {
@@ -47,10 +55,11 @@ function ProjectPage() {
 
   return (
     <article className="section project-page page-enter" key={project.slug}>
-      {/* Goes back to the home page and scrolls to the Projects section. */}
-      <Link to="/#projects" className="back-link">
+      {/* Back to the home page's Projects section, at this project's card. A button styled like
+          the other back links. */}
+      <button type="button" className="back-link back-button" onClick={goBack}>
         <span aria-hidden="true">←</span> All projects
-      </Link>
+      </button>
 
       <header className="project-page__header">
         {project.context && <p className="eyebrow">{project.context}</p>}
@@ -173,22 +182,31 @@ function ProjectPage() {
 
       {project.note && <p className="project-page__note">{project.note}</p>}
 
-      <nav className="post__nav" aria-label="More projects">
+      {/* Previous project | All projects | Next project (phones: All projects under the other two). */}
+      <nav className="post__nav post__nav--three" aria-label="More projects">
         {previous ? (
-          <Link to={`/projects/${previous.slug}`} title={previous.title}>
+          <Link to={`/projects/${previous.slug}`} className="post__nav-prev" title={previous.title}>
             <span className="post__nav-label"><b aria-hidden="true">←</b> Previous project</span>
             <span className="post__nav-title">{previous.title}</span>
           </Link>
         ) : (
-          <span />
+          <span className="post__nav-prev" />
         )}
-        {next && (
+        <button type="button" className="button button-outline post__nav-all" onClick={goBack}>
+          All projects
+        </button>
+        {next ? (
           <Link to={`/projects/${next.slug}`} className="post__nav-newer" title={next.title}>
             <span className="post__nav-label">Next project <b aria-hidden="true">→</b></span>
             <span className="post__nav-title">{next.title}</span>
           </Link>
+        ) : (
+          <span className="post__nav-newer" />
         )}
       </nav>
+
+      {/* Phones, in the middle of the page: the same way back, under the thumb when you scroll up. */}
+      <ScrollUpBack key={project.slug} label="All projects" onClick={goBack} />
     </article>
   )
 }

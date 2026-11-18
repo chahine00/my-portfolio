@@ -233,7 +233,8 @@ function ProjectCard({ project, slideOffset }: ProjectCardProps) {
   const meta = [project.role, project.period].filter(Boolean).join(' · ')
 
   return (
-    <article className="card project-card card-clickable">
+    // data-project-slug: coming back from a project's page, the home page scrolls to its card.
+    <article className="card project-card card-clickable" data-project-slug={project.slug}>
       {/* ?. means "only if there are images"; an empty list shows no cover. */}
       {project.images?.length ? <CoverBanner images={project.images} slideOffset={slideOffset} pageUrl={pageUrl} /> : null}
 
