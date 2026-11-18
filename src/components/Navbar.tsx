@@ -46,6 +46,9 @@ const links: NavItem[] = [
 ]
 const moreLinks = links.filter((link) => link.more)
 
+// Phones: how far back above the top bar's row of links you scroll before the tab bar hides again.
+const TABBAR_HIDE_MARGIN = 40
+
 // How long the More menu stays open if you don't pick anything, in milliseconds.
 const MENU_CLOSE_AFTER_MS = 5000
 
@@ -160,7 +163,11 @@ function Navbar() {
       // Where the row of links starts on the page (the header sits at the very top of the page).
       const row = linksRowRef.current
       const rowTop = row ? row.getBoundingClientRect().top + window.scrollY : (headerRef.current?.offsetHeight ?? 0)
-      setPastTopBar(window.scrollY > rowTop)
+      // Two lines instead of one: it shows once you're past the row, but only hides again once
+      // you're back well above it. With a single line, momentum scrolling and the phone's address
+      // bar moving could flip it back and forth for a moment, so the tab bar half slid away
+      // (its labels dropped below the screen edge) and came back.
+      setPastTopBar((was) => (was ? window.scrollY > rowTop - TABBAR_HIDE_MARGIN : window.scrollY > rowTop))
     }
     handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })

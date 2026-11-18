@@ -4797,13 +4797,18 @@ a {
     backdrop-filter: blur(14px);
     box-shadow: 0 -4px 16px rgb(0 0 0 / 0.06);
     opacity: 0;
-    transform: translateY(110%);
+    transform: translate3d(0, 110%, 0);
     transition: transform 0.3s ease, opacity 0.3s ease;
+    /* Its own graphics layer, always (translate3d below, not "none"): iPhone Safari otherwise
+       clips a frosted bar fixed to the bottom while its toolbar shrinks or grows during a scroll,
+       cutting the labels off under the icons for a moment. */
+    will-change: transform;
+    backface-visibility: hidden;
   }
 
   .tabbar--visible {
     opacity: 1;
-    transform: none;
+    transform: translate3d(0, 0, 0);
   }
 
   /* Room at the end of the page, so the tab bar never covers the footer. */
