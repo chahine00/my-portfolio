@@ -17,15 +17,9 @@ export const profile = {
     'LLM & RAG features',
     'web apps, end to end'
   ],
-  // The robot's lab (RobotLab.tsx): shown in the hero instead of the avatar every other time a
-  // visitor comes back to the top. Set lines to [] to always show the avatar.
-  lab: {
-    // Typed in the terminal, one after another. Keep each line under ~26 characters (it's small).
-    // A line starting with "✓" turns green once typed.
-    lines: ['$ ali --status', '› backend  APIs · DBs', '› mobile   iOS · Android', '› ai       LLM · RAG', '✓ all systems online'],
-    // The nodes wired to the robot. Six fit best; keep the names short.
-    stack: ['React', 'TypeScript', 'Node.js', 'Python', 'AWS', 'Docker'],
-  },
+  // The night desk (RobotLab.tsx): shown in the hero instead of the avatar every other time a
+  // visitor comes back to the top. Set to false to always show the avatar.
+  lab: true,
 }
 
 // The small numbers in the About section.

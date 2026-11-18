@@ -427,9 +427,9 @@ main {
 }
 
 /* ------------------------------------------------------------------------------------------------
-   Robot lab (RobotLab.tsx): every other time a visitor comes back to the top, the avatar steps
-   aside and the robot takes its place: a terminal typing a status, and the robot floating in the
-   middle of the stack, wired to each technology, with data pulses running along the wires.
+   Night desk (RobotLab.tsx): every other time a visitor comes back to the top, the avatar steps
+   aside and a small night workspace takes its place: a window with the night sky, a laptop typing
+   code, a lamp, a mug of coffee and a plant. No words on it.
    The tiny robot out in the hero keeps playing around it.
    ------------------------------------------------------------------------------------------------ */
 .hero__photo img {
@@ -462,244 +462,239 @@ main {
   }
 }
 
-/* The terminal: dark in both themes (it's a terminal), with a thin accent edge. */
-.lab__terminal {
-  flex: none;
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
-  border-radius: 12px;
-  background: #0b1020;
-  box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent),
-    0 14px 30px -12px rgb(15 23 42 / 0.45);
-  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 0.72rem;
-  line-height: 1.55;
-  color: #c9d1d9;
-}
-
-.lab__bar {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 10px;
-  border-bottom: 1px solid rgb(255 255 255 / 0.08);
-  background: rgb(255 255 255 / 0.04);
-}
-
-.lab__bar span {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #f87171;
-}
-
-.lab__bar span:nth-child(2) {
-  background: #fbbf24;
-}
-
-.lab__bar span:nth-child(3) {
-  background: #4ade80;
-}
-
-.lab__bar em {
-  margin-left: auto;
-  font-style: normal;
-  font-size: 0.65rem;
-  color: #6b7280;
-}
-
-/* Three lines tall: new lines push the old ones up and out, like a real terminal. */
-.lab__lines {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  height: calc(3 * 1.55em);
-  overflow: hidden;
-  /* A margin, not padding: the overflow is cut at the padding's edge, so padding would let half
-     of an old line peek in at the top. */
-  margin: 6px 10px;
-}
-
-.lab__line {
-  margin: 0;
-  white-space: pre;
-}
-
-.lab__line--ok {
-  color: #4ade80;
-}
-
-.lab__caret {
-  display: inline-block;
-  width: 0.55em;
-  height: 1.05em;
-  margin-left: 1px;
-  vertical-align: -0.15em;
-  background: #22d3ee;
-  animation: guide-caret 0.9s steps(1) infinite;
-}
-
-/* The network: the robot in the middle of the stack. */
-.lab__net {
+/* The scene fills the box (the window at the top, the desk at the bottom). */
+.desk {
   flex: 1;
   min-height: 0;
   width: 100%;
   overflow: visible;
 }
 
-.lab__wire {
-  stroke: color-mix(in srgb, var(--accent) 30%, var(--border));
-  stroke-width: 1;
-  stroke-dasharray: 3 4;
-}
-
-/* A short bright dash running from the robot to the node (pathLength is 1: the whole wire). */
-.lab__pulse {
-  stroke: var(--accent-2);
-  stroke-width: 2.2;
+/* Outlines in the accent color, like the robot's drawings; soft fills that suit both themes. */
+.desk__frame,
+.desk__lid,
+.desk__base,
+.desk__pot,
+.desk__cup,
+.desk__handle,
+.desk__arm,
+.desk__shade,
+.desk__lamp-base,
+.desk__top,
+.desk__leg {
+  stroke: color-mix(in srgb, var(--accent) 70%, var(--text));
+  stroke-width: 1.6;
+  stroke-linejoin: round;
   stroke-linecap: round;
-  stroke-dasharray: 0.14 1;
-  stroke-dashoffset: 0.14;
-  animation: lab-pulse 2.7s linear infinite;
 }
 
-@keyframes lab-pulse {
-  0% {
-    stroke-dashoffset: 0.14;
-    opacity: 1;
-  }
-  33% {
-    stroke-dashoffset: -0.9;
-    opacity: 1;
-  }
-  34%,
-  100% {
-    stroke-dashoffset: -0.9;
-    opacity: 0;
-  }
-}
-
-/* Each node lights up as its pulse arrives (its delay is set in RobotLab.tsx). */
-.lab__node rect {
-  fill: var(--bg);
-  stroke: color-mix(in srgb, var(--accent) 35%, var(--border));
-  stroke-width: 1;
-  animation: lab-node 2.7s ease-out infinite;
-  animation-delay: inherit;
-}
-
-.lab__node text {
-  fill: var(--text);
-  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 10.5px;
-  font-weight: 600;
-  text-anchor: middle;
-}
-
-@keyframes lab-node {
-  0% {
-    fill: color-mix(in srgb, var(--accent-2) 22%, var(--bg));
-    stroke: var(--accent-2);
-  }
-  25%,
-  100% {
-    fill: var(--bg);
-    stroke: color-mix(in srgb, var(--accent) 35%, var(--border));
-  }
-}
-
-/* A radar ring growing out of the robot and fading, twice per cycle. */
-.lab__ring {
+.desk__frame {
   fill: none;
-  stroke: var(--accent);
-  stroke-width: 1;
+}
+
+.desk__top,
+.desk__leg {
+  fill: color-mix(in srgb, var(--accent) 16%, var(--bg));
+}
+
+.desk__lid,
+.desk__base {
+  fill: color-mix(in srgb, var(--accent) 22%, var(--bg));
+}
+
+.desk__screen {
+  fill: #0b1020;
+}
+
+.desk__pot {
+  fill: color-mix(in srgb, #f97316 45%, var(--bg));
+}
+
+.desk__leaves path {
+  fill: color-mix(in srgb, #22c55e 55%, var(--bg));
+  stroke: color-mix(in srgb, #16a34a 80%, var(--text));
+  stroke-width: 1.2;
+}
+
+.desk__cup {
+  fill: color-mix(in srgb, var(--accent-2) 30%, var(--bg));
+}
+
+.desk__handle,
+.desk__arm {
+  fill: none;
+}
+
+.desk__arm {
+  stroke-width: 2.4;
+}
+
+.desk__joint {
+  fill: color-mix(in srgb, var(--accent) 70%, var(--text));
+}
+
+.desk__shade,
+.desk__lamp-base {
+  fill: color-mix(in srgb, var(--accent) 45%, var(--bg));
+}
+
+.desk__bulb {
+  fill: #fde68a;
+  filter: drop-shadow(0 0 4px #fde68a);
+}
+
+/* The night sky: the moon, the stars twinkling, and a shooting star now and then. */
+.desk__moon {
+  fill: #fef3c7;
+  filter: drop-shadow(0 0 5px rgb(254 243 199 / 0.6));
+}
+
+.desk__star {
+  fill: #fff;
+  animation: desk-twinkle 3.1s ease-in-out infinite;
+}
+
+@keyframes desk-twinkle {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.desk__shooting {
+  stroke: #fff;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-dasharray: 0.3 1.3;
+  stroke-dashoffset: 0.3;
   opacity: 0;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: lab-ring 3.2s ease-out infinite;
+  animation: desk-shooting 9s ease-in 2s infinite;
 }
 
-.lab__ring--late {
-  animation-delay: 1.6s;
-}
-
-@keyframes lab-ring {
+@keyframes desk-shooting {
   0% {
+    stroke-dashoffset: 0.3;
+    opacity: 1;
+  }
+  8% {
+    stroke-dashoffset: -1;
+    opacity: 1;
+  }
+  9%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The lamp's light flickers very gently; the laptop's glow breathes. */
+.desk__cone {
+  animation: desk-lamp 5s ease-in-out infinite;
+}
+
+@keyframes desk-lamp {
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.desk__glow {
+  animation: desk-glow 3.5s ease-in-out infinite;
+}
+
+@keyframes desk-glow {
+  50% {
     opacity: 0.55;
-    transform: scale(0.55);
+  }
+}
+
+/* The code on the screen: each row "types" from the left (its delay is set in RobotLab.tsx),
+   stays, then they all clear and it starts over. */
+.desk__code {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: desk-code 7s steps(6, end) infinite both;
+}
+
+@keyframes desk-code {
+  0% {
+    transform: scaleX(0);
+    opacity: 1;
+  }
+  10%,
+  80% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  88%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+.desk__bar--1 {
+  fill: #c084fc;
+}
+
+.desk__bar--2 {
+  fill: #22d3ee;
+}
+
+.desk__bar--3 {
+  fill: #fbbf24;
+}
+
+.desk__bar--4 {
+  fill: #4ade80;
+}
+
+.desk__cursor {
+  fill: #22d3ee;
+  animation: guide-caret 0.9s steps(1) infinite;
+}
+
+/* The coffee's steam rises and fades; the plant sways a little. */
+.desk__steam {
+  fill: none;
+  stroke: color-mix(in srgb, var(--text) 45%, transparent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  animation: desk-steam 3s ease-out infinite;
+}
+
+.desk__steam--late {
+  animation-delay: 1.5s;
+}
+
+@keyframes desk-steam {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  30% {
+    opacity: 0.9;
   }
   100% {
     opacity: 0;
-    transform: scale(1.5);
+    transform: translateY(-8px);
   }
 }
 
-/* The robot floats, scans with its eyes, blinks its antenna light; its core pulses. */
-.lab__bot {
-  animation: lab-float 3.2s ease-in-out infinite;
-}
-
-@keyframes lab-float {
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-.lab__robot .robot__shadow,
-.lab__robot .robot__flame,
-.lab__robot .robot__beam {
-  display: none;
-}
-
-.lab__robot .robot__eyes {
-  animation: lab-eyes 4s steps(1) infinite;
-}
-
-@keyframes lab-eyes {
-  0%,
-  100% {
-    transform: none;
-  }
-  25% {
-    transform: translateX(-3px);
-  }
-  50% {
-    transform: translateX(-6px);
-  }
-  75% {
-    transform: translateX(-3px);
-  }
-}
-
-.lab__robot .robot__led {
-  animation: lab-led 1.4s steps(1) infinite;
-}
-
-@keyframes lab-led {
-  50% {
-    opacity: 0.25;
-  }
-}
-
-.lab__robot .robot__core {
+.desk__leaves {
   transform-box: fill-box;
-  transform-origin: center;
-  animation: lab-core 2.7s ease-out infinite;
+  transform-origin: 50% 100%;
+  animation: desk-sway 4.5s ease-in-out infinite alternate;
 }
 
-@keyframes lab-core {
-  0% {
-    fill: var(--accent-2);
-    transform: scale(1.35);
+@keyframes desk-sway {
+  from {
+    transform: rotate(-3deg);
   }
-  30%,
-  100% {
-    transform: none;
+  to {
+    transform: rotate(3deg);
   }
 }
 
-/* The tiny robot at home on the big robot's head (RobotLab.tsx). It pops up, and while it
+/* The tiny robot at home on the desk (RobotLab.tsx). It pops up, and while it
    waits for a click (sent home with "Hide"), a "click me!" tag bobs above it. */
 .lab__kid {
   pointer-events: auto;
@@ -758,45 +753,21 @@ main {
   }
 }
 
-/* Phones: the box is square and smaller, so a smaller terminal. */
-@media (max-width: 720px) {
-  .lab {
-    gap: 4px;
-  }
-
-  .lab__terminal {
-    font-size: 0.62rem;
-    border-radius: 10px;
-  }
-
-  /* No title bar on the small square: more room for the robot. */
-  .lab__bar {
-    display: none;
-  }
-
-  .lab__lines {
-    height: calc(2 * 1.55em);
-    margin: 5px 9px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .lab,
-  .lab__bot,
-  .lab__pulse,
-  .lab__node rect,
-  .lab__ring,
   .lab__kid,
   .lab__kid-tag,
-  .lab__robot .robot__eyes,
-  .lab__robot .robot__led,
-  .lab__robot .robot__core,
-  .lab__caret {
+  .desk__star,
+  .desk__cone,
+  .desk__glow,
+  .desk__code,
+  .desk__cursor,
+  .desk__steam,
+  .desk__leaves {
     animation: none;
   }
 
-  .lab__pulse,
-  .lab__ring {
+  .desk__shooting {
     display: none;
   }
 

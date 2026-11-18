@@ -243,7 +243,7 @@ function PhotoArt({ cutout, robotHome, robotDismissed }: { cutout?: string; robo
   )
 }
 
-// Switches the hero between the avatar and the robot's lab (RobotLab.tsx) when a visitor comes
+// Switches the hero between the avatar and the night desk (RobotLab.tsx) when a visitor comes
 // back to the top: they scrolled down past the hero, stayed away at least AWAY_MS, and scrolled
 // back up to it. Each return switches to the other one. A quick dip down and back up doesn't count.
 const AWAY_MS = 3000
@@ -286,9 +286,9 @@ function Hero() {
   const robotHome = useRobotHome()
   // Sent home with its "×": it then waits on the welcome box for a click (see PhotoArt).
   const robotDismissed = useRobotDismissed()
-  // The avatar, or the robot's lab once a visitor comes back to the top (see useReturnSwap).
-  // While the lab shows, the hover drawing steps aside (the tiny robot out in the hero stays).
-  const lab = useReturnSwap(profile.lab.lines.length > 0)
+  // The avatar, or the night desk once a visitor comes back to the top (see useReturnSwap).
+  // While the desk shows, the hover drawing steps aside (the tiny robot out in the hero stays).
+  const lab = useReturnSwap(profile.lab)
 
   function startDrawing() {
     window.clearTimeout(hideTimer.current)
@@ -451,7 +451,7 @@ function Hero() {
       </div>
 
       {/* The avatar, on a transparent background, so it suits light and dark mode as it is. Every
-          other return to the top, the robot's lab takes its place (RobotLab.tsx). */}
+          other return to the top, the night desk takes its place (RobotLab.tsx). */}
       {profile.photo && (
         // Behind it: a line drawing (see PhotoArt above) that plays while the hero is hovered (or a
         // finger is on a phone's screen). Moving away fades it out; coming back redraws it.
