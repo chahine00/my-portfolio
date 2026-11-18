@@ -6,12 +6,19 @@
 // - it waves when you scroll down to the footer
 // - it dances while the mouse is on it
 // - clicked or tapped, it says a footer joke in a speech bubble, which closes by itself
+// - its jokes open on hover too (rest the mouse on it a moment), and on phones as soon as a
+//   finger presses it; a press that turns into a scroll doesn't count
+// - once per visit, soon after the footer shows, it invites you to click it (a glow and a few
+//   words in a small pill), unless a robot was already clicked this session (robotMet). The pill only shows where it covers no text and
+//   stays inside the footer and on screen; no room where it stands → it walks to a spot on the line
+//   where there is, and if there's none, it only glows
 // - it stops moving while the footer is off screen (saves battery)
 // - visitors who turned off animations get a robot standing still at the end of the line
 // One requestAnimationFrame loop moves it with a transform; only the speech bubble uses React state.
 
 import { useEffect, useRef, useState } from 'react'
 import RobotSprite from './RobotSprite.tsx'
+import { rememberRobotMet, robotMet } from './robotStore.ts'
 
 type Mode = 'idle' | 'walk' | 'turn' | 'scan' | 'wave' | 'hop' | 'dance'
 
@@ -31,7 +38,7 @@ const MOVE_SHARE = 0.55
 const SPEED = 34 // px per second, on average
 const TALK_MS = 3500 // the bubble closes by itself after this long
 const DURATIONS: Record<Mode, [number, number]> = {
-  idle: [900, 2200],
+  idle: [600, 1400],
   walk: [0, 0], // until it reaches its target
   turn: [200, 200],
   scan: [1100, 1100],
@@ -40,19 +47,34 @@ const DURATIONS: Record<Mode, [number, number]> = {
   dance: [0, 0], // while the mouse is on it
 }
 
+// Inviting you to click it (sayInvite): playful hints, not orders. The first one comes first.
+const INVITES = ['End of page. Joke?', 'joke.exe is ready', 'I guard the jokes', 'Insert click to continue', 'Beep? (that’s “bye”)']
+const TOUCH_INVITES = ['End of page. Joke?', 'joke.exe is ready', 'I guard the jokes', 'Insert tap to continue', 'Beep? (that’s “bye”)']
+const INVITE_GAPS = [1800] // the wait before each invite while the footer is in view: just one
+const HOVER_TALK_MS = 450 // mouse: resting on it this long opens a joke
+const PRESS_TALK_MS = 150 // touch: a press this long (that isn't a scroll) opens a joke
+const PRESS_CLICK_GUARD_MS = 1500 // …and the click that follows the press doesn't open another
+const INVITE_SHOW_MS = 3200 // how long the words stay (same as robot-invite in global.css)
+const GLOW_MS = 1600 // same as robot-glow in global.css
+
 const between = ([min, max]: [number, number]) => min + Math.random() * (max - min)
+const pick = <T,>(list: T[]) => list[Math.floor(Math.random() * list.length)]
 
 function FooterRobot() {
   const rootRef = useRef<HTMLDivElement>(null)
   const [line, setLine] = useState<string | null>(null)
   const [side, setSide] = useState<'left' | 'right'>('left')
   const talkRef = useRef<() => void>(() => {})
+  const clickRef = useRef<() => void>(() => {})
+  const inviteRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     const root = rootRef.current
     const track = root?.parentElement
     if (!root || !track) return
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const touch = window.matchMedia('(hover: none), (any-pointer: coarse)').matches
+    const footer = track.closest('footer') ?? track
 
     let x = 0
     let dir = 1
@@ -66,6 +88,16 @@ function FooterRobot() {
     let lastLine = ''
     let talkTimer = 0
     let talking = false
+    // Invites (sayInvite).
+    let tapped = robotMet() // it (or the hero robot) was clicked: no more invites
+    let hoverTimer = 0
+    let pressTimer = 0
+    let pressTalkAt = 0
+    let invites = 0 // how many it showed
+    let nextInvite = Infinity // when the next one is due (set when the footer comes into view)
+    let inviteUntil = 0 // the words are showing until then (it holds still)
+    let wordsAfterWalk = false // it's walking to a spot where the words fit
+    let inviteTimer = 0
 
     const size = () => root.offsetWidth
     const room = () => Math.max(0, track.clientWidth - size())
@@ -101,6 +133,120 @@ function FooterRobot() {
       set('idle', now)
     }
 
+    // A soft pulsing glow around it: "you can click me". A light, not a box: it hides no text.
+    function glow() {
+      root!.classList.remove('robot--glow')
+      void root!.offsetWidth // restart its animation
+      root!.classList.add('robot--glow')
+      window.setTimeout(() => root!.classList.remove('robot--glow'), GLOW_MS)
+    }
+
+    // What must stay readable, in screen coordinates: each line of text in the footer (only where
+    // the letters are), and its links and icons.
+    function obstacles() {
+      const rects: DOMRect[] = []
+      const range = document.createRange()
+      const walker = document.createTreeWalker(footer, NodeFilter.SHOW_TEXT)
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (!node.textContent?.trim() || root!.contains(node)) continue
+        range.selectNodeContents(node)
+        for (const r of range.getClientRects()) if (r.width > 2 && r.height > 2) rects.push(r)
+      }
+      for (const el of footer.querySelectorAll('a, button, svg, img')) {
+        if (root!.contains(el)) continue
+        const r = el.getBoundingClientRect()
+        if (r.width > 2 && r.height > 2) rects.push(r)
+      }
+      return rects
+    }
+
+    // Where the pill (w × h) can go around the robot standing at `at` on the line: above its head,
+    // or beside it (toward the line's middle first). The first place that covers no text, stays
+    // inside the footer (so nothing above it is covered) and on screen, as a position inside the
+    // robot's box, or null.
+    function inviteSpot(at: number, w: number, h: number, list: DOMRect[]) {
+      const box = root!.getBoundingClientRect()
+      const left = box.left - x + at
+      const top = box.top
+      const sz = box.width
+      const area = footer.getBoundingClientRect()
+      const viewWidth = document.documentElement.clientWidth
+      const inward = at > room() / 2 ? 'left' : 'right'
+      const spots: Record<string, [number, number]> = {
+        above: [sz / 2 - w / 2, -h - 6],
+        left: [-w - 6, sz * 0.15 - h / 2],
+        right: [sz + 6, sz * 0.15 - h / 2],
+      }
+      for (const name of ['above', inward, inward === 'left' ? 'right' : 'left']) {
+        const [dx, dy] = spots[name]
+        const l = left + dx
+        const t = top + dy
+        const rr = l + w
+        const b = t + h
+        if (l < Math.max(8, area.left) || rr > Math.min(viewWidth - 8, area.right)) continue
+        if (t < Math.max(4, area.top) || b > Math.min(window.innerHeight - 4, area.bottom)) continue
+        if (list.some((o) => o.left < rr + 3 && o.right > l - 3 && o.top < b + 3 && o.bottom > t - 3)) continue
+        return { x: dx, y: dy, name }
+      }
+      return null
+    }
+
+    // Says "Click me!" (or the like) where it covers no text. No room where it stands: it walks to
+    // a spot on the line where there is (canMove) and says it there. No room anywhere: it only
+    // glows.
+    function sayInvite(now: number, canMove: boolean) {
+      const el = inviteRef.current
+      if (!el || tapped || talking || !visible) return inviteDone(now, false)
+      const words = touch ? TOUCH_INVITES : INVITES
+      el.textContent = invites === 0 ? words[0] : pick(words)
+      el.classList.remove('is-on')
+      el.style.left = '0px'
+      el.style.top = '0px'
+      const w = el.offsetWidth
+      const h = el.offsetHeight
+      const list = obstacles()
+      glow()
+      if (!reduceMotion) set(Math.random() < 0.5 ? 'wave' : 'hop', now)
+      const spot = w && h ? inviteSpot(x, w, h, list) : null
+      if (spot) {
+        el.style.left = `${Math.round(spot.x)}px`
+        el.style.top = `${Math.round(spot.y)}px`
+        el.dataset.place = spot.name
+        void el.offsetWidth // restart its animation
+        el.classList.add('is-on')
+        inviteUntil = now + INVITE_SHOW_MS
+        window.clearTimeout(inviteTimer)
+        inviteTimer = window.setTimeout(() => el.classList.remove('is-on'), INVITE_SHOW_MS)
+        return inviteDone(now, true)
+      }
+      if (canMove && !reduceMotion && w && h) {
+        const ends = [0, room() / 2, room()].sort((a, b) => Math.abs(a - x) - Math.abs(b - x))
+        const to = ends.find((at) => Math.abs(at - x) > 2 && inviteSpot(at, w, h, list))
+        if (to !== undefined) {
+          target = to
+          wordsAfterWalk = true
+          const newDir = to >= x ? 1 : -1
+          if (newDir !== dir) {
+            dir = newDir
+            place()
+          }
+          return set('walk', now)
+        }
+      }
+      inviteDone(now, true)
+    }
+
+    function inviteDone(now: number, counted: boolean) {
+      if (counted) invites += 1
+      nextInvite = tapped ? Infinity : now + INVITE_SHOW_MS + (INVITE_GAPS[invites] ?? Infinity)
+    }
+
+    function hideInvite() {
+      inviteRef.current?.classList.remove('is-on')
+      inviteUntil = 0
+      wordsAfterWalk = false
+    }
+
     function tick(now: number) {
       const dt = Math.min(now - last, 100)
       last = now
@@ -108,6 +254,8 @@ function FooterRobot() {
         if (mode !== 'dance') set('dance', now)
       } else if (mode === 'dance') {
         set('idle', now)
+      } else if (now < inviteUntil) {
+        // Its words are showing: it holds still, so they stay where they fit.
       } else if (mode === 'walk') {
         // Servo steps: it moves in the first part of each step, then stops.
         const moving = now % STEP_MS < STEP_MS * MOVE_SHARE
@@ -115,10 +263,19 @@ function FooterRobot() {
         if ((dir > 0 && x >= target) || (dir < 0 && x <= target)) {
           x = Math.max(0, Math.min(target, room()))
           set('idle', now)
+          if (wordsAfterWalk) {
+            wordsAfterWalk = false
+            place()
+            sayInvite(now, false)
+          }
         }
         place()
       } else if (mode === 'turn' && now >= until) {
         set('walk', now)
+      } else if (!talking && !wordsAfterWalk && now >= nextInvite && (mode === 'idle' || mode === 'scan')) {
+        nextInvite = Infinity // set again once this invite is over
+        set('idle', now)
+        sayInvite(now, true)
       } else if (now >= until && !talking) {
         decide(now)
       }
@@ -145,11 +302,23 @@ function FooterRobot() {
     const io = new IntersectionObserver(([entry]) => {
       const was = visible
       visible = entry.isIntersecting
+      const now = performance.now()
       if (visible) {
         start()
-        if (!was && !reduceMotion && !hovered) set('wave', performance.now())
+        if (!was && !reduceMotion && !hovered) set('wave', now)
+        // Not clicked yet: invite soon after it comes into view (after its hello wave).
+        if (!was && !tapped && invites < INVITE_GAPS.length) {
+          nextInvite = now + INVITE_GAPS[invites] + (invites === 0 ? 1000 : 0)
+          if (reduceMotion && invites === 0) {
+            // No animation loop: one invite, if it fits where it stands.
+            window.clearTimeout(inviteTimer)
+            inviteTimer = window.setTimeout(() => sayInvite(performance.now(), false), INVITE_GAPS[0])
+          }
+        }
       } else {
         stop()
+        hideInvite()
+        if (!tapped) nextInvite = Infinity // set again when it comes back into view
       }
     })
     io.observe(track)
@@ -163,16 +332,56 @@ function FooterRobot() {
     ro.observe(track)
 
     function onEnter(event: PointerEvent) {
-      if (event.pointerType === 'mouse' && !reduceMotion) hovered = true
+      if (event.pointerType !== 'mouse') return
+      if (!reduceMotion) hovered = true
+      // Resting on it a moment: it tells a joke (once per hover).
+      window.clearTimeout(hoverTimer)
+      hoverTimer = window.setTimeout(() => {
+        if (!talking) talkRef.current()
+      }, HOVER_TALK_MS)
     }
-    function onLeave() {
+    function onLeave(event: PointerEvent) {
+      if (event.pointerType !== 'mouse') return
       hovered = false
+      window.clearTimeout(hoverTimer)
+    }
+    // A finger on it: the joke opens right away, unless the press turns into a scroll.
+    function onDown(event: PointerEvent) {
+      if (event.pointerType === 'mouse' || talking) return
+      window.clearTimeout(pressTimer)
+      pressTimer = window.setTimeout(() => {
+        pressTimer = 0
+        pressTalkAt = performance.now()
+        talkRef.current()
+      }, PRESS_TALK_MS)
+    }
+    function onCancel() {
+      window.clearTimeout(pressTimer)
+      pressTimer = 0
     }
     root.addEventListener('pointerenter', onEnter)
     root.addEventListener('pointerleave', onLeave)
+    root.addEventListener('pointerdown', onDown)
+    window.addEventListener('pointercancel', onCancel, { passive: true })
+    window.addEventListener('scroll', onCancel, { passive: true })
+
+    // Its own click (mouse, keyboard, or the end of a tap).
+    clickRef.current = () => {
+      if (pressTimer) {
+        onCancel()
+        pressTalkAt = performance.now()
+        return talkRef.current()
+      }
+      if (performance.now() - pressTalkAt < PRESS_CLICK_GUARD_MS) return
+      talkRef.current()
+    }
 
     // Talks: a joke it didn't just say. It stops walking while it talks.
     talkRef.current = () => {
+      tapped = true
+      rememberRobotMet()
+      nextInvite = Infinity
+      hideInvite()
       const fresh = LINES.filter((l) => l !== lastLine)
       lastLine = fresh[Math.floor(Math.random() * fresh.length)]
       setSide(x > room() / 2 ? 'right' : 'left')
@@ -181,7 +390,12 @@ function FooterRobot() {
       if (!reduceMotion && !hovered) set('hop', performance.now())
       talking = true
       window.clearTimeout(talkTimer)
-      talkTimer = window.setTimeout(() => {
+      // Closes by itself (not while the mouse is still on it: then once it leaves).
+      talkTimer = window.setTimeout(function close() {
+        if (hovered) {
+          talkTimer = window.setTimeout(close, 400)
+          return
+        }
         talking = false
         setLine(null)
       }, TALK_MS)
@@ -193,7 +407,13 @@ function FooterRobot() {
       ro.disconnect()
       root.removeEventListener('pointerenter', onEnter)
       root.removeEventListener('pointerleave', onLeave)
+      root.removeEventListener('pointerdown', onDown)
+      window.removeEventListener('pointercancel', onCancel)
+      window.removeEventListener('scroll', onCancel)
       window.clearTimeout(talkTimer)
+      window.clearTimeout(hoverTimer)
+      window.clearTimeout(pressTimer)
+      window.clearTimeout(inviteTimer)
     }
   }, [])
 
@@ -204,11 +424,12 @@ function FooterRobot() {
           <p role="status">{line}</p>
         </div>
       )}
+      <span ref={inviteRef} className="robot__invite" aria-hidden="true" />
       <button
         type="button"
         className="robot__hit"
-        aria-label="Tiny footer robot. Click to hear what it says."
-        onClick={() => talkRef.current()}
+        aria-label="Tiny footer robot. Click or hover to hear what it says."
+        onClick={() => clickRef.current()}
       >
         <span className="robot__flip">
           <RobotSprite className="robot__sprite" />

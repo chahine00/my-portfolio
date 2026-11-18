@@ -62,3 +62,21 @@ export function sendRobotHome() {
 export function robotOrigin() {
   return origin
 }
+
+// A robot was clicked once (hero or footer): remembered for the browser session, so going back to the home page or reloading
+// doesn't start the invites over (the footer robot reads it too).
+const MET_KEY = 'robot:met'
+export function robotMet() {
+  try {
+    return sessionStorage.getItem(MET_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+export function rememberRobotMet() {
+  try {
+    sessionStorage.setItem(MET_KEY, '1')
+  } catch {
+    // Storage blocked (private mode…): it just forgets on reload.
+  }
+}

@@ -18,7 +18,15 @@
 // - until you click it, it invites you to, a few times, spaced out (see maybeInvite): it glows and
 //   makes a silent gesture (a wave or a hop), and if that gets no reaction, says two words in a
 //   small pill where they cover no text. No room where it stands? It walks or hops to a spot where
-//   the words fit. At most 4 per page (3 on touch screens); once clicked, one reminder at most
+//   the words fit. The first one comes right after it lands in the hero (from the welcome box or
+//   the big robot), so it's clear it can be clicked. Then one at about 10s and one at about 25s,
+//   and that's all: 3 per visit. It stops inviting for good once you've clicked it (remembered for
+//   the browser session, see robotMet in robotStore.ts), or once you go for the hero's main content (hover or tap
+//   its buttons or icons, or scroll away from the hero).
+//   Its favorite spot is the "Software Engineer" title: lots of free room above it, so the words
+//   fit there without covering any text. It lands there first and flies back to it often.
+// - its jokes open on hover too (rest the mouse on it for a moment), and on phones as soon as a
+//   finger presses it (not only on release); a press that turns into a scroll doesn't count
 // - it dances while the mouse is on it or right next to it (about to click), and for a moment
 //   when a finger presses it
 // - some sentences depend on what it stands on (your name, the CV button, the social icons…)
@@ -37,7 +45,7 @@
 
 import { useLayoutEffect, useRef, useState } from 'react'
 import RobotSprite from './RobotSprite.tsx'
-import { robotOrigin, sendRobotHome, useRobotHome } from './robotStore.ts'
+import { rememberRobotMet, robotMet, robotOrigin, sendRobotHome, useRobotHome } from './robotStore.ts'
 
 type Mode =
   | 'boot' // starting up where it came out (scan line, eyes switching on)
@@ -78,7 +86,7 @@ const LEAVE_MS = 550
 // Touch screens (and keyboard): the bubble closes by itself after this long.
 const READ_MS = 3000
 const SCROLL_CLOSE_PX = 4 // the bubble closes once the page has scrolled this far
-const STANDBY_AFTER_MS = 25000 // no mouse movement for this long → standby
+const STANDBY_AFTER_MS = 45000 // no mouse movement for this long → standby (mouse screens only)
 const CLOSE_GUARD_MS = 500 // "Hide" ignores taps this long after it appears (no hiding by a double tap)
 const NEAR_TAP = 44 // touch: a tap this close to it counts as a tap on it (it's small, and moves)
 const SCREEN_MARGIN = 16 // the bubble stays this far inside the screen
@@ -127,23 +135,51 @@ const PERCH_LINES: [string, string[]][] = [
 ]
 const PERCH_LINE_CHANCE = 0.4
 
-// Inviting you to click it (see maybeInvite): two words at most, and rarely.
-const INVITES = ['Click me!', 'Psst!', 'Hey you!', 'Poke me!', 'Over here!', 'Boop me?', 'Hello?', 'Pick me!']
-const TOUCH_INVITES = ['Tap me!', 'Psst!', 'Hey you!', 'Poke me!', 'Over here!', 'Boop me?', 'Hello?', 'Pick me!']
-const REMINDERS = ['Again?', 'More jokes?', 'Miss me?', 'One more?'] // once it was clicked
-const INVITE_GAPS = [5000, 20000, 40000, 60000] // the wait before each invite, until it's clicked
-const MAX_INVITES = 4 // per page, with a mouse…
+// Inviting you to click it (see maybeInvite): short, playful hints that it has something to say,
+// not orders. The very first one is always the first of the list.
+const INVITES = [
+  'Joke time?',
+  'joke.exe ready',
+  'I byte. Gently.',
+  'Clickable bot!',
+  'Insert click to continue',
+  'I’m funnier up close',
+  'Beep? (that’s “hi”)',
+]
+const TOUCH_INVITES = [
+  'Joke time?',
+  'joke.exe ready',
+  'I byte. Gently.',
+  'Tappable bot!',
+  'Insert tap to continue',
+  'I’m funnier up close',
+  'Beep? (that’s “hi”)',
+]
+// On the title, it sometimes says one of these instead (short: it's about the spot it's on).
+const TITLE_INVITES = ['Best seat here!', 'Top of the hero!', 'Engineer’s sidekick', 'Nice view, joke?']
+const REMINDERS = ['Encore?', 'Got more jokes…', 'Miss me?', 'Round two?'] // once it was clicked
+// The first invite comes right after it lands (see 'jet' in tick); these are the waits before
+// each one otherwise: about 10s and 25s after the first.
+const INVITE_GAPS = [2500, 7000, 12000]
+const MAX_INVITES = 3 // per visit, with a mouse…
 const MAX_TOUCH_INVITES = 3 // …on touch screens…
 const MAX_STILL_INVITES = 1 // …and for visitors who turned off animations
 const REMINDER_AFTER_MS = 90000 // once clicked: one reminder, after this long without another click
 const MAX_INVITE_MOVES = 2 // it moves at most this many times to find room for the words
-const INVITE_RETRY_MS = 12000 // the moment passed (scrolled away, mouse came close…): try later
+const INVITE_RETRY_MS = 8000 // the moment passed (scrolled away, mouse came close…): try later
+// Its favorite spot, the "Software Engineer" title: roomy above, so it goes there often…
+const TITLE_PERCH = '.hero__text > .eyebrow'
+const TITLE_CHANCE = 0.55 // …when it flies somewhere, it picks the title this often
+const TITLE_EARLY_MS = 2000 // …and on it, the next invite comes this much sooner
+const HOVER_TALK_MS = 450 // mouse: resting on it this long opens a joke
+const PRESS_TALK_MS = 150 // touch: a press this long (that isn't a scroll) opens a joke
+const PRESS_CLICK_GUARD_MS = 1500 // …and the click that follows the press doesn't open another
 const GLOW_MS = 1600 // same as robot-glow in global.css
-const INVITE_SHOW_MS = 2400 // how long the words stay (same as robot-invite in global.css)
+const INVITE_SHOW_MS = 3200 // how long the words stay (same as robot-invite in global.css)
 const WORDS_AFTER_GESTURE_MS = 2200 // the words come this long after the gesture, if it got no reaction
 const HERO_IN_VIEW = 0.6 // the hero must fill this much of the screen (or be this much on it)
 const SCROLL_QUIET_MS = 700 // not right after a scroll
-const TOUCH_QUIET_MS = 3000 // touch: no tap or scroll for this long first
+const TOUCH_QUIET_MS = 2000 // touch: no tap or scroll for this long first
 const NUDGE_NEAR = 200 // mouse: the cursor this close without clicking…
 const NUDGE_AFTER_MS = 1500 // …for this long: a good moment for an invite
 const NUDGE_MIN_GAP_MS = 8000 // but not sooner than this after the last one
@@ -305,8 +341,12 @@ function Robot() {
       order: [] as number[], // the sentences still to say, shuffled (no repeats until all are said)
       perchLine: '', // the last spot sentence it said (not twice in a row)
       // Invites (see maybeInvite).
-      tapped: false, // it was clicked: no more invites, one reminder at most
-      reminded: false,
+      tapped: robotMet(), // it was clicked: no more invites, one reminder at most
+      reminded: robotMet(), // met in an earlier visit this session: no reminder either
+      engaged: false, // you went for the hero's buttons or icons, or scrolled away: no more invites
+      hoverSince: 0, // mouse: since when it's on the robot
+      hoverTalked: false, // this hover already opened a joke
+      pressTalkAt: 0, // touch: when a press opened a joke
       invites: 0, // how many it showed (before it was clicked)
       nextInvite: 0,
       lastInviteAt: 0,
@@ -326,6 +366,7 @@ function Robot() {
       visibleSince: performance.now(),
       scrolledAt: 0,
       lastTouch: 0,
+      landed: false, // it landed in the hero once: its first invite comes right then
     }
     s.nextInvite = performance.now() + (INVITE_GAPS[s.invites] ?? Infinity)
     let frame = 0
@@ -333,6 +374,7 @@ function Robot() {
     let last = performance.now()
     let talkTimer = 0
     let stillInviteTimer = 0
+    let pressTimer = 0 // touch: the press that will open a joke
     const touch = window.matchMedia('(hover: none), (any-pointer: coarse)').matches
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const maxInvites = reduceMotion ? MAX_STILL_INVITES : touch ? MAX_TOUCH_INVITES : MAX_INVITES
@@ -359,6 +401,7 @@ function Robot() {
       return roomy.length ? roomy : all
     }
     const name = () => heroEl.querySelector<HTMLElement>('.hero__name')
+    const onTitle = () => !!s.perch?.matches(TITLE_PERCH)
 
     function setMode(mode: Mode, ms = 0) {
       s.mode = mode
@@ -400,9 +443,8 @@ function Robot() {
     }
 
     // Touch screens: longer rests (it moves less, and saves battery).
-    function rest(min = 900, max = 2000) {
-      const slow = touch ? 1.5 : 1
-      setMode('idle', random(min * slow, max * slow))
+    function rest(min = 600, max = 1400) {
+      setMode('idle', random(min, max))
     }
 
     // A wave or a hop: to greet you, to react, or to invite you (then words may follow).
@@ -441,11 +483,6 @@ function Robot() {
         else rest(300, 500)
         return
       }
-      // Touch screens: it moves less (more often it just keeps resting).
-      if (touch && Math.random() < 0.3) {
-        rest()
-        return
-      }
       const span = spanOf(s.perch, heroEl)
       const roll = Math.random()
       // Your mouse is in the hero, behind it: it turns to look at it, now and then.
@@ -473,8 +510,15 @@ function Robot() {
         rest(600, 1000)
         return
       }
+      // Looks around (flying is the most eye-catching move: it does it a bit less often).
+      if (roll < 0.72) {
+        turn(s.dir > 0 ? -1 : 1)
+        return
+      }
       const others = perches().filter((p) => p !== s.perch)
-      if (others.length) jetTo(pick(others))
+      const title = others.find((p) => p.matches(TITLE_PERCH))
+      if (title && Math.random() < TITLE_CHANCE) jetTo(title)
+      else if (others.length) jetTo(pick(others))
       else rest()
     }
 
@@ -494,9 +538,16 @@ function Robot() {
         beep('♪')
       } else if (!wantDance && s.mode === 'dance') rest(300, 600)
 
+      // Mouse resting on it for a moment: it tells a joke (once per hover).
+      if (s.onRobot && !s.hoverTalked && !s.talking && now - s.hoverSince > HOVER_TALK_MS) {
+        s.hoverTalked = true
+        talk()
+      }
+
       switch (s.mode) {
         case 'boot': {
-          const to = perches().find((p) => p === name()) ?? perches()[0]
+          const all = perches()
+          const to = all.find((p) => p.matches(TITLE_PERCH)) ?? all.find((p) => p === name()) ?? all[0]
           if (done && to) jetTo(to)
           break
         }
@@ -512,6 +563,16 @@ function Robot() {
             s.jet = null
             fitTo(j.to)
             setMode('land', LAND_MS)
+            // Its first landing in the hero (out of the welcome box or the big robot): it glows
+            // and says its first invite right away, so you know at once it can be clicked.
+            if (!s.landed) {
+              s.landed = true
+              if (!s.tapped && s.invites === 0) {
+                glow()
+                s.wordsAt = now + LAND_MS + 150
+                s.lastInviteAt = now
+              }
+            }
             // It came here to say its invite (there was no room for it at the last spot).
             if (s.wordsAfterLanding) {
               s.wordsAfterLanding = false
@@ -586,7 +647,8 @@ function Robot() {
             s.x = clamp(s.x, span.left, Math.max(span.left, span.right))
           }
           if (s.mode === 'standby' || s.talking) break
-          if (now - s.lastPointer > STANDBY_AFTER_MS) setMode('standby')
+          // Standby only with a mouse: a phone has no mouse moving, so it would just fall asleep.
+          if (!touch && now - s.lastPointer > STANDBY_AFTER_MS) setMode('standby')
           else if (done) decide()
           break
         case 'leave':
@@ -612,6 +674,7 @@ function Robot() {
       const left = s.tapped ? !s.reminded : s.invites < maxInvites
       return (
         left &&
+        !s.engaged &&
         !s.talking &&
         s.heroVisible >= HERO_IN_VIEW &&
         document.visibilityState === 'visible' &&
@@ -637,11 +700,11 @@ function Robot() {
       }
       if (s.wordsAfterLanding || s.wordsAfterWalk || !inviteAllowed(now) || s.mode !== 'idle' || !s.perch) return
       if (touch) {
-        if (now < s.nextInvite) return
+        if (now < s.nextInvite - (onTitle() ? TITLE_EARLY_MS : 0)) return
         if (now - Math.max(s.lastTouch, s.scrolledAt, s.visibleSince) < TOUCH_QUIET_MS) return
       } else {
         const nudge = s.nearSince > 0 && now - s.nearSince > NUDGE_AFTER_MS && now - s.lastInviteAt > NUDGE_MIN_GAP_MS
-        if (!nudge && now < s.nextInvite) return
+        if (!nudge && now < s.nextInvite - (onTitle() ? TITLE_EARLY_MS : 0)) return
       }
       s.lastInviteAt = now
       s.nextInvite = Infinity // set again once the invite is over
@@ -669,7 +732,14 @@ function Robot() {
     // spot, or hops to another one, where they fit (canMove), and says them there. No room
     // anywhere: the glow and the gesture were the invite.
     function sayInvite(now: number, canMove: boolean) {
-      const text = s.tapped ? pick(REMINDERS) : pick(touch ? TOUCH_INVITES : INVITES)
+      const words = touch ? TOUCH_INVITES : INVITES
+      const text = s.tapped
+        ? pick(REMINDERS)
+        : s.invites === 0
+          ? words[0]
+          : onTitle() && Math.random() < 0.5
+            ? pick(TITLE_INVITES)
+            : pick(words)
       const el = inviteRef.current
       if (!el) return
       const fit = placeInvite(text)
@@ -768,6 +838,8 @@ function Robot() {
       const others = perches()
         .filter((p) => p !== s.perch)
         .sort((a, b) => Math.abs(spanOf(a, heroEl).top - s.y) - Math.abs(spanOf(b, heroEl).top - s.y))
+        // The title has the most room above it: try it first.
+        .sort((a, b) => Number(b.matches(TITLE_PERCH)) - Number(a.matches(TITLE_PERCH)))
       for (const perch of [s.perch, ...others]) {
         const span = spanOf(perch, heroEl)
         const sz = perch === s.perch ? size() : sizeFor(perch)
@@ -872,6 +944,7 @@ function Robot() {
     function onPointerDown(event: PointerEvent) {
       s.lastPointer = performance.now()
       const target = event.target instanceof Element ? event.target : null
+      if (target?.closest('.hero-actions a')) s.engaged = true // going for the main content
       if (event.pointerType !== 'mouse') {
         s.lastTouch = performance.now()
         // Touch, bubble open: ANY tap closes it (on the bubble, on the robot, anywhere), except
@@ -884,8 +957,16 @@ function Robot() {
           return
         }
         if (target && robot.contains(target)) {
-          // A finger on it: a little dance, then its own click makes it talk.
+          // A finger on it: a little dance, and the joke opens right away (once it's clear this
+          // press isn't the start of a scroll), like hovering it with a mouse.
           s.danceUntil = performance.now() + TOUCH_DANCE_MS
+          if (target.closest('.robot__home, .robot__bubble')) return
+          window.clearTimeout(pressTimer)
+          pressTimer = window.setTimeout(() => {
+            pressTimer = 0
+            s.pressTalkAt = performance.now()
+            talk()
+          }, PRESS_TALK_MS)
           return
         }
         // A near miss is a tap on it (it's small, and moves).
@@ -905,6 +986,27 @@ function Robot() {
       if (distance < NEAR_TAP) talk()
     }
 
+    // The finger moved off into a scroll (the browser cancels the press): no joke.
+    function onPointerCancel() {
+      window.clearTimeout(pressTimer)
+      pressTimer = 0
+    }
+
+    // Its own click (mouse, keyboard, or the end of a tap).
+    function click() {
+      if (pressTimer) {
+        // A quick tap, released before the press opened the joke: open it now.
+        window.clearTimeout(pressTimer)
+        pressTimer = 0
+        s.pressTalkAt = performance.now()
+        talk()
+        return
+      }
+      // The press already opened it: this click is the same tap, not a second one.
+      if (performance.now() - s.pressTalkAt < PRESS_CLICK_GUARD_MS) return
+      talk()
+    }
+
     function talk() {
       if (s.mode === 'leave' || performance.now() < s.noTalkUntil) return
       // Tapped while booting up or flying: it answers once it has landed.
@@ -915,6 +1017,7 @@ function Robot() {
       s.talking = true
       // Clicked: no more invites. At most one reminder, once it's been a while since.
       s.tapped = true
+      rememberRobotMet()
       hideInvite()
       window.clearTimeout(stillInviteTimer)
       s.nextInvite = performance.now() + REMINDER_AFTER_MS
@@ -928,8 +1031,12 @@ function Robot() {
       setSide(s.x > heroEl.clientWidth / 2 ? 'right' : 'left')
       s.talkScrollY = window.scrollY
       window.clearTimeout(talkTimer)
-      // It closes by itself after READ_MS, with a mouse as on touch screens.
-      talkTimer = window.setTimeout(quiet, READ_MS)
+      // It closes by itself after READ_MS, with a mouse as on touch screens (not while the mouse
+      // is still on it: then once it leaves).
+      talkTimer = window.setTimeout(function close() {
+        if (s.onRobot) talkTimer = window.setTimeout(close, 400)
+        else quiet()
+      }, READ_MS)
     }
 
     // Closes its speech bubble (it goes back to what it was doing a moment later).
@@ -944,6 +1051,7 @@ function Robot() {
     // Scrolling the page closes the bubble (a few pixels of jitter don't).
     function onScroll() {
       s.scrolledAt = performance.now()
+      onPointerCancel()
       if (s.talking && Math.abs(window.scrollY - s.talkScrollY) > SCROLL_CLOSE_PX) quiet()
     }
 
@@ -952,6 +1060,8 @@ function Robot() {
       if (event.pointerType !== 'mouse' || reduceMotion) return
       const target = event.target instanceof Element ? event.target : null
       if (!target?.closest('.hero-actions a')) return
+      // Going for the main content: no more invites this visit.
+      s.engaged = true
       const now = performance.now()
       if (now - s.lastHoverHop < HOVER_HOP_GAP_MS || s.talking || now < s.inviteUntil) return
       if (s.wordsAt || s.wordsAfterWalk || s.wordsAfterLanding) return // on its way to an invite
@@ -981,6 +1091,8 @@ function Robot() {
         const visible = entry.isIntersecting ? shown / Math.min(entry.boundingClientRect.height, window.innerHeight) : 0
         const was = s.heroVisible
         s.heroVisible = visible
+        // Scrolled away from the hero (on to the content): no more invites this visit.
+        if (visible < 0.3 && was >= HERO_IN_VIEW) s.engaged = true
         if (visible >= HERO_IN_VIEW && was < HERO_IN_VIEW) {
           s.visibleSince = performance.now()
           if (was < 0.3 && !reduceMotion) s.greet = true
@@ -999,7 +1111,10 @@ function Robot() {
 
     // The mouse on it: it dances (see tick).
     function onRobotEnter(event: PointerEvent) {
-      if (event.pointerType === 'mouse') s.onRobot = true
+      if (event.pointerType !== 'mouse') return
+      s.onRobot = true
+      s.hoverSince = performance.now()
+      s.hoverTalked = false
     }
     function onRobotLeave(event: PointerEvent) {
       if (event.pointerType === 'mouse') s.onRobot = false
@@ -1011,10 +1126,11 @@ function Robot() {
     robot.addEventListener('pointerleave', onRobotLeave)
     document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('pointerdown', onPointerDown, { passive: true })
+    window.addEventListener('pointercancel', onPointerCancel, { passive: true })
     window.addEventListener('scroll', onScroll, { passive: true })
 
     brain.current = {
-      talk,
+      talk: click,
       leave() {
         // Just appeared: that tap was meant for the robot (a double tap), not for "Hide".
         if (performance.now() - s.talkedAt < CLOSE_GUARD_MS) return
@@ -1038,6 +1154,8 @@ function Robot() {
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('pointercancel', onPointerCancel)
+      window.clearTimeout(pressTimer)
       window.removeEventListener('scroll', onScroll)
       brain.current = null
     }
@@ -1067,7 +1185,7 @@ function Robot() {
       <button
         type="button"
         className="robot__hit"
-        aria-label="Tiny robot. Click to hear what it says."
+        aria-label="Tiny robot. Click or hover to hear what it says."
         onClick={() => brain.current?.talk()}
       >
         <span className="robot__flip">

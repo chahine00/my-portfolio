@@ -5303,9 +5303,9 @@ a {
   100% { opacity: 0; transform: translate(-50%, -6px); }
 }
 
-/* "Click me!", "Psst!"…: a little call above or beside it, rarely, when nobody has clicked it
-   (HeroRobot.tsx, maybeInvite). Two words at most. HeroRobot.tsx sets left/top to a place where it
-   covers no text. It pops in, wiggles, and fades away. */
+/* "Click me!", "Tap for a joke!"…: a little call above or beside it, now and then, when nobody has
+   clicked it (HeroRobot.tsx maybeInvite, FooterRobot.tsx sayInvite). A few words at most. The
+   script sets left/top to a place where it covers no text. It pops in, wiggles, and fades away. */
 .robot__invite {
   position: absolute;
   top: 0;
@@ -5331,7 +5331,7 @@ a {
 }
 
 .robot__invite.is-on {
-  animation: robot-invite 2.4s ease both;
+  animation: robot-invite 3.2s ease both;
 }
 
 [data-robot='jet'] .robot__invite,
@@ -5352,7 +5352,7 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .robot__invite.is-on {
-    animation: robot-invite-still 2.4s steps(1, end) both;
+    animation: robot-invite-still 3.2s steps(1, end) both;
   }
 
   @keyframes robot-invite-still {
