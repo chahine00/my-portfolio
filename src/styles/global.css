@@ -5979,7 +5979,7 @@ a {
 }
 
 /* Only on screens that really hover: phones keep a "stuck" hover after a tap, which would show
-   the × at random there. Phones close it with a tap on the bubble instead. */
+   the × at random there. Phones show it after a tap on the bubble instead (below). */
 @media (hover: hover) {
   .avatar-guide:hover .avatar-guide__close,
   .avatar-guide:focus-within .avatar-guide__close {
@@ -5989,13 +5989,19 @@ a {
 }
 
 /* Touch screens: the avatar lets touches through to the page under it, so a finger scrolling or
-   tapping never hits it by accident. Only the bubble takes a tap (it sends the guide away). */
+   tapping never hits it by accident. Only the bubble takes a tap: the first shows its ×
+   (data-revealed), a second sends the guide away. */
 @media (hover: none) {
   .avatar-guide__body {
     pointer-events: none;
   }
   .avatar-guide__close {
-    display: none;
+    pointer-events: none;
+  }
+  .avatar-guide[data-revealed] .avatar-guide__close {
+    opacity: 1;
+    pointer-events: auto;
+    transition-delay: 0s;
   }
 }
 

@@ -18,8 +18,8 @@
 //   Either way it leaves at once when you leave its section, or when you click it. Then the next
 //   section's guide can come out.
 // - On phones the avatar lets touches through to the page (so a finger never hits it by accident
-//   while scrolling or tapping), and one tap on its bubble sends it away.
-// - A small × on its bubble (shown on hover) sends it away for that section. Closed with the × twice, it's off until the page is reloaded
+//   while scrolling or tapping). A tap on its bubble shows the ×; a second tap sends it away.
+// - A small × on its bubble (shown on hover, or after a tap on phones) sends it away for that section. Closed with the × twice, it's off until the page is reloaded
 //   (guideStore.ts).
 // - Scrolling on inside the same section (a long one like Projects) moves it to a post that's
 //   still on screen there, and it carries on with its sentence.
@@ -56,6 +56,7 @@ const SETTLE_MS = 450 // …and the page must have stopped scrolling this long. 
 // it doesn't keep covering the small screen while you read…
 const PHONE_TOTAL_MS = 4500
 const PHONE_MIN_READ_MS = 2500 // …but the full sentence always stays at least this long.
+const PHONE_REVEALED_MS = 5000 // Tapped (its × showing): it stays this long, time to hit the ×.
 // On bigger screens it stays until you leave its section.
 const PHONE_MAX = 720 // same breakpoint as in global.css and avatarGuidePlacement.ts
 const QUICK_MS = 150 // when it has to leave while the page is still scrolling: a quick fade instead of sinking
@@ -136,6 +137,7 @@ function AvatarGuide() {
   // True when it's leaving while the page is scrolling: it fades out quickly instead of sinking.
   const [quick, setQuick] = useState(false)
   // Phones (no hover): true once the guide was tapped, which shows its ×.
+  const [revealed, setRevealed] = useState(false)
 
   const rootRef = useRef<HTMLDivElement>(null)
   // True when it leaves before it was read (scrolled away, or the screen was resized): then the
@@ -265,6 +267,7 @@ function AvatarGuide() {
         setPhase('in')
         setTyped(0)
         setAway(false)
+        setRevealed(false)
         return
       }
       candidate = null
@@ -399,7 +402,10 @@ function AvatarGuide() {
     } else if (phase === 'talk' && !away && isPhone()) {
       // Phones, once read: it sinks away by itself (the reading time waits while it's scrolled off
       // screen). It doesn't come back in this section until you've left it and come back later.
-      const read = Math.max(PHONE_MIN_READ_MS, PHONE_TOTAL_MS - text.length * TYPE_MS)
+      // Tapped (its × showing): it waits a bit longer, so there's time to hit the ×.
+      const read = revealed
+        ? PHONE_REVEALED_MS
+        : Math.max(PHONE_MIN_READ_MS, PHONE_TOTAL_MS - text.length * TYPE_MS)
       timer = window.setTimeout(() => setPhase('out'), read)
     } else if (phase === 'out') {
       // 4. Gone: free the spot for the next section. Not read? Let it come out there again.
@@ -425,7 +431,7 @@ function AvatarGuide() {
       )
     }
     return () => window.clearTimeout(timer)
-  }, [shown, phase, typed, away, quick])
+  }, [shown, phase, typed, away, quick, revealed])
 
   if (!shown) return null
 
@@ -440,9 +446,12 @@ function AvatarGuide() {
     setPhase('out')
   }
 
-  // Phones (no hover, and the avatar lets touches through): one tap on the bubble sends it away.
+  // Phones (no hover, and the avatar lets touches through): a tap on the bubble shows its ×
+  // (like hovering does with a mouse); a second tap on the bubble sends it away.
   function tapBubble() {
-    if (!canHover()) hide()
+    if (canHover()) return
+    if (revealed) hide()
+    else setRevealed(true)
   }
 
   return createPortal(
@@ -452,6 +461,7 @@ function AvatarGuide() {
       data-phase={phase}
       data-dock={spot.dock ? '' : undefined}
       data-quick={quick ? '' : undefined}
+      data-revealed={revealed ? '' : undefined}
       style={{ height: spot.rise }}
     >
       {/* Read out once, in full, by screen readers (the letter-by-letter text is hidden from them). */}
