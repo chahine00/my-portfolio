@@ -1495,11 +1495,80 @@ main {
   background: var(--border);
 }
 
+/* With several photos, the cover sits above the card's link (so it can be swiped, and has its
+   own arrows and dots). A plain click still opens the project (ProjectCard.tsx). Up-and-down
+   swipes are left to the page, so scrolling over a card still works. */
+.project-card__cover--many {
+  z-index: 2;
+  cursor: pointer;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 /* The strip of photos inside the cover. Only one fits at a time; ProjectCard.tsx slides it. */
 .cover-banner {
   display: flex;
   height: 100%;
   transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* While it's being dragged, it follows the finger with no delay. */
+.cover-banner.is-dragging {
+  transition: none;
+}
+
+/* Previous / next arrows: round buttons on the sides, shown when the card is hovered (or one of
+   them has keyboard focus). On touch screens there's no hover: swiping does it there. */
+.cover-banner__arrow {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.45);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity 0.2s, background-color 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.cover-banner__arrow--prev {
+  left: 10px;
+}
+
+.cover-banner__arrow--prev svg {
+  transform: rotate(180deg);
+}
+
+.cover-banner__arrow--next {
+  right: 10px;
+}
+
+.project-card__cover:hover .cover-banner__arrow,
+.cover-banner__arrow:focus-visible {
+  opacity: 1;
+}
+
+.cover-banner__arrow:hover {
+  background: rgb(0 0 0 / 0.65);
+}
+
+.cover-banner__arrow:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+@media (hover: none) {
+  .cover-banner__arrow {
+    display: none;
+  }
 }
 
 /* One photo of the strip: the blurred copy fills the frame, the real photo sits on top, whole. */
@@ -1541,15 +1610,35 @@ main {
   transform: translateX(-50%);
 }
 
-.cover-banner__dots span {
+.cover-banner__dots button {
+  position: relative;
   width: 6px;
   height: 6px;
+  padding: 0;
+  border: 0;
   border-radius: 999px;
   background: rgb(255 255 255 / 0.55);
+  cursor: pointer;
   transition: width 0.3s, background-color 0.3s;
 }
 
-.cover-banner__dots span.is-active {
+/* A bigger area to tap than the dot itself. */
+.cover-banner__dots button::before {
+  content: '';
+  position: absolute;
+  inset: -6px -3px;
+}
+
+.cover-banner__dots button:hover {
+  background: rgb(255 255 255 / 0.85);
+}
+
+.cover-banner__dots button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.cover-banner__dots button.is-active {
   width: 18px;
   background: #fff;
 }
