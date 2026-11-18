@@ -17,14 +17,21 @@
 //   after about 6 seconds (READ_MS), so it doesn't keep covering the small screen while you read.
 //   Either way it leaves at once when you leave its section, or when you click it. Then the next
 //   section's guide can come out.
+// - A small × on its bubble (shown on hover; on phones, which can't hover, after a first tap on
+//   the guide) sends it
+//   away for that section. Closed with the × twice, it's off until the page is reloaded
+//   (guideStore.ts).
 // - Scrolling on inside the same section (a long one like Projects) moves it to a post that's
 //   still on screen there, and it carries on with its sentence.
 // - Each section's tip shows once while you're there; after you leave, it can show again when
 //   you come back.
-// - It takes turns: one time your avatar comes out, the next time the tiny robot from the hero
-//   (RobotSprite.tsx), waving its arm and saying the section's robotText (guide.ts), so your face
-//   isn't at every stop. The first one under the hero is the robot (the hero already shows you).
-// - The avatar is avatar-wave.webp: the avatar waving, cropped to the upper body. It's one picture, so it moves as a whole (rises, tilts, bobs).
+// - It takes turns between three guides: the tiny robot from the hero (RobotSprite.tsx), waving
+//   its arm and saying the section's robotText (guide.ts); your avatar waving (avatar-wave.webp);
+//   and your main avatar standing (avatar-stand.webp), so it isn't the same face at every stop.
+//   The first one under the hero is the robot (the hero already shows you).
+// - Both avatars are cropped to the upper body at the same size (520×600, head at the same place
+//   and scale), so they use the same spots and CSS. Each is one picture, so it moves as a whole
+//   (rises, tilts, bobs).
 //   The animations are in global.css under "avatar guide".
 
 import { useEffect, useRef, useState } from 'react'
@@ -32,6 +39,7 @@ import { createPortal } from 'react-dom'
 import { asset } from '../utils/asset.ts'
 import RobotSprite from './RobotSprite.tsx'
 import { guideTips, type GuideTip } from '../data/guide.ts'
+import { guideClosed, isGuideOff, useGuideOff } from './guideStore.ts'
 import { dockSpot, edgeOf, findPlacements, fitsOnScreen, type Placement } from './avatarGuidePlacement.ts'
 
 // "in": rising. "talk": typing and showing the bubble. "out": sinking back.
@@ -67,12 +75,17 @@ const seen = new Map<string, { anchor: HTMLElement; at: number; left: boolean }>
 let lastScrollAt = 0
 const scrolling = () => Date.now() - lastScrollAt < 200
 
-// Whose turn it is to come out next (see "takes turns" above). The robot goes first.
-let robotNext = true
+// Who comes out, in turn (see "takes turns" above). The robot goes first.
+const TURNS = ['robot', 'wave', 'stand'] as const
+type Turn = (typeof TURNS)[number]
+let turn = 0
 
-// The tip as said by the avatar or the robot: its text, and who says it.
-function said(tip: GuideTip, robot: boolean): GuideTip {
-  return robot ? { ...tip, text: tip.robotText, by: 'robot' } : { ...tip, by: 'avatar' }
+// The avatar pictures, by pose (both 520×600, framed the same way).
+const POSE_SRC = { wave: '/avatar-wave.webp', stand: '/avatar-stand.webp' } as const
+
+// The tip as said by the robot or the avatar (waving or standing): its text, and who says it.
+function said(tip: GuideTip, who: Turn): GuideTip {
+  return who === 'robot' ? { ...tip, text: tip.robotText, by: 'robot' } : { ...tip, by: 'avatar', pose: who }
 }
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -82,6 +95,9 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
 function navBottom() {
   return Math.max(0, document.querySelector('.navbar')?.getBoundingClientRect().bottom ?? 0)
 }
+
+// Mouse (or trackpad) screens show the guide's × on hover; touch screens on a first tap.
+const canHover = () => window.matchMedia('(hover: hover)').matches
 
 const isPhone = () => window.matchMedia(`(max-width: ${PHONE_MAX}px)`).matches
 
@@ -119,6 +135,8 @@ function AvatarGuide() {
   const [away, setAway] = useState(false)
   // True when it's leaving while the page is scrolling: it fades out quickly instead of sinking.
   const [quick, setQuick] = useState(false)
+  // Phones (no hover): true once the guide was tapped, which shows its ×.
+  const [revealed, setRevealed] = useState(false)
 
   const rootRef = useRef<HTMLDivElement>(null)
   // True when it leaves before it was read (scrolled away, or the screen was resized): then the
@@ -130,12 +148,21 @@ function AvatarGuide() {
   // Where it goes next when it moves to another post in the same section (you scrolled on, but
   // you're still in that section): it sinks, then rises there and carries on with its sentence.
   const moveRef = useRef<Placement | null>(null)
+  const off = useGuideOff()
 
   useEffect(() => {
     phaseRef.current = phase
     shownRef.current = shown
     awayRef.current = away
   }, [phase, shown, away])
+
+  // Turned off (closed with its × twice): if it's still out, it leaves now.
+  useEffect(() => {
+    if (off && shownRef.current && phaseRef.current !== 'out') {
+      moveRef.current = null
+      setPhase('out')
+    }
+  }, [off])
 
   // 1. Watch the scroll and pick the section to talk about.
   useEffect(() => {
@@ -169,8 +196,10 @@ function AvatarGuide() {
       const now = Date.now()
       for (const [section, entry] of seen) {
         if (section === shownRef.current?.tip.section) continue
-        const rect = entry.anchor.getBoundingClientRect()
-        if (rect.bottom < 0 || rect.top > window.innerHeight) entry.left = true
+        // Only once you've left the whole section (not just its post), so a long section like
+        // Projects or Blog doesn't show its tip again while you're still scrolling through it.
+        const rect = document.getElementById(section)?.getBoundingClientRect()
+        if (!rect || rect.bottom < 0 || rect.top > window.innerHeight) entry.left = true
         if (entry.left && now - entry.at > REPEAT_MS) seen.delete(section)
       }
 
@@ -201,9 +230,14 @@ function AvatarGuide() {
       // One at a time: while it's out, no other section comes (it leaves once you've left its
       // section, see step 2, and the next one comes right after).
       if (current) return
+      // Turned off: closed with its × twice (guideStore.ts).
+      if (isGuideOff()) {
+        candidate = null
+        return
+      }
 
       for (const plain of guideTips) {
-        const tip = said(plain, robotNext)
+        const tip = said(plain, TURNS[turn])
         if (seen.has(tip.section) || !sectionOnScreen(tip)) continue
         const section = document.getElementById(tip.section)
         if (!section) continue
@@ -226,9 +260,10 @@ function AvatarGuide() {
         candidate = null
         seen.set(tip.section, { anchor: spot.anchor, at: now, left: false })
         unreadRef.current = false
-        robotNext = !robotNext
+        turn = (turn + 1) % TURNS.length
         setShown({ tip, spot })
         setQuick(false)
+        setRevealed(false)
         setPhase('in')
         setTyped(0)
         setAway(false)
@@ -398,6 +433,22 @@ function AvatarGuide() {
   const { tip, spot } = shown
   const talking = phase === 'talk'
 
+  // Sent away: gone for this visit to the section (no move to another post, and counted as
+  // shown), until you leave the section and come back.
+  function hide() {
+    moveRef.current = null
+    unreadRef.current = false
+    setPhase('out')
+  }
+
+  // Phones (no hover): the first tap on the guide (its avatar or its bubble) shows its ×. After
+  // that, a tap on the avatar sends it away as before. Returns true when this tap only showed it.
+  function reveal() {
+    if (revealed || canHover()) return false
+    setRevealed(true)
+    return true
+  }
+
   return createPortal(
     <div
       ref={rootRef}
@@ -405,6 +456,7 @@ function AvatarGuide() {
       data-phase={phase}
       data-dock={spot.dock ? '' : undefined}
       data-quick={quick ? '' : undefined}
+      data-revealed={revealed ? '' : undefined}
       style={{ height: spot.rise }}
     >
       {/* Read out once, in full, by screen readers (the letter-by-letter text is hidden from them). */}
@@ -416,9 +468,26 @@ function AvatarGuide() {
         className="avatar-guide__bubble"
         data-side={spot.side}
         style={{ maxWidth: spot.bubbleWidth }}
-        aria-hidden="true"
+        onClick={reveal}
       >
-        <p>
+        {/* Closes it for this section; twice, and it's off until a reload (guideStore.ts). */}
+        <button
+          type="button"
+          className="avatar-guide__close"
+          aria-label="Close the guide"
+          title="Close"
+          tabIndex={talking ? 0 : -1}
+          onClick={(event) => {
+            event.stopPropagation() // not a tap on the bubble (reveal)
+            hide()
+            guideClosed()
+          }}
+        >
+          <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">
+            <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
+        </button>
+        <p aria-hidden="true">
           {tip.text.slice(0, typed)}
           {/* A blinking cursor while it types. It takes no space, so the bubble's size doesn't change. */}
           {typed < tip.text.length && <span className="avatar-guide__caret" />}
@@ -434,12 +503,14 @@ function AvatarGuide() {
           className="avatar-guide__body"
           aria-label="Hide the guide"
           tabIndex={talking ? 0 : -1}
-          onClick={() => setPhase('out')}
+          onClick={() => {
+            if (!reveal()) hide()
+          }}
         >
           {tip.by === 'robot' ? (
             <RobotSprite className="avatar-guide__robot" />
           ) : (
-            <img src={asset('/avatar-wave.webp')} alt="" draggable={false} />
+            <img src={asset(POSE_SRC[tip.pose ?? 'wave'])} alt="" draggable={false} />
           )}
         </button>
       </div>

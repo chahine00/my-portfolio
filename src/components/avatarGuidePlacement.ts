@@ -7,7 +7,7 @@
 // the free space above the section's heading.
 //
 // The avatar rises from behind an "edge": the top of a post (it peeks over it), or the line of
-// a post's bottom, next to it (it stands beside it). Its bubble goes on its left, right, or above.
+// a post's bottom, next to it on its right or left (it stands beside it). Its bubble goes on its left, right, or above.
 //
 // Positions come from the page layout (offsetTop/offsetLeft), not from what's on screen, so a
 // card lifting on hover (or a reveal animation) never moves the avatar: it's the same spot every
@@ -227,6 +227,10 @@ export function findPlacements(section: HTMLElement, tip: GuideTip): Placement[]
       // Standing in the empty space on the post's right, on the line of its bottom.
       const from = box.r + BESIDE_GAP + width * HAND
       edges.push({ anchor: post, edge: 'bottom', from, to: contentRight - width, align: 'left', sides: preferred })
+    } else if (spot.edge === 'beside-left') {
+      // The same on the post's left, in the page's margin, as close to the post as it fits.
+      const from = scrollX + MARGIN + width * HAND
+      edges.push({ anchor: post, edge: 'bottom', from, to: box.l - BESIDE_GAP - width, align: 'right', sides: preferred })
     } else {
       edges.push({ anchor: post, edge: 'top', from: box.l + width * HAND + 12, to: box.r - width - 12, align: spot.align ?? 'right', sides: preferred })
     }

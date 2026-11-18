@@ -3,13 +3,13 @@
 //
 // section: the id of the <section> (the same as the navbar link, e.g. 'projects' for #projects).
 // text: one or two short sentences. They're typed out letter by letter.
-// robotText: the same, said by the robot. The guide takes turns: one time your avatar comes out
-//   (and says text), the next time the tiny robot from the hero (and says robotText), so your
-//   face isn't at every stop. The avatar talks as you ("My…"), the robot ABOUT you ("Ali's…").
+// robotText: the same, said by the robot. The guide takes turns: the tiny robot from the hero
+//   (says robotText), then your avatar waving, then your main avatar standing (both say text). The avatar talks as you ("My…"), the robot ABOUT you ("Ali's…").
 // Where it comes out (all optional; without them it uses the free space above the heading):
 //   anchor + index: the post it's next to: a CSS selector, and which match (0 = the first).
 //   edge: 'top' → it peeks over that post's top edge (the default).
 //         'beside' → it stands in the empty space on the post's right, level with its bottom.
+//         'beside-left' → the same, in the empty space on the post's left (the page's margin).
 //   align: for 'top', where along the edge: 'left', 'center' or 'right' (the default).
 //   bubble: where its speech bubble goes first: 'left', 'right' or 'above' of it.
 //   phone: the same settings for phones (screens up to 720px wide), where posts are stacked in one
@@ -24,7 +24,7 @@
 export interface GuideSpot {
   anchor?: string
   index?: number
-  edge?: 'top' | 'beside'
+  edge?: 'top' | 'beside' | 'beside-left'
   align?: 'left' | 'center' | 'right'
   bubble?: 'left' | 'right' | 'above'
 }
@@ -35,6 +35,8 @@ export interface GuideTip extends GuideSpot {
   robotText: string
   // Who says it this time: set by AvatarGuide.tsx when it comes out (it takes turns), not here.
   by?: 'avatar' | 'robot'
+  // Which avatar picture, when by is 'avatar': waving or standing (also set by AvatarGuide.tsx).
+  pose?: 'wave' | 'stand'
   leaveBelow?: number
   phone?: GuideSpot
 }
@@ -59,14 +61,15 @@ export const guideTips: GuideTip[] = [
     phone: PHONE_FIRST_POST('.mindset__lead'),
   },
   {
-    // Over the second project card, on its left, under the empty right side of the title.
+    // Standing in the page's margin on the left of a project card, its feet level with the
+    // bottom of the card's picture, bubble above it. Where the margin is too narrow for it (smaller
+    // laptop screens), it uses the free space above the heading instead.
     section: 'projects',
     text: 'Real projects I shipped. Click a card for details.',
     robotText: "Beep! Ali's shipped projects. Open a card for details.",
-    anchor: '.project-card',
-    index: 1,
-    align: 'left',
-    bubble: 'right',
+    anchor: '.project-card__cover',
+    edge: 'beside-left',
+    bubble: 'above',
     phone: PHONE_FIRST_POST('.project-card'),
   },
   {

@@ -5625,7 +5625,7 @@ a {
   border-radius: 12px;
 }
 
-/* avatar-wave.webp (520×600) is the upper body, centered on the head, with the waving hand on
+/* avatar-wave.webp and avatar-stand.webp (both 520×600, framed the same way) are the upper body, centered on the head, with the waving hand on
    the left. 1.73× the box's width makes the head about as wide as the box; the hand sticks out
    a little on the left (the box only cuts at the bottom). */
 .avatar-guide__body img {
@@ -5868,6 +5868,65 @@ a {
   opacity: 1;
   transform: scale(1);
   pointer-events: auto;
+}
+
+/* The small × on the bubble's top-right corner (AvatarGuide.tsx). Shown while you hover the
+   guide (its avatar or its bubble) or focus it; it fades out with a short delay, so it doesn't
+   vanish while the mouse crosses from the avatar to it. Phones can't hover: there it shows once
+   the guide is tapped (data-revealed, set in AvatarGuide.tsx). */
+.avatar-guide__close {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgb(15 23 42 / 0.15);
+  opacity: 0;
+  transition:
+    opacity 0.2s ease 0.4s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+/* A bigger area to hit than it looks, for fingers. */
+.avatar-guide__close::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+/* Only on screens that really hover: phones keep a "stuck" hover after a tap, which would show
+   the × at random there. */
+@media (hover: hover) {
+  .avatar-guide:hover .avatar-guide__close,
+  .avatar-guide:focus-within .avatar-guide__close {
+    opacity: 1;
+    transition-delay: 0s;
+  }
+}
+
+.avatar-guide[data-revealed] .avatar-guide__close {
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+.avatar-guide__close:hover,
+.avatar-guide__close:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.avatar-guide__close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* The part of the sentence not typed yet: takes its space, but can't be seen. */
