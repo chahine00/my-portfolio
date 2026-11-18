@@ -10,6 +10,7 @@ import { asset } from '../../utils/asset.ts'
 import { BACK_AT_TOP_EVENT } from '../../components/BackToTop.tsx'
 import { callRobotOut, isRobotDismissed, useRobotDismissed, useRobotHome } from '../../components/robotStore.ts'
 import RobotSprite from '../../components/RobotSprite.tsx'
+import RobotLab from './RobotLab.tsx'
 import HeroRobot from '../../components/HeroRobot.tsx'
 
 // The robot pops up on the welcome box when the word is typed (~2.2s, see .hero__art-robot in
@@ -242,6 +243,32 @@ function PhotoArt({ cutout, robotHome, robotDismissed }: { cutout?: string; robo
   )
 }
 
+// Switches the hero between the avatar and the robot's lab (RobotLab.tsx) when a visitor comes
+// back to the top: they scrolled down past the hero, stayed away at least AWAY_MS, and scrolled
+// back up to it. Each return switches to the other one. A quick dip down and back up doesn't count.
+const AWAY_MS = 3000
+
+function useReturnSwap(enabled: boolean) {
+  const [swapped, setSwapped] = useState(false)
+  useEffect(() => {
+    if (!enabled) return
+    let leftAt = 0 // when the hero was scrolled away (0 while it's on screen)
+    function onScroll() {
+      const y = window.scrollY
+      if (y > window.innerHeight * 0.9) {
+        if (!leftAt) leftAt = Date.now()
+      } else if (leftAt && y < window.innerHeight * 0.6) {
+        // Back at the top: switch while it comes into view, so the visitor sees the change.
+        if (Date.now() - leftAt >= AWAY_MS) setSwapped((current) => !current)
+        leftAt = 0
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [enabled])
+  return swapped
+}
+
 function Hero() {
   const typed = useTypingLoop(profile.building)
   const nameRef = useRef<HTMLSpanElement>(null)
@@ -259,6 +286,9 @@ function Hero() {
   const robotHome = useRobotHome()
   // Sent home with its "×": it then waits on the welcome box for a click (see PhotoArt).
   const robotDismissed = useRobotDismissed()
+  // The avatar, or the robot's lab once a visitor comes back to the top (see useReturnSwap).
+  // While the lab shows, the hover drawing steps aside (the tiny robot out in the hero stays).
+  const lab = useReturnSwap(profile.lab.lines.length > 0)
 
   function startDrawing() {
     window.clearTimeout(hideTimer.current)
@@ -420,7 +450,8 @@ function Hero() {
         </div>
       </div>
 
-      {/* The avatar, on a transparent background, so it suits light and dark mode as it is. */}
+      {/* The avatar, on a transparent background, so it suits light and dark mode as it is. Every
+          other return to the top, the robot's lab takes its place (RobotLab.tsx). */}
       {profile.photo && (
         // Behind it: a line drawing (see PhotoArt above) that plays while the hero is hovered (or a
         // finger is on a phone's screen). Moving away fades it out; coming back redraws it.
@@ -430,12 +461,13 @@ function Hero() {
               drawing too, not only the photo. It sits under the drawing, so the robot on the
               welcome box stays clickable. */}
           <span className="hero__hit" aria-hidden="true" />
-          {drawing && <PhotoArt key={run} cutout={asset(profile.photo)} robotHome={robotHome} robotDismissed={robotDismissed} />}
-          <div className="hero__photo">
+          {drawing && !lab && <PhotoArt key={run} cutout={asset(profile.photo)} robotHome={robotHome} robotDismissed={robotDismissed} />}
+          <div className={`hero__photo${lab ? ' hero__photo--away' : ''}`}>
             {/* The first big picture on the page: "high" priority makes the browser fetch it before
                 anything less important, and width/height reserve its space so nothing jumps. */}
             <img src={asset(profile.photo)} alt={profile.name} width={1024} height={1024} fetchPriority="high" />
           </div>
+          {lab && <RobotLab robotHome={robotHome} robotDismissed={robotDismissed} />}
         </div>
       )}
 

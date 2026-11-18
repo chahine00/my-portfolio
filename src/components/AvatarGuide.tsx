@@ -21,12 +21,16 @@
 //   still on screen there, and it carries on with its sentence.
 // - Each section's tip shows once while you're there; after you leave, it can show again when
 //   you come back.
-// - It uses avatar-wave.webp: the avatar waving, cropped to the upper body. It's one picture, so it moves as a whole (rises, tilts, bobs).
+// - It takes turns: one time your avatar comes out, the next time the tiny robot from the hero
+//   (RobotSprite.tsx), waving its arm and saying the section's robotText (guide.ts), so your face
+//   isn't at every stop. The first one under the hero is the robot (the hero already shows you).
+// - The avatar is avatar-wave.webp: the avatar waving, cropped to the upper body. It's one picture, so it moves as a whole (rises, tilts, bobs).
 //   The animations are in global.css under "avatar guide".
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { asset } from '../utils/asset.ts'
+import RobotSprite from './RobotSprite.tsx'
 import { guideTips, type GuideTip } from '../data/guide.ts'
 import { dockSpot, edgeOf, findPlacements, fitsOnScreen, type Placement } from './avatarGuidePlacement.ts'
 
@@ -62,6 +66,14 @@ const seen = new Map<string, { anchor: HTMLElement; at: number; left: boolean }>
 // of sinking, so flying through the page doesn't leave avatars animating everywhere.
 let lastScrollAt = 0
 const scrolling = () => Date.now() - lastScrollAt < 200
+
+// Whose turn it is to come out next (see "takes turns" above). The robot goes first.
+let robotNext = true
+
+// The tip as said by the avatar or the robot: its text, and who says it.
+function said(tip: GuideTip, robot: boolean): GuideTip {
+  return robot ? { ...tip, text: tip.robotText, by: 'robot' } : { ...tip, by: 'avatar' }
+}
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -136,10 +148,12 @@ function AvatarGuide() {
 
     function spotsFor(tip: GuideTip, section: HTMLElement) {
       const now = Date.now()
-      const known = places.get(tip.section)
+      // Measured per section and per speaker (the two sentences have different lengths).
+      const key = `${tip.section}:${tip.by}`
+      const known = places.get(key)
       if (known && now - known.at < PLACES_TTL && known.width === window.innerWidth) return known.spots
       const spots = findPlacements(section, tip)
-      places.set(tip.section, { at: now, width: window.innerWidth, spots })
+      places.set(key, { at: now, width: window.innerWidth, spots })
       return spots
     }
 
@@ -170,7 +184,7 @@ function AvatarGuide() {
         if (section && sectionOnScreen(current.tip)) {
           const rest = SETTLE_MS - (now - scrolledAt)
           if (rest > 0) return later(rest + 20)
-          places.delete(current.tip.section) // measured afresh: the posts may have moved since
+          places.delete(`${current.tip.section}:${current.tip.by}`) // measured afresh: the posts may have moved since
           // No post with room on screen: the screen's corner.
           const spot =
             spotsFor(current.tip, section).find((s) => fitsOnScreen(s, nav, LOWEST)) ??
@@ -188,7 +202,8 @@ function AvatarGuide() {
       // section, see step 2, and the next one comes right after).
       if (current) return
 
-      for (const tip of guideTips) {
+      for (const plain of guideTips) {
+        const tip = said(plain, robotNext)
         if (seen.has(tip.section) || !sectionOnScreen(tip)) continue
         const section = document.getElementById(tip.section)
         if (!section) continue
@@ -211,6 +226,7 @@ function AvatarGuide() {
         candidate = null
         seen.set(tip.section, { anchor: spot.anchor, at: now, left: false })
         unreadRef.current = false
+        robotNext = !robotNext
         setShown({ tip, spot })
         setQuick(false)
         setPhase('in')
@@ -420,7 +436,11 @@ function AvatarGuide() {
           tabIndex={talking ? 0 : -1}
           onClick={() => setPhase('out')}
         >
-          <img src={asset('/avatar-wave.webp')} alt="" draggable={false} />
+          {tip.by === 'robot' ? (
+            <RobotSprite className="avatar-guide__robot" />
+          ) : (
+            <img src={asset('/avatar-wave.webp')} alt="" draggable={false} />
+          )}
         </button>
       </div>
     </div>,

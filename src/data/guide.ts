@@ -3,6 +3,9 @@
 //
 // section: the id of the <section> (the same as the navbar link, e.g. 'projects' for #projects).
 // text: one or two short sentences. They're typed out letter by letter.
+// robotText: the same, said by the robot. The guide takes turns: one time your avatar comes out
+//   (and says text), the next time the tiny robot from the hero (and says robotText), so your
+//   face isn't at every stop. The avatar talks as you ("My…"), the robot ABOUT you ("Ali's…").
 // Where it comes out (all optional; without them it uses the free space above the heading):
 //   anchor + index: the post it's next to: a CSS selector, and which match (0 = the first).
 //   edge: 'top' → it peeks over that post's top edge (the default).
@@ -29,6 +32,9 @@ export interface GuideSpot {
 export interface GuideTip extends GuideSpot {
   section: string
   text: string
+  robotText: string
+  // Who says it this time: set by AvatarGuide.tsx when it comes out (it takes turns), not here.
+  by?: 'avatar' | 'robot'
   leaveBelow?: number
   phone?: GuideSpot
 }
@@ -41,6 +47,7 @@ export const guideTips: GuideTip[] = [
     // Over the third "mindset" card, on its right (the text above it stops before that).
     section: 'about',
     text: "This is how I think and work.",
+    robotText: "Beep! This is how Ali thinks and works.",
     anchor: '.mindset__item',
     index: 2,
     align: 'right',
@@ -55,6 +62,7 @@ export const guideTips: GuideTip[] = [
     // Over the second project card, on its left, under the empty right side of the title.
     section: 'projects',
     text: 'Real projects I shipped. Click a card for details.',
+    robotText: "Beep! Ali's shipped projects. Open a card for details.",
     anchor: '.project-card',
     index: 1,
     align: 'left',
@@ -65,6 +73,7 @@ export const guideTips: GuideTip[] = [
     // Standing beside the first job, in the empty column right of the timeline.
     section: 'experience',
     text: 'My jobs and what I delivered at each one.',
+    robotText: "Work history loaded: Ali's jobs and results.",
     anchor: '.card.job',
     edge: 'beside',
     bubble: 'above',
@@ -74,6 +83,7 @@ export const guideTips: GuideTip[] = [
     // Over the middle of the stack card.
     section: 'skills',
     text: 'The tools I use every day.',
+    robotText: "Scanning… Ali's everyday tools.",
     anchor: '.stack',
     align: 'center',
     bubble: 'right',
@@ -83,6 +93,7 @@ export const guideTips: GuideTip[] = [
     // Over the second degree card, on its right.
     section: 'education',
     text: 'My degrees and the languages I speak.',
+    robotText: "Ali's degrees and languages, all in one place.",
     anchor: '.edu-degree',
     index: 1,
     align: 'right',
@@ -93,6 +104,7 @@ export const guideTips: GuideTip[] = [
     // Over the post in the right column, on its left (clear of "See all" on the far right).
     section: 'blog',
     text: 'My latest posts and events.',
+    robotText: "Fresh data: Ali's latest posts and events.",
     anchor: '.blog-preview__item',
     index: 1,
     align: 'left',
@@ -103,6 +115,7 @@ export const guideTips: GuideTip[] = [
     // Standing beside the contact form, in the empty space on its right.
     section: 'contact',
     text: 'Want to work together? Message me here.',
+    robotText: 'Want to work with Ali? Send a message here.',
     anchor: '.contact-form',
     edge: 'beside',
     bubble: 'above',
