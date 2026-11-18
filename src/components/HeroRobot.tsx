@@ -26,7 +26,7 @@
 //   doesn't count: on a computer the mouse crosses them all the time.
 //   Its favorite spot is the "Software Engineer" title: lots of free room above it, so the words
 //   fit there without covering any text. It lands there first and flies back to it often.
-// - its jokes open on hover too (rest the mouse on it for a moment), and on phones as soon as a
+// - its jokes open on hover too (as soon as the mouse is on it), and on phones as soon as a
 //   finger presses it (not only on release); a press that turns into a scroll doesn't count
 // - it dances while the mouse is on it or right next to it (about to click), and for a moment
 //   when a finger presses it
@@ -172,7 +172,6 @@ const INVITE_RETRY_MS = 8000 // the moment passed (scrolled away, mouse came clo
 const TITLE_PERCH = '.hero__text > .eyebrow'
 const TITLE_CHANCE = 0.55 // …when it flies somewhere, it picks the title this often
 const TITLE_EARLY_MS = 2000 // …and on it, the next invite comes this much sooner
-const HOVER_TALK_MS = 450 // mouse: resting on it this long opens a joke
 const PRESS_TALK_MS = 150 // touch: a press this long (that isn't a scroll) opens a joke
 const PRESS_CLICK_GUARD_MS = 1500 // …and the click that follows the press doesn't open another
 const GLOW_MS = 1600 // same as robot-glow in global.css
@@ -345,7 +344,6 @@ function Robot() {
       tapped: robotMet(), // it was clicked: no more invites, one reminder at most
       reminded: robotMet(), // met earlier (before coming back to this page): no reminder either
       engaged: false, // you clicked the hero's buttons or icons, or scrolled away: no more invites
-      hoverSince: 0, // mouse: since when it's on the robot
       hoverTalked: false, // this hover already opened a joke
       pressTalkAt: 0, // touch: when a press opened a joke
       invites: 0, // how many it showed (before it was clicked)
@@ -539,8 +537,8 @@ function Robot() {
         beep('♪')
       } else if (!wantDance && s.mode === 'dance') rest(300, 600)
 
-      // Mouse resting on it for a moment: it tells a joke (once per hover).
-      if (s.onRobot && !s.hoverTalked && !s.talking && now - s.hoverSince > HOVER_TALK_MS) {
+      // The mouse on it: it tells a joke right away (once per hover).
+      if (s.onRobot && !s.hoverTalked && !s.talking) {
         s.hoverTalked = true
         talk()
       }
@@ -1032,12 +1030,9 @@ function Robot() {
       setSide(s.x > heroEl.clientWidth / 2 ? 'right' : 'left')
       s.talkScrollY = window.scrollY
       window.clearTimeout(talkTimer)
-      // It closes by itself after READ_MS, with a mouse as on touch screens (not while the mouse
-      // is still on it: then once it leaves).
-      talkTimer = window.setTimeout(function close() {
-        if (s.onRobot) talkTimer = window.setTimeout(close, 400)
-        else quiet()
-      }, READ_MS)
+      // It closes by itself after READ_MS (3s), with a mouse as on touch screens, even while the
+      // mouse is still on it. It doesn't open again until the mouse leaves and comes back.
+      talkTimer = window.setTimeout(quiet, READ_MS)
     }
 
     // Closes its speech bubble (it goes back to what it was doing a moment later).
@@ -1112,8 +1107,12 @@ function Robot() {
     function onRobotEnter(event: PointerEvent) {
       if (event.pointerType !== 'mouse') return
       s.onRobot = true
-      s.hoverSince = performance.now()
       s.hoverTalked = false
+      // A joke right away (talk() waits for landing if it's flying).
+      if (!s.talking) {
+        s.hoverTalked = true
+        talk()
+      }
     }
     function onRobotLeave(event: PointerEvent) {
       if (event.pointerType === 'mouse') s.onRobot = false

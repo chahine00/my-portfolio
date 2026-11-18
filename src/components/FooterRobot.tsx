@@ -6,7 +6,7 @@
 // - it waves when you scroll down to the footer
 // - it dances while the mouse is on it
 // - clicked or tapped, it says a footer joke in a speech bubble, which closes by itself
-// - its jokes open on hover too (rest the mouse on it a moment), and on phones as soon as a
+// - its jokes open on hover too (as soon as the mouse is on it), and on phones as soon as a
 //   finger presses it; a press that turns into a scroll doesn't count
 // - once per visit, soon after the footer shows, it invites you to click it (a glow and a few
 //   words in a small pill), unless a robot was already clicked (robotMet, until a reload). The pill only shows where it covers no text and
@@ -36,7 +36,7 @@ const LINES = [
 const STEP_MS = 260 // one servo step: it moves for the first part, then stops (same as robot-step)
 const MOVE_SHARE = 0.55
 const SPEED = 34 // px per second, on average
-const TALK_MS = 3500 // the bubble closes by itself after this long
+const TALK_MS = 3000 // the bubble closes by itself after this long (same as the hero robot)
 const DURATIONS: Record<Mode, [number, number]> = {
   idle: [600, 1400],
   walk: [0, 0], // until it reaches its target
@@ -51,7 +51,6 @@ const DURATIONS: Record<Mode, [number, number]> = {
 const INVITES = ['End of page. Joke?', 'joke.exe is ready', 'I guard the jokes', 'Insert click to continue', 'Beep? (that’s “bye”)']
 const TOUCH_INVITES = ['End of page. Joke?', 'joke.exe is ready', 'I guard the jokes', 'Insert tap to continue', 'Beep? (that’s “bye”)']
 const INVITE_GAPS = [1800] // the wait before each invite while the footer is in view: just one
-const HOVER_TALK_MS = 450 // mouse: resting on it this long opens a joke
 const PRESS_TALK_MS = 150 // touch: a press this long (that isn't a scroll) opens a joke
 const PRESS_CLICK_GUARD_MS = 1500 // …and the click that follows the press doesn't open another
 const INVITE_SHOW_MS = 3200 // how long the words stay (same as robot-invite in global.css)
@@ -90,7 +89,6 @@ function FooterRobot() {
     let talking = false
     // Invites (sayInvite).
     let tapped = robotMet() // it (or the hero robot) was clicked: no more invites
-    let hoverTimer = 0
     let pressTimer = 0
     let pressTalkAt = 0
     let invites = 0 // how many it showed
@@ -334,16 +332,12 @@ function FooterRobot() {
     function onEnter(event: PointerEvent) {
       if (event.pointerType !== 'mouse') return
       if (!reduceMotion) hovered = true
-      // Resting on it a moment: it tells a joke (once per hover).
-      window.clearTimeout(hoverTimer)
-      hoverTimer = window.setTimeout(() => {
-        if (!talking) talkRef.current()
-      }, HOVER_TALK_MS)
+      // The mouse on it: it tells a joke right away (once per hover).
+      if (!talking) talkRef.current()
     }
     function onLeave(event: PointerEvent) {
       if (event.pointerType !== 'mouse') return
       hovered = false
-      window.clearTimeout(hoverTimer)
     }
     // A finger on it: the joke opens right away, unless the press turns into a scroll.
     function onDown(event: PointerEvent) {
@@ -390,12 +384,9 @@ function FooterRobot() {
       if (!reduceMotion && !hovered) set('hop', performance.now())
       talking = true
       window.clearTimeout(talkTimer)
-      // Closes by itself (not while the mouse is still on it: then once it leaves).
-      talkTimer = window.setTimeout(function close() {
-        if (hovered) {
-          talkTimer = window.setTimeout(close, 400)
-          return
-        }
+      // Closes by itself after 3s, even while the mouse is still on it. It doesn't open again
+      // until the mouse leaves and comes back.
+      talkTimer = window.setTimeout(() => {
         talking = false
         setLine(null)
       }, TALK_MS)
@@ -411,7 +402,6 @@ function FooterRobot() {
       window.removeEventListener('pointercancel', onCancel)
       window.removeEventListener('scroll', onCancel)
       window.clearTimeout(talkTimer)
-      window.clearTimeout(hoverTimer)
       window.clearTimeout(pressTimer)
       window.clearTimeout(inviteTimer)
     }
