@@ -5532,12 +5532,13 @@ a {
   --guide-fade: 18px;
 }
 
-/* Phones: a bit smaller, so it fits in the space beside the short section titles, right on the
-   first post (see "phone" in src/data/guide.ts). Same breakpoint as PHONE_MAX there. */
+/* Phones: smaller, so it fits in the space beside the short section titles, right on the
+   first post (see "phone" in src/data/guide.ts), and takes less of the screen. Same breakpoint as
+   PHONE_MAX there. */
 @media (max-width: 720px) {
   :root {
-    --guide-w: 72px;
-    --guide-h: 104px;
+    --guide-w: 60px;
+    --guide-h: 88px;
   }
 }
 
@@ -5875,7 +5876,7 @@ a {
 }
 
 /* Only on screens that really hover: phones keep a "stuck" hover after a tap, which would show
-   the × at random there. */
+   the × at random there. Phones close it with a tap on the bubble instead. */
 @media (hover: hover) {
   .avatar-guide:hover .avatar-guide__close,
   .avatar-guide:focus-within .avatar-guide__close {
@@ -5884,9 +5885,15 @@ a {
   }
 }
 
-.avatar-guide[data-revealed] .avatar-guide__close {
-  opacity: 1;
-  transition-delay: 0s;
+/* Touch screens: the avatar lets touches through to the page under it, so a finger scrolling or
+   tapping never hits it by accident. Only the bubble takes a tap (it sends the guide away). */
+@media (hover: none) {
+  .avatar-guide__body {
+    pointer-events: none;
+  }
+  .avatar-guide__close {
+    display: none;
+  }
 }
 
 .avatar-guide__close:hover,

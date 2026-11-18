@@ -14,12 +14,12 @@
 //   has really stopped (SETTLE_MS), and if it has to leave while you're still scrolling, it just
 //   fades out (QUICK_MS) instead of sinking.
 // - On bigger screens it stays as long as you're in its section. On phones it sinks away by itself
-//   after about 6 seconds (READ_MS), so it doesn't keep covering the small screen while you read.
+//   after about 4-5 seconds in all (PHONE_TOTAL_MS), so it doesn't keep covering the small screen.
 //   Either way it leaves at once when you leave its section, or when you click it. Then the next
 //   section's guide can come out.
-// - A small × on its bubble (shown on hover; on phones, which can't hover, after a first tap on
-//   the guide) sends it
-//   away for that section. Closed with the × twice, it's off until the page is reloaded
+// - On phones the avatar lets touches through to the page (so a finger never hits it by accident
+//   while scrolling or tapping), and one tap on its bubble sends it away.
+// - A small × on its bubble (shown on hover) sends it away for that section. Closed with the × twice, it's off until the page is reloaded
 //   (guideStore.ts).
 // - Scrolling on inside the same section (a long one like Projects) moves it to a post that's
 //   still on screen there, and it carries on with its sentence.
@@ -52,11 +52,11 @@ const DWELL_MS = 500 // how long a section stays in view before it comes out (co
 const SETTLE_MS = 450 // …and the page must have stopped scrolling this long. Long enough that a phone's
 // fling (the page gliding on after your finger lets go) isn't taken for a stop, so scrolling fast
 // through the page never makes it pop up on the way.
-// Phones only: how long it stays once the sentence is typed…
-const READ_MS = 4000
-const READ_PER_LETTER_MS = 50 // …plus this much per letter (about 6 seconds in all), then it sinks
-// away by itself so it doesn't keep covering the small screen while you read. On bigger screens
-// it stays until you leave its section.
+// Phones only: about how long it's out in all (typing included), then it sinks away by itself so
+// it doesn't keep covering the small screen while you read…
+const PHONE_TOTAL_MS = 4500
+const PHONE_MIN_READ_MS = 2500 // …but the full sentence always stays at least this long.
+// On bigger screens it stays until you leave its section.
 const PHONE_MAX = 720 // same breakpoint as in global.css and avatarGuidePlacement.ts
 const QUICK_MS = 150 // when it has to leave while the page is still scrolling: a quick fade instead of sinking
 const REPEAT_MS = 6000 // a section's tip plays again at the earliest this long after it last came out
@@ -136,7 +136,6 @@ function AvatarGuide() {
   // True when it's leaving while the page is scrolling: it fades out quickly instead of sinking.
   const [quick, setQuick] = useState(false)
   // Phones (no hover): true once the guide was tapped, which shows its ×.
-  const [revealed, setRevealed] = useState(false)
 
   const rootRef = useRef<HTMLDivElement>(null)
   // True when it leaves before it was read (scrolled away, or the screen was resized): then the
@@ -263,7 +262,6 @@ function AvatarGuide() {
         turn = (turn + 1) % TURNS.length
         setShown({ tip, spot })
         setQuick(false)
-        setRevealed(false)
         setPhase('in')
         setTyped(0)
         setAway(false)
@@ -401,7 +399,8 @@ function AvatarGuide() {
     } else if (phase === 'talk' && !away && isPhone()) {
       // Phones, once read: it sinks away by itself (the reading time waits while it's scrolled off
       // screen). It doesn't come back in this section until you've left it and come back later.
-      timer = window.setTimeout(() => setPhase('out'), READ_MS + text.length * READ_PER_LETTER_MS)
+      const read = Math.max(PHONE_MIN_READ_MS, PHONE_TOTAL_MS - text.length * TYPE_MS)
+      timer = window.setTimeout(() => setPhase('out'), read)
     } else if (phase === 'out') {
       // 4. Gone: free the spot for the next section. Not read? Let it come out there again.
       timer = window.setTimeout(
@@ -441,12 +440,9 @@ function AvatarGuide() {
     setPhase('out')
   }
 
-  // Phones (no hover): the first tap on the guide (its avatar or its bubble) shows its ×. After
-  // that, a tap on the avatar sends it away as before. Returns true when this tap only showed it.
-  function reveal() {
-    if (revealed || canHover()) return false
-    setRevealed(true)
-    return true
+  // Phones (no hover, and the avatar lets touches through): one tap on the bubble sends it away.
+  function tapBubble() {
+    if (!canHover()) hide()
   }
 
   return createPortal(
@@ -456,7 +452,6 @@ function AvatarGuide() {
       data-phase={phase}
       data-dock={spot.dock ? '' : undefined}
       data-quick={quick ? '' : undefined}
-      data-revealed={revealed ? '' : undefined}
       style={{ height: spot.rise }}
     >
       {/* Read out once, in full, by screen readers (the letter-by-letter text is hidden from them). */}
@@ -468,7 +463,7 @@ function AvatarGuide() {
         className="avatar-guide__bubble"
         data-side={spot.side}
         style={{ maxWidth: spot.bubbleWidth }}
-        onClick={reveal}
+        onClick={tapBubble}
       >
         {/* Closes it for this section; twice, and it's off until a reload (guideStore.ts). */}
         <button
@@ -478,7 +473,7 @@ function AvatarGuide() {
           title="Close"
           tabIndex={talking ? 0 : -1}
           onClick={(event) => {
-            event.stopPropagation() // not a tap on the bubble (reveal)
+            event.stopPropagation() // not a tap on the bubble
             hide()
             guideClosed()
           }}
@@ -503,9 +498,7 @@ function AvatarGuide() {
           className="avatar-guide__body"
           aria-label="Hide the guide"
           tabIndex={talking ? 0 : -1}
-          onClick={() => {
-            if (!reveal()) hide()
-          }}
+          onClick={hide}
         >
           {tip.by === 'robot' ? (
             <RobotSprite className="avatar-guide__robot" />
