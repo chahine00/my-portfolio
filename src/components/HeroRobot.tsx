@@ -170,6 +170,10 @@ const INVITE_RETRY_MS = 8000 // the moment passed (scrolled away, mouse came clo
 const TITLE_PERCH = '.hero__text > .eyebrow'
 const TITLE_CHANCE = 0.55 // …when it flies somewhere, it picks the title this often
 const TITLE_EARLY_MS = 2000 // …and on it, the next invite comes this much sooner
+// Touch: right after a finger opens a joke (or lifts), stray events a phone sends around a tap
+// (a tiny scroll, a late tap or click) don't close it. Only its 3s, or a real tap elsewhere after
+// this, close it.
+const TOUCH_GRACE_MS = 1000
 const PRESS_CLICK_GUARD_MS = 1500 // touch: the click that ends a press that opened a joke doesn't open another
 const GLOW_MS = 1600 // same as robot-glow in global.css
 const INVITE_SHOW_MS = 3200 // how long the words stay (same as robot-invite in global.css)
@@ -346,6 +350,7 @@ function Robot() {
       hoverTalked: false, // this hover already opened a joke
       pressTalkAt: 0, // touch: when a press opened a joke (then when that finger lifted)
       fingerDown: false, // touch: a finger is pressing it right now (its joke waits to count down)
+      touchAt: 0, // touch: when a finger last opened a joke, or lifted from it (see TOUCH_GRACE_MS)
       invites: 0, // how many it showed (before it was clicked)
       nextInvite: 0,
       lastInviteAt: 0,
@@ -978,6 +983,7 @@ function Robot() {
         // Touch, bubble open: a tap anywhere else (the bubble too) closes it.
         // A tap on the robot goes on below: it dances and says its next sentence.
         if (s.talking && !onIt) {
+          if (inTouchGrace()) return
           quiet()
           s.noTalkUntil = performance.now() + 450
           return
@@ -989,6 +995,7 @@ function Robot() {
           s.danceUntil = performance.now() + TOUCH_DANCE_MS
           s.fingerDown = true
           s.pressTalkAt = performance.now()
+          s.touchAt = performance.now()
           talk()
           return
         }
@@ -996,6 +1003,7 @@ function Robot() {
         const r = heroEl.getBoundingClientRect()
         if (Math.hypot(event.clientX - r.left - s.x, event.clientY - r.top - (s.y - size() / 2)) < NEAR_TAP) {
           s.danceUntil = performance.now() + TOUCH_DANCE_MS
+          s.touchAt = performance.now()
           talk()
         }
         return
@@ -1003,8 +1011,9 @@ function Robot() {
       if (target && robot.contains(target)) return
       const r = heroEl.getBoundingClientRect()
       const distance = Math.hypot(event.clientX - r.left - s.x, event.clientY - r.top - (s.y - size() / 2))
-      // Mouse: a click elsewhere closes its bubble too.
+      // Mouse: a click elsewhere closes its bubble too (not a stray one right after a touch).
       if (s.talking) {
+        if (inTouchGrace()) return
         quiet()
         return
       }
@@ -1056,10 +1065,16 @@ function Robot() {
       s.fingerDown = false
       // The click that follows this release is the same tap: it mustn't open another joke.
       s.pressTalkAt = performance.now()
+      s.touchAt = performance.now()
       if (s.talking) {
         window.clearTimeout(talkTimer)
         talkTimer = window.setTimeout(quiet, READ_MS)
       }
+    }
+
+    // True for a moment after a finger opened a joke or lifted from it (TOUCH_GRACE_MS).
+    function inTouchGrace() {
+      return performance.now() - s.touchAt < TOUCH_GRACE_MS
     }
 
     // Closes its speech bubble (it goes back to what it was doing a moment later).
@@ -1074,7 +1089,13 @@ function Robot() {
     // Scrolling the page closes the bubble (a few pixels of jitter don't).
     function onScroll() {
       s.scrolledAt = performance.now()
-      if (s.talking && Math.abs(window.scrollY - s.talkScrollY) > SCROLL_CLOSE_PX) quiet()
+      if (!s.talking) return
+      // Right after a touch: a phone can nudge the page a little around a tap. Measure from here.
+      if (inTouchGrace()) {
+        s.talkScrollY = window.scrollY
+        return
+      }
+      if (Math.abs(window.scrollY - s.talkScrollY) > SCROLL_CLOSE_PX) quiet()
     }
 
     // Hovering the buttons or social icons: it hops (now and then, not every time).
