@@ -236,7 +236,7 @@ function AvatarGuide() {
   //    its whole section is off screen (for LEAVE_MS).
   useEffect(() => {
     if (!shown) return
-    const { spot } = shown
+    const { spot, tip } = shown
     let frame = 0
     let awaySince = 0 // 0 while it's on screen
     let leftSince = 0 // 0 while its section is on screen
@@ -272,7 +272,7 @@ function AvatarGuide() {
           setAway(false)
         }
         // It leaves only once you've left its whole section.
-        if (sectionOnScreen(shown.tip)) leftSince = 0
+        if (sectionOnScreen(tip)) leftSince = 0
         else if (!leftSince) leftSince = now
         else if (now - leftSince > LEAVE_MS && phaseRef.current !== 'out') {
           moveRef.current = null
