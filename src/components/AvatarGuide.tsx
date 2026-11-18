@@ -10,16 +10,12 @@
 //   on hover); the only thing the mouse does is send it away with a click.
 // - When: as soon as a section's spot is on screen and you've stopped on it for a moment
 //   (DWELL_MS), so scrolling quickly past a section doesn't make it pop up.
-// - One at a time: if you move on to another section while it's talking, it leaves right away
-//   and comes out again for the new section, so it always talks about what you're looking at.
-// - Each section's tip shows once while you're there; once the spot has left the screen, it can
-//   show again when you come back.
+// - It stays as long as you're in its section, and leaves only once the whole section is off
+//   screen (or when you click it). Then the next section's guide comes out.
 // - Scrolling on inside the same section (a long one like Projects) moves it to a post that's
 //   still on screen there, and it carries on with its sentence.
-// - Scrolling it off screen doesn't send it away at once (on phones you often scroll past, then
-//   back up to it): it waits AWAY_MS, with its reading time paused, and stays if you come back.
-//   If it did leave before you could read it, it comes out again when you return to that spot.
-// - It stays about 9 to 11 seconds (longer for longer sentences); clicking it sends it away.
+// - Each section's tip shows once while you're there; after you leave, it can show again when
+//   you come back.
 // - It uses avatar-wave.webp: the avatar waving, cut out from "Friendly Waving Chibi Avatar.png"
 //   and cropped to the upper body. It's one picture, so it moves as a whole (rises, tilts, bobs).
 //   The animations are in global.css under "avatar guide".
@@ -36,15 +32,11 @@ type Phase = 'in' | 'talk' | 'out'
 const RISE_MS = 450 // same as the guide-rise animation in global.css
 const SINK_MS = 450 // same as the guide-sink animation
 const TYPE_MS = 30 // per letter
-const READ_MS = 4500 // how long it stays once the sentence is typed…
-const READ_PER_LETTER_MS = 55 // …plus this much per letter, so longer sentences stay longer
 const DWELL_MS = 250 // how long a section stays in view before it comes out (counted while scrolling too)…
 const SETTLE_MS = 120 // …and the page must have stopped scrolling this long (fast scrolling up and down doesn't call it)
 const REPEAT_MS = 6000 // a section's tip plays again at the earliest this long after it last came out
-const COOLDOWN_MS = 500 // the pause after a tip ends by itself (none when a new section takes over)
-const AWAY_MS = 2000 // how long its spot can be off screen before it leaves…
-const AWAY_AT_TOP_MS = 700 // …or this long when you're back at the top of the page
-const TAKEOVER_MS = 400 // once it's scrolled away, another section must stay in view this long to take over
+const LEAVE_MS = 250 // its section must be off screen this long before it leaves (no flicker at the edge)
+const SECTION_MARGIN = 60 // a section counts as on screen while more than this much of it shows
 const LOWEST = 0.85 // the spot's edge must be in the top 85% of the screen (where you're reading)
 const PLACES_TTL = 2000 // spots are measured again after this long (images load, cards reveal…)
 
@@ -59,6 +51,17 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
 // screen (on phones it scrolls away with the page), that's the top of the screen.
 function navBottom() {
   return Math.max(0, document.querySelector('.navbar')?.getBoundingClientRect().bottom ?? 0)
+}
+
+// True while some of this section is on screen (below the navbar). The guide stays as long as
+// its section is: it leaves only once you've left the whole section. A tip with leaveBelow
+// (see guide.ts) leaves sooner on the way up: once the section's top is lower than that share
+// of the screen.
+function sectionOnScreen(tip: GuideTip) {
+  const rect = document.getElementById(tip.section)?.getBoundingClientRect()
+  if (!rect) return false
+  const lowestTop = tip.leaveBelow ? window.innerHeight * tip.leaveBelow : window.innerHeight - SECTION_MARGIN
+  return rect.bottom > navBottom() + SECTION_MARGIN && rect.top < lowestTop
 }
 
 interface Shown {
@@ -95,7 +98,6 @@ function AvatarGuide() {
     // The free spots of each section, measured once in a while (it's the costly part).
     const places = new Map<string, { at: number; width: number; spots: Placement[] }>()
     let candidate: { section: string; since: number } | null = null
-    let cooldownUntil = 0
     let frame = 0
     let recheck = 0
     let scrolledAt = 0
@@ -126,7 +128,6 @@ function AvatarGuide() {
         if (entry.left && now - entry.at > REPEAT_MS) seen.delete(section)
       }
 
-      if (now < cooldownUntil) return later(cooldownUntil - now + 20)
       const nav = navBottom()
 
       // It's out, its post has scrolled away, but you're still in the same section (a long one
@@ -134,9 +135,7 @@ function AvatarGuide() {
       const current = shownRef.current
       if (current && awayRef.current && phaseRef.current !== 'out' && !moveRef.current) {
         const section = document.getElementById(current.tip.section)
-        const rect = section?.getBoundingClientRect()
-        const middle = window.innerHeight / 2
-        if (section && rect && rect.top < middle && rect.bottom > middle) {
+        if (section && sectionOnScreen(current.tip)) {
           const rest = SETTLE_MS - (now - scrolledAt)
           if (rest > 0) return later(rest + 20)
           places.delete(current.tip.section) // measured afresh: the posts may have moved since
@@ -150,9 +149,12 @@ function AvatarGuide() {
           return
         }
       }
+      // One at a time: while it's out, no other section comes (it leaves once you've left its
+      // section, see step 2, and the next one comes right after).
+      if (current) return
 
       for (const tip of guideTips) {
-        if (seen.has(tip.section)) continue
+        if (seen.has(tip.section) || !sectionOnScreen(tip)) continue
         const section = document.getElementById(tip.section)
         if (!section) continue
         // Quick test first: is this section around the reading area at all?
@@ -167,17 +169,6 @@ function AvatarGuide() {
         const wait = Math.max(DWELL_MS - (now - candidate.since), SETTLE_MS - (now - scrolledAt))
         if (wait > 0) return later(wait + 20)
 
-        if (shownRef.current) {
-          // Scrolling a bit up or down to another section doesn't send it away: while it's still
-          // on screen it keeps talking (the next one comes after it's done). Once it's scrolled
-          // away, the new section takes over after TAKEOVER_MS.
-          if (!awayRef.current) return later(300)
-          const hold = TAKEOVER_MS - (now - candidate.since)
-          if (hold > 0) return later(hold + 20)
-          // Still talking about another section: it leaves now, and this one starts right after.
-          if (phaseRef.current !== 'out') setPhase('out')
-          return
-        }
         candidate = null
         seen.set(tip.section, { anchor: spot.anchor, at: now, left: false })
         unreadRef.current = false
@@ -214,10 +205,8 @@ function AvatarGuide() {
       recheckSoon()
     }
 
-    // A tip is over (step 4). If another section is waiting (it was sent away for it), that one
-    // comes out straight away; otherwise wait a little before the next.
+    // A tip is over (step 4): the next section's can come out straight away.
     function onDone() {
-      cooldownUntil = candidate ? 0 : Date.now() + COOLDOWN_MS
       recheckSoon()
     }
 
@@ -243,13 +232,14 @@ function AvatarGuide() {
   //    whole pixels. The spot comes from the layout (edgeOf), so it doesn't move when the post
   //    under the mouse lifts on hover.
   //    When almost all of the avatar is off screen (under the navbar, or below the bottom), it's
-  //    "away": the reading time waits, and only if it stays away for AWAY_MS does it leave
-//    (almost at once, AWAY_AT_TOP_MS, when you're back at the top of the page).
+  //    "away": step 1 moves it to a post of the section that's on screen. It leaves only when
+  //    its whole section is off screen (for LEAVE_MS).
   useEffect(() => {
     if (!shown) return
     const { spot } = shown
     let frame = 0
     let awaySince = 0 // 0 while it's on screen
+    let leftSince = 0 // 0 while its section is on screen
     let placed: { x: number; y: number } | null = null
     function follow() {
       const root = rootRef.current
@@ -269,7 +259,6 @@ function AvatarGuide() {
         const top = bottom - spot.rise
         const peek = spot.rise * 0.25
         const offScreen = bottom < navBottom() + peek || top > window.innerHeight - peek
-        const atTop = window.scrollY < window.innerHeight / 2
         const now = Date.now()
         if (offScreen && !awaySince) {
           awaySince = now
@@ -281,8 +270,13 @@ function AvatarGuide() {
         } else if (!offScreen && awaySince) {
           awaySince = 0
           setAway(false)
-        } else if (awaySince && now - awaySince > (atTop ? AWAY_AT_TOP_MS : AWAY_MS) && phaseRef.current !== 'out') {
-          unreadRef.current = true
+        }
+        // It leaves only once you've left its whole section.
+        if (sectionOnScreen(shown.tip)) leftSince = 0
+        else if (!leftSince) leftSince = now
+        else if (now - leftSince > LEAVE_MS && phaseRef.current !== 'out') {
+          moveRef.current = null
+          unreadRef.current = false
           setPhase('out')
         }
       }
@@ -292,7 +286,7 @@ function AvatarGuide() {
     return () => cancelAnimationFrame(frame)
   }, [shown])
 
-  // 3. Rise → type the sentence → wait while it's read → sink.
+  // 3. Rise → type the sentence → stay while you're in its section → sink.
   useEffect(() => {
     if (!shown) return
     const { text } = shown.tip
@@ -302,9 +296,6 @@ function AvatarGuide() {
     } else if (phase === 'talk' && typed < text.length) {
       // People who turn off animations get the whole sentence at once.
       timer = window.setTimeout(() => setTyped(reducedMotion() ? text.length : typed + 1), TYPE_MS)
-    } else if (phase === 'talk' && !away) {
-      // Reading time grows with the sentence. It starts over when you come back to it.
-      timer = window.setTimeout(() => setPhase('out'), READ_MS + text.length * READ_PER_LETTER_MS)
     } else if (phase === 'out') {
       // 4. Gone: free the spot for the next section. Not read? Let it come out there again.
       timer = window.setTimeout(

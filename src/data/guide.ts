@@ -12,6 +12,9 @@
 //   phone: the same settings for phones (screens up to 720px wide), where posts are stacked in one
 //     column. There the free space is usually on the right of the short section title, just
 //     above the first post. Without it, phones try the desktop spot.
+// leaveBelow: the guide normally stays until its whole section is off screen. With this (a share
+//   of the screen's height, e.g. 0.5) it leaves once the section's top is lower than that, so
+//   scrolling back up to the section above sends it away (About sits right under the home screen).
 // If that spot would cover any text or part of a post, the nearest free spot is used instead (the
 // space above the section's heading), so you can change these without checking every screen size.
 
@@ -26,6 +29,7 @@ export interface GuideSpot {
 export interface GuideTip extends GuideSpot {
   section: string
   text: string
+  leaveBelow?: number
   phone?: GuideSpot
 }
 
@@ -41,6 +45,8 @@ export const guideTips: GuideTip[] = [
     index: 2,
     align: 'right',
     bubble: 'above',
+    // It leaves once you scroll back up to the home screen (the top of About is past mid-screen).
+    leaveBelow: 0.5,
     // Phones: the intro paragraph runs the full width right above the first card, so it stands on
     // that paragraph instead, on the right, next to the short "Think bigger. / Adapt faster." title.
     phone: PHONE_FIRST_POST('.mindset__lead'),
