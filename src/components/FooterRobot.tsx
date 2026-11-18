@@ -9,7 +9,7 @@
 // - its jokes open on hover too (rest the mouse on it a moment), and on phones as soon as a
 //   finger presses it; a press that turns into a scroll doesn't count
 // - once per visit, soon after the footer shows, it invites you to click it (a glow and a few
-//   words in a small pill), unless a robot was already clicked this session (robotMet). The pill only shows where it covers no text and
+//   words in a small pill), unless a robot was already clicked (robotMet, until a reload). The pill only shows where it covers no text and
 //   stays inside the footer and on screen; no room where it stands → it walks to a spot on the line
 //   where there is, and if there's none, it only glows
 // - it stops moving while the footer is off screen (saves battery)

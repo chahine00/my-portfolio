@@ -20,9 +20,10 @@
 //   small pill where they cover no text. No room where it stands? It walks or hops to a spot where
 //   the words fit. The first one comes right after it lands in the hero (from the welcome box or
 //   the big robot), so it's clear it can be clicked. Then one at about 10s and one at about 25s,
-//   and that's all: 3 per visit. It stops inviting for good once you've clicked it (remembered for
-//   the browser session, see robotMet in robotStore.ts), or once you go for the hero's main content (hover or tap
-//   its buttons or icons, or scroll away from the hero).
+//   and that's all: 3 per visit. It stops inviting once you've clicked it (remembered until a
+//   reload, see robotMet in robotStore.ts), or once you go for the hero's main content (click or
+//   tap its buttons or icons, or scroll away from the hero). Just moving the mouse over them
+//   doesn't count: on a computer the mouse crosses them all the time.
 //   Its favorite spot is the "Software Engineer" title: lots of free room above it, so the words
 //   fit there without covering any text. It lands there first and flies back to it often.
 // - its jokes open on hover too (rest the mouse on it for a moment), and on phones as soon as a
@@ -342,8 +343,8 @@ function Robot() {
       perchLine: '', // the last spot sentence it said (not twice in a row)
       // Invites (see maybeInvite).
       tapped: robotMet(), // it was clicked: no more invites, one reminder at most
-      reminded: robotMet(), // met in an earlier visit this session: no reminder either
-      engaged: false, // you went for the hero's buttons or icons, or scrolled away: no more invites
+      reminded: robotMet(), // met earlier (before coming back to this page): no reminder either
+      engaged: false, // you clicked the hero's buttons or icons, or scrolled away: no more invites
       hoverSince: 0, // mouse: since when it's on the robot
       hoverTalked: false, // this hover already opened a joke
       pressTalkAt: 0, // touch: when a press opened a joke
@@ -1060,8 +1061,6 @@ function Robot() {
       if (event.pointerType !== 'mouse' || reduceMotion) return
       const target = event.target instanceof Element ? event.target : null
       if (!target?.closest('.hero-actions a')) return
-      // Going for the main content: no more invites this visit.
-      s.engaged = true
       const now = performance.now()
       if (now - s.lastHoverHop < HOVER_HOP_GAP_MS || s.talking || now < s.inviteUntil) return
       if (s.wordsAt || s.wordsAfterWalk || s.wordsAfterLanding) return // on its way to an invite

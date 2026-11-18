@@ -63,20 +63,13 @@ export function robotOrigin() {
   return origin
 }
 
-// A robot was clicked once (hero or footer): remembered for the browser session, so going back to the home page or reloading
-// doesn't start the invites over (the footer robot reads it too).
-const MET_KEY = 'robot:met'
+// A robot was clicked once (hero or footer): remembered while you move around the site, so
+// coming back to the home page doesn't start its invites over. In memory only, like the rest of
+// this file: a reload starts over, and the robots invite again.
+let met = false
 export function robotMet() {
-  try {
-    return sessionStorage.getItem(MET_KEY) === '1'
-  } catch {
-    return false
-  }
+  return met
 }
 export function rememberRobotMet() {
-  try {
-    sessionStorage.setItem(MET_KEY, '1')
-  } catch {
-    // Storage blocked (private mode…): it just forgets on reload.
-  }
+  met = true
 }
