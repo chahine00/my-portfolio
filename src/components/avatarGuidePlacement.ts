@@ -25,6 +25,9 @@ export interface Placement {
   side: Side // where the bubble is
   bubbleWidth: number // the bubble's max width (narrower → more lines, so it fits on phones)
   reach: number // how far above the edge the avatar and bubble go, together
+  // In the bottom-left corner of the screen instead of on a post (see dockSpot): for when you're
+  // deep in a section and no post has free space next to it on screen.
+  dock?: boolean
 }
 
 interface Box {
@@ -39,6 +42,8 @@ const GAP = 4 // the empty space kept around texts and cards
 const MARGIN = 8 // the space kept from the screen's left and right edges
 const HAND = 0.25 // the waving hand sticks out on the left by this much of the avatar's width
 const BESIDE_GAP = 16 // between a post and the avatar standing beside it
+const DOCK_CLEAR = 10 // the space kept between the corner spot's bubble and the back-to-top button
+const DOCK_MIN_BUBBLE = 150 // narrower than this beside the avatar → the bubble goes above it instead
 const PHONE_MAX = 720 // up to this width, a tip's "phone" spot is used (same breakpoint as --guide-w in global.css)
 
 // Same numbers as the bubble's position in global.css ("avatar guide").
@@ -269,4 +274,29 @@ export function findPlacements(section: HTMLElement, tip: GuideTip): Placement[]
 export function fitsOnScreen(spot: Placement, navBottom: number, lowest: number) {
   const y = edgeOf(spot).y - scrollY
   return y - spot.reach >= navBottom + MARGIN && y <= window.innerHeight * lowest
+}
+
+// The corner spot: the avatar rises from the bottom-left corner of the screen. It's used when
+// you've scrolled into the middle of a section (you skipped its title) and none of its posts has
+// free space on screen, which is common on phones, where the posts are stacked with little room
+// between them.
+// The bubble goes on its right, but stops before the back-to-top button (bottom right), so the
+// two never overlap. If that leaves too little room (a narrow phone), it goes above the avatar.
+export function dockSpot(section: HTMLElement): Placement {
+  const { width, height } = guideSize()
+  const viewWidth = document.documentElement.clientWidth
+  // The avatar's left, from the screen's left edge: the waving hand sticks out past it, so that's
+  // the hand plus a margin (same as .avatar-guide[data-dock] in global.css).
+  const side = width * HAND + MARGIN
+  // The button keeps its place while hidden, so its left edge is known either way.
+  const button = document.querySelector('.back-to-top')?.getBoundingClientRect()
+  const end = Math.min(viewWidth - MARGIN, button && button.width ? button.left - DOCK_CLEAR : Infinity)
+  const room = end - (side + width + BUBBLE_GAP)
+  if (room >= DOCK_MIN_BUBBLE) {
+    const bubbleWidth = Math.min(BUBBLE_WIDTHS[0], Math.floor(room))
+    return { anchor: section, edge: 'bottom', dx: 0, rise: height, side: 'right', bubbleWidth, reach: height, dock: true }
+  }
+  // Above its head, starting at its hand: from near the screen's left edge to the button.
+  const bubbleWidth = Math.min(BUBBLE_WIDTHS[0], Math.floor(end - MARGIN))
+  return { anchor: section, edge: 'bottom', dx: 0, rise: height, side: 'above', bubbleWidth, reach: height, dock: true }
 }

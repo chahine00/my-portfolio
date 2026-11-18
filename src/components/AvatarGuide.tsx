@@ -23,7 +23,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { asset } from '../utils/asset.ts'
 import { guideTips, type GuideTip } from '../data/guide.ts'
-import { edgeOf, findPlacements, fitsOnScreen, type Placement } from './avatarGuidePlacement.ts'
+import { dockSpot, edgeOf, findPlacements, fitsOnScreen, type Placement } from './avatarGuidePlacement.ts'
 
 // "in": rising. "talk": typing and showing the bubble. "out": sinking back.
 type Phase = 'in' | 'talk' | 'out'
@@ -50,6 +50,14 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
 // screen (on phones it scrolls away with the page), that's the top of the screen.
 function navBottom() {
   return Math.max(0, document.querySelector('.navbar')?.getBoundingClientRect().bottom ?? 0)
+}
+
+// True when you're in the middle of this section's content: it fills the screen from near the top
+// to near the bottom. Then, if none of its posts has room for the guide, it comes out in the
+// screen's corner instead (dockSpot), so scrolling fast past the title doesn't skip it.
+function deepIn(section: HTMLElement) {
+  const rect = section.getBoundingClientRect()
+  return rect.top < window.innerHeight * 0.35 && rect.bottom > window.innerHeight * 0.65
 }
 
 // True while some of this section is on screen (below the navbar). The guide stays as long as
@@ -138,7 +146,10 @@ function AvatarGuide() {
           const rest = SETTLE_MS - (now - scrolledAt)
           if (rest > 0) return later(rest + 20)
           places.delete(current.tip.section) // measured afresh: the posts may have moved since
-          const spot = spotsFor(current.tip, section).find((s) => fitsOnScreen(s, nav, LOWEST))
+          // No post with room on screen: the screen's corner.
+          const spot =
+            spotsFor(current.tip, section).find((s) => fitsOnScreen(s, nav, LOWEST)) ??
+            (deepIn(section) ? dockSpot(section) : undefined)
           if (spot) {
             moveRef.current = spot
             seen.set(current.tip.section, { anchor: spot.anchor, at: now, left: false })
@@ -159,7 +170,11 @@ function AvatarGuide() {
         // Quick test first: is this section around the reading area at all?
         const rect = section.getBoundingClientRect()
         if (rect.top > window.innerHeight * LOWEST || rect.bottom < nav + 100) continue
-        const spot = spotsFor(tip, section).find((s) => fitsOnScreen(s, nav, LOWEST))
+        // A post with room next to it on screen, or, when you've scrolled into the middle of the
+        // section (past its title), the screen's corner.
+        const spot =
+          spotsFor(tip, section).find((s) => fitsOnScreen(s, nav, LOWEST)) ??
+          (deepIn(section) ? dockSpot(section) : undefined)
         if (!spot) continue
 
         // The section has to stay in view a moment (DWELL_MS), and the page has to rest (SETTLE_MS),
@@ -242,7 +257,13 @@ function AvatarGuide() {
     let placed: { x: number; y: number } | null = null
     function follow() {
       const root = rootRef.current
-      if (root) {
+      if (root && spot.dock) {
+        // In the screen's corner: fixed there by the CSS, just above the phone's tab bar when it
+        // shows. It's never "away"; it only leaves with its section (below).
+        const tabbar = document.querySelector('.tabbar--visible')?.getBoundingClientRect()
+        const lift = tabbar && tabbar.height ? Math.max(0, window.innerHeight - tabbar.top) : 0
+        root.style.setProperty('--dock-bottom', `${Math.round(lift)}px`)
+      } else if (root) {
         const edge = edgeOf(spot)
         const x = Math.round(edge.x + spot.dx)
         const y = Math.round(edge.y - spot.rise)
@@ -270,7 +291,10 @@ function AvatarGuide() {
           awaySince = 0
           setAway(false)
         }
+      }
+      if (root) {
         // It leaves only once you've left its whole section.
+        const now = Date.now()
         if (sectionOnScreen(tip)) leftSince = 0
         else if (!leftSince) leftSince = now
         else if (now - leftSince > LEAVE_MS && phaseRef.current !== 'out') {
@@ -330,6 +354,7 @@ function AvatarGuide() {
       ref={rootRef}
       className="avatar-guide"
       data-phase={phase}
+      data-dock={spot.dock ? '' : undefined}
       style={{ height: spot.rise }}
     >
       {/* Read out once, in full, by screen readers (the letter-by-letter text is hidden from them). */}

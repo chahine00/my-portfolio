@@ -5203,6 +5203,20 @@ a {
   pointer-events: none;
 }
 
+/* The corner spot (dockSpot in avatarGuidePlacement.ts): fixed in the screen's bottom-left
+   corner, rising from the bottom edge of the screen, or from the top of the phone's tab bar when
+   it shows (--dock-bottom, set in AvatarGuide.tsx). The back-to-top button is on the right. */
+.avatar-guide[data-dock] {
+  position: fixed;
+  top: auto;
+  /* The waving hand sticks out a quarter of its width on the left: clear it, plus 8px
+     (dockSpot in avatarGuidePlacement.ts uses the same numbers). */
+  left: calc(var(--guide-w) * 0.25 + 8px);
+  bottom: var(--dock-bottom, 0px);
+  transform: none;
+  transition: bottom 0.3s ease;
+}
+
 .avatar-guide__peek {
   /* Bigger than the avatar on the top and sides (the hand sticks out on the left), so the only
      cut is at the bottom: the edge it hides behind. The last few pixels fade out (--guide-fade),
@@ -5385,6 +5399,19 @@ a {
   right: calc(var(--guide-w) / 2 - 6px);
   bottom: -7px;
   transform: rotate(135deg);
+}
+
+/* In the screen's corner (data-dock), "above" starts at the avatar's left instead of ending at
+   its right, so it stays on screen and clear of the back-to-top button. */
+.avatar-guide[data-dock] .avatar-guide__bubble[data-side='above'] {
+  right: auto;
+  left: calc(var(--guide-w) * -0.25); /* starts at the hand, 8px from the screen's edge */
+  transform-origin: 15% 100%;
+}
+
+.avatar-guide[data-dock] .avatar-guide__bubble[data-side='above']::after {
+  right: auto;
+  left: calc(var(--guide-w) * 0.75 - 6px); /* over the avatar's head */
 }
 
 /* Where avatarGuidePlacement.ts measures a bubble's size before it's shown: off screen. */
