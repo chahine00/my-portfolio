@@ -4,7 +4,8 @@
 //
 // A small, cozy workspace at night, drawn in SVG (no words or technology names on it, the hero's
 // text already says what you build):
-// - a window with the night sky: a moon, twinkling stars, and now and then a shooting star;
+// - a window with the sky: in dark mode the night (a moon, twinkling stars, and now and then a
+//   shooting star), in light mode the day (a sun with slowly turning rays, a few clouds);
 // - a laptop on the desk whose screen "types" code (colored bars, line after line), then starts over,
 //   with its glow on the desk in front of it;
 // - a desk lamp lighting the desk, a mug of coffee with rising steam, and a plant swaying a little.
@@ -90,6 +91,10 @@ function RobotLab({ robotHome, robotDismissed }: RobotLabProps) {
             <stop offset="0" stopColor="#0b1030" />
             <stop offset="1" stopColor="#27235a" />
           </linearGradient>
+          <linearGradient id={`${id}-day`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#7dd3fc" />
+            <stop offset="1" stopColor="#e0f2fe" />
+          </linearGradient>
           <linearGradient id={`${id}-cone`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#fde68a" stopOpacity="0.55" />
             <stop offset="1" stopColor="#fde68a" stopOpacity="0" />
@@ -105,9 +110,22 @@ function RobotLab({ robotHome, robotDismissed }: RobotLabProps) {
           </mask>
         </defs>
 
-        {/* The window and its night sky. */}
+        {/* The window and its sky: the night in dark mode, the day in light mode (global.css
+            shows one of the two). */}
         <g className="desk__window">
           <rect className="desk__sky" x="18" y="12" width="104" height="80" rx="6" fill={`url(#${id}-sky)`} />
+          <rect className="desk__sky desk__sky--day" x="18" y="12" width="104" height="80" rx="6" fill={`url(#${id}-day)`} />
+          <g className="desk__day">
+            <g className="desk__sun-rays">
+              {Array.from({ length: 8 }, (_, i) => (
+                <line key={i} x1="94" y1="13" x2="94" y2="17" transform={`rotate(${i * 45} 94 28)`} />
+              ))}
+            </g>
+            <circle className="desk__sun" cx="94" cy="28" r="8.5" />
+            <path className="desk__cloud" d="M30 44 a5 5 0 0 1 9 -3 a6 6 0 0 1 11 2 a4 4 0 0 1 0 8 h-19 a4 4 0 0 1 -1 -7 z" />
+            <path className="desk__cloud desk__cloud--far" d="M78 70 a4 4 0 0 1 7 -2 a5 5 0 0 1 9 2 a3 3 0 0 1 0 6 h-15 a3 3 0 0 1 -1 -6 z" />
+          </g>
+          <g className="desk__night">
           <circle className="desk__moon" cx="94" cy="28" r="11" mask={`url(#${id}-moon)`} />
           {STARS.map((s, i) => (
             <circle
@@ -120,6 +138,7 @@ function RobotLab({ robotHome, robotDismissed }: RobotLabProps) {
             />
           ))}
           <line className="desk__shooting" x1="40" y1="20" x2="62" y2="32" pathLength={1} />
+          </g>
           {/* The frame: outline and the cross bars. */}
           <rect className="desk__frame" x="18" y="12" width="104" height="80" rx="6" />
           <line className="desk__frame" x1="70" y1="12" x2="70" y2="92" />

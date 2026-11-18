@@ -14,8 +14,16 @@ import RobotLab from './RobotLab.tsx'
 import HeroRobot from '../../components/HeroRobot.tsx'
 
 // The robot pops up on the welcome box when the word is typed (~2.2s, see .hero__art-robot in
-// global.css), then comes out by itself this long after the drawing starts.
+// global.css), then comes out by itself this long after the drawing starts (times ART_TIME).
 const ROBOT_OUT_AFTER_MS = 2900
+
+// How fast the welcome plays is --art-time in global.css (faster with a mouse, as it plays while
+// you hover; as before on touch screens). The inline delays below are multiplied by it in CSS, and
+// the robot's exit reads it from the drawing, so everything follows it.
+const artTime = (el: Element | null) => (el && parseFloat(getComputedStyle(el).getPropertyValue('--art-time'))) || 1
+// Rounded: sums like 1.45 + 5 * 0.07 give 1.8000000000000003, and a delay like that once left a
+// letter of the welcome invisible.
+const artDelay = (seconds: number) => `calc(${Math.round(seconds * 1000)}ms * var(--art-time))`
 
 // After the "back to top" button brings you up, the drawing plays on its own and stays this long
 // (in milliseconds; it takes about 1.6s to draw) before fading out.
@@ -115,7 +123,7 @@ function PhotoArt({ cutout, robotHome, robotDismissed }: { cutout?: string; robo
     const timer = window.setTimeout(() => {
       const robot = robotRef.current
       if (robot && !isRobotDismissed()) callRobotOut(robot.getBoundingClientRect())
-    }, ROBOT_OUT_AFTER_MS)
+    }, ROBOT_OUT_AFTER_MS * artTime(robotRef.current))
     return () => window.clearTimeout(timer)
   }, [robotHome, robotDismissed])
 
@@ -131,14 +139,14 @@ function PhotoArt({ cutout, robotHome, robotDismissed }: { cutout?: string; robo
     <g key={`${side}${i}`}>
       <path
         className="hero__art-line hero__art-code"
-        style={{ animationDelay: `${0.55 + i * 0.07}s` }}
+        style={{ animationDelay: artDelay(0.55 + i * 0.07) }}
         pathLength={1}
         d={`M${x + indent} ${y} h${length}`}
       />
       {ACCENT_LINES.has(i) && (
         <path
           className="hero__art-line hero__art-token"
-          style={{ animationDelay: `${0.65 + i * 0.07}s` }}
+          style={{ animationDelay: artDelay(0.65 + i * 0.07) }}
           pathLength={1}
           d={`M${x + indent + length + 8} ${y} h${Math.round(length * 0.45)}`}
         />
@@ -167,7 +175,7 @@ function PhotoArt({ cutout, robotHome, robotDismissed }: { cutout?: string; robo
         <path className="hero__art-line hero__art-window" pathLength={1} d="M40 399 V82 a12 12 0 0 1 12 -12 H468 a12 12 0 0 1 12 12 V399" />
         <path className="hero__art-line hero__art-titlebar" pathLength={1} d="M40 96 H480" />
         {[56, 70, 84].map((cx, i) => (
-          <circle key={cx} className="hero__art-dot" style={{ animationDelay: `${0.45 + i * 0.06}s` }} cx={cx} cy="83" r="3.2" />
+          <circle key={cx} className="hero__art-dot" style={{ animationDelay: artDelay(0.45 + i * 0.06) }} cx={cx} cy="83" r="3.2" />
         ))}
         {CODE_LEFT.map((line, i) => codeLine(56, 122 + i * 20, line, i, 'l'))}
         {CODE_RIGHT.map((line, i) => codeLine(318, 122 + i * 20, line, i, 'r'))}
@@ -180,7 +188,7 @@ function PhotoArt({ cutout, robotHome, robotDismissed }: { cutout?: string; robo
         />
         <text className="hero__art-text" x={TEXT_X} y={BUBBLE.y + 26} textLength={GREETING.length * CHAR_W} lengthAdjust="spacing">
           {[...GREETING].map((char, i) => (
-            <tspan key={i} className="hero__art-char" style={{ animationDelay: `${1.45 + i * 0.07}s` }}>
+            <tspan key={i} className="hero__art-char" style={{ animationDelay: artDelay(1.45 + i * 0.07) }}>
               {char}
             </tspan>
           ))}

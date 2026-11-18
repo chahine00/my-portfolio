@@ -538,12 +538,102 @@ main {
   fill: color-mix(in srgb, var(--accent) 45%, var(--bg));
 }
 
+/* The lamp is off in the day (light mode: the sun is out, see the sky below): no light cone, and a
+   plain unlit bulb. It's on at night (dark mode, the same two ways as the colors at the top). */
+.desk__cone {
+  display: none;
+}
+
 .desk__bulb {
+  fill: color-mix(in srgb, var(--accent) 20%, var(--bg));
+  filter: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .desk__cone {
+    display: inline;
+  }
+  :root:not([data-theme='light']) .desk__bulb {
+    fill: #fde68a;
+    filter: drop-shadow(0 0 4px #fde68a);
+  }
+}
+
+:root[data-theme='dark'] .desk__cone {
+  display: inline;
+}
+
+:root[data-theme='dark'] .desk__bulb {
   fill: #fde68a;
   filter: drop-shadow(0 0 4px #fde68a);
 }
 
-/* The night sky: the moon, the stars twinkling, and a shooting star now and then. */
+/* The window's sky. Light mode: the day (a sun with slowly turning rays, two clouds). Dark mode
+   (the same two ways as the colors at the top): the night (the moon, the stars twinkling, and a
+   shooting star now and then). */
+.desk__night,
+.desk__sky:not(.desk__sky--day) {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .desk__night,
+  :root:not([data-theme='light']) .desk__sky:not(.desk__sky--day) {
+    display: inline;
+  }
+  :root:not([data-theme='light']) .desk__day,
+  :root:not([data-theme='light']) .desk__sky--day {
+    display: none;
+  }
+}
+
+:root[data-theme='dark'] .desk__night,
+:root[data-theme='dark'] .desk__sky:not(.desk__sky--day) {
+  display: inline;
+}
+
+:root[data-theme='dark'] .desk__day,
+:root[data-theme='dark'] .desk__sky--day {
+  display: none;
+}
+
+.desk__sun {
+  fill: #fbbf24;
+  filter: drop-shadow(0 0 5px rgb(251 191 36 / 0.7));
+}
+
+.desk__sun-rays {
+  stroke: #f59e0b;
+  stroke-width: 2;
+  stroke-linecap: round;
+  transform-origin: 94px 28px;
+  animation: desk-sun-turn 24s linear infinite;
+}
+
+@keyframes desk-sun-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.desk__cloud {
+  fill: #fff;
+  opacity: 0.95;
+  animation: desk-cloud-drift 14s ease-in-out infinite alternate;
+}
+
+.desk__cloud--far {
+  opacity: 0.8;
+  animation-duration: 18s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes desk-cloud-drift {
+  to {
+    transform: translateX(10px);
+  }
+}
+
 .desk__moon {
   fill: #fef3c7;
   filter: drop-shadow(0 0 5px rgb(254 243 199 / 0.6));
@@ -758,6 +848,8 @@ main {
   .lab__kid,
   .lab__kid-tag,
   .desk__star,
+  .desk__sun-rays,
+  .desk__cloud,
   .desk__cone,
   .desk__glow,
   .desk__code,
@@ -783,6 +875,9 @@ main {
    starts it, see Hero.tsx). Each hover rebuilds it, so it draws again from the start; leaving
    fades it out. Its bottom lines up with the photo's bottom; its height follows its width. */
 .hero__art {
+  /* How fast the welcome plays: every time in it is multiplied by this (Hero.tsx uses the same
+     numbers, ART_TIME). Mouse screens: faster, it plays as you hover. Touch screens: as before. */
+  --art-time: 0.55;
   position: absolute;
   left: -20%;
   bottom: 0; /* the window's bottom sits on the photo's bottom edge */
@@ -809,6 +904,12 @@ main {
   padding: var(--hit-top) var(--hit-side) 0;
 }
 
+@media (hover: none), (any-pointer: coarse) {
+  .hero__art {
+    --art-time: 1;
+  }
+}
+
 .hero__visual:not(.hero__visual--on) .hero__art {
   opacity: 0;
 }
@@ -828,15 +929,15 @@ main {
   stroke-linejoin: round;
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
-  animation: hero-art-draw 0.5s ease-in-out both;
+  animation: hero-art-draw calc(0.5s * var(--art-time)) ease-in-out both;
 }
 
 /* When each part draws and how long it takes: the window in about 0.6s, then the code types in
    line by line (each line's delay is set in Hero.tsx), then the bubble around 1.2s. */
-.hero__art-window { animation-duration: 0.6s; opacity: 0.7; }
-.hero__art-titlebar { animation-duration: 0.35s; animation-delay: 0.3s; opacity: 0.5; }
-.hero__art-code { stroke-width: 3; opacity: 0.35; animation-duration: 0.3s; }
-.hero__art-token { stroke: var(--accent); stroke-width: 3; opacity: 0.55; animation-duration: 0.2s; }
+.hero__art-window { animation-duration: calc(0.6s * var(--art-time)); opacity: 0.7; }
+.hero__art-titlebar { animation-duration: calc(0.35s * var(--art-time)); animation-delay: calc(0.3s * var(--art-time)); opacity: 0.5; }
+.hero__art-code { stroke-width: 3; opacity: 0.35; animation-duration: calc(0.3s * var(--art-time)); }
+.hero__art-token { stroke: var(--accent); stroke-width: 3; opacity: 0.55; animation-duration: calc(0.2s * var(--art-time)); }
 
 /* The three window dots pop in as the title bar finishes. */
 .hero__art-dot {
@@ -846,7 +947,7 @@ main {
   opacity: 0.8;
   transform-box: fill-box;
   transform-origin: center;
-  animation: hero-art-pop 0.25s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+  animation: hero-art-pop calc(0.25s * var(--art-time)) cubic-bezier(0.34, 1.6, 0.64, 1) both;
 }
 
 /* The tiny robot patrolling the welcome box (Hero.tsx, PhotoArt): it pops up once the word is
@@ -859,7 +960,7 @@ main {
   cursor: pointer;
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: hero-art-robot-in 0.4s cubic-bezier(0.34, 1.6, 0.64, 1) 2.2s both;
+  animation: hero-art-robot-in 0.4s cubic-bezier(0.34, 1.6, 0.64, 1) calc(2.2s * var(--art-time)) both;
   outline: none;
 }
 
@@ -872,7 +973,7 @@ main {
 .hero__art-robot-patrol {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: hero-art-robot-patrol 3.4s steps(7, end) 2.6s infinite both;
+  animation: hero-art-robot-patrol 3.4s steps(7, end) calc(2.6s * var(--art-time)) infinite both;
 }
 
 @keyframes hero-art-robot-patrol {
@@ -899,7 +1000,7 @@ main {
   transform-box: fill-box;
   transform-origin: center;
   opacity: 0;
-  animation: hero-art-robot-pulse 1.6s ease-out 2.7s infinite;
+  animation: hero-art-robot-pulse 1.6s ease-out calc(2.7s * var(--art-time)) infinite;
 }
 
 @keyframes hero-art-robot-pulse {
@@ -911,8 +1012,8 @@ main {
   transform-box: fill-box;
   transform-origin: 50% 100%;
   animation:
-    hero-art-pop 0.35s cubic-bezier(0.34, 1.6, 0.64, 1) 3s both,
-    hero-art-robot-bob 1.2s ease-in-out 3.4s infinite alternate;
+    hero-art-pop 0.35s cubic-bezier(0.34, 1.6, 0.64, 1) calc(3s * var(--art-time)) both,
+    hero-art-robot-bob 1.2s ease-in-out calc(3.4s * var(--art-time)) infinite alternate;
 }
 
 .hero__art-robot-hint rect {
@@ -980,8 +1081,8 @@ main {
   transform-box: view-box;
   filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--accent) 35%, transparent));
   animation:
-    hero-art-pop 0.35s cubic-bezier(0.34, 1.5, 0.64, 1) 1.15s both,
-    hero-art-float 3.2s ease-in-out 1.6s infinite;
+    hero-art-pop calc(0.35s * var(--art-time)) cubic-bezier(0.34, 1.5, 0.64, 1) calc(1.15s * var(--art-time)) both,
+    hero-art-float 3.2s ease-in-out calc(1.6s * var(--art-time)) infinite;
 }
 
 .hero__art-bubble-shape {
@@ -1000,7 +1101,9 @@ main {
 
 /* Each character appears on its turn (delays in Hero.tsx), like typing. */
 .hero__art-char {
-  animation: hero-art-type 0.01s steps(1) both;
+  /* Linear and a little longer than an instant: a near-zero stepped animation could stay at its
+     start (invisible) for one letter, depending on how its start time rounded. */
+  animation: hero-art-type 0.04s linear both;
 }
 
 /* The cursor: jumps one character right per typed character (same pace as the typing:
@@ -1009,8 +1112,8 @@ main {
   fill: var(--bg);
   transform: translateX(var(--typed));
   animation:
-    hero-art-caret calc(var(--chars) * 0.07s) steps(var(--chars), jump-start) 1.45s both,
-    hero-art-blink 1s steps(1) calc(1.45s + var(--chars) * 0.07s) infinite;
+    hero-art-caret calc(var(--chars) * 0.07s * var(--art-time)) steps(var(--chars), jump-start) calc(1.45s * var(--art-time)) both,
+    hero-art-blink 1s steps(1) calc((1.45s + var(--chars) * 0.07s) * var(--art-time)) infinite;
 }
 
 @keyframes hero-art-draw {

@@ -47,17 +47,20 @@ const DURATIONS: Record<Mode, [number, number]> = {
   dance: [0, 0], // while the mouse is on it
 }
 
-// Inviting you to click it (sayInvite): playful hints, not orders. The first one comes first.
-const INVITES = ['End of page. Joke?', 'joke.exe is ready', 'I guard the jokes', 'Insert click to continue', 'Beep? (that’s “bye”)']
-const TOUCH_INVITES = ['End of page. Joke?', 'joke.exe is ready', 'I guard the jokes', 'Insert tap to continue', 'Beep? (that’s “bye”)']
+// Inviting you to click it (sayInvite): a little curiosity, never an order, the same with a mouse
+// and on phones. It promises "one last thing", so the first thing it says when clicked right
+// after is the useful one (PROMISED_LINE).
+const INVITE = 'Before you go…'
+const PROMISED_LINE = 'Psst… the contact form is just above. Ali reads every message.'
+const PROMISE_MS = 10000 // clicked this soon after its invite: it says PROMISED_LINE
 const INVITE_GAPS = [1800] // the wait before each invite while the footer is in view: just one
+const TOUCH_DANCE_MS = 900 // touch: a finger on it makes it dance this long (same as the hero robot)
 const PRESS_TALK_MS = 150 // touch: a press this long (that isn't a scroll) opens a joke
 const PRESS_CLICK_GUARD_MS = 1500 // …and the click that follows the press doesn't open another
 const INVITE_SHOW_MS = 3200 // how long the words stay (same as robot-invite in global.css)
 const GLOW_MS = 1600 // same as robot-glow in global.css
 
 const between = ([min, max]: [number, number]) => min + Math.random() * (max - min)
-const pick = <T,>(list: T[]) => list[Math.floor(Math.random() * list.length)]
 
 function FooterRobot() {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -72,7 +75,6 @@ function FooterRobot() {
     const track = root?.parentElement
     if (!root || !track) return
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const touch = window.matchMedia('(hover: none), (any-pointer: coarse)').matches
     const footer = track.closest('footer') ?? track
 
     let x = 0
@@ -91,11 +93,13 @@ function FooterRobot() {
     let tapped = robotMet() // it (or the hero robot) was clicked: no more invites
     let pressTimer = 0
     let pressTalkAt = 0
+    let danceUntil = 0 // touch: a finger on it makes it dance this long (with a sentence)
     let invites = 0 // how many it showed
     let nextInvite = Infinity // when the next one is due (set when the footer comes into view)
     let inviteUntil = 0 // the words are showing until then (it holds still)
     let wordsAfterWalk = false // it's walking to a spot where the words fit
     let inviteTimer = 0
+    let promiseUntil = 0 // clicked before then: it says PROMISED_LINE
 
     const size = () => root.offsetWidth
     const room = () => Math.max(0, track.clientWidth - size())
@@ -189,14 +193,14 @@ function FooterRobot() {
       return null
     }
 
-    // Says "Click me!" (or the like) where it covers no text. No room where it stands: it walks to
+    // Says its invite ("Before you go…") where it covers no text. No room where it stands: it walks to
     // a spot on the line where there is (canMove) and says it there. No room anywhere: it only
     // glows.
     function sayInvite(now: number, canMove: boolean) {
       const el = inviteRef.current
       if (!el || tapped || talking || !visible) return inviteDone(now, false)
-      const words = touch ? TOUCH_INVITES : INVITES
-      el.textContent = invites === 0 ? words[0] : pick(words)
+      el.textContent = INVITE
+      promiseUntil = now + INVITE_SHOW_MS + PROMISE_MS
       el.classList.remove('is-on')
       el.style.left = '0px'
       el.style.top = '0px'
@@ -248,12 +252,17 @@ function FooterRobot() {
     function tick(now: number) {
       const dt = Math.min(now - last, 100)
       last = now
-      if (hovered) {
+      if (hovered || now < danceUntil) {
         if (mode !== 'dance') set('dance', now)
       } else if (mode === 'dance') {
         set('idle', now)
       } else if (now < inviteUntil) {
         // Its words are showing: it holds still, so they stay where they fit.
+      } else if (!talking && !wordsAfterWalk && now >= nextInvite && mode !== 'turn') {
+        // On time, even mid-walk: it stops where it is and says it (or walks to a roomier spot).
+        nextInvite = Infinity // set again once this invite is over
+        set('idle', now)
+        sayInvite(now, true)
       } else if (mode === 'walk') {
         // Servo steps: it moves in the first part of each step, then stops.
         const moving = now % STEP_MS < STEP_MS * MOVE_SHARE
@@ -270,10 +279,6 @@ function FooterRobot() {
         place()
       } else if (mode === 'turn' && now >= until) {
         set('walk', now)
-      } else if (!talking && !wordsAfterWalk && now >= nextInvite && (mode === 'idle' || mode === 'scan')) {
-        nextInvite = Infinity // set again once this invite is over
-        set('idle', now)
-        sayInvite(now, true)
       } else if (now >= until && !talking) {
         decide(now)
       }
@@ -340,8 +345,10 @@ function FooterRobot() {
       hovered = false
     }
     // A finger on it: the joke opens right away, unless the press turns into a scroll.
+    // A tap on it while it talks says the next sentence (with a dance, like any tap on it).
     function onDown(event: PointerEvent) {
-      if (event.pointerType === 'mouse' || talking) return
+      if (event.pointerType === 'mouse') return
+      if (!reduceMotion) danceUntil = performance.now() + TOUCH_DANCE_MS
       window.clearTimeout(pressTimer)
       pressTimer = window.setTimeout(() => {
         pressTimer = 0
@@ -377,7 +384,8 @@ function FooterRobot() {
       nextInvite = Infinity
       hideInvite()
       const fresh = LINES.filter((l) => l !== lastLine)
-      lastLine = fresh[Math.floor(Math.random() * fresh.length)]
+      lastLine = performance.now() < promiseUntil ? PROMISED_LINE : fresh[Math.floor(Math.random() * fresh.length)]
+      promiseUntil = 0
       setSide(x > room() / 2 ? 'right' : 'left')
       setLine(lastLine)
       if (mode === 'walk' || mode === 'turn') set('idle', performance.now())

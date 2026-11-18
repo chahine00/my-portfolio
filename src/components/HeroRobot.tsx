@@ -136,36 +136,38 @@ const PERCH_LINES: [string, string[]][] = [
 ]
 const PERCH_LINE_CHANCE = 0.4
 
-// Inviting you to click it (see maybeInvite): short, playful hints that it has something to say,
-// not orders. The very first one is always the first of the list.
-const INVITES = [
-  'Joke time?',
-  'joke.exe ready',
-  'I byte. Gently.',
-  'Clickable bot!',
-  'Insert click to continue',
-  'I’m funnier up close',
-  'Beep? (that’s “hi”)',
+// Inviting you to click it (see sayInvite): never an order ("click me", "tap me") and never about
+// jokes, just a little curiosity, so the same words work with a mouse and on phones. It's smart
+// about it:
+// - the first one is a plain "Tap me!" (on phones and computers alike)
+// - on a spot that has its own sentences (PERCH_LINES), it often hints at that spot, and if you
+//   click it right after, it answers with a sentence about that same spot (s.promise)
+// - with a mouse lingering near it without clicking, it notices you (NUDGES)
+// - never the same words twice in a row
+const FIRST_INVITE = 'Tap me!'
+const INVITES = ['I know things…', 'Psst… hi there', 'Got a secret…', 'Curious?', 'Ali’s sidekick 👋']
+const SPOT_INVITES: [string, string[]][] = [
+  ['.hero__name', ['I know him well', 'Guess who’s boss?']],
+  ['.hero__text > .eyebrow', ['I work for him', 'Behind the title…']],
+  ['.hero__code', ['I can read this']],
+  ['.hero__meta li', ['Fun fact here…']],
+  ['.hero-actions .button[download]', ['Seen his CV?']],
+  ['.hero-actions .button', ['Seen his work?']],
+  ['.hero-actions .social-links', ['He’s on there…']],
 ]
-const TOUCH_INVITES = [
-  'Joke time?',
-  'joke.exe ready',
-  'I byte. Gently.',
-  'Tappable bot!',
-  'Insert tap to continue',
-  'I’m funnier up close',
-  'Beep? (that’s “hi”)',
-]
-// On the title, it sometimes says one of these instead (short: it's about the spot it's on).
-const TITLE_INVITES = ['Best seat here!', 'Top of the hero!', 'Engineer’s sidekick', 'Nice view, joke?']
-const REMINDERS = ['Encore?', 'Got more jokes…', 'Miss me?', 'Round two?'] // once it was clicked
-// The first invite comes right after it lands (see 'jet' in tick); these are the waits before
-// each one otherwise: about 10s and 25s after the first.
-const INVITE_GAPS = [2500, 7000, 12000]
-const MAX_INVITES = 3 // per visit, with a mouse…
-const MAX_TOUCH_INVITES = 3 // …on touch screens…
+const SPOT_INVITE_CHANCE = 0.7 // on such a spot, it hints at it this often
+const PROMISE_MS = 10000 // clicked this soon after a spot hint (still there): it answers about it
+const NUDGES = ['I see you 👀', 'Curious?', 'Hi there 👋'] // mouse lingering near it
+const REMINDERS = ['There’s more…', 'Still here 👋', 'Back again?'] // once it was clicked
+// The first invite comes a few seconds after it lands (FIRST_INVITE_MS, see 'jet' in tick): long
+// enough to read the hero first, while it stands still on its spot. These are the waits before each
+// one after it (counted from the end of the one before): it talks more once it has started.
+const FIRST_INVITE_MS = 4500
+const INVITE_GAPS = [2500, 5000, 7000, 9000, 12000]
+const MAX_INVITES = 5 // per visit, with a mouse…
+const MAX_TOUCH_INVITES = 5 // …on touch screens…
 const MAX_STILL_INVITES = 1 // …and for visitors who turned off animations
-const REMINDER_AFTER_MS = 90000 // once clicked: one reminder, after this long without another click
+const REMINDER_AFTER_MS = 30000 // once clicked: one reminder, after this long without another click
 const MAX_INVITE_MOVES = 2 // it moves at most this many times to find room for the words
 const INVITE_RETRY_MS = 8000 // the moment passed (scrolled away, mouse came close…): try later
 // Its favorite spot, the "Software Engineer" title: roomy above, so it goes there often…
@@ -343,6 +345,9 @@ function Robot() {
       // Invites (see maybeInvite).
       tapped: robotMet(), // it was clicked: no more invites, one reminder at most
       reminded: robotMet(), // met earlier (before coming back to this page): no reminder either
+      promise: null as { perch: HTMLElement; until: number } | null, // it hinted at this spot (inviteWords)
+      nudged: false, // this invite comes early because the mouse lingers near it
+      lastInviteText: '',
       engaged: false, // you clicked the hero's buttons or icons, or scrolled away: no more invites
       hoverTalked: false, // this hover already opened a joke
       pressTalkAt: 0, // touch: when a press opened a joke
@@ -374,6 +379,7 @@ function Robot() {
     let talkTimer = 0
     let stillInviteTimer = 0
     let pressTimer = 0 // touch: the press that will open a joke
+    let inviteOffTimer = 0 // takes the invite pill off once it's over
     const touch = window.matchMedia('(hover: none), (any-pointer: coarse)').matches
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const maxInvites = reduceMotion ? MAX_STILL_INVITES : touch ? MAX_TOUCH_INVITES : MAX_INVITES
@@ -562,13 +568,12 @@ function Robot() {
             s.jet = null
             fitTo(j.to)
             setMode('land', LAND_MS)
-            // Its first landing in the hero (out of the welcome box or the big robot): it glows
-            // and says its first invite right away, so you know at once it can be clicked.
+            // Its first landing in the hero (out of the welcome box or the big robot): it stands
+            // still a few seconds (you read the hero first), then glows and says "Tap me!".
             if (!s.landed) {
               s.landed = true
               if (!s.tapped && s.invites === 0) {
-                glow()
-                s.wordsAt = now + LAND_MS + 150
+                s.wordsAt = now + FIRST_INVITE_MS
                 s.lastInviteAt = now
               }
             }
@@ -693,7 +698,10 @@ function Robot() {
       if (s.wordsAt) {
         if (now < s.wordsAt) return
         s.wordsAt = 0
-        if (inviteAllowed(now) && s.mode === 'idle') sayInvite(now, true)
+        if (inviteAllowed(now) && s.mode === 'idle') {
+          if (s.invites === 0 && !s.tapped) glow() // the first one (after landing) had no gesture before it
+          sayInvite(now, true)
+        }
         else s.nextInvite = now + INVITE_RETRY_MS
         return
       }
@@ -704,6 +712,7 @@ function Robot() {
       } else {
         const nudge = s.nearSince > 0 && now - s.nearSince > NUDGE_AFTER_MS && now - s.lastInviteAt > NUDGE_MIN_GAP_MS
         if (!nudge && now < s.nextInvite - (onTitle() ? TITLE_EARLY_MS : 0)) return
+        s.nudged = nudge && now < s.nextInvite // early because of the mouse: it noticed you
       }
       s.lastInviteAt = now
       s.nextInvite = Infinity // set again once the invite is over
@@ -731,14 +740,7 @@ function Robot() {
     // spot, or hops to another one, where they fit (canMove), and says them there. No room
     // anywhere: the glow and the gesture were the invite.
     function sayInvite(now: number, canMove: boolean) {
-      const words = touch ? TOUCH_INVITES : INVITES
-      const text = s.tapped
-        ? pick(REMINDERS)
-        : s.invites === 0
-          ? words[0]
-          : onTitle() && Math.random() < 0.5
-            ? pick(TITLE_INVITES)
-            : pick(words)
+      const text = inviteWords(now)
       const el = inviteRef.current
       if (!el) return
       const fit = placeInvite(text)
@@ -747,6 +749,10 @@ function Robot() {
         void el.offsetWidth // restart its animation
         el.classList.add('is-on')
         s.inviteUntil = now + INVITE_SHOW_MS
+        // Off once it's over: left on, its animation would play again after the next flight
+        // (the pill is hidden while it flies, and showing it again restarts the animation).
+        window.clearTimeout(inviteOffTimer)
+        inviteOffTimer = window.setTimeout(() => el.classList.remove('is-on'), INVITE_SHOW_MS)
         inviteDone(now)
         return
       }
@@ -772,6 +778,29 @@ function Robot() {
       }
       glow()
       inviteDone(now)
+    }
+
+    // The words for this invite (see INVITES).
+    function inviteWords(now: number) {
+      const fresh = (list: string[]) => {
+        const rest = list.filter((t) => t !== s.lastInviteText)
+        return pick(rest.length ? rest : list)
+      }
+      s.promise = null
+      let text: string
+      if (s.tapped) text = fresh(REMINDERS)
+      else if (s.invites === 0) text = FIRST_INVITE
+      else if (s.nudged) text = fresh(NUDGES)
+      else {
+        const spot = s.perch ? SPOT_INVITES.find(([sel]) => s.perch!.matches(sel)) : undefined
+        if (spot && Math.random() < SPOT_INVITE_CHANCE) {
+          text = fresh(spot[1])
+          s.promise = { perch: s.perch!, until: now + INVITE_SHOW_MS + PROMISE_MS }
+        } else text = fresh(INVITES)
+      }
+      s.nudged = false
+      s.lastInviteText = text
+      return text
     }
 
     function inviteDone(now: number) {
@@ -864,7 +893,10 @@ function Robot() {
     // A sentence about the spot it stands on, if it has some (not the same one twice in a row).
     function perchLine() {
       const lines = s.perch ? PERCH_LINES.find(([sel]) => s.perch!.matches(sel))?.[1] : undefined
-      if (!lines || Math.random() >= PERCH_LINE_CHANCE) return null
+      // It just hinted at this spot: clicked now, it keeps its promise and talks about it.
+      const promised = s.promise && s.promise.perch === s.perch && performance.now() < s.promise.until
+      s.promise = null
+      if (!lines || (!promised && Math.random() >= PERCH_LINE_CHANCE)) return null
       const fresh = lines.filter((l) => l !== s.perchLine)
       s.perchLine = pick(fresh.length ? fresh : lines)
       return s.perchLine
@@ -922,7 +954,9 @@ function Robot() {
       s.lastPointer = performance.now()
       const r = heroEl.getBoundingClientRect()
       const inside = event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom
-      s.pointer = inside ? { x: event.clientX - r.left, y: event.clientY - r.top } : null
+      // Only a mouse counts as a cursor near it: a finger's last touch would leave it dancing
+      // (see wantDance in tick) without anything to say.
+      s.pointer = inside && event.pointerType === 'mouse' ? { x: event.clientX - r.left, y: event.clientY - r.top } : null
       // Its eyes follow the mouse (in its own direction: the drawing is mirrored when it faces left).
       if (s.pointer && event.pointerType === 'mouse') {
         const sz = size()
@@ -946,20 +980,19 @@ function Robot() {
       if (target?.closest('.hero-actions a')) s.engaged = true // going for the main content
       if (event.pointerType !== 'mouse') {
         s.lastTouch = performance.now()
-        // Touch, bubble open: ANY tap closes it (on the bubble, on the robot, anywhere), except
-        // "Hide" itself. A tap on the robot doesn't open it again right away (noTalkUntil):
-        // the next tap does, with its next sentence.
-        if (s.talking) {
+        const onIt = !!target && robot.contains(target) && !target.closest('.robot__home, .robot__bubble')
+        // Touch, bubble open: a tap anywhere else (the bubble too) closes it, except "Hide"
+        // itself. A tap on the robot goes on below: it dances and says its next sentence.
+        if (s.talking && !onIt) {
           if (target?.closest('.robot__home')) return
           quiet()
           s.noTalkUntil = performance.now() + 450
           return
         }
-        if (target && robot.contains(target)) {
-          // A finger on it: a little dance, and the joke opens right away (once it's clear this
-          // press isn't the start of a scroll), like hovering it with a mouse.
+        if (onIt) {
+          // A finger on it: it dances, and always says something with it, right away (once it's
+          // clear this press isn't the start of a scroll), like hovering it with a mouse.
           s.danceUntil = performance.now() + TOUCH_DANCE_MS
-          if (target.closest('.robot__home, .robot__bubble')) return
           window.clearTimeout(pressTimer)
           pressTimer = window.setTimeout(() => {
             pressTimer = 0
@@ -968,9 +1001,12 @@ function Robot() {
           }, PRESS_TALK_MS)
           return
         }
-        // A near miss is a tap on it (it's small, and moves).
+        // A near miss is a tap on it (it's small, and moves): a dance and a sentence too.
         const r = heroEl.getBoundingClientRect()
-        if (Math.hypot(event.clientX - r.left - s.x, event.clientY - r.top - (s.y - size() / 2)) < NEAR_TAP) talk()
+        if (Math.hypot(event.clientX - r.left - s.x, event.clientY - r.top - (s.y - size() / 2)) < NEAR_TAP) {
+          s.danceUntil = performance.now() + TOUCH_DANCE_MS
+          talk()
+        }
         return
       }
       if (target && robot.contains(target)) return
@@ -1154,6 +1190,7 @@ function Robot() {
       window.removeEventListener('pointerdown', onPointerDown)
       window.removeEventListener('pointercancel', onPointerCancel)
       window.clearTimeout(pressTimer)
+      window.clearTimeout(inviteOffTimer)
       window.removeEventListener('scroll', onScroll)
       brain.current = null
     }
@@ -1178,7 +1215,7 @@ function Robot() {
         </div>
       )}
       <span ref={markRef} className="robot__mark" aria-hidden="true" />
-      {/* "Click me!" and friends: a small call above or beside it, rarely (see maybeInvite). */}
+      {/* Its invite ("Good evening 👋" and friends): a small call above or beside it (see sayInvite). */}
       <span ref={inviteRef} className="robot__invite" aria-hidden="true" />
       <button
         type="button"
