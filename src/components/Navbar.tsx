@@ -1,6 +1,6 @@
 // The navigation bar at the top of the page.
-// On phones every link shows an icon with a small label. Only the five most used fit on the row
-// (Home, About, Projects, Experience, and "More"); the others open from the More button. The menu
+// On phones every link shows an icon with a small label. Six tabs fit on the row (Home, About,
+// Projects, Experience, Contact, and "More"); Skills, Education and Blog open from the More button. The menu
 // "moves" to the bottom of the screen once you scroll: the top bar scrolls away with the page and a
 // matching bar slides up at the bottom (the "tab bar", see the end of this file). Same on every
 // page, except the Blog list, where the Blog bar (search + categories) sticks at the top instead.
@@ -41,7 +41,8 @@ const links: NavItem[] = [
   { to: '/#skills', label: 'Skills', icon: 'code', more: true },
   { to: '/#education', label: 'Education', icon: 'cap', more: true },
   { to: '/blog', label: 'Blog', section: 'blog', dot: hasRecentUpdate, icon: 'pen', more: true },
-  { to: '/#contact', label: 'Contact', icon: 'chat', more: true },
+  // Contact keeps its own tab on phones too: getting in touch should always be one tap away.
+  { to: '/#contact', label: 'Contact', icon: 'chat' },
 ]
 const moreLinks = links.filter((link) => link.more)
 

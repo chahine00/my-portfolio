@@ -5912,8 +5912,8 @@ a {
 }
 
 /* ------------------------------------------------------------------------------------------------
-   Phones: only five tabs (Home, About, Projects, Experience, More). Skills, Education, Blog and
-   Contact move into the small menu the "More" button opens (Navbar.tsx). Bigger screens show
+   Phones: six tabs (Home, About, Projects, Experience, Contact, More). Skills, Education and Blog
+   move into the small menu the "More" button opens (Navbar.tsx). Bigger screens show
    every link in the row, and no More button.
    ------------------------------------------------------------------------------------------------ */
 .navbar__more {
