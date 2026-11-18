@@ -4151,100 +4151,12 @@ a {
   50% { transform: translateX(4px); }
 }
 
-/* The small house on top of the name, like a crown (Navbar.tsx): a hint that the name is a link to
-   the home page. Thin accent lines, centered above the name. Every 10s it draws itself line by
-   line (roof, chimney, walls, door) with a little hop, stays a moment and fades away; on hover or
-   keyboard focus it draws and stays. It's a separate layer, so the letters' wave and hover color
-   work as before. */
-.navbar__brand {
-  position: relative;
-}
-
-.brand__home {
-  position: absolute;
-  bottom: calc(100% - 3px); /* sits right on top of the letters */
-  left: 50%;
-  width: 17px;
-  height: 17px;
-  translate: -50% 0;
-  overflow: visible;
-  pointer-events: none;
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: 0;
-  transform-origin: 50% 100%;
-  animation: brand-home-hint 10s ease-in-out 4s infinite;
-}
-
-.brand__home path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: brand-home-draw 10s ease-in-out 4s infinite;
-}
-
-/* Each line starts a little after the one before: roof, chimney, walls, then the door. */
-.brand__home path:nth-child(2) { animation-delay: 4.1s; }
-.brand__home path:nth-child(3) { animation-delay: 4.2s; }
-.brand__home path:nth-child(4) { animation-delay: 4.35s; }
-
-/* In 10s: pops up and draws during the first 0.8s (a little hop), shown until 2.2s, gone by
-   2.8s, then hidden. */
-@keyframes brand-home-hint {
-  0% { opacity: 0; transform: translateY(3px) scale(0.85); }
-  4% { opacity: 1; transform: translateY(-1.5px) scale(1.05); }
-  7%, 22% { opacity: 1; transform: none; }
-  28%, 100% { opacity: 0; transform: none; }
-}
-
-@keyframes brand-home-draw {
-  0% { stroke-dashoffset: 1; }
-  8%, 26% { stroke-dashoffset: 0; }
-  28%, 100% { stroke-dashoffset: 1; }
-}
-
-/* Hover or keyboard focus: draws itself (same order) and stays while you're on the name. */
-.navbar__brand:hover .brand__home,
-.navbar__brand:focus-visible .brand__home {
-  opacity: 1;
-  animation: none;
-  transition: opacity 0.2s;
-}
-
-.navbar__brand:hover .brand__home path,
-.navbar__brand:focus-visible .brand__home path {
-  animation: brand-home-draw-in 0.6s ease-out forwards;
-}
-
-.navbar__brand:hover .brand__home path:nth-child(2),
-.navbar__brand:focus-visible .brand__home path:nth-child(2) { animation-delay: 0.08s; }
-.navbar__brand:hover .brand__home path:nth-child(3),
-.navbar__brand:focus-visible .brand__home path:nth-child(3) { animation-delay: 0.16s; }
-.navbar__brand:hover .brand__home path:nth-child(4),
-.navbar__brand:focus-visible .brand__home path:nth-child(4) { animation-delay: 0.28s; }
-
-@keyframes brand-home-draw-in {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
-}
-
-/* People who turn off animations in their settings get the name standing still, and the house
-   only shows (already drawn) on hover or focus. */
+/* People who turn off animations in their settings get the name standing still. */
 @media (prefers-reduced-motion: reduce) {
   .navbar__brand,
   .brand__letter,
-  .brand__bracket,
-  .brand__home,
-  .brand__home path {
+  .brand__bracket {
     animation: none;
-  }
-
-  .navbar__brand:hover .brand__home path,
-  .navbar__brand:focus-visible .brand__home path {
-    animation: none;
-    stroke-dashoffset: 0;
   }
 }
 
@@ -5309,7 +5221,6 @@ a {
   animation: robot-leave 0.55s steps(6, end) forwards;
 }
 
-[data-robot='leave'] .robot__home,
 [data-robot='leave'] .robot__bubble {
   display: none;
 }
@@ -5476,7 +5387,7 @@ a {
 }
 
 /* The speech bubble: opens toward the middle of the hero (data-side). It only shows after the robot
-   is clicked or tapped, and closes by itself (HeroRobot.tsx). Under the text: "Hide". */
+   is clicked or tapped, and closes by itself (HeroRobot.tsx). Just the words, no buttons. */
 .robot__bubble {
   position: absolute;
   bottom: calc(100% + 12px);
@@ -5513,44 +5424,6 @@ a {
 .robot__bubble[data-below] {
   top: calc(100% + 12px);
   bottom: auto;
-}
-
-/* "Hide": a small labeled pill (a "×" looked like it only closed the message). It sits on
-   the side of the bubble away from the robot: the bubble opens away from it (data-side), so the
-   far end of its bottom row is the farthest point from the robot. */
-.robot__home {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-end;
-  padding: 3px 10px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: none;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.72rem;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.robot__bubble[data-side='right'] .robot__home {
-  align-self: flex-start;
-}
-
-.robot__home:hover,
-.robot__home:focus-visible {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-/* Fingers: a taller pill, easy to hit on purpose (and still far from the robot). */
-@media (hover: none), (any-pointer: coarse) {
-  .robot__home {
-    min-height: 32px;
-    padding-inline: 12px;
-  }
 }
 
 @keyframes robot-bubble-in {
@@ -6035,5 +5908,161 @@ a {
   .avatar-guide__bubble {
     transition: opacity 0.15s;
     transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Phones: only five tabs (Home, About, Projects, Experience, More). Skills, Education, Blog and
+   Contact move into the small menu the "More" button opens (Navbar.tsx). Bigger screens show
+   every link in the row, and no More button.
+   ------------------------------------------------------------------------------------------------ */
+.navbar__more {
+  display: none;
+  position: relative;
+}
+
+@media (max-width: 720px) {
+  .navbar__links .navbar__extra {
+    display: none;
+  }
+
+  .navbar__links .navbar__more {
+    display: block;
+  }
+
+  /* Looks exactly like the other tabs. */
+  .navbar__more-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    padding: 4px 0 2px;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .navbar__more-button.active,
+  .navbar__more-button.open {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* The menu: a small frosted card under the button (top bar) or above it (tab bar). */
+  .navbar__menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 4px;
+    z-index: 20;
+    min-width: 170px;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.16);
+    font-size: 0.95rem;
+    animation: navbar-menu-in 0.16s ease;
+  }
+
+  .navbar__menu--up {
+    top: auto;
+    bottom: calc(100% + 12px);
+  }
+
+  .navbar__menu li {
+    flex: none;
+  }
+
+  .navbar .navbar__menu a,
+  .tabbar .navbar__menu a {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 10px;
+    color: var(--text);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .navbar__menu a:hover,
+  .navbar__menu a:focus-visible {
+    background: var(--card);
+  }
+
+  .navbar .navbar__menu a.active,
+  .tabbar .navbar__menu a.active {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .navbar__menu .navbar__dot {
+    width: 6px;
+    height: 6px;
+    margin-left: 0;
+  }
+}
+
+@keyframes navbar-menu-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar__menu {
+    animation: none;
+  }
+}
+
+/* The Blog banner keeps its size without the photos: an empty space where they used to be. */
+.blog-hero__space {
+  height: 120px;
+}
+
+@media (max-width: 720px) {
+  .blog-hero__space {
+    height: 100px;
+  }
+}
+
+/* The "All posts" button under Older/Newer post. */
+.post__all {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+/* The post's Back button looks like the other back links (a plain link, not a button). */
+.back-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* While the More menu is open, the back-to-top button steps aside: the menu sits where it floats. */
+body:has(.navbar__menu) .back-to-top {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Phones: no empty space under the Blog banner's text. */
+@media (max-width: 720px) {
+  .blog-hero__space {
+    display: none;
   }
 }

@@ -11,11 +11,14 @@ import Education from '../education/Education.tsx'
 import Updates from '../updates/Updates.tsx'
 import Contact from '../contact/Contact.tsx'
 import AvatarGuide from '../../components/AvatarGuide.tsx'
+import { BACK_AT_TOP_EVENT } from '../../utils/goToTop.ts'
 
 function HomePage() {
   // useLocation tells us the current URL. "hash" is the #part, e.g. '#skills'.
   // "key" changes on every navigation, so clicking the same link twice still scrolls.
-  const { hash, key } = useLocation()
+  const { hash, key, state } = useLocation()
+  // Set by the navbar's Home link: the welcome drawing plays once the page is at the top.
+  const replayWelcome = (state as { replayWelcome?: boolean } | null)?.replayWelcome === true
 
   // When the URL has a #section (for example coming back from /blog to /#skills),
   // scroll to that section once the page is on screen.
@@ -25,10 +28,11 @@ function HomePage() {
   useEffect(() => {
     if (hash === '#home') {
       window.scrollTo(0, 0)
+      if (replayWelcome) window.dispatchEvent(new Event(BACK_AT_TOP_EVENT))
     } else if (hash) {
       document.getElementById(hash.slice(1))?.scrollIntoView()
     }
-  }, [hash, key])
+  }, [hash, key, replayWelcome])
 
   return (
     <>

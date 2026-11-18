@@ -3,8 +3,9 @@
 
 import { Fragment, useLayoutEffect } from 'react'
 import type { ReactNode } from 'react'
-import { Link, useParams } from 'react-router'
-import { formatDate, readingTime, sortedUpdates } from '../../data/updates.ts'
+import { Link, useLocation, useNavigate, useParams } from 'react-router'
+import { filterUpdates, formatDate, readingTime, sortedUpdates } from '../../data/updates.ts'
+import { readListSpot } from './listSpot.ts'
 import Gallery from '../../components/Gallery.tsx'
 
 // Turns one paragraph of a post into what the page shows.
@@ -72,6 +73,26 @@ function UpdatePost() {
   const { slug } = useParams()
   const postIndex = sortedUpdates.findIndex((update) => update.slug === slug)
   const post = sortedUpdates[postIndex]
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  // "All posts" (top and bottom of the post): to the Blog list, where you left it. Opened straight from the list: just step back
+  // (the list remembers its scroll spot). Otherwise (after Older/Newer, or a shared link), open the
+  // list at this post's card, keeping the last search/category if this post is in it.
+  function goBack() {
+    if ((location.state as { fromList?: boolean } | null)?.fromList) {
+      navigate(-1)
+      return
+    }
+    const spot = readListSpot()
+    let search = ''
+    if (spot?.search) {
+      const params = new URLSearchParams(spot.search)
+      const inList = filterUpdates(sortedUpdates, params.get('q') ?? '', params.get('category') ?? 'All')
+      if (inList.some((update) => update.slug === slug)) search = spot.search
+    }
+    navigate(`/blog${search}`, { state: { returnTo: slug } })
+  }
 
   // Start at the top whenever you open a post (including via Older/Newer links).
   useLayoutEffect(() => {
@@ -102,9 +123,10 @@ function UpdatePost() {
 
   return (
     <article className="section post page-enter" key={post.slug}>
-      <Link to="/blog" className="back-link">
+      {/* A button styled like the other back links: it returns to the list where you left it. */}
+      <button type="button" className="back-link back-button" onClick={goBack}>
         <span aria-hidden="true">←</span> All posts
-      </Link>
+      </button>
 
       <header className="post__header">
         {/* The category opens the Blog page showing only that category. */}
@@ -150,6 +172,13 @@ function UpdatePost() {
           </Link>
         )}
       </nav>
+
+      {/* Same as the link at the top, for readers who reached the end: back to the list where you left it. */}
+      <div className="post__all">
+        <button type="button" className="button button-outline" onClick={goBack}>
+          <span aria-hidden="true">←</span> All posts
+        </button>
+      </div>
     </article>
   )
 }

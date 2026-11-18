@@ -27,17 +27,15 @@
 //   Its favorite spot is the "Software Engineer" title: lots of free room above it, so the words
 //   fit there without covering any text. It lands there first and flies back to it often.
 // - its jokes open on hover too (as soon as the mouse is on it), and on phones as soon as a
-//   finger presses it (not only on release); a press that turns into a scroll doesn't count
+//   finger touches it, at the same moment it starts dancing (not only on release)
 // - it dances while the mouse is on it or right next to it (about to click), and for a moment
 //   when a finger presses it
 // - some sentences depend on what it stands on (your name, the CV button, the social icons…)
 // - it stops moving while the hero is off screen or the tab is hidden (saves battery), and moves
 //   less on touch screens
-// Clicking (or tapping) it makes it say something in a speech bubble. The bubble has a labeled
-// "Hide" button that beams it back to the welcome box (a "×" there looked like it only
-// closed the message). It sits on the bubble's side away from the robot, so a tap meant for the
-// robot can't hit it by accident. The bubble closes by itself after 3 seconds (with a mouse as on
-// touch screens), and when the page scrolls; on touch screens, also on any tap (except "Hide"). Visitors who turned off animations get a robot that stands still on
+// Clicking (or tapping) it makes it say something in a speech bubble: just the words, no buttons.
+// The bubble closes by itself after 3 seconds (with a mouse as on touch screens), and when the page
+// scrolls; on touch screens, also on any tap. Visitors who turned off animations get a robot that stands still on
 // your name (and still talks).
 //
 // One requestAnimationFrame loop moves it with a transform, so React doesn't re-draw while it
@@ -83,12 +81,10 @@ const BOOT_MS = 700
 const TURN_MS = 200
 const SCAN_MS = 1100
 const LAND_MS = 160
-const LEAVE_MS = 550
 // Touch screens (and keyboard): the bubble closes by itself after this long.
 const READ_MS = 3000
 const SCROLL_CLOSE_PX = 4 // the bubble closes once the page has scrolled this far
 const STANDBY_AFTER_MS = 45000 // no mouse movement for this long → standby (mouse screens only)
-const CLOSE_GUARD_MS = 500 // "Hide" ignores taps this long after it appears (no hiding by a double tap)
 const NEAR_TAP = 44 // touch: a tap this close to it counts as a tap on it (it's small, and moves)
 const SCREEN_MARGIN = 16 // the bubble stays this far inside the screen
 
@@ -174,8 +170,7 @@ const INVITE_RETRY_MS = 8000 // the moment passed (scrolled away, mouse came clo
 const TITLE_PERCH = '.hero__text > .eyebrow'
 const TITLE_CHANCE = 0.55 // …when it flies somewhere, it picks the title this often
 const TITLE_EARLY_MS = 2000 // …and on it, the next invite comes this much sooner
-const PRESS_TALK_MS = 150 // touch: a press this long (that isn't a scroll) opens a joke
-const PRESS_CLICK_GUARD_MS = 1500 // …and the click that follows the press doesn't open another
+const PRESS_CLICK_GUARD_MS = 1500 // touch: the click that ends a press that opened a joke doesn't open another
 const GLOW_MS = 1600 // same as robot-glow in global.css
 const INVITE_SHOW_MS = 3200 // how long the words stay (same as robot-invite in global.css)
 const WORDS_AFTER_GESTURE_MS = 2200 // the words come this long after the gesture, if it got no reaction
@@ -293,7 +288,7 @@ function Robot() {
   const rootRef = useRef<HTMLDivElement>(null)
   const markRef = useRef<HTMLSpanElement>(null)
   const inviteRef = useRef<HTMLSpanElement>(null)
-  const brain = useRef<{ talk: () => void; leave: () => void } | null>(null)
+  const brain = useRef<{ talk: () => void } | null>(null)
   const [line, setLine] = useState<string | null>(null)
   const [side, setSide] = useState<'left' | 'right'>('left')
 
@@ -336,7 +331,6 @@ function Robot() {
       lastPointer: performance.now(),
       talking: false,
       talkScrollY: 0, // where the page was scrolled when the bubble opened
-      talkedAt: 0, // when it last started talking (the "Hide" button appears then)
       noTalkUntil: 0, // touch: the tap that just closed the bubble mustn't open it again
       talkAfterLanding: false, // tapped while flying: it talks once it has landed
       line: -1,
@@ -378,7 +372,6 @@ function Robot() {
     let last = performance.now()
     let talkTimer = 0
     let stillInviteTimer = 0
-    let pressTimer = 0 // touch: the press that will open a joke
     let inviteOffTimer = 0 // takes the invite pill off once it's over
     const touch = window.matchMedia('(hover: none), (any-pointer: coarse)').matches
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -980,25 +973,21 @@ function Robot() {
       if (target?.closest('.hero-actions a')) s.engaged = true // going for the main content
       if (event.pointerType !== 'mouse') {
         s.lastTouch = performance.now()
-        const onIt = !!target && robot.contains(target) && !target.closest('.robot__home, .robot__bubble')
-        // Touch, bubble open: a tap anywhere else (the bubble too) closes it, except "Hide"
-        // itself. A tap on the robot goes on below: it dances and says its next sentence.
+        const onIt = !!target && robot.contains(target) && !target.closest('.robot__bubble')
+        // Touch, bubble open: a tap anywhere else (the bubble too) closes it.
+        // A tap on the robot goes on below: it dances and says its next sentence.
         if (s.talking && !onIt) {
-          if (target?.closest('.robot__home')) return
           quiet()
           s.noTalkUntil = performance.now() + 450
           return
         }
         if (onIt) {
-          // A finger on it: it dances, and always says something with it, right away (once it's
-          // clear this press isn't the start of a scroll), like hovering it with a mouse.
+          // A finger on it: it dances and says something at the same moment, like hovering it
+          // with a mouse. (It used to wait a moment to rule out a scroll, but the slightest finger
+          // movement cancelled the joke, leaving a dance with no words.)
           s.danceUntil = performance.now() + TOUCH_DANCE_MS
-          window.clearTimeout(pressTimer)
-          pressTimer = window.setTimeout(() => {
-            pressTimer = 0
-            s.pressTalkAt = performance.now()
-            talk()
-          }, PRESS_TALK_MS)
+          s.pressTalkAt = performance.now()
+          talk()
           return
         }
         // A near miss is a tap on it (it's small, and moves): a dance and a sentence too.
@@ -1021,22 +1010,8 @@ function Robot() {
       if (distance < NEAR_TAP) talk()
     }
 
-    // The finger moved off into a scroll (the browser cancels the press): no joke.
-    function onPointerCancel() {
-      window.clearTimeout(pressTimer)
-      pressTimer = 0
-    }
-
     // Its own click (mouse, keyboard, or the end of a tap).
     function click() {
-      if (pressTimer) {
-        // A quick tap, released before the press opened the joke: open it now.
-        window.clearTimeout(pressTimer)
-        pressTimer = 0
-        s.pressTalkAt = performance.now()
-        talk()
-        return
-      }
       // The press already opened it: this click is the same tap, not a second one.
       if (performance.now() - s.pressTalkAt < PRESS_CLICK_GUARD_MS) return
       talk()
@@ -1056,9 +1031,8 @@ function Robot() {
       hideInvite()
       window.clearTimeout(stillInviteTimer)
       s.nextInvite = performance.now() + REMINDER_AFTER_MS
-      s.talkedAt = performance.now()
       s.lastPointer = performance.now()
-      // It stops while it talks, so its bubble (and the "Hide" button) stays put.
+      // It stops while it talks, so its bubble stays put.
       if (['walk', 'standby', 'turn', 'wave', 'hop'].includes(s.mode)) setMode('idle')
       s.thenWalk = false
       setLine(perchLine() ?? nextLine())
@@ -1083,7 +1057,6 @@ function Robot() {
     // Scrolling the page closes the bubble (a few pixels of jitter don't).
     function onScroll() {
       s.scrolledAt = performance.now()
-      onPointerCancel()
       if (s.talking && Math.abs(window.scrollY - s.talkScrollY) > SCROLL_CLOSE_PX) quiet()
     }
 
@@ -1160,21 +1133,10 @@ function Robot() {
     robot.addEventListener('pointerleave', onRobotLeave)
     document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('pointerdown', onPointerDown, { passive: true })
-    window.addEventListener('pointercancel', onPointerCancel, { passive: true })
     window.addEventListener('scroll', onScroll, { passive: true })
 
     brain.current = {
       talk: click,
-      leave() {
-        // Just appeared: that tap was meant for the robot (a double tap), not for "Hide".
-        if (performance.now() - s.talkedAt < CLOSE_GUARD_MS) return
-        window.clearTimeout(talkTimer)
-        s.talking = false
-        setLine(null)
-        s.jet = null
-        setMode('leave', LEAVE_MS)
-        if (!frame || reduceMotion) window.setTimeout(sendRobotHome, reduceMotion ? 0 : LEAVE_MS)
-      },
     }
 
     return () => {
@@ -1188,8 +1150,6 @@ function Robot() {
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('pointerdown', onPointerDown)
-      window.removeEventListener('pointercancel', onPointerCancel)
-      window.clearTimeout(pressTimer)
       window.clearTimeout(inviteOffTimer)
       window.removeEventListener('scroll', onScroll)
       brain.current = null
@@ -1198,20 +1158,11 @@ function Robot() {
 
   return (
     <div ref={rootRef} className="robot">
-      {/* What it says. The bubble closes by itself (scroll, pointer away, tap elsewhere), so it needs
-          no "×". Its only button is a clearly labeled one that hides the robot, on the side of the
-          bubble away from the robot (so a tap meant for the robot can't land on it). */}
+      {/* What it says. The bubble closes by itself (after 3s, scroll, pointer away, tap elsewhere),
+          so it needs no buttons. */}
       {line && (
         <div className="robot__bubble" data-side={side}>
           <p role="status">{line}</p>
-          <button
-            type="button"
-            className="robot__home"
-            aria-label="Hide the robot (it goes back to the welcome box)"
-            onClick={() => brain.current?.leave()}
-          >
-            Hide
-          </button>
         </div>
       )}
       <span ref={markRef} className="robot__mark" aria-hidden="true" />

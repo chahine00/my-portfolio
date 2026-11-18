@@ -6,12 +6,10 @@
 import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent, PointerEvent } from 'react'
 import Icon from './Icon.tsx'
+import { goToTop } from '../utils/goToTop.ts'
 
 // How long the button stays after the last scroll, in milliseconds.
 const HIDE_AFTER_MS = 2000
-
-// Sent on window once the trip to the top arrives. The hero listens for it and replays its drawing.
-export const BACK_AT_TOP_EVENT = 'back-to-top:arrived'
 
 // True while the Skills section (home page) is under the button, near the bottom of the screen.
 // The button stays hidden there.
@@ -50,47 +48,7 @@ function BackToTop() {
   function scrollToTop() {
     // The mouse is still over the button after a click; don't let that keep it shown at the top.
     setHovered(false)
-    // After a trackpad or finger "flick" the page keeps gliding for a moment, and that glide
-    // would cancel the trip to the top. So while we travel up, the leftover glide is ignored:
-    // until the page reaches the top, or 1.5 seconds at most.
-    const ignoreGlide = (event: Event) => event.preventDefault()
-    window.addEventListener('wheel', ignoreGlide, { passive: false })
-    window.addEventListener('touchmove', ignoreGlide, { passive: false })
-
-    function release() {
-      window.removeEventListener('wheel', ignoreGlide)
-      window.removeEventListener('touchmove', ignoreGlide)
-      window.clearTimeout(glideTimer)
-    }
-    const glideTimer = window.setTimeout(release, 1500)
-
-    // Separately, watch for the arrival at the top, and tell the hero (it replays its drawing).
-    // This waits longer than the glide guard above: from far down a long page, the smooth trip
-    // up can take more than 1.5 seconds. It stops watching if you scroll back down on the way.
-    let lastY = window.scrollY
-    function stopWatching() {
-      window.removeEventListener('scroll', watchArrival)
-      window.removeEventListener('scrollend', watchArrival)
-      window.clearTimeout(giveUpTimer)
-    }
-    function watchArrival() {
-      const y = window.scrollY
-      if (y <= 2) {
-        stopWatching()
-        release()
-        window.dispatchEvent(new Event(BACK_AT_TOP_EVENT))
-      } else if (y > lastY + 2) {
-        stopWatching() // the visitor scrolled down again: no replay
-      }
-      lastY = y
-    }
-    const giveUpTimer = window.setTimeout(stopWatching, 6000)
-    window.addEventListener('scroll', watchArrival, { passive: true })
-    window.addEventListener('scrollend', watchArrival, { passive: true })
-
-    // Smooth scrolling, unless the visitor turned on "reduce motion" in their system settings.
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })
+    goToTop()
   }
 
   // React as soon as a finger or the mouse button goes down. On phones, a tap while the page

@@ -4,32 +4,72 @@
 // so a filtered list can be shared, and the home page can open the page already filtered.
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router'
+import { Link, useLocation, useNavigationType, useSearchParams } from 'react-router'
 import { filterUpdates, sortedUpdates } from '../../data/updates.ts'
-import { asset } from '../../utils/asset.ts'
+import { readListSpot, saveListSpot } from './listSpot.ts'
 import BlogFilters from './BlogFilters.tsx'
 import UpdateTimeline from './UpdateTimeline.tsx'
 import GradientText from '../../components/GradientText.tsx'
-
-// For the banner: the main photo of the 3 newest posts that have one.
-const bannerPhotos = sortedUpdates.filter((post) => post.images.length > 0).slice(0, 3)
 
 function UpdatesPage() {
   const [params, setParams] = useSearchParams()
   const query = params.get('q') ?? ''
   const category = params.get('category') ?? 'All'
 
-  // A new page should start at the top, not wherever the previous page was scrolled to.
-  useLayoutEffect(() => {
-    // 'instant': skip the smooth scrolling set in global.css, so the page opens at the top
-    // instead of gliding up from where the previous page was.
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
-  }, [])
+  const location = useLocation()
+  const navigationType = useNavigationType()
 
   // Whether the Blog bar is stuck under the navbar right now. It changes the shape of the bar's
   // faded background (see .blog-bar--stuck in global.css).
   const barRef = useRef<HTMLDivElement>(null)
   const [stuck, setStuck] = useState(false)
+
+  // Where a post's card should land: just under the Blog bar.
+  function cardTarget(card: Element) {
+    const bar = barRef.current
+    const barBottom = bar ? (parseFloat(getComputedStyle(bar).top) || 0) + bar.offsetHeight : 0
+    return Math.max(0, card.getBoundingClientRect().top + window.scrollY - barBottom - 12)
+  }
+
+  // Where the page opens. Normally at the top. Coming back from a post (its Back button, or the
+  // browser's back button), it opens where you left the list, or, if you moved on to other posts
+  // with Older/Newer, at the card of the post you were reading.
+  // How the page was opened, kept from its first showing.
+  const [opening] = useState(() => ({
+    returnTo: (location.state as { returnTo?: string } | null)?.returnTo,
+    back: navigationType === 'POP',
+    search: location.search,
+  }))
+
+  useLayoutEffect(() => {
+    let top = 0
+    const { returnTo, back, search } = opening
+    if (returnTo || back) {
+      const spot = readListSpot()
+      const sameList = spot !== null && spot.search === search
+      const card = returnTo ? document.querySelector(`[data-slug="${CSS.escape(returnTo)}"]`) : null
+      // The saved spot still shows that card: use it, so the list looks just as you left it.
+      const cardInView = (y: number) => {
+        if (!card) return true
+        const cardTop = card.getBoundingClientRect().top + window.scrollY - y
+        return cardTop > 0 && cardTop < window.innerHeight - 80
+      }
+      if (sameList && cardInView(spot.y)) top = spot.y
+      else if (card) top = cardTarget(card)
+    }
+    // 'instant': skip the smooth scrolling set in global.css, so the page doesn't glide there.
+    window.scrollTo({ top, left: 0, behavior: 'instant' })
+  }, [opening])
+
+  // Remember where the list is scrolled to (and which search/category it shows), for coming back.
+  // A layout effect, so it stops listening before the next page scrolls itself to the top.
+  useLayoutEffect(() => {
+    function remember() {
+      saveListSpot({ search: window.location.search, y: window.scrollY })
+    }
+    window.addEventListener('scroll', remember, { passive: true })
+    return () => window.removeEventListener('scroll', remember)
+  }, [])
 
   useEffect(() => {
     function handleScroll() {
@@ -52,13 +92,14 @@ function UpdatesPage() {
   // Blog bar. Only when you've scrolled past the list's start (otherwise it's already in view),
   // and not on the page's first showing.
   const resultsRef = useRef<HTMLDivElement>(null)
-  const firstShow = useRef(true)
+  // The search and category last shown. Compared instead of a "first time" flag, so it also
+  // holds when React runs effects twice while developing.
+  const shown = useRef(`${category}|${query}`)
 
   useEffect(() => {
-    if (firstShow.current) {
-      firstShow.current = false
-      return
-    }
+    if (shown.current === `${category}|${query}`) return
+    shown.current = `${category}|${query}`
+    saveListSpot({ search: window.location.search, y: window.scrollY })
     const results = resultsRef.current
     const bar = barRef.current
     if (!results || !bar) return
@@ -90,7 +131,7 @@ function UpdatesPage() {
       </Link>
 
       {/* A banner, so the page looks like its own place and not like a section of the home page:
-          the title on the left, a mosaic of recent post photos on the right (one big, two small). */}
+          the title on the left. The space on the right keeps the banner at its usual size. */}
       <header className="blog-hero">
         <div className="blog-hero__text">
           <p className="eyebrow">The blog</p>
@@ -102,17 +143,7 @@ function UpdatesPage() {
           <p>Lessons from real work, how I think about software, and the moments along the way.</p>
         </div>
 
-        {/* Each photo opens its post. Full-size photos here: the small thumbnails look blurry this big. */}
-        {bannerPhotos.length > 0 && (
-          <div className={`blog-hero__mosaic blog-hero__mosaic--${bannerPhotos.length}`}>
-            {bannerPhotos.map((post) => (
-              <Link key={post.slug} to={`/blog/${post.slug}`} className="blog-hero__tile" aria-label={post.title}>
-                <img src={asset(post.images[0])} alt="" decoding="async" />
-                <span className="blog-hero__caption">{post.title}</span>
-              </Link>
-            ))}
-          </div>
-        )}
+        <div className="blog-hero__space" aria-hidden="true" />
       </header>
 
       {/* Sticks under the navbar while you scroll, so it's always clear you're on the Blog page.

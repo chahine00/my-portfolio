@@ -7,7 +7,7 @@
 // - it dances while the mouse is on it
 // - clicked or tapped, it says a footer joke in a speech bubble, which closes by itself
 // - its jokes open on hover too (as soon as the mouse is on it), and on phones as soon as a
-//   finger presses it; a press that turns into a scroll doesn't count
+//   finger touches it, at the same moment it starts dancing
 // - once per visit, soon after the footer shows, it invites you to click it (a glow and a few
 //   words in a small pill), unless a robot was already clicked (robotMet, until a reload). The pill only shows where it covers no text and
 //   stays inside the footer and on screen; no room where it stands → it walks to a spot on the line
@@ -55,8 +55,7 @@ const PROMISED_LINE = 'Psst… the contact form is just above. Ali reads every m
 const PROMISE_MS = 10000 // clicked this soon after its invite: it says PROMISED_LINE
 const INVITE_GAPS = [1800] // the wait before each invite while the footer is in view: just one
 const TOUCH_DANCE_MS = 900 // touch: a finger on it makes it dance this long (same as the hero robot)
-const PRESS_TALK_MS = 150 // touch: a press this long (that isn't a scroll) opens a joke
-const PRESS_CLICK_GUARD_MS = 1500 // …and the click that follows the press doesn't open another
+const PRESS_CLICK_GUARD_MS = 1500 // touch: the click that ends a press that opened a joke doesn't open another
 const INVITE_SHOW_MS = 3200 // how long the words stay (same as robot-invite in global.css)
 const GLOW_MS = 1600 // same as robot-glow in global.css
 
@@ -91,7 +90,6 @@ function FooterRobot() {
     let talking = false
     // Invites (sayInvite).
     let tapped = robotMet() // it (or the hero robot) was clicked: no more invites
-    let pressTimer = 0
     let pressTalkAt = 0
     let danceUntil = 0 // touch: a finger on it makes it dance this long (with a sentence)
     let invites = 0 // how many it showed
@@ -344,35 +342,20 @@ function FooterRobot() {
       if (event.pointerType !== 'mouse') return
       hovered = false
     }
-    // A finger on it: the joke opens right away, unless the press turns into a scroll.
+    // A finger on it: it dances and the joke opens at the same moment, like hovering it with a mouse.
     // A tap on it while it talks says the next sentence (with a dance, like any tap on it).
     function onDown(event: PointerEvent) {
       if (event.pointerType === 'mouse') return
       if (!reduceMotion) danceUntil = performance.now() + TOUCH_DANCE_MS
-      window.clearTimeout(pressTimer)
-      pressTimer = window.setTimeout(() => {
-        pressTimer = 0
-        pressTalkAt = performance.now()
-        talkRef.current()
-      }, PRESS_TALK_MS)
-    }
-    function onCancel() {
-      window.clearTimeout(pressTimer)
-      pressTimer = 0
+      pressTalkAt = performance.now()
+      talkRef.current()
     }
     root.addEventListener('pointerenter', onEnter)
     root.addEventListener('pointerleave', onLeave)
     root.addEventListener('pointerdown', onDown)
-    window.addEventListener('pointercancel', onCancel, { passive: true })
-    window.addEventListener('scroll', onCancel, { passive: true })
 
     // Its own click (mouse, keyboard, or the end of a tap).
     clickRef.current = () => {
-      if (pressTimer) {
-        onCancel()
-        pressTalkAt = performance.now()
-        return talkRef.current()
-      }
       if (performance.now() - pressTalkAt < PRESS_CLICK_GUARD_MS) return
       talkRef.current()
     }
@@ -407,10 +390,7 @@ function FooterRobot() {
       root.removeEventListener('pointerenter', onEnter)
       root.removeEventListener('pointerleave', onLeave)
       root.removeEventListener('pointerdown', onDown)
-      window.removeEventListener('pointercancel', onCancel)
-      window.removeEventListener('scroll', onCancel)
       window.clearTimeout(talkTimer)
-      window.clearTimeout(pressTimer)
       window.clearTimeout(inviteTimer)
     }
   }, [])

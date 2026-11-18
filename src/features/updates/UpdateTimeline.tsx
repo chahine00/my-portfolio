@@ -30,7 +30,7 @@ function UpdateTimeline({ updates }: UpdateTimelineProps) {
         const hiddenCount = update.images.length - MAX_THUMBS
 
         return (
-          <li className="timeline__item" key={update.slug}>
+          <li className="timeline__item" key={update.slug} data-slug={update.slug}>
             <article className="card update-card card-clickable">
               <div className="update-card__meta">
                 {/* <time> tells browsers and search engines that this text is a date. */}
@@ -40,7 +40,8 @@ function UpdateTimeline({ updates }: UpdateTimelineProps) {
               </div>
 
               <h3>
-                <Link to={postUrl} className="update-card__title card-link">
+                {/* fromList: the post's Back button then simply steps back to this list. */}
+                <Link to={postUrl} state={{ fromList: true }} className="update-card__title card-link">
                   {update.title}
                 </Link>
               </h3>

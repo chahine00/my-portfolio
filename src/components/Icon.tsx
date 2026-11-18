@@ -21,6 +21,8 @@ export type IconName =
   | 'cap'
   | 'pen'
   | 'chat'
+  | 'home'
+  | 'more'
 
 interface IconProps {
   name: IconName
@@ -130,6 +132,23 @@ function Icon({ name, size = 20 }: IconProps) {
         <svg {...stroke}>
           <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z" />
           <path d="m13.5 6.5 4 4" />
+        </svg>
+      )
+    case 'home':
+      return (
+        <svg {...stroke}>
+          <path d="M3 11.5 12 4l9 7.5" />
+          <path d="M5.5 9.5V20h13V9.5" />
+          <path d="M10 20v-5h4v5" />
+        </svg>
+      )
+    // Three dots: "more sections".
+    case 'more':
+      return (
+        <svg {...common} fill="currentColor">
+          <circle cx="5" cy="12" r="2" />
+          <circle cx="12" cy="12" r="2" />
+          <circle cx="19" cy="12" r="2" />
         </svg>
       )
     case 'chat':

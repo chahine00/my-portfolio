@@ -1,5 +1,6 @@
 // The navigation bar at the top of the page.
-// On phones every link shows an icon with a small label (so all seven fit on one row), and the menu
+// On phones every link shows an icon with a small label. Only the five most used fit on the row
+// (Home, About, Projects, Experience, and "More"); the others open from the More button. The menu
 // "moves" to the bottom of the screen once you scroll: the top bar scrolls away with the page and a
 // matching bar slides up at the bottom (the "tab bar", see the end of this file). Same on every
 // page, except the Blog list, where the Blog bar (search + categories) sticks at the top instead.
@@ -10,6 +11,7 @@ import { Link, useLocation } from 'react-router'
 import { hasRecentUpdate } from '../data/updates.ts'
 import { profile } from '../data/profile.ts'
 import ThemeToggle from './ThemeToggle.tsx'
+import { goToTop } from '../utils/goToTop.ts'
 import Icon from './Icon.tsx'
 import type { IconName } from './Icon.tsx'
 
@@ -28,20 +30,93 @@ interface NavItem {
   section?: string // a page link that also has a section on the home page (its id): highlight it there too
   dot?: boolean // show the pulsing "new" dot
   icon: IconName // shown on phones, above the label
+  more?: boolean // phones: tucked into the "More" menu instead of having its own tab
 }
 
 const links: NavItem[] = [
+  { to: '/#home', label: 'Home', icon: 'home' },
   { to: '/#about', label: 'About', icon: 'user' },
   { to: '/#projects', label: 'Projects', match: '/projects', icon: 'folder' },
   { to: '/#experience', label: 'Experience', icon: 'briefcase' },
-  { to: '/#skills', label: 'Skills', icon: 'code' },
-  { to: '/#education', label: 'Education', icon: 'cap' },
-  { to: '/blog', label: 'Blog', section: 'blog', dot: hasRecentUpdate, icon: 'pen' },
-  { to: '/#contact', label: 'Contact', icon: 'chat' },
+  { to: '/#skills', label: 'Skills', icon: 'code', more: true },
+  { to: '/#education', label: 'Education', icon: 'cap', more: true },
+  { to: '/blog', label: 'Blog', section: 'blog', dot: hasRecentUpdate, icon: 'pen', more: true },
+  { to: '/#contact', label: 'Contact', icon: 'chat', more: true },
 ]
+const moreLinks = links.filter((link) => link.more)
+
+// How long the More menu stays open if you don't pick anything, in milliseconds.
+const MENU_CLOSE_AFTER_MS = 5000
+
+// The phones-only "More" button at the end of the row, and the small menu it opens with the links
+// that don't have their own tab. "up": in the tab bar at the bottom, the menu opens above the button.
+function MoreMenu({ isActive, up }: { isActive: (link: NavItem) => boolean; up: boolean }) {
+  const [open, setOpen] = useState(false)
+  const boxRef = useRef<HTMLLIElement>(null)
+  // Left open, it closes by itself after a few seconds.
+  useEffect(() => {
+    if (!open) return
+    const timer = window.setTimeout(() => setOpen(false), MENU_CLOSE_AFTER_MS)
+    return () => window.clearTimeout(timer)
+  }, [open])
+
+  // A tap anywhere else, or Escape, closes it. (Following a link closes it as well: the menu is
+  // given a new key whenever the address changes, see below.)
+  useEffect(() => {
+    if (!open) return
+    function onPointerDown(event: PointerEvent) {
+      if (!boxRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  const active = moreLinks.some(isActive)
+
+  return (
+    <li className="navbar__more" ref={boxRef}>
+      <button
+        type="button"
+        className={`navbar__more-button${active ? ' active' : ''}${open ? ' open' : ''}`}
+        aria-expanded={open}
+        aria-haspopup="true"
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span className="navbar__icon" aria-hidden="true">
+          <Icon name="more" size={20} />
+        </span>
+        <span className="navbar__label">
+          More
+          {/* Blog lives in this menu on phones, so its "new post" dot shows here. */}
+          {moreLinks.some((link) => link.dot) && <span className="navbar__dot" aria-label="new post" />}
+        </span>
+      </button>
+      {open && (
+        <ul className={up ? 'navbar__menu navbar__menu--up' : 'navbar__menu'}>
+          {moreLinks.map((link) => (
+            <li key={link.to}>
+              <Link to={link.to} className={isActive(link) ? 'active' : undefined} onClick={() => setOpen(false)}>
+                <Icon name={link.icon} size={18} />
+                {link.label}
+                {link.dot && <span className="navbar__dot" aria-label="new post" />}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </li>
+  )
+}
 
 function Navbar() {
-  const { pathname } = useLocation()
+  const { pathname, hash } = useLocation()
   // Which home section is on screen right now, e.g. 'skills'. Used to light up its link.
   const [activeSection, setActiveSection] = useState('')
   // True once the page is scrolled a little: the navbar then gets a soft shadow.
@@ -99,8 +174,9 @@ function Navbar() {
     return onSection || (match !== undefined && pathname.startsWith(match))
   }
 
-  // The list of links, used by the top bar and by the tab bar.
-  const linkList = (
+  // The list of links, used by the top bar and by the tab bar. Links marked "more" hide on phones
+  // (CSS), where the More button (hidden on bigger screens) offers them instead.
+  const linkList = (up: boolean) => (
     <ul className="navbar__links">
       {/*
         Curly braces { } let you write JavaScript inside JSX.
@@ -108,8 +184,20 @@ function Navbar() {
         React needs a unique "key" on each item in a list so it can keep track of them.
       */}
       {links.map((link) => (
-        <li key={link.to}>
-          <Link to={link.to} className={isActive(link) ? 'active' : undefined}>
+        <li key={link.to} className={link.more ? 'navbar__extra' : undefined}>
+          <Link
+            to={link.to}
+            className={isActive(link) ? 'active' : undefined}
+            // Home works like the back-to-top button: a smooth trip up, then the welcome plays.
+            // From another page, the home page opens at the top and plays it (see HomePage.tsx).
+            state={link.to === '/#home' ? { replayWelcome: true } : undefined}
+            onClick={(event) => {
+              if (link.to === '/#home' && onHome) {
+                event.preventDefault()
+                goToTop()
+              }
+            }}
+          >
             {/* The icon only shows on phones (see .navbar__icon in global.css). */}
             <span className="navbar__icon" aria-hidden="true">
               <Icon name={link.icon} size={20} />
@@ -122,6 +210,7 @@ function Navbar() {
           </Link>
         </li>
       ))}
+      <MoreMenu isActive={isActive} up={up} key={`${up}-${pastTopBar}-${pathname}${hash}`} />
     </ul>
   )
 
@@ -156,15 +245,6 @@ function Navbar() {
           {/* draggable={false}: a press that moves a little (easy on a moving target) would
               otherwise start dragging the link, and the click would be lost. */}
           <Link to="/#home" className="navbar__brand" aria-label={`${profile.name}, home`} draggable={false}>
-            {/* A small house on top of the name, like a crown: it draws itself every few seconds and
-                on hover, to show the name is a link to the home page (see .brand__home in
-                global.css). It's its own layer: the letters' wave and hover color don't change. */}
-            <svg className="brand__home" viewBox="0 0 24 24" aria-hidden="true">
-              <path pathLength={1} d="M2.5 11.5 L12 3.5 L21.5 11.5" />
-              <path pathLength={1} d="M16.5 7.2 V4.5 H18.8 V9.1" />
-              <path pathLength={1} d="M5 9.6 V20.5 H19 V9.6" />
-              <path pathLength={1} d="M10 20.5 V15 a2 2 0 0 1 4 0 V20.5" />
-            </svg>
             <span className="brand__bracket" aria-hidden="true">
               &lt;
             </span>
@@ -182,7 +262,7 @@ function Navbar() {
           </Link>
         </div>
         <nav className="navbar__nav" ref={linksRowRef}>
-          {linkList}
+          {linkList(false)}
         </nav>
         <ThemeToggle />
       </header>
@@ -196,7 +276,7 @@ function Navbar() {
           aria-label="Sections"
           inert={!pastTopBar}
         >
-          {linkList}
+          {linkList(true)}
         </nav>
       )}
     </>
