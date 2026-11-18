@@ -344,7 +344,8 @@ function Robot() {
       lastInviteText: '',
       engaged: false, // you clicked the hero's buttons or icons, or scrolled away: no more invites
       hoverTalked: false, // this hover already opened a joke
-      pressTalkAt: 0, // touch: when a press opened a joke
+      pressTalkAt: 0, // touch: when a press opened a joke (then when that finger lifted)
+      fingerDown: false, // touch: a finger is pressing it right now (its joke waits to count down)
       invites: 0, // how many it showed (before it was clicked)
       nextInvite: 0,
       lastInviteAt: 0,
@@ -986,6 +987,7 @@ function Robot() {
           // with a mouse. (It used to wait a moment to rule out a scroll, but the slightest finger
           // movement cancelled the joke, leaving a dance with no words.)
           s.danceUntil = performance.now() + TOUCH_DANCE_MS
+          s.fingerDown = true
           s.pressTalkAt = performance.now()
           talk()
           return
@@ -1042,7 +1044,22 @@ function Robot() {
       window.clearTimeout(talkTimer)
       // It closes by itself after READ_MS (3s), with a mouse as on touch screens, even while the
       // mouse is still on it. It doesn't open again until the mouse leaves and comes back.
-      talkTimer = window.setTimeout(quiet, READ_MS)
+      // A finger still pressing it: the 3s start when it lifts (onPointerUp), as after a click.
+      if (!s.fingerDown) talkTimer = window.setTimeout(quiet, READ_MS)
+    }
+
+    // The finger that opened a joke lifts (or the browser takes over the press, e.g. a long press):
+    // now the joke's 3 seconds start. Before, they counted from the touch, so after holding the
+    // robot to watch it dance, the joke vanished as soon as the finger came off.
+    function onPointerUp(event: PointerEvent) {
+      if (event.pointerType === 'mouse' || !s.fingerDown) return
+      s.fingerDown = false
+      // The click that follows this release is the same tap: it mustn't open another joke.
+      s.pressTalkAt = performance.now()
+      if (s.talking) {
+        window.clearTimeout(talkTimer)
+        talkTimer = window.setTimeout(quiet, READ_MS)
+      }
     }
 
     // Closes its speech bubble (it goes back to what it was doing a moment later).
@@ -1133,6 +1150,8 @@ function Robot() {
     robot.addEventListener('pointerleave', onRobotLeave)
     document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('pointerdown', onPointerDown, { passive: true })
+    window.addEventListener('pointerup', onPointerUp, { passive: true })
+    window.addEventListener('pointercancel', onPointerUp, { passive: true })
     window.addEventListener('scroll', onScroll, { passive: true })
 
     brain.current = {
@@ -1150,6 +1169,8 @@ function Robot() {
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('pointerup', onPointerUp)
+      window.removeEventListener('pointercancel', onPointerUp)
       window.clearTimeout(inviteOffTimer)
       window.removeEventListener('scroll', onScroll)
       brain.current = null

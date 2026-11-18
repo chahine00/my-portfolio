@@ -88,6 +88,7 @@ function FooterRobot() {
     let lastLine = ''
     let talkTimer = 0
     let talking = false
+    let fingerDown = false // touch: a finger is pressing it right now
     // Invites (sayInvite).
     let tapped = robotMet() // it (or the hero robot) was clicked: no more invites
     let pressTalkAt = 0
@@ -344,15 +345,38 @@ function FooterRobot() {
     }
     // A finger on it: it dances and the joke opens at the same moment, like hovering it with a mouse.
     // A tap on it while it talks says the next sentence (with a dance, like any tap on it).
+    // While the finger stays on it, the joke stays open; its 3 seconds start when the finger lifts
+    // (as after a click). Otherwise a long press used up the reading time, and the joke vanished
+    // as soon as the finger came off.
     function onDown(event: PointerEvent) {
       if (event.pointerType === 'mouse') return
       if (!reduceMotion) danceUntil = performance.now() + TOUCH_DANCE_MS
+      fingerDown = true
       pressTalkAt = performance.now()
       talkRef.current()
+    }
+    function onUp(event: PointerEvent) {
+      if (event.pointerType === 'mouse' || !fingerDown) return
+      fingerDown = false
+      // The click that follows this release is the same tap: it mustn't open another joke.
+      pressTalkAt = performance.now()
+      if (talking) closeLater()
     }
     root.addEventListener('pointerenter', onEnter)
     root.addEventListener('pointerleave', onLeave)
     root.addEventListener('pointerdown', onDown)
+    window.addEventListener('pointerup', onUp, { passive: true })
+    window.addEventListener('pointercancel', onUp, { passive: true })
+
+    // Closes the bubble by itself after 3s, even while the mouse is still on it. It doesn't open
+    // again until the mouse leaves and comes back.
+    function closeLater() {
+      window.clearTimeout(talkTimer)
+      talkTimer = window.setTimeout(() => {
+        talking = false
+        setLine(null)
+      }, TALK_MS)
+    }
 
     // Its own click (mouse, keyboard, or the end of a tap).
     clickRef.current = () => {
@@ -375,12 +399,8 @@ function FooterRobot() {
       if (!reduceMotion && !hovered) set('hop', performance.now())
       talking = true
       window.clearTimeout(talkTimer)
-      // Closes by itself after 3s, even while the mouse is still on it. It doesn't open again
-      // until the mouse leaves and comes back.
-      talkTimer = window.setTimeout(() => {
-        talking = false
-        setLine(null)
-      }, TALK_MS)
+      // A finger still on it: the countdown starts when it lifts (onUp).
+      if (!fingerDown) closeLater()
     }
 
     return () => {
@@ -390,6 +410,8 @@ function FooterRobot() {
       root.removeEventListener('pointerenter', onEnter)
       root.removeEventListener('pointerleave', onLeave)
       root.removeEventListener('pointerdown', onDown)
+      window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onUp)
       window.clearTimeout(talkTimer)
       window.clearTimeout(inviteTimer)
     }
