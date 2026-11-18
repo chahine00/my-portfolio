@@ -17,8 +17,9 @@
 //   after about 4-5 seconds in all (PHONE_TOTAL_MS), so it doesn't keep covering the small screen.
 //   Either way it leaves at once when you leave its section, or when you click it. Then the next
 //   section's guide can come out.
-// - On phones the avatar lets touches through to the page (so a finger never hits it by accident
-//   while scrolling or tapping). A tap on its bubble shows the ×; a second tap sends it away.
+// - On phones a tap on the guide (the avatar or robot, or its bubble) shows the ×, and a second tap
+//   sends it away. The tap stays on the guide: it never reaches the link or card under it.
+//   (Scrolling with a finger that starts on it still scrolls the page.)
 // - A small × on its bubble (shown on hover, or after a tap on phones) sends it away for that section. Closed with the × twice, it's off until the page is reloaded
 //   (guideStore.ts).
 // - Scrolling on inside the same section (a long one like Projects) moves it to a post that's
@@ -446,9 +447,9 @@ function AvatarGuide() {
     setPhase('out')
   }
 
-  // Phones (no hover, and the avatar lets touches through): a tap on the bubble shows its ×
-  // (like hovering does with a mouse); a second tap on the bubble sends it away.
-  function tapBubble() {
+  // Phones (no hover): a tap on the guide or its bubble shows its × (like hovering does with a
+  // mouse); a second tap sends it away.
+  function tapGuide() {
     if (canHover()) return
     if (revealed) hide()
     else setRevealed(true)
@@ -473,7 +474,7 @@ function AvatarGuide() {
         className="avatar-guide__bubble"
         data-side={spot.side}
         style={{ maxWidth: spot.bubbleWidth }}
-        onClick={tapBubble}
+        onClick={tapGuide}
       >
         {/* Closes it for this section; twice, and it's off until a reload (guideStore.ts). */}
         <button
@@ -508,7 +509,8 @@ function AvatarGuide() {
           className="avatar-guide__body"
           aria-label="Hide the guide"
           tabIndex={talking ? 0 : -1}
-          onClick={hide}
+          // Mouse: a click sends it away. Phones: the first tap shows the ×, like a tap on the bubble.
+          onClick={() => (canHover() ? hide() : tapGuide())}
         >
           {tip.by === 'robot' ? (
             <RobotSprite className="avatar-guide__robot" />

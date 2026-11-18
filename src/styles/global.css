@@ -5861,13 +5861,10 @@ a {
   }
 }
 
-/* Touch screens: the avatar lets touches through to the page under it, so a finger scrolling or
-   tapping never hits it by accident. Only the bubble takes a tap: the first shows its ×
-   (data-revealed), a second sends the guide away. */
+/* Touch screens: a tap on the avatar (or robot) or on its bubble shows its × (data-revealed), a
+   second sends the guide away. The avatar takes the tap itself (pointer-events: auto, above), so
+   it never goes through to a link or card under it. */
 @media (hover: none) {
-  .avatar-guide__body {
-    pointer-events: none;
-  }
   .avatar-guide__close {
     pointer-events: none;
   }
