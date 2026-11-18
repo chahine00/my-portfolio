@@ -8,6 +8,7 @@ import { Link, useLocation, useNavigationType, useSearchParams } from 'react-rou
 import { filterUpdates, sortedUpdates } from '../../data/updates.ts'
 import { readListSpot, saveListSpot } from './listSpot.ts'
 import BlogFilters from './BlogFilters.tsx'
+import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import UpdateTimeline from './UpdateTimeline.tsx'
 import GradientText from '../../components/GradientText.tsx'
 
@@ -18,6 +19,7 @@ function UpdatesPage() {
 
   const location = useLocation()
   const navigationType = useNavigationType()
+  useDocumentTitle('Blog')
 
   // Whether the Blog bar is stuck under the navbar right now. It changes the shape of the bar's
   // faded background (see .blog-bar--stuck in global.css).

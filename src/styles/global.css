@@ -6054,13 +6054,6 @@ a {
   }
 }
 
-/* The "All posts" button under Older/Newer post. */
-.post__all {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
-}
-
 /* The post's Back button looks like the other back links (a plain link, not a button). */
 .back-button {
   padding: 0;
@@ -6147,9 +6140,9 @@ body:has(.navbar__menu) .back-to-top {
   }
 }
 
-/* A project's bottom row: Previous project | All projects | Next project. The middle column fits
+/* The bottom row of a project or a post: Previous | All projects | Next (Older | All posts | Newer). The middle column fits
    the button; the sides share the rest, so the titles still end with "…" when they're long.
-   Phones: Previous and Next side by side, All projects centered under them. */
+   Phones: the two links side by side, the "All" button centered under them. */
 .post__nav--three {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);

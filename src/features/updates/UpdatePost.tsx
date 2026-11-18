@@ -8,6 +8,7 @@ import { filterUpdates, formatDate, readingTime, sortedUpdates } from '../../dat
 import { readListSpot } from './listSpot.ts'
 import Gallery from '../../components/Gallery.tsx'
 import ScrollUpBack from '../../components/ScrollUpBack.tsx'
+import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 
 // Turns one paragraph of a post into what the page shows.
 // Lines starting with "- " become a real bulleted list, so a long point that wraps lines up
@@ -76,6 +77,8 @@ function UpdatePost() {
   const post = sortedUpdates[postIndex]
   const location = useLocation()
   const navigate = useNavigate()
+  // The tab shows the post's title (or "Post not found").
+  useDocumentTitle(post ? post.title : 'Post not found')
 
   // "All posts" (top and bottom of the post): to the Blog list, where you left it. Opened straight from the list: just step back
   // (the list remembers its scroll spot). Otherwise (after Older/Newer, or a shared link), open the
@@ -157,29 +160,29 @@ function UpdatePost() {
         {paragraphs.map(renderParagraph)}
       </div>
 
-      <nav className="post__nav" aria-label="More posts">
+      {/* Older post | All posts | Newer post (phones: All posts under the other two), like a
+          project's page. All posts goes back to the list where you left it. */}
+      <nav className="post__nav post__nav--three" aria-label="More posts">
         {older ? (
-          <Link to={`/blog/${older.slug}`} title={older.title}>
+          <Link to={`/blog/${older.slug}`} className="post__nav-prev" title={older.title}>
             <span className="post__nav-label"><b aria-hidden="true">←</b> Older post</span>
             <span className="post__nav-title">{older.title}</span>
           </Link>
         ) : (
-          <span />
+          <span className="post__nav-prev" />
         )}
-        {newer && (
+        <button type="button" className="button button-outline post__nav-all" onClick={goBack}>
+          All posts
+        </button>
+        {newer ? (
           <Link to={`/blog/${newer.slug}`} className="post__nav-newer" title={newer.title}>
             <span className="post__nav-label">Newer post <b aria-hidden="true">→</b></span>
             <span className="post__nav-title">{newer.title}</span>
           </Link>
+        ) : (
+          <span className="post__nav-newer" />
         )}
       </nav>
-
-      {/* Same as the link at the top, for readers who reached the end: back to the list where you left it. */}
-      <div className="post__all">
-        <button type="button" className="button button-outline" onClick={goBack}>
-          <span aria-hidden="true">←</span> All posts
-        </button>
-      </div>
 
       {/* Phones, in the middle of the post: the same way back, under the thumb when you scroll up. */}
       <ScrollUpBack key={post.slug} label="All posts" onClick={goBack} />

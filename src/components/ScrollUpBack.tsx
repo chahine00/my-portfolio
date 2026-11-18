@@ -3,7 +3,7 @@
 // Scrolling up mid-page usually means you're thinking of leaving, so the way back is right under
 // your thumb then, without covering the text while you read. It mirrors the back-to-top button on
 // the right. It stays hidden while the page's own way back is on screen (the back link at the top,
-// or the Older/Newer row and its "All …" button at the end), and fades out by itself a few
+// or the Older/Newer row with its "All …" button at the end), and fades out by itself a few
 // seconds after you stop scrolling. Bigger screens don't show it
 // (global.css): the page's links are easy to reach there.
 
@@ -14,7 +14,7 @@ const HIDE_AFTER_DOWN_PX = 12 // scrolled down this far: it hides (you're readin
 const TOP_ZONE_PX = 400 // this close to the top, the page's own back link is in view: no button
 const HIDE_AFTER_MS = 4000 // after the last scroll, it fades out by itself
 // The page's own ways back: while one of them is on screen, the button isn't needed.
-const OWN_LINKS = '.section > .back-link, .post__nav, .post__all'
+const OWN_LINKS = '.section > .back-link, .post__nav'
 
 interface ScrollUpBackProps {
   label: string

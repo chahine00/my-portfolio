@@ -6,6 +6,8 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { projects } from '../../data/projects.ts'
 import Gallery from '../../components/Gallery.tsx'
 import ScrollUpBack from '../../components/ScrollUpBack.tsx'
+import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
+import { rememberProjectLeft } from './projectReturn.ts'
 
 function ProjectPage() {
   // useParams reads the ":slug" part of the URL (see the <Route> in App.tsx).
@@ -13,6 +15,15 @@ function ProjectPage() {
   const index = projects.findIndex((project) => project.slug === slug)
   const project = projects[index]
   const navigate = useNavigate()
+  useDocumentTitle(project ? project.title : 'Project not found')
+
+  // Leaving this page (any way: a link, or the phone's back gesture): remember the project, so the
+  // home page can open at its card when that's where you land (HomePage.tsx). A layout effect, so
+  // it's saved before the home page decides where to scroll.
+  useLayoutEffect(() => {
+    if (!slug) return
+    return () => rememberProjectLeft(slug)
+  }, [slug])
 
   // "All projects" (top, bottom, and the button that shows when you scroll up on phones): back to
   // the Projects section of the home page, at this project's card, so you carry on from here.
