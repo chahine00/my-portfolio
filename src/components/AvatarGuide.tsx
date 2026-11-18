@@ -10,8 +10,13 @@
 //   on hover); the only thing the mouse does is send it away with a click.
 // - When: as soon as a section's spot is on screen and you've stopped on it for a moment
 //   (DWELL_MS), so scrolling quickly past a section doesn't make it pop up.
-// - It stays as long as you're in its section, and leaves only once the whole section is off
-//   screen (or when you click it). Then the next section's guide comes out.
+// - Scrolling fast through the page doesn't make it pop up on the way: it waits until the page
+//   has really stopped (SETTLE_MS), and if it has to leave while you're still scrolling, it just
+//   fades out (QUICK_MS) instead of sinking.
+// - On bigger screens it stays as long as you're in its section. On phones it sinks away by itself
+//   after about 6 seconds (READ_MS), so it doesn't keep covering the small screen while you read.
+//   Either way it leaves at once when you leave its section, or when you click it. Then the next
+//   section's guide can come out.
 // - Scrolling on inside the same section (a long one like Projects) moves it to a post that's
 //   still on screen there, and it carries on with its sentence.
 // - Each section's tip shows once while you're there; after you leave, it can show again when
@@ -31,8 +36,17 @@ type Phase = 'in' | 'talk' | 'out'
 const RISE_MS = 450 // same as the guide-rise animation in global.css
 const SINK_MS = 450 // same as the guide-sink animation
 const TYPE_MS = 30 // per letter
-const DWELL_MS = 250 // how long a section stays in view before it comes out (counted while scrolling too)…
-const SETTLE_MS = 120 // …and the page must have stopped scrolling this long (fast scrolling up and down doesn't call it)
+const DWELL_MS = 500 // how long a section stays in view before it comes out (counted while scrolling too)…
+const SETTLE_MS = 450 // …and the page must have stopped scrolling this long. Long enough that a phone's
+// fling (the page gliding on after your finger lets go) isn't taken for a stop, so scrolling fast
+// through the page never makes it pop up on the way.
+// Phones only: how long it stays once the sentence is typed…
+const READ_MS = 4000
+const READ_PER_LETTER_MS = 50 // …plus this much per letter (about 6 seconds in all), then it sinks
+// away by itself so it doesn't keep covering the small screen while you read. On bigger screens
+// it stays until you leave its section.
+const PHONE_MAX = 720 // same breakpoint as in global.css and avatarGuidePlacement.ts
+const QUICK_MS = 150 // when it has to leave while the page is still scrolling: a quick fade instead of sinking
 const REPEAT_MS = 6000 // a section's tip plays again at the earliest this long after it last came out
 const LEAVE_MS = 250 // its section must be off screen this long before it leaves (no flicker at the edge)
 const SECTION_MARGIN = 60 // a section counts as on screen while more than this much of it shows
@@ -44,6 +58,11 @@ const PLACES_TTL = 2000 // spots are measured again after this long (images load
 // you come back (but not every time you scroll past it).
 const seen = new Map<string, { anchor: HTMLElement; at: number; left: boolean }>()
 
+// When the page last scrolled. Leaving while it's still scrolling, it fades out at once instead
+// of sinking, so flying through the page doesn't leave avatars animating everywhere.
+let lastScrollAt = 0
+const scrolling = () => Date.now() - lastScrollAt < 200
+
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 // The bottom of the navbar: nothing should come out underneath it. When the navbar isn't on
@@ -52,10 +71,14 @@ function navBottom() {
   return Math.max(0, document.querySelector('.navbar')?.getBoundingClientRect().bottom ?? 0)
 }
 
-// True when you're in the middle of this section's content: it fills the screen from near the top
-// to near the bottom. Then, if none of its posts has room for the guide, it comes out in the
-// screen's corner instead (dockSpot), so scrolling fast past the title doesn't skip it.
+const isPhone = () => window.matchMedia(`(max-width: ${PHONE_MAX}px)`).matches
+
+// Phones only: true when you're in the middle of this section's content (it fills the screen from
+// near the top to near the bottom). Then, if none of its posts has room for the guide, it comes
+// out in the screen's corner instead (dockSpot), so scrolling fast past the title doesn't skip it.
+// On bigger screens the posts have room beside them, so it never uses the corner there.
 function deepIn(section: HTMLElement) {
+  if (!isPhone()) return false
   const rect = section.getBoundingClientRect()
   return rect.top < window.innerHeight * 0.35 && rect.bottom > window.innerHeight * 0.65
 }
@@ -82,6 +105,8 @@ function AvatarGuide() {
   const [typed, setTyped] = useState(0)
   // True while its spot is scrolled off screen (the reading time waits).
   const [away, setAway] = useState(false)
+  // True when it's leaving while the page is scrolling: it fades out quickly instead of sinking.
+  const [quick, setQuick] = useState(false)
 
   const rootRef = useRef<HTMLDivElement>(null)
   // True when it leaves before it was read (scrolled away, or the screen was resized): then the
@@ -187,6 +212,7 @@ function AvatarGuide() {
         seen.set(tip.section, { anchor: spot.anchor, at: now, left: false })
         unreadRef.current = false
         setShown({ tip, spot })
+        setQuick(false)
         setPhase('in')
         setTyped(0)
         setAway(false)
@@ -197,6 +223,7 @@ function AvatarGuide() {
 
     function onScroll() {
       scrolledAt = Date.now()
+      lastScrollAt = scrolledAt
       if (!frame) frame = requestAnimationFrame(check)
     }
 
@@ -300,6 +327,7 @@ function AvatarGuide() {
         else if (now - leftSince > LEAVE_MS && phaseRef.current !== 'out') {
           moveRef.current = null
           unreadRef.current = false
+          setQuick(scrolling())
           setPhase('out')
         }
       }
@@ -309,7 +337,7 @@ function AvatarGuide() {
     return () => cancelAnimationFrame(frame)
   }, [shown])
 
-  // 3. Rise → type the sentence → stay while you're in its section → sink.
+  // 3. Rise → type the sentence → wait while it's read → sink.
   useEffect(() => {
     if (!shown) return
     const { text } = shown.tip
@@ -319,6 +347,10 @@ function AvatarGuide() {
     } else if (phase === 'talk' && typed < text.length) {
       // People who turn off animations get the whole sentence at once.
       timer = window.setTimeout(() => setTyped(reducedMotion() ? text.length : typed + 1), TYPE_MS)
+    } else if (phase === 'talk' && !away && isPhone()) {
+      // Phones, once read: it sinks away by itself (the reading time waits while it's scrolled off
+      // screen). It doesn't come back in this section until you've left it and come back later.
+      timer = window.setTimeout(() => setPhase('out'), READ_MS + text.length * READ_PER_LETTER_MS)
     } else if (phase === 'out') {
       // 4. Gone: free the spot for the next section. Not read? Let it come out there again.
       timer = window.setTimeout(
@@ -330,6 +362,7 @@ function AvatarGuide() {
             moveRef.current = null
             unreadRef.current = false
             setShown({ tip: shown.tip, spot: next })
+            setQuick(false)
             setPhase('in')
             setAway(false)
             return
@@ -338,11 +371,11 @@ function AvatarGuide() {
           setShown(null)
           window.dispatchEvent(new Event('avatar-guide:done'))
         },
-        reducedMotion() ? 150 : SINK_MS,
+        reducedMotion() || quick ? QUICK_MS : SINK_MS,
       )
     }
     return () => window.clearTimeout(timer)
-  }, [shown, phase, typed, away])
+  }, [shown, phase, typed, away, quick])
 
   if (!shown) return null
 
@@ -355,6 +388,7 @@ function AvatarGuide() {
       className="avatar-guide"
       data-phase={phase}
       data-dock={spot.dock ? '' : undefined}
+      data-quick={quick ? '' : undefined}
       style={{ height: spot.rise }}
     >
       {/* Read out once, in full, by screen readers (the letter-by-letter text is hidden from them). */}

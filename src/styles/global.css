@@ -5289,6 +5289,16 @@ a {
 }
 
 /* A small hop, then back down behind the card. */
+/* Leaving while the page is scrolling: a quick fade, no sinking (AvatarGuide.tsx, QUICK_MS). */
+.avatar-guide[data-quick][data-phase='out'] {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.avatar-guide[data-quick][data-phase='out'] .avatar-guide__body {
+  animation: none;
+}
+
 @keyframes guide-sink {
   0% { transform: translateY(0); }
   25% { transform: translateY(-6%); }
