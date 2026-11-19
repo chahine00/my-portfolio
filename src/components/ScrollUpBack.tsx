@@ -1,4 +1,4 @@
-// Phones: a small "← All posts" button (or any label) at the bottom left, above the tab bar, that
+// Phones: a small "← All posts" (or "← Home", on the Blog page) button at the bottom left, above the tab bar, that
 // shows up when you scroll UP in the middle of a long page and hides again when you scroll down.
 // Scrolling up mid-page usually means you're thinking of leaving, so the way back is right under
 // your thumb then, without covering the text while you read. It mirrors the back-to-top button on

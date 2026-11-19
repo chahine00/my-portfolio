@@ -4,13 +4,14 @@
 // so a filtered list can be shared, and the home page can open the page already filtered.
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigationType, useSearchParams } from 'react-router'
+import { Link, useLocation, useNavigate, useNavigationType, useSearchParams } from 'react-router'
 import { filterUpdates, sortedUpdates } from '../../data/updates.ts'
 import { readListSpot, saveListSpot } from './listSpot.ts'
 import BlogFilters from './BlogFilters.tsx'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import UpdateTimeline from './UpdateTimeline.tsx'
 import GradientText from '../../components/GradientText.tsx'
+import ScrollUpBack from '../../components/ScrollUpBack.tsx'
 
 function UpdatesPage() {
   const [params, setParams] = useSearchParams()
@@ -19,6 +20,7 @@ function UpdatesPage() {
 
   const location = useLocation()
   const navigationType = useNavigationType()
+  const navigate = useNavigate()
   useDocumentTitle('Blog')
 
   // Whether the Blog bar is stuck under the navbar right now. It changes the shape of the bar's
@@ -182,6 +184,10 @@ function UpdatesPage() {
           </div>
         )}
       </div>
+
+      {/* Phones: a "← Home" pill when you scroll up mid-list. It goes to the very top of the home
+          page (the hero), like the navbar's Home link, and replays the hero's welcome drawing. */}
+      <ScrollUpBack label="Home" onClick={() => navigate('/#home', { state: { replayWelcome: true } })} />
     </section>
   )
 }

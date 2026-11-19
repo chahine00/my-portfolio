@@ -2925,6 +2925,14 @@ a.card-pill:hover svg {
   font-weight: 500;
 }
 
+/* Phones: the floating "← Home" pill (ScrollUpBack.tsx) takes this link's job while you scroll,
+   so the bar drops it and keeps its room for the count and the filters. */
+@media (max-width: 720px) {
+  .blog-bar__home {
+    display: none;
+  }
+}
+
 
 /* Phones, on the Blog page only: the navbar scrolls away with the page instead of staying on top,
    and the Blog bar takes its place at the very top of the screen. One bar instead of two stacked
