@@ -23,8 +23,8 @@ function UpdatesPage() {
   const navigate = useNavigate()
   useDocumentTitle('Blog')
 
-  // Whether the Blog bar is stuck under the navbar right now. It changes the shape of the bar's
-  // faded background (see .blog-bar--stuck in global.css).
+  // Whether the Blog bar is stuck under the navbar right now. Adds .blog-bar--stuck, which fades in
+  // the cover behind the bar's items so the posts scrolling under it are hidden (see global.css).
   const barRef = useRef<HTMLDivElement>(null)
   const [stuck, setStuck] = useState(false)
 

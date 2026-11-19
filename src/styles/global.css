@@ -2835,61 +2835,50 @@ a.card-pill:hover svg {
 }
 
 /* The Blog bar: sticks right under the navbar (--navbar-height, set by Navbar.tsx) while you
-   scroll, frosted like the navbar, so you always see you're on the Blog page. */
+   scroll, so you always see you're on the Blog page. At the top of the page it has no background:
+   the page shows around its items. Once stuck, a snug cover hides the posts under it (below). */
 .blog-bar {
   position: sticky;
   top: var(--navbar-height, 64px);
   z-index: 10;
   margin: 0 0 20px;
   padding: 8px 0;
-  /* Its background is the ::before below. z-index above makes the bar its own layer,
-     so the ::before (z-index -1) stays behind the bar's content. */
 }
 
-/* The bar's background: a patch of the page color that is fully solid behind the bar's content
-   and fades out smoothly all around it, so it melts into the page with no edge or line.
-   The fades sit OUTSIDE the content (in the space left and right of it, a strip above, a longer
-   strip below), so a post scrolling underneath never shows through behind the search or the buttons.
-   Two gradient masks do it: one fades the left and right sides, the other the top and bottom;
-   "intersect" keeps only what both allow, which also softens the corners.
-   --bleed: how far it reaches past the content on each side (16px on phones, the space they have). */
-.blog-bar {
-  --bleed: clamp(16px, (100vw - 960px) / 2, 200px);
-  --fade-top: 36px;
-  /* Short at first, so the fade doesn't dim the first post sitting right under the bar. */
-  --fade-bottom: 28px;
-}
-
+/* While the bar is stuck (UpdatesPage.tsx adds .blog-bar--stuck), posts scroll under it. A cover
+   then fades in behind the items, so the posts slip out of sight instead of showing between them.
+   It's frosted, not solid: a strong blur smudges the posts away, while only a light tint of the
+   page color sits on top, so the page's colored glow keeps its color and the cover has no visible
+   edge (a solid color showed as a darker box over the glow). It stays snug: 48px past the bar on
+   the left and right, where it fades out, and a short 32px fade below. At the top of the
+   page nothing scrolls under the bar, so the cover stays hidden and the page's glow shows freely.
+   z-index on .blog-bar makes the bar its own layer, so the cover (z-index -1) stays behind its items. */
 .blog-bar::before {
   content: '';
   position: absolute;
   z-index: -1;
-  top: calc(-1 * var(--fade-top));
-  bottom: calc(-1 * var(--fade-bottom));
-  left: calc(-1 * var(--bleed));
-  right: calc(-1 * var(--bleed));
-  /* Frosted, not solid: the page's colored glow shows through (so the bar doesn't look like a dark
-     block over it, especially in dark mode), while posts scrolling underneath are blurred and dimmed. */
-  background: color-mix(in srgb, var(--bg) 40%, transparent);
-  -webkit-backdrop-filter: blur(26px);
-  backdrop-filter: blur(26px);
+  top: 0;
+  bottom: -32px;
+  left: -48px;
+  right: -48px;
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  -webkit-backdrop-filter: blur(28px);
+  backdrop-filter: blur(28px);
   -webkit-mask-image:
-    linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2) calc(var(--bleed) * 0.5), #000 var(--bleed), #000 calc(100% - var(--bleed)), rgb(0 0 0 / 0.2) calc(100% - var(--bleed) * 0.5), transparent),
-    linear-gradient(180deg, transparent, rgb(0 0 0 / 0.2) calc(var(--fade-top) * 0.5), #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), rgb(0 0 0 / 0.2) calc(100% - var(--fade-bottom) * 0.5), transparent);
+    linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent),
+    linear-gradient(180deg, #000 calc(100% - 32px), transparent);
   -webkit-mask-composite: source-in;
   mask-image:
-    linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2) calc(var(--bleed) * 0.5), #000 var(--bleed), #000 calc(100% - var(--bleed)), rgb(0 0 0 / 0.2) calc(100% - var(--bleed) * 0.5), transparent),
-    linear-gradient(180deg, transparent, rgb(0 0 0 / 0.2) calc(var(--fade-top) * 0.5), #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), rgb(0 0 0 / 0.2) calc(100% - var(--fade-bottom) * 0.5), transparent);
+    linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent),
+    linear-gradient(180deg, #000 calc(100% - 32px), transparent);
   mask-composite: intersect;
+  opacity: 0;
+  transition: opacity 0.2s;
   pointer-events: none;
 }
 
-/* While the bar is stuck under the navbar (UpdatesPage.tsx adds the class): no fade on top, so the
-   top stays solid right under the navbar and no post shows through there. */
-.blog-bar--stuck {
-  --fade-top: 0px;
-  /* Once stuck, posts scroll under the bar: a long fade lets them slip away softly. */
-  --fade-bottom: 110px;
+.blog-bar--stuck::before {
+  opacity: 1;
 }
 
 .blog-bar .blog-filters {
