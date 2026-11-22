@@ -7,6 +7,7 @@ import { projects } from '../../data/projects.ts'
 import Gallery from '../../components/Gallery.tsx'
 import ScrollUpBack from '../../components/ScrollUpBack.tsx'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
+import { projectDescription } from '../../data/seo.ts'
 import { rememberProjectLeft } from './projectReturn.ts'
 
 function ProjectPage() {
@@ -15,7 +16,10 @@ function ProjectPage() {
   const index = projects.findIndex((project) => project.slug === slug)
   const project = projects[index]
   const navigate = useNavigate()
-  useDocumentTitle(project ? project.title : 'Project not found')
+  useDocumentTitle(project ? project.title : 'Project not found', {
+    description: project && projectDescription(project),
+    noindex: !project,
+  })
 
   // Leaving this page (any way: a link, or the phone's back gesture): remember the project, so the
   // home page can open at its card when that's where you land (HomePage.tsx). A layout effect, so

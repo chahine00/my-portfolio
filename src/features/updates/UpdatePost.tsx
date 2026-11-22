@@ -9,6 +9,7 @@ import { readListSpot } from './listSpot.ts'
 import Gallery from '../../components/Gallery.tsx'
 import ScrollUpBack from '../../components/ScrollUpBack.tsx'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
+import { postDescription } from '../../data/seo.ts'
 
 // Turns one paragraph of a post into what the page shows.
 // Lines starting with "- " become a real bulleted list, so a long point that wraps lines up
@@ -77,8 +78,8 @@ function UpdatePost() {
   const post = sortedUpdates[postIndex]
   const location = useLocation()
   const navigate = useNavigate()
-  // The tab shows the post's title (or "Post not found").
-  useDocumentTitle(post ? post.title : 'Post not found')
+  // The tab and Google show the post's title and summary (or "Post not found", kept out of Google).
+  useDocumentTitle(post ? post.title : 'Post not found', { description: post && postDescription(post), noindex: !post })
 
   // "All posts" (top and bottom of the post): to the Blog list, where you left it. Opened straight from the list: just step back
   // (the list remembers its scroll spot). Otherwise (after Older/Newer, or a shared link), open the

@@ -3,9 +3,14 @@
 
 export const profile = {
   name: 'Ali Chahine',
-  role: 'Software Engineer',
+  // The studio this site belongs to: shown in the navbar, the tab title and the footer.
+  brand: 'Axihex',
+  site: 'https://axihex.com',
+  role: 'Software Engineer · Building Axihex',
+  // One or two sentences under your name in the hero.
+  intro: "I'm Ali Chahine, the software engineer behind Axihex. I design and build thoughtful digital solutions, from idea to implementation.",
   location: 'Beirut, Lebanon',
-  availability: 'Open for opportunities', // set to '' to hide it
+  availability: 'Open to opportunities & software projects', // set to '' to hide it
   // Your picture in /public: the 3D avatar, on a transparent background so it suits light AND
   // dark mode. WebP (77 KB instead of the 670 KB PNG it was made from), so it loads fast. Its
   // outline also cuts your silhouette out of the welcome drawing, so the drawing stays behind you.

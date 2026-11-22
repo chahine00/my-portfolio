@@ -1,9 +1,10 @@
 // The "About Me" section: one short statement as the title, a line on what it means, three "how I work" cards under it,
-// and the small numbers underneath. Edit the text below to introduce yourself.
+// the small numbers underneath, and a short note on the idea behind Axihex. Edit the text below to introduce yourself.
 // The numbers come from "stats" in src/data/profile.ts.
 
 import { stats } from '../../data/profile.ts'
 import GradientText from '../../components/GradientText.tsx'
+import AxihexMark from '../../components/AxihexMark.tsx'
 
 // How you work, in three short points. Keep each one to a title and one line.
 const principles = [
@@ -59,6 +60,19 @@ function About() {
           </li>
         ))}
       </ul>
+
+      {/* What Axihex is, in a few lines: the brand in the navbar and hero, explained. */}
+      <div className="axihex">
+        <AxihexMark className="axihex__mark" />
+        <div>
+          <h3 className="axihex__title">The idea behind Axihex</h3>
+          <p className="axihex__text">
+            Axihex is the software engineering identity I'm building around thoughtful problem-solving, reliable
+            systems, and purposeful development. Today it represents my work and technical expertise, with the
+            ambition to grow into an independent software studio.
+          </p>
+        </div>
+      </div>
     </section>
   )
 }

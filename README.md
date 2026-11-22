@@ -38,6 +38,31 @@ src/
   styles/global.css         All the styles.
 ```
 
+## Hosting (axihex.com on EC2, nginx)
+
+`npm run build` makes the `dist` folder: copy its contents to the server's web root.
+Besides `index.html`, it has one HTML file per page (`blog.html`, `blog/<slug>.html`,
+`projects/<slug>.html`), each with that page's title, description and link preview
+(see `scripts/seo-plugin.ts`), plus `404.html`, `sitemap.xml` and `robots.txt`.
+
+nginx needs to try those files before falling back to the app:
+
+```nginx
+location / {
+    try_files $uri $uri.html /index.html;
+}
+
+# Files with a hash in their name never change: let browsers keep them for a year.
+location /assets/ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+}
+```
+
+Don't add `$uri/` to `try_files`: project photos live in `projects/<slug>/`, a folder with the
+same name as the project's page, and nginx would send the page there instead.
+After changing the config: `sudo nginx -t && sudo systemctl reload nginx`.
+
 ## Which file teaches what
 
 Read them roughly in this order, from simplest to most advanced:

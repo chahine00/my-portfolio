@@ -1,0 +1,5 @@
+# Every page may be crawled. The sitemap lists them all (made by scripts/seo-plugin.ts).
+User-agent: *
+Allow: /
+
+Sitemap: https://axihex.com/sitemap.xml

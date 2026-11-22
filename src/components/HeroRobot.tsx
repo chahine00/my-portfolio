@@ -91,7 +91,7 @@ const SCREEN_MARGIN = 16 // the bubble stays this far inside the screen
 const LINES = [
   "Beep boop! I'm Ali's tiny helper bot. Unpaid, obviously.",
   'Scanning… this portfolio is 100% AI. Ali just pressed Enter.',
-  'Try “View my work”: that’s where the good stuff is.',
+  'Try “Explore projects”: that’s where the good stuff is.',
   '01001000 01101001! (That’s “Hi” in binary. You’re welcome.)',
   'Compiling coffee… please wait.',
   'Need a developer? My human is open for opportunities. And snacks.',

@@ -4,7 +4,7 @@ import { Link } from 'react-router'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 
 function NotFound() {
-  useDocumentTitle('Page not found')
+  useDocumentTitle('Page not found', { noindex: true })
   return (
     <section className="section not-found">
       <p className="not-found__code">404</p>

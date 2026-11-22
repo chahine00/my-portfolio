@@ -320,6 +320,14 @@ main {
 }
 
 /* The typing code line under the name (see useTypingLoop in Hero.tsx) */
+.hero__intro {
+  max-width: 34rem;
+  margin: 12px 0 0;
+  color: var(--text);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
 .hero__code {
   display: grid; /* the ghost and the typed text share one cell, so the bigger one sets the size */
   margin: 12px 0 0;
@@ -1186,24 +1194,13 @@ main {
     white-space: nowrap;
   }
 
-  /* Phones: location | availability on one row, shrinking a little on small phones. */
+  /* Phones: location, then availability under it (together they're too long for one row).
+     They shrink a little on small phones. */
   .hero__meta {
-    flex-wrap: nowrap;
-    gap: 10px;
+    flex-direction: column;
+    gap: 4px;
     font-size: clamp(0.72rem, 3.5vw, 0.95rem);
     white-space: nowrap;
-  }
-
-  /* The divider is a thin drawn line, not a "|" character: phones that force their own dark mode
-     turn dark text (like a "|" in the border color) bright white, but leave a line's color alone. */
-  .hero__meta li + li::before {
-    content: '';
-    display: inline-block;
-    width: 1px;
-    height: 0.9em;
-    margin-right: 6px;
-    vertical-align: -0.1em;
-    background: var(--border);
   }
 
   /* Phones: the two buttons share a row, the icon links get their own row under them. */
@@ -1478,6 +1475,62 @@ main {
 @media (max-width: 760px) {
   .mindset__list {
     grid-template-columns: 1fr;
+  }
+}
+
+/* About: "The idea behind Axihex", a card under the numbers with the hexagon mark on the left. */
+.axihex {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 14px;
+  background: var(--card);
+  transition: border-color 0.3s;
+}
+
+.axihex:hover {
+  border-color: var(--accent);
+}
+
+.axihex__mark {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  transition: transform 0.6s ease;
+}
+
+.axihex__mark circle {
+  fill: var(--accent);
+  stroke: none;
+}
+
+.axihex:hover .axihex__mark {
+  transform: rotate(60deg);
+}
+
+.axihex__title {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+}
+
+.axihex__text {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .axihex__mark {
+    transition: none;
   }
 }
 
@@ -4058,7 +4111,7 @@ a {
   }
 }
 
-/* Brand name: always shown as <Ali Chahine />, and always moving.
+/* Brand name: shown as a hexagon mark + Axihex, and always moving.
    The lane is the empty space it has at the top (left of the links on big screens,
    left of the theme button on phones). The name glides from one end of it to the other and back. */
 .navbar__lane {
@@ -4073,7 +4126,7 @@ a {
 .navbar__brand {
   display: inline-flex;
   align-items: center;
-  /* Never break "Ali Chahine" onto two lines. */
+  /* Never break the name onto two lines. */
   white-space: nowrap;
   animation: brand-glide 9s ease-in-out infinite alternate;
 }
@@ -4124,36 +4177,36 @@ a {
   10% { transform: translateY(-4px); }
 }
 
-/* The < and /> breathe: they step out from the name and back in. */
-.brand__bracket {
-  display: inline-block;
-  margin-right: 4px;
-  color: var(--accent);
-  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  white-space: pre;
-  animation: brand-breathe-open 3s ease-in-out infinite;
+/* The Axihex mark before the name: a hexagon that turns slowly on hover. */
+.brand__mark {
+  width: 1.25em;
+  height: 1.25em;
+  margin-right: 8px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  transition: transform 0.6s ease;
 }
 
-.brand__bracket--close {
-  margin-right: 0;
-  margin-left: 4px;
-  animation-name: brand-breathe-close;
+.brand__mark circle {
+  fill: var(--accent);
+  stroke: none;
 }
 
-@keyframes brand-breathe-open {
-  50% { transform: translateX(-4px); }
-}
-
-@keyframes brand-breathe-close {
-  50% { transform: translateX(4px); }
+.navbar__brand:hover .brand__mark {
+  transform: rotate(60deg);
 }
 
 /* People who turn off animations in their settings get the name standing still. */
 @media (prefers-reduced-motion: reduce) {
   .navbar__brand,
-  .brand__letter,
-  .brand__bracket {
+  .brand__letter {
     animation: none;
+  }
+  .brand__mark {
+    transition: none;
   }
 }
 

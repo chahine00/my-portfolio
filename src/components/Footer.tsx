@@ -16,7 +16,7 @@ function Footer() {
       <div className="footer__line">
         <span className="footer__track">
           <FooterRobot />
-          © {year} Ali Chahine · Built with React &amp; TypeScript · Hosted on AWS ·{' '}
+          © {year} Axihex · Ali Chahine · Built with React &amp; TypeScript · Hosted on AWS ·{' '}
           <a href="https://github.com/chahine00/my-portfolio" target="_blank" rel="noreferrer">
             View source
           </a>

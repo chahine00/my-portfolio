@@ -9,6 +9,7 @@ import { filterUpdates, sortedUpdates } from '../../data/updates.ts'
 import { readListSpot, saveListSpot } from './listSpot.ts'
 import BlogFilters from './BlogFilters.tsx'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
+import { BLOG_DESCRIPTION } from '../../data/seo.ts'
 import UpdateTimeline from './UpdateTimeline.tsx'
 import GradientText from '../../components/GradientText.tsx'
 import ScrollUpBack from '../../components/ScrollUpBack.tsx'
@@ -21,7 +22,7 @@ function UpdatesPage() {
   const location = useLocation()
   const navigationType = useNavigationType()
   const navigate = useNavigate()
-  useDocumentTitle('Blog')
+  useDocumentTitle('Blog', { description: BLOG_DESCRIPTION })
 
   // Whether the Blog bar is stuck under the navbar right now. Adds .blog-bar--stuck, which fades in
   // the cover behind the bar's items so the posts scrolling under it are hidden (see global.css).

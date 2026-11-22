@@ -13,6 +13,7 @@ import { profile } from '../data/profile.ts'
 import ThemeToggle from './ThemeToggle.tsx'
 import { goToTop } from '../utils/goToTop.ts'
 import Icon from './Icon.tsx'
+import AxihexMark from './AxihexMark.tsx'
 import type { IconName } from './Icon.tsx'
 
 // Instead of writing each <li> by hand, we keep the links in an array.
@@ -244,28 +245,23 @@ function Navbar() {
       {/* In JSX we write "className" instead of "class" (class is a reserved word in JavaScript). */}
       <header ref={headerRef} className={scrolled ? 'navbar navbar--scrolled' : 'navbar'}>
         {/*
-          The name is shown as a code tag, <Ali Chahine />. It glides back and forth across the
-          empty space at the top (its "lane"), the letters keep doing a little wave, and the tags breathe.
+          The brand: a small hexagon mark, then the name, Axihex. It glides back and forth across the
+          empty space at the top (its "lane"), and the letters keep doing a little wave.
           Each letter is its own <span> with its position (--i), so the wave can run left to right.
           Screen readers just read the aria-label, not the separate letters.
         */}
         <div className="navbar__lane">
           {/* draggable={false}: a press that moves a little (easy on a moving target) would
               otherwise start dragging the link, and the click would be lost. */}
-          <Link to="/#home" className="navbar__brand" aria-label={`${profile.name}, home`} draggable={false}>
-            <span className="brand__bracket" aria-hidden="true">
-              &lt;
-            </span>
+          <Link to="/#home" className="navbar__brand" aria-label={`${profile.brand}, home`} draggable={false}>
+            <AxihexMark className="brand__mark" />
             <span aria-hidden="true">
-              {[...profile.name].map((letter, i) => (
+              {[...profile.brand].map((letter, i) => (
                 <span key={i} className="brand__letter" style={{ '--i': i } as CSSProperties}>
                   {/* A normal space would collapse, so use a non-breaking one. */}
                   {letter === ' ' ? '\u00A0' : letter}
                 </span>
               ))}
-            </span>
-            <span className="brand__bracket brand__bracket--close" aria-hidden="true">
-              /&gt;
             </span>
           </Link>
         </div>

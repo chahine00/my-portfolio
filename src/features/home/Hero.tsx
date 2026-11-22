@@ -419,6 +419,8 @@ function Hero() {
           </span>
         </h1>
 
+        <p className="hero__intro">{profile.intro}</p>
+
         {/* A line of "code" that keeps typing what you build. Screen readers get the full list once instead. */}
         <p className="hero__code" aria-label={`I build ${profile.building.join(', ')}`}>
           {/* An invisible copy of the LONGEST phrase sits in the same spot and sets the line's size,
@@ -448,7 +450,7 @@ function Hero() {
         {/* Buttons and icon links sit side by side in a row. */}
         <div className="hero-actions">
           <a href="#projects" className="button">
-            View my work
+            Explore projects
           </a>
           {/* The PDF lives in /public, so it is served from the site root. */}
           <a href={asset('/Ali_Chahine_CV.pdf')} download="Ali_Chahine_CV.pdf" className="button button-outline">
