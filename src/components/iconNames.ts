@@ -33,3 +33,11 @@ export type IconName =
   | 'share'
   | 'book'
   | 'spark'
+  // The studio's identity (src/data/identity.ts):
+  | 'server'
+  | 'bulb'
+  | 'target'
+  | 'shield'
+  | 'trend'
+  | 'flask'
+  | 'box'

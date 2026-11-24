@@ -18,8 +18,13 @@ export const SITE_URL = profile.site // 'https://axihex.com', no slash at the en
 export const SITE_TITLE = `${profile.brand} | Building what's next · Founded by ${profile.name}`
 
 export const HOME_DESCRIPTION =
-  `${profile.brand} is an independent software studio founded by ${profile.name}: ` +
+  `${profile.brand} is an independent, founder-led software studio by ${profile.name}: ` +
   'exploring ideas, engineering digital products, and creating useful technology.'
+
+// The Studio page (/studio): the identity, the five pillars and the direction.
+export const STUDIO_DESCRIPTION =
+  `What ${profile.brand} is and where it's going: five pillars (Explore, Build, Showcase, Share, Grow), ` +
+  'core engineering capabilities, product thinking, mission, vision and values.'
 
 // Who the founder is: used for the person in the structured data (scripts/seo-plugin.ts).
 export const FOUNDER_DESCRIPTION =

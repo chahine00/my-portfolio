@@ -7,7 +7,7 @@ export const profile = {
   brand: 'Axihex',
   site: 'https://axihex.com',
   // The small label above the hero's headline: what Axihex is.
-  role: 'Independent software studio',
+  role: 'Independent, founder-led software studio',
   // The hero's headline. The words in "headlineAccent" are shown in the accent gradient.
   headline: 'Building',
   headlineAccent: "what's next.",
@@ -24,11 +24,13 @@ export const profile = {
   // hero (the hero shows the Axihex mark). Also the person's image in the structured data.
   photo: '/avatar.webp',
   // Typed out one by one under the home page's headline, like code being written. Keep each one short.
+  // One per core capability (src/data/identity.ts): web, mobile, backend, AI, cloud.
   building: [
+    'web apps, end to end',
+    'cross-platform mobile apps',
     'secure APIs & databases',
-    'cross-platform mobile apps',         // Focus on business/internal use
     'LLM & RAG features',
-    'web apps, end to end'
+    'cloud deployments on AWS',
   ],
   // The night desk (RobotLab.tsx): shown in the hero instead of the avatar every other time a
   // visitor comes back to the top. Set to false to always show the avatar.

@@ -526,8 +526,10 @@ function Hero({ variant = 'studio' }: { variant?: 'studio' | 'founder' }) {
               <Link to="/#projects" className="button">
                 Explore our work <span aria-hidden="true">→</span>
               </Link>
-              <Link to="/#studio" className="button button-outline">
-                About the studio
+              {/* Client work and original products coexist: the studio welcomes projects, so say so up front.
+                  The Contact form opens with "A project" chosen (Contact.tsx). */}
+              <Link to="/#contact" state={{ topic: 'project' }} className="button button-outline">
+                Start a project
               </Link>
             </>
           )}

@@ -8,7 +8,7 @@
 //   - puts the right <title>, description, canonical link, preview tags and structured data
 //     (JSON-LD, which tells Google who you are and what each page is) in the home page
 //   - writes a copy of index.html for every other page with ITS tags:
-//       dist/blog.html, dist/background.html, dist/blog/<slug>.html, dist/projects/<slug>.html
+//       dist/blog.html, dist/background.html, dist/studio.html, dist/blog/<slug>.html, dist/projects/<slug>.html
 //     (and dist/projects/<slug>/index.html: see "Project pages" below)
 //   - writes dist/404.html (not indexed) and dist/sitemap.xml (the list of pages for Google)
 // The page content is still drawn by React: only the <head> differs.
@@ -18,7 +18,7 @@
 
 import { execFileSync } from 'node:child_process'
 import type { Plugin } from 'vite'
-import { blogBody, founderBody, homeBody, postBody, projectBody } from './prerender.ts'
+import { blogBody, founderBody, homeBody, postBody, projectBody, studioBody } from './prerender.ts'
 import { contacts } from '../src/data/contact.ts'
 import { profile } from '../src/data/profile.ts'
 import { projects } from '../src/data/projects.ts'
@@ -30,6 +30,7 @@ import {
   FOUNDER_DESCRIPTION,
   HOME_DESCRIPTION,
   SITE_URL,
+  STUDIO_DESCRIPTION,
   absoluteUrl,
   pageTitle,
   postDescription,
@@ -264,6 +265,23 @@ const background: Page = {
   ],
 }
 
+const studioPage: Page = {
+  path: '/studio',
+  title: pageTitle('Identity, Purpose & Vision'),
+  description: STUDIO_DESCRIPTION,
+  imageAlt: `${profile.brand}: identity, purpose and vision`,
+  body: studioBody(),
+  jsonLd: [
+    { '@type': 'AboutPage', url: absoluteUrl('/studio'), about: { '@id': BRAND_ID } },
+    breadcrumbs([
+      { name: 'Home', path: '/' },
+      { name: 'Studio', path: '/studio' },
+    ]),
+    brand,
+    person,
+  ],
+}
+
 const notFound: Page = {
   path: '/404',
   title: pageTitle('Page not found'),
@@ -327,6 +345,7 @@ function sitemap() {
   const entries = [
     { path: '/', lastmod: latestPost },
     { path: '/blog', lastmod: latestPost },
+    { path: '/studio', lastmod: lastChanged('src/data/identity.ts') },
     {
       path: '/background',
       lastmod: lastChanged('src/data/experience.ts', 'src/data/founder.ts', 'src/data/education.ts', 'src/data/profile.ts'),
@@ -370,6 +389,7 @@ export default function seoPlugin(): Plugin {
         emit(`${page.path.slice(1)}/index.html`, pageHtml)
       }
       emit('background.html', withPage(html, background))
+      emit('studio.html', withPage(html, studioPage))
       emit('404.html', withPage(html, notFound))
       emit('sitemap.xml', sitemap())
     },

@@ -16,22 +16,21 @@ export const studio = {
   eyebrow: 'The Studio',
   title: 'Ideas deserve to be',
   titleAccent: 'built.', // in the accent gradient
-  text: 'Axihex brings engineering, experimentation, and product thinking together to turn ideas into useful technology.',
-  // The studio's principles, in order. Keep each note to a few words.
-  principles: [
-    { word: 'Explore', note: 'Ideas worth solving', icon: 'compass' as IconName },
-    { word: 'Build', note: 'Software that works', icon: 'layers' as IconName },
-    { word: 'Share', note: 'Knowledge & tools', icon: 'share' as IconName },
-  ],
+  text: 'Axihex is an independent, founder-led software studio. It brings engineering, experimentation, and product thinking together to turn ideas into useful technology, for its own products and for clients.',
+  // The pillars, capabilities and the rest of the identity live in src/data/identity.ts.
+  pillarsTitle: 'Five pillars.',
+  pillarsAccent: 'One studio.',
   behindTitle: 'Behind Axihex',
   behind: [
-    'Axihex is a software studio rooted in real engineering experience: robust backends, practical AI, mobile apps people use every day, and the cloud that keeps it all running.',
-    "From enterprise systems to real-world applications, that experience shapes how we approach ideas, build products, and explore what's next.",
+    'Axihex is rooted in real engineering experience: robust backends, practical AI, mobile apps people use every day, and the cloud that keeps it all running.',
+    'Founder-led today and open to collaboration: Axihex grows through real work and real relationships, not an artificial impression of size.',
   ],
-  // The founder card under it (no name here: the home page stays about Axihex).
+  // The founder card under it (no name here: the home page stays about Axihex). "availability":
+  // running a studio doesn't mean the founder isn't open to a role, so it says so.
   founderCard: {
     title: 'Meet the founder.',
-    text: 'Software engineer with experience across backend systems, AI integration, mobile development, and cloud infrastructure.',
+    text: 'The engineering behind the studio: backend systems, AI integration, mobile development, and cloud infrastructure.',
+    availability: 'Open to engineering opportunities',
     link: 'Experience & CV',
   },
 }

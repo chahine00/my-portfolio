@@ -46,7 +46,8 @@ function FounderContact() {
         {profile.founderAvailability && `${profile.founderAvailability}. `}Send a message and I'll get back to you.
       </p>
       <div className="hero-actions">
-        <Link to="/#contact" className="button">
+        {/* The form opens with "A role for the founder" chosen (Contact.tsx). */}
+        <Link to="/#contact" state={{ topic: 'role' }} className="button">
           Get in touch
         </Link>
       </div>

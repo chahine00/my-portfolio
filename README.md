@@ -29,6 +29,7 @@ src/
   features/                 One folder per section or page:
     home/                   The home page and its top part (Hero).
     about/, experience/, skills/, education/, contact/
+    studio/                 The /studio page: Axihex's identity, purpose and vision.
     projects/               The project list, its cards, and each project's page.
     updates/                The blog: preview on the home page, list page, post page.
     not-found/              The "page not found" page.

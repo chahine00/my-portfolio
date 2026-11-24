@@ -14,6 +14,7 @@ import UpdatesPage from '../features/updates/UpdatesPage.tsx'
 import UpdatePost from '../features/updates/UpdatePost.tsx'
 import ProjectPage from '../features/projects/ProjectPage.tsx'
 import BackgroundPage from '../features/background/BackgroundPage.tsx'
+import StudioPage from '../features/studio/StudioPage.tsx'
 import NotFound from '../features/not-found/NotFound.tsx'
 
 // Sends an old post link (/updates/<slug>) to the same post at its new address (/blog/<slug>).
@@ -48,6 +49,7 @@ function App() {
           "/updates…" → the blog's old address. Old shared links are sent on to /blog.
           "/projects/:slug" → one project's page, e.g. /projects/cinetwork
           "/background" → the founder's full background: experience, capabilities, education
+          "/studio" → Axihex's identity, purpose and vision in full
           To add a new page: create its component, add a <Route> here,
           and add a link to it in Navbar.tsx.
           The last route ("*") catches any unknown URL and shows a "Page not found" page.
@@ -61,6 +63,7 @@ function App() {
             <Route path="/updates/:slug" element={<OldPostRedirect />} />
             <Route path="/projects/:slug" element={<ProjectPage />} />
             <Route path="/background" element={<BackgroundPage />} />
+            <Route path="/studio" element={<StudioPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

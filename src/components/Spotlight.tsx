@@ -1,4 +1,4 @@
-// A soft light that follows the mouse across cards (projects, blog posts, the studio's principles,
+// A soft light that follows the mouse across cards (projects, blog posts, the studio's pillar panel and capabilities,
 // the mindset, the contact boxes and form): a premium touch on bigger screens. It only shares the
 // mouse position with the card under it (--spot-x / --spot-y); the light itself is CSS
 // ("card spotlight" in global.css). Off on touch screens and for people who turn off animations.
@@ -6,7 +6,8 @@
 import { useEffect } from 'react'
 
 // The cards that get the light. Keep in sync with the "card spotlight" selectors in global.css.
-export const SPOTLIGHT_CARDS = '.card, .studio__principles li, .mindset__item, .contact-panel, .contact-tile'
+export const SPOTLIGHT_CARDS =
+  '.card, .caps__item, .hive-panel, .trait, .value-grid li, .mindset__item, .contact-panel, .contact-tile'
 
 function Spotlight() {
   useEffect(() => {

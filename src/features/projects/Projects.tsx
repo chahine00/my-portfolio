@@ -18,7 +18,8 @@ function Projects() {
   return (
     <section id="projects" className="section">
       <SectionTitle label="Selected Work" title="Engineering in" accent="practice" />
-      <p className="page-intro">What Axihex is built on, and where it's going: from the founder's work to the studio's own.</p>
+      {/* Attributed honestly: who delivered what (studio, the founder's clients, previous employers). */}
+      <p className="page-intro">Real work, attributed honestly: studio projects, client work, and the founder's experience.</p>
       <div className="work-groups" ref={groupsRef}>
         {groups.map((group) => (
           <div key={group.id} className="work-group">

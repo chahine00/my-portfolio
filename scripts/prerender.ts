@@ -11,6 +11,23 @@
 
 import { profile } from '../src/data/profile.ts'
 import { studio } from '../src/data/studio.ts'
+import {
+  capabilities,
+  definition,
+  horizon,
+  isRather,
+  measure,
+  mission,
+  notLimitedTo,
+  philosophy,
+  pillars,
+  process,
+  thinking,
+  traits,
+  umbrella,
+  values,
+  vision,
+} from '../src/data/identity.ts'
 import { coreStack, mindset, testimonials } from '../src/data/founder.ts'
 import { projectCategories, projects, type Project } from '../src/data/projects.ts'
 import { formatDate, type Update } from '../src/data/updates.ts'
@@ -38,6 +55,7 @@ const paragraphs = (text?: string) =>
 const nav = `<nav>${[
   link('/', profile.brand),
   link('/#studio', 'Studio'),
+  link('/studio', 'Identity & vision'),
   link('/#projects', 'Work'),
   link('/background', 'Founder'),
   link('/blog', 'Blog'),
@@ -68,16 +86,24 @@ export function homeBody(posts: Update[]) {
   return wrap(
     `<header>${el('p', profile.role)}${el('h1', `${profile.headline} ${profile.headlineAccent}`)}${el('p', profile.intro)}</header>` +
       `<section id="studio">${el('h2', `${studio.title} ${studio.titleAccent}`)}${el('p', studio.text)}` +
-      list(studio.principles.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.note)}`)) +
+      `<p>${link('/studio', 'Identity, purpose & vision')}</p>` +
+      el('h3', `${studio.pillarsTitle} ${studio.pillarsAccent}`) +
+      list(pillars.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.statement)}`)) +
+      el('h3', 'Core engineering capabilities') +
+      list(capabilities.map((c) => `<strong>${esc(c.title)}</strong>: ${esc(c.text)}`)) +
       el('h3', studio.behindTitle) +
       studio.behind.map((p) => el('p', p)).join('') +
-      `<p>${link('/background', studio.founderCard.title)} ${esc(studio.founderCard.text)}</p></section>` +
+      `<p>${link('/background', studio.founderCard.title)} ${esc(studio.founderCard.text)} ${esc(studio.founderCard.availability)}.</p></section>` +
       `<section id="projects">${el('h2', 'Selected Work: engineering in practice')}${work}</section>` +
       `<section id="blog">${el('h2', 'Blog: notes, ideas & milestones')}` +
       list(posts.slice(0, 3).map((post) => `${link(`/blog/${post.slug}`, post.title)} ${esc(post.summary)}`)) +
       `<p>${link('/blog', 'All posts')}</p></section>` +
+      `<section id="direction">${el('h2', 'Direction: where we’re going')}` +
+      el('h3', 'Mission') + el('p', mission) + el('h3', 'Vision') + el('p', vision) +
+      list(horizon.filter((h) => h.home).map((h) => `<strong>${esc(h.aspect)}</strong>: today ${esc(h.today)}; next ${esc(h.next)}`)) +
+      `<p>${link('/studio', 'Identity, purpose & vision')}</p></section>` +
       `<section id="contact">${el('h2', 'Let’s talk.')}` +
-      el('p', 'Reach out any time by email, on LinkedIn, or with the form below.') +
+      el('p', 'A project in mind, an idea to build together, or a role for the founder? Reach out by email, on LinkedIn, or with the form.') +
       `${contactLinks}</section>`,
   )
 }
@@ -117,6 +143,44 @@ export function founderBody() {
       el('p', languages.map((l) => `${l.name} (${l.label})`).join(', ')) +
       '</section>' +
       `<section id="founder-contact">${el('h2', 'Let’s talk.')}${contactLinks}<p>${cv}</p></section>`,
+  )
+}
+
+export function studioBody() {
+  return wrap(
+    `<header>${el('p', 'Identity, purpose & vision')}${el('h1', 'Where engineering meets curiosity.')}${el('p', definition)}` +
+      el('p', `Not limited to: ${notLimitedTo.join(', ')}. ${isRather}`) +
+      '</header>' +
+      `<section id="defines">${el('h2', 'What defines Axihex')}` +
+      list(traits.map((t) => `<strong>${esc(t.title)}</strong>: ${esc(t.text)}`)) +
+      '</section>' +
+      `<section id="pillars">${el('h2', 'Five pillars. One studio.')}` +
+      pillars
+        .map((p, i) => el('h3', `0${i + 1} ${p.word}: ${p.statement}`) + el('p', p.text) + el('p', `Objective: ${p.objective}`))
+        .join('') +
+      '</section>' +
+      `<section id="capabilities">${el('h2', 'Core engineering capabilities')}` +
+      list(capabilities.map((c) => `<strong>${esc(c.title)}</strong>: ${esc(c.text)}`)) +
+      '</section>' +
+      `<section id="approach">${el('h2', 'Product thinking, in practice')}` +
+      el('p', `Engineering asks: ${thinking.how.join(' ')}`) +
+      el('p', `Product thinking asks: ${thinking.why.join(' ')}`) +
+      el('p', thinking.principle) +
+      `<ol>${process.map((s) => `<li><strong>${esc(s.title)}</strong>: ${esc(s.text)}</li>`).join('')}</ol>` +
+      '</section>' +
+      `<section id="brand">${el('h2', 'One brand, many forms')}` +
+      list(umbrella.map((u) => `<strong>${esc(u.title)}</strong>: ${esc(u.text)}`)) +
+      '</section>' +
+      `<section id="direction">${el('h2', 'Today, and what’s next')}` +
+      list(horizon.map((h) => `<strong>${esc(h.aspect)}</strong>: today ${esc(h.today)}; next ${esc(h.next)}`)) +
+      el('p', measure) +
+      '</section>' +
+      `<section id="values">${el('h2', 'What we stand for')}` +
+      el('h3', 'Mission') + el('p', mission) + el('h3', 'Long-term vision') + el('p', vision) +
+      list(values.map((v) => `<strong>${esc(v.title)}</strong>: ${esc(v.text)}`)) +
+      el('p', philosophy) +
+      `<p>${link('/#contact', 'Start a project')} · ${link('/background', 'Meet the founder')}</p>` +
+      '</section>',
   )
 }
 

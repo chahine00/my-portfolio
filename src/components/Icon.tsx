@@ -170,6 +170,58 @@ function Icon({ name, size = 20 }: IconProps) {
           <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8" />
         </svg>
       )
+    // The studio's identity pictures (src/data/identity.ts).
+    case 'server':
+      return (
+        <svg {...stroke}>
+          <rect x="3.5" y="4" width="17" height="7" rx="2" />
+          <rect x="3.5" y="13" width="17" height="7" rx="2" />
+          <path d="M7.5 7.5h.01M7.5 16.5h.01M11 7.5h5M11 16.5h5" />
+        </svg>
+      )
+    case 'bulb':
+      return (
+        <svg {...stroke}>
+          <path d="M9 18h6M10 21h4" />
+          <path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V16h5v-.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3Z" />
+        </svg>
+      )
+    case 'target':
+      return (
+        <svg {...stroke}>
+          <circle cx="12" cy="12" r="9" />
+          <circle cx="12" cy="12" r="5" />
+          <circle cx="12" cy="12" r="1" />
+        </svg>
+      )
+    case 'shield':
+      return (
+        <svg {...stroke}>
+          <path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      )
+    case 'trend':
+      return (
+        <svg {...stroke}>
+          <path d="m3 17 6-6 4 4 8-8" />
+          <path d="M15 7h6v6" />
+        </svg>
+      )
+    case 'flask':
+      return (
+        <svg {...stroke}>
+          <path d="M9 3h6M10 3v6.5L4.6 18.4A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.4-2.6L14 9.5V3" />
+          <path d="M7.5 15h9" />
+        </svg>
+      )
+    case 'box':
+      return (
+        <svg {...stroke}>
+          <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Z" />
+          <path d="m4 7.5 8 4.5 8-4.5M12 12v9" />
+        </svg>
+      )
     case 'home':
       return (
         <svg {...stroke}>

@@ -38,7 +38,7 @@ const links: NavItem[] = [
   { to: '/#home', label: 'Home', icon: 'home', phoneOnly: true },
   // The studio first, then the work, then the founder's own page (his professional portfolio,
   // /background), then the writing. Contact always last.
-  { to: '/#studio', label: 'Studio', icon: 'code' },
+  { to: '/#studio', label: 'Studio', match: '/studio', icon: 'code' },
   { to: '/#projects', label: 'Work', match: '/projects', icon: 'folder' },
   { to: '/background', label: 'Founder', icon: 'user' },
   { to: '/blog', label: 'Blog', section: 'blog', dot: hasRecentUpdate, icon: 'pen' },

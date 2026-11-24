@@ -7,6 +7,7 @@ import FooterRobot from './FooterRobot.tsx'
 import AxihexMark from './AxihexMark.tsx'
 import { profile } from '../data/profile.ts'
 import { asset } from '../utils/asset.ts'
+import { essence } from '../data/identity.ts'
 
 // Normal JavaScript works in a component file too.
 // This gets the current year (for example 2026) so the footer never goes out of date.
@@ -18,6 +19,7 @@ const columns = [
     title: 'Studio',
     links: [
       { to: '/#studio', label: 'About the studio' },
+      { to: '/studio', label: 'Identity & vision' },
       { to: '/#projects', label: 'Work' },
       { to: '/blog', label: 'Blog' },
     ],
@@ -32,7 +34,10 @@ const columns = [
   },
   {
     title: 'Contact',
-    links: [{ to: '/#contact', label: 'Get in touch' }],
+    links: [
+      { to: '/#contact', label: 'Start a project', topic: 'project' },
+      { to: '/#contact', label: 'Get in touch' },
+    ],
   },
 ]
 
@@ -45,7 +50,7 @@ function Footer() {
             <AxihexMark className="footer__mark" /> {profile.brand}
           </Link>
           <p>
-            {profile.role}. {profile.headline} {profile.headlineAccent}
+            {profile.role}. {essence}
           </p>
           <SocialLinks />
         </div>
@@ -62,7 +67,9 @@ function Footer() {
                         {item.label}
                       </a>
                     ) : (
-                      <Link to={item.to}>{item.label}</Link>
+                      <Link to={item.to} state={'topic' in item ? { topic: item.topic } : undefined}>
+                        {item.label}
+                      </Link>
                     )}
                   </li>
                 ))}

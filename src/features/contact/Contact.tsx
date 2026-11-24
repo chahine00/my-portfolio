@@ -5,7 +5,9 @@
 // and React re-draws the component whenever one of those values changes.
 import { useEffect, useRef, useState } from 'react'
 import type { SubmitEvent } from 'react'
+import { useLocation } from 'react-router'
 import { sendContactMessage } from '../../services/api.ts'
+import { topics, type Topic } from '../../data/identity.ts'
 import { contacts } from '../../data/contact.ts'
 import { asset } from '../../utils/asset.ts'
 import Icon from '../../components/Icon.tsx'
@@ -26,6 +28,18 @@ function Contact() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<Status>('idle') // <Status> tells TypeScript which values are allowed
+  // What the message is about (a project, a collaboration, a role…): optional. Links like the hero's
+  // "Start a project" choose one for the visitor (they pass { topic } in the link's state).
+  const { state, key } = useLocation()
+  const wantedTopic = (state as { topic?: Topic } | null)?.topic
+  const [topic, setTopic] = useState<Topic | null>(wantedTopic ?? null)
+  // A new link with a topic (even the same one again, "key" changes) picks it.
+  const [seenKey, setSeenKey] = useState(key)
+  if (key !== seenKey) {
+    setSeenKey(key)
+    if (wantedTopic) setTopic(wantedTopic)
+  }
+  const chosen = topics.find((item) => item.id === topic)
   // Remembers who just wrote, so the thank-you message can use their name after the form is cleared.
   const [sentName, setSentName] = useState('')
   // The label of the phone number that was just copied, so its box can say "Copied!" for a moment.
@@ -61,7 +75,8 @@ function Contact() {
 
     // try/catch: run the code in "try". If anything throws an error, jump to "catch".
     try {
-      await sendContactMessage({ name, email, message })
+      // The topic goes first in the message, so the email says what it's about.
+      await sendContactMessage({ name, email, message: chosen ? `[${chosen.tag}]\n\n${message}` : message })
       setSentName(name.trim())
       setStatus('sent')
 
@@ -77,9 +92,12 @@ function Contact() {
   return (
     <section id="contact" className="section">
       <SectionTitle label="Contact" title="Let's" accent="talk." />
-      {/* Open to any reason to write (a question, a problem with a service, a job, an idea…), so the
-          text doesn't name one. */}
-      <p className="contact-intro">Reach out any time by email, on LinkedIn, or with the form below.</p>
+      {/* Axihex welcomes client projects and collaborations, and the founder is open to roles:
+          the intro names all three, the form's topic choices (src/data/identity.ts) too. */}
+      <p className="contact-intro">
+        A project in mind, an idea to build together, or a role for the founder? Reach out by email, on LinkedIn, or with
+        the form.
+      </p>
 
       {/* One box per contact, read from src/data/contact.ts. Clicking the box opens the contact
           (email, LinkedIn…); on a phone box it copies the number. A number that's on WhatsApp also gets a small
@@ -176,6 +194,23 @@ function Contact() {
             </div>
           ) : (
             <form className="contact-form" onSubmit={handleSubmit}>
+              {/* What it's about: one choice, or none. Choosing the same one again clears it. */}
+              <fieldset className="contact-topics">
+                <legend>What brings you here?</legend>
+                <div className="contact-topics__list">
+                  {topics.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className="contact-topic"
+                      aria-pressed={topic === item.id}
+                      onClick={() => setTopic((current) => (current === item.id ? null : item.id))}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
               {/*
               A "CONTROLLED INPUT":
               - value={name} → the input always shows what's stored in state
@@ -209,7 +244,7 @@ function Contact() {
                 <span>Message</span>
                 <textarea
                   name="message"
-                  placeholder="Your message"
+                  placeholder={chosen?.placeholder ?? 'Your message'}
                   rows={5}
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}
