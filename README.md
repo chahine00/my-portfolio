@@ -42,8 +42,9 @@ src/
 
 `npm run build` makes the `dist` folder: copy its contents to the server's web root.
 Besides `index.html`, it has one HTML file per page (`blog.html`, `blog/<slug>.html`,
-`projects/<slug>.html`), each with that page's title, description and link preview
-(see `scripts/seo-plugin.ts`), plus `404.html`, `sitemap.xml` and `robots.txt`.
+`projects/<slug>.html`, `background.html`), each with that page's title, description, link preview
+and text (see `scripts/seo-plugin.ts` and `scripts/prerender.ts`), plus `404.html`, `sitemap.xml`
+and `robots.txt`.
 
 nginx needs to try those files before falling back to the app:
 

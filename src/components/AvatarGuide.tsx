@@ -24,12 +24,12 @@
 //   (guideStore.ts).
 // - Scrolling on inside the same section (a long one like Projects) moves it to a post that's
 //   still on screen there, and it carries on with its sentence.
-// - Each section's tip shows once while you're there; after you leave, it can show again when
-//   you come back.
+// - Each section's tip shows once per visit (unless you left before reading it). On phones it
+//   comes out at most PHONE_MAX_APPEARANCES times per visit, and only for tips without desktopOnly.
 // - It takes turns between three guides: the tiny robot from the hero (RobotSprite.tsx), waving
 //   its arm and saying the section's robotText (guide.ts); your avatar waving (avatar-wave.webp);
 //   and your main avatar standing (avatar-stand.webp), so it isn't the same face at every stop.
-//   The first one under the hero is the robot (the hero already shows you).
+//   The first one is the robot, the studio's small assistant; the avatars are the founder.
 // - Both avatars are cropped to the upper body at the same size (520×600, head at the same place
 //   and scale), so they use the same spots and CSS. Each is one picture, so it moves as a whole
 //   (rises, tilts, bobs).
@@ -61,16 +61,20 @@ const PHONE_REVEALED_MS = 5000 // Tapped (its × showing): it stays this long, t
 // On bigger screens it stays until you leave its section.
 const PHONE_MAX = 720 // same breakpoint as in global.css and avatarGuidePlacement.ts
 const QUICK_MS = 150 // when it has to leave while the page is still scrolling: a quick fade instead of sinking
-const REPEAT_MS = 6000 // a section's tip plays again at the earliest this long after it last came out
+// Phones: how many times per visit the guide comes out in all, so it rarely covers the small screen.
+const PHONE_MAX_APPEARANCES = 1
 const LEAVE_MS = 250 // its section must be off screen this long before it leaves (no flicker at the edge)
 const SECTION_MARGIN = 60 // a section counts as on screen while more than this much of it shows
 const LOWEST = 0.85 // the spot's edge must be in the top 85% of the screen (where you're reading)
 const PLACES_TTL = 2000 // spots are measured again after this long (images load, cards reveal…)
 
-// The sections whose tip was shown, with the element it hid behind and when. A section is removed
-// once that element has left the screen and REPEAT_MS has passed, so its tip can play again when
-// you come back (but not every time you scroll past it).
-const seen = new Map<string, { anchor: HTMLElement; at: number; left: boolean }>()
+// The sections whose tip was shown during this visit to the home page, with the element it hid
+// behind and when. A tip shows once per visit; it's only removed again if you left before it
+// finished talking (unread). A "visit" ends when you leave the home page (the guide unmounts and
+// both are reset), so coming back from another page lets the tips show again.
+const seen = new Map<string, { anchor: HTMLElement; at: number }>()
+// How many times it came out this visit, counting only tips that were read (PHONE_MAX_APPEARANCES).
+let appearances = 0
 
 // When the page last scrolled. Leaving while it's still scrolling, it fades out at once instead
 // of sinking, so flying through the page doesn't leave avatars animating everywhere.
@@ -130,6 +134,15 @@ interface Shown {
 }
 
 function AvatarGuide() {
+  // Leaving the home page ends the visit: the tips can show again next time (see "seen").
+  useEffect(
+    () => () => {
+      seen.clear()
+      appearances = 0
+    },
+    [],
+  )
+
   const [shown, setShown] = useState<Shown | null>(null)
   const [phase, setPhase] = useState<Phase>('in')
   const [typed, setTyped] = useState(0)
@@ -193,17 +206,7 @@ function AvatarGuide() {
 
     function check() {
       frame = 0
-      // Sections you scrolled away from can show their tip again next time. Not the one that's
-      // out right now: it handles being scrolled away itself (see step 2).
       const now = Date.now()
-      for (const [section, entry] of seen) {
-        if (section === shownRef.current?.tip.section) continue
-        // Only once you've left the whole section (not just its post), so a long section like
-        // Projects or Blog doesn't show its tip again while you're still scrolling through it.
-        const rect = document.getElementById(section)?.getBoundingClientRect()
-        if (!rect || rect.bottom < 0 || rect.top > window.innerHeight) entry.left = true
-        if (entry.left && now - entry.at > REPEAT_MS) seen.delete(section)
-      }
 
       const nav = navBottom()
 
@@ -222,7 +225,7 @@ function AvatarGuide() {
             (deepIn(section) ? dockSpot(section) : undefined)
           if (spot) {
             moveRef.current = spot
-            seen.set(current.tip.section, { anchor: spot.anchor, at: now, left: false })
+            seen.set(current.tip.section, { anchor: spot.anchor, at: now })
             setPhase('out')
             return
           }
@@ -238,7 +241,14 @@ function AvatarGuide() {
         return
       }
 
+      // Phones: once it has come out PHONE_MAX_APPEARANCES times, that's it for this visit.
+      if (isPhone() && appearances >= PHONE_MAX_APPEARANCES) {
+        candidate = null
+        return
+      }
+
       for (const plain of guideTips) {
+        if (plain.desktopOnly && isPhone()) continue
         const tip = said(plain, TURNS[turn])
         if (seen.has(tip.section) || !sectionOnScreen(tip)) continue
         const section = document.getElementById(tip.section)
@@ -260,9 +270,10 @@ function AvatarGuide() {
         if (wait > 0) return later(wait + 20)
 
         candidate = null
-        seen.set(tip.section, { anchor: spot.anchor, at: now, left: false })
+        seen.set(tip.section, { anchor: spot.anchor, at: now })
         unreadRef.current = false
         turn = (turn + 1) % TURNS.length
+        appearances += 1
         setShown({ tip, spot })
         setQuick(false)
         setPhase('in')
@@ -424,7 +435,11 @@ function AvatarGuide() {
             setAway(false)
             return
           }
-          if (unreadRef.current) seen.delete(shown.tip.section)
+          // Left before it finished: that tip may come again, and it doesn't count on phones.
+          if (unreadRef.current) {
+            seen.delete(shown.tip.section)
+            appearances = Math.max(0, appearances - 1)
+          }
           setShown(null)
           window.dispatchEvent(new Event('avatar-guide:done'))
         },

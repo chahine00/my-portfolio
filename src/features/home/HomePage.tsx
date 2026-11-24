@@ -1,19 +1,27 @@
 // The one-page home: all the sections you scroll through, in order.
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { useLocation, useNavigationType } from 'react-router'
+import { useLocation, useNavigate, useNavigationType } from 'react-router'
 import Hero from './Hero.tsx'
 import About from '../about/About.tsx'
-import Experience from '../experience/Experience.tsx'
 import Projects from '../projects/Projects.tsx'
-import Skills from '../skills/Skills.tsx'
-import Education from '../education/Education.tsx'
 import Updates from '../updates/Updates.tsx'
 import Contact from '../contact/Contact.tsx'
 import AvatarGuide from '../../components/AvatarGuide.tsx'
-import { BACK_AT_TOP_EVENT } from '../../utils/goToTop.ts'
+import { BACK_AT_TOP_EVENT, clearHash } from '../../utils/goToTop.ts'
 import { forgetProjectLeft, projectJustLeft, scrollToProjectCard } from '../projects/projectReturn.ts'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
+
+// Sections that used to be on the home page, and where they are now. Old links (in the CV, on
+// LinkedIn, in bookmarks) to /#experience and the like are sent there instead of the page's top.
+const MOVED_SECTIONS: Record<string, string> = {
+  '#about': '/#studio',
+  '#background': '/background',
+  '#mindset': '/background#mindset',
+  '#experience': '/background#experience',
+  '#skills': '/background#skills',
+  '#education': '/background#education',
+}
 
 function HomePage() {
   // useLocation tells us the current URL. "hash" is the #part, e.g. '#skills'.
@@ -24,7 +32,14 @@ function HomePage() {
   // Set by a project page's "All projects" links: the project whose card to come back to.
   const returnToProject = (state as { returnToProject?: string } | null)?.returnToProject
   const navigationType = useNavigationType()
+  const navigate = useNavigate()
   useDocumentTitle() // the site's usual title
+
+  // An old link to a section that moved: go to its new place (replacing the old address).
+  const moved = MOVED_SECTIONS[hash]
+  useEffect(() => {
+    if (moved) navigate(moved, { replace: true })
+  }, [moved, navigate])
 
   // The phone's back gesture (or the browser's back button) from a project's page: open at that
   // project's card, like the page's "All projects" buttons do. Decided once, when the page opens.
@@ -47,6 +62,7 @@ function HomePage() {
       atCard.current = false
       return
     }
+    if (moved) return // on its way to the section's new place (above)
     if (hash === '#home') {
       window.scrollTo(0, 0)
       if (replayWelcome) window.dispatchEvent(new Event(BACK_AT_TOP_EVENT))
@@ -57,16 +73,18 @@ function HomePage() {
         document.getElementById(hash.slice(1))?.scrollIntoView()
       }
     }
-  }, [hash, key, replayWelcome, returnToProject])
+    // The section is on screen: take the "#section" out of the address (axihex.com/, not /#contact).
+    if (hash) clearHash()
+  }, [hash, key, replayWelcome, returnToProject, moved])
 
   return (
     <>
       <Hero />
+      {/* Studio-first: Hero → Ideas, engineered + Behind Axihex → Work → Blog → Contact.
+          The founder's background has its own page (/background), linked from "Meet the founder". */}
+      {/* The Studio section: the vision panel and "Behind Axihex". */}
       <About />
       <Projects />
-      <Experience />
-      <Skills />
-      <Education />
       {/* The blog sits just before Contact: the latest news, then a way to get in touch. */}
       <Updates />
       <Contact />

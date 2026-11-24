@@ -48,7 +48,7 @@ function ProjectPage() {
         <h1>Project not found</h1>
         <p>This project doesn't exist or was removed.</p>
         <Link to="/#projects" className="back-link">
-          <span aria-hidden="true">←</span> Back to projects
+          <span aria-hidden="true">←</span> Back to the work
         </Link>
       </section>
     )

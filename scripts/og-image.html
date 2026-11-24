@@ -1,0 +1,57 @@
+<!-- The link-preview picture (public/og-image.png, 1440×740), shown when axihex.com is shared.
+     To change it: edit this file, then from the project folder run
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars --force-device-scale-factor=1 --virtual-time-budget=5000 --window-size=1440,740 --screenshot=public/og-image.png "file://$PWD/scripts/og-image.html" -->
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{width:1440px;height:740px;overflow:hidden}
+body{background:#0d1117;color:#e6edf3;font-family:Inter,system-ui,sans-serif;position:relative}
+.glow{position:absolute;border-radius:50%;filter:blur(90px)}
+.g1{width:620px;height:620px;left:-160px;top:-220px;background:rgb(99 102 241/.38)}
+.g2{width:520px;height:520px;right:120px;bottom:-260px;background:rgb(34 211 238/.20)}
+.g3{width:380px;height:380px;right:-80px;top:-120px;background:rgb(168 85 247/.22)}
+.hex{position:absolute;right:-120px;top:50%;transform:translateY(-50%);width:720px;height:720px;fill:none;stroke:#8b93f9;stroke-width:.35;opacity:.18}
+.wrap{position:absolute;inset:0;padding:72px 88px;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:14px;font-family:'Space Grotesk';font-weight:700;font-size:34px;letter-spacing:-.01em}
+.brand svg{width:40px;height:40px;fill:none;stroke:#8b93f9;stroke-width:1.8;stroke-linejoin:round}
+.brand svg circle,.hex circle{fill:#8b93f9;stroke:none}
+.main{margin-top:auto;margin-bottom:auto;max-width:760px}
+.eyebrow{color:#8b93f9;font-weight:600;font-size:22px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:22px}
+h1{font-family:'Space Grotesk';font-weight:700;font-size:112px;line-height:1.02;letter-spacing:-.03em}
+h1 span{background:linear-gradient(90deg,#8b93f9,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+p.intro{margin-top:28px;font-size:30px;line-height:1.4;color:#c9d1d9;max-width:700px}
+.foot{display:flex;gap:18px;align-items:center;font-size:22px;color:#969da6}
+.foot strong{color:#e6edf3;font-weight:600}
+.dot{width:6px;height:6px;border-radius:50%;background:#30363d}
+.stack{position:absolute;right:90px;top:50%;transform:translateY(-50%);width:560px;height:560px;overflow:visible}
+.stack .face{stroke:url(#edge);stroke-width:2;stroke-linejoin:round}
+.stack .side{fill:#2e2f63;stroke:rgb(139 147 249/.6);stroke-width:1;stroke-linejoin:round}
+.stack .logo{fill:#0d1117;stroke:url(#edge);stroke-width:2.5;stroke-linejoin:round}
+.stack .lines{fill:none;stroke:#8b949e;stroke-width:4;stroke-linecap:round;opacity:.55}
+.stack .ring{fill:none;stroke:#8b93f9;stroke-width:1.5;stroke-dasharray:4 8;opacity:.6}
+.stack .shadow{fill:rgb(139 147 249/.22);filter:blur(10px)}
+</style></head><body>
+<div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+<svg class="hex" viewBox="0 0 24 24"><path d="M12 2.5 20.2 7.25v9.5L12 21.5 3.8 16.75v-9.5Z"/></svg>
+<!-- The home hero's mark: three hexagon layers in perspective (src/features/home/HeroMark.tsx). -->
+<svg class="stack" viewBox="-185 -185 370 370">
+  <defs>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b93f9"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+    <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#25284a"/><stop offset="1" stop-color="#132029"/></linearGradient>
+  </defs>
+  <ellipse class="shadow" cx="0" cy="150" rx="110" ry="18"/>
+  <g transform="translate(0 70)"><path class="side" d="M-120 0 L-60 52 L60 52 L120 0 V14 L60 66 L-60 66 L-120 14 Z"/><path class="face" fill="url(#fill)" d="M-120 0 L-60 -52 L60 -52 L120 0 L60 52 L-60 52 Z"/><path class="ring" d="M-80 0 L-40 -35 L40 -35 L80 0 L40 35 L-40 35 Z"/></g>
+  <g><path class="side" d="M-120 0 L-60 52 L60 52 L120 0 V14 L60 66 L-60 66 L-120 14 Z"/><path class="face" fill="url(#fill)" d="M-120 0 L-60 -52 L60 -52 L120 0 L60 52 L-60 52 Z"/><path class="lines" d="M-52 -12 h40 M-36 0 h56 M-20 12 h30"/></g>
+  <g transform="translate(0 -70)"><path class="side" d="M-120 0 L-60 52 L60 52 L120 0 V14 L60 66 L-60 66 L-120 14 Z"/><path class="face" fill="url(#fill)" d="M-120 0 L-60 -52 L60 -52 L120 0 L60 52 L-60 52 Z"/><path class="logo" d="M-44 0 L-22 -19 L22 -19 L44 0 L22 19 L-22 19 Z"/><ellipse rx="12" ry="6" fill="url(#edge)"/></g>
+</svg>
+<div class="wrap">
+  <div class="brand"><svg viewBox="0 0 24 24"><path d="M12 2.5 20.2 7.25v9.5L12 21.5 3.8 16.75v-9.5Z"/><circle cx="12" cy="12" r="2.6"/></svg>Axihex</div>
+  <div class="main">
+    <div class="eyebrow">Independent software studio</div>
+    <h1>Building<br><span>what's next.</span></h1>
+    <p class="intro">Exploring ideas, engineering digital products, and creating useful technology.</p>
+  </div>
+  <div class="foot"><strong>axihex.com</strong><span class="dot"></span><span>Founded by Ali Chahine · Software Engineer</span></div>
+</div>
+</body></html>

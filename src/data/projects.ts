@@ -16,13 +16,24 @@
 export interface Project {
   slug: string // the page's address: 'my-app' → /projects/my-app (lowercase, dashes, no spaces)
   title: string
-  context?: string // what kind of project: 'Company project', 'Freelance', 'Personal project'…
+  // Which group of the Work section it's in (see "projectCategories" below). Be honest about who did it:
+  //   'studio'      → delivered under Axihex
+  //   'founder-led' → independent client work the founder delivered personally, not contracted under Axihex
+  //   'experience'  → work done as an employee at a previous company
+  category: ProjectCategory
+  // A short label on the card and the page, e.g. 'Founder-led · Client Project'.
+  context?: string
   role?: string // your role, e.g. 'Backend & AI engineer' or 'Solo developer'
   period?: string // when, e.g. 'Jan – Jun 2025' or '2024 – present'
   team?: string // e.g. 'Team of 4' or 'Solo'
-  status?: string // e.g. 'Live', 'In production', 'Completed', 'In progress'
+  status?: string // e.g. 'Live', 'In production', 'Completed', 'In progress' (also a badge on the card)
+  highlight?: string // one short, true result line for the card, e.g. 'Live on Google Play, the App Store and the web'
 
-  // --- Shown on the card AND the page ---
+  // --- Shown on the home page card only (short, so the card reads in seconds) ---
+  summary?: string // one sentence on what you did; the card shows "problem" if left out
+  cardTech?: string[] // the 3–4 technologies on the card; the first 4 of "tech" if left out
+
+  // --- Shown on the page ---
   problem: string // one or two sentences: why did this project exist?
   result?: string // the outcome, ideally with a number
   tech: string[] // the 4–6 main technologies. string[] means "an array of strings"
@@ -44,6 +55,22 @@ export interface Project {
   liveLabel?: string
 }
 
+export type ProjectCategory = 'studio' | 'founder-led' | 'experience'
+
+// The Work section's groups, in the order they're shown. A group with no projects is left out,
+// so "Studio Work" appears by itself once the first Axihex project is added.
+// "aside": shown next to the card when a group has only ONE project, so the row doesn't look half empty.
+export const projectCategories: { id: ProjectCategory; title: string; intro: string; aside?: string }[] = [
+  { id: 'studio', title: 'Studio Work', intro: 'Projects delivered under Axihex.' },
+  {
+    id: 'founder-led',
+    title: 'Founder-led Projects',
+    intro: 'Independent client projects delivered by the founder.',
+    aside: 'Client work, built from concept to launch.',
+  },
+  { id: 'experience', title: "Founder's Experience", intro: 'Engineering work at previous employers.' },
+]
+
 // "Project[]" means "an array of Project objects".
 // To show a new project on the website, just add a new object to this list.
 // Order matters: put your strongest project first. 3 strong projects beat 10 average ones.
@@ -51,7 +78,11 @@ export const projects: Project[] = [
   {
     slug: 'boxmind-ai-backend',
     title: 'boxMind AI: Enterprise AI Products',
-    context: 'Company project',
+    category: 'experience',
+    context: "Founder's Experience · boxMind AI",
+    summary: 'Built secure backend systems and AI integrations that helped bring enterprise AI products into production.',
+    highlight: '~3 years building AI products for enterprises',
+    cardTech: ['Python', 'FastAPI', 'RAG', 'AWS'],
     role: 'Backend & AI integration',
     period: 'Jul 2023 – Mar 2026',
     team: 'With the AI and frontend teams',
@@ -137,15 +168,20 @@ The role went beyond code: I was part of the discussions and decisions on which 
   },
   {
     slug: 'cinetwork',
-    title: 'Cinetwork',
-    context: 'Freelance project',
-    role: 'Mobile, web & backend',
+    title: 'The CI Network',
+    category: 'founder-led',
+    context: 'Founder-led · Client Project',
+    summary: 'Engineered a film-industry networking platform across iOS, Android, web, backend, and cloud.',
+    highlight: 'Live on Google Play, the App Store and the web',
+    cardTech: ['React Native', 'Flask', 'MySQL', 'AWS'],
+    role: 'Mobile, web & backend engineering',
     period: '2025 – present',
-    team: 'Freelance, with the client',
+    team: 'Engineered for the client, in close collaboration',
     status: 'Live',
     problem:
-      'End-to-end cross-platform app for film community networking.',
-    result: 'Monetized with subscriptions & AdMob; featured at the Byblos International Film Festival.',
+      "The client's professional network for the film community needed to be engineered end to end: one app for Android, iOS and the web, with its backend and cloud.",
+    result:
+      'Engineered the app, API, database and cloud setup, and shipped it live on Google Play, the App Store and the web.',
     tech: ['React Native', 'Flask', 'MySQL', 'AWS', 'Nginx', 'AdMob'],
     images: [
       '/projects/cinetwork/1.jpg',
@@ -154,17 +190,17 @@ The role went beyond code: I was part of the discussions and decisions on which 
       '/projects/cinetwork/4.jpg',
       '/projects/cinetwork/5.jpg',
     ],
-    overview: `Cinetwork is a professional networking platform for filmmakers, audiovisual professionals, students and creatives. In one place, they can build a professional profile, connect with the industry, find jobs and projects, and discover films, talent and services. Its motto: Connect. Create. Work.
+    overview: `The CI Network is a professional networking platform for filmmakers, audiovisual professionals, students and creatives, owned and run by the client. In one place, its members can build a professional profile, connect with the industry, find jobs and projects, and discover films, talent and services. Its motto: Connect. Create. Work.
 
-I built it as a freelancer, working closely with the client, from the database to the app stores. It started mobile-first, then the client asked for a web version too, so I adapted the same React Native codebase to run on the web. It's now live on Android, iOS and at thecinetwork.com.
+My part was the engineering, working closely with the client from the database to the app stores. The app started mobile-first; when the client asked for a web version too, I adapted the same React Native codebase to run on the web. It's now live on Android, iOS and at thecinetwork.com.
 
-Cinetwork is also a business: users can pay for subscriptions inside the app, and AdMob ads earn revenue from the free tier.
+The product, its vision and its business belong to the client. On the engineering side, I implemented the in-app subscriptions and AdMob ads behind its business model.
 
-Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos International Film Festival.`,
+Before its official launch, The CI Network got an exclusive sneak peek at the Byblos International Film Festival.`,
     built: [
       'Built the app in React Native, from one codebase for Android, iOS and the web',
       'Built the backend API in Flask (Python) with a MySQL relational database',
-      'Helped set the pricing, then added paid subscriptions with in-app purchases on Google Play and the App Store, unlocking premium features in the backend',
+      'Advised on pricing, then implemented paid subscriptions with in-app purchases on Google Play and the App Store, unlocking premium features in the backend',
       'Integrated AdMob ads to earn revenue from free users, without getting in the way of the main flows',
       'Deployed the web app on AWS EC2 behind Nginx, with HTTPS (Let\'s Encrypt) and S3 + CloudFront for assets',
       'Published and maintain the app on Google Play and the App Store, handling iOS signing, provisioning and permissions',
@@ -199,14 +235,20 @@ Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos 
     learnings: [
       'A working app is only half the job. Making it deployed, secure and stable is the other half.',
       'Cross-platform code saves a lot of time, but each platform still has its own rules for permissions, signing, payments and release.',
-      'Freelancing teaches you to care about everything: the product, the code, the release and the relationship with the client.',
+      'Engineering for a client teaches you to care about everything: the product, the code, the release and the relationship.',
     ],
+    note: 'The CI Network is a client project: the product and its brand belong to the client. This page describes my engineering contributions.',
     liveUrl: 'https://www.thecinetwork.com',
+    liveLabel: 'Visit The CI Network',
   },
   {
     slug: 'boxmind-academy',
     title: 'boxMind Academy: AI Learning for Schools',
-    context: 'Company project (boxMind AI)',
+    category: 'experience',
+    context: "Founder's Experience · boxMind AI",
+    summary: 'Designed the database and built the backend for an AI-supported learning platform used by schools.',
+    highlight: 'Used by schools under contract',
+    cardTech: ['Python', 'MySQL', 'AI Integration', 'AWS'],
     role: 'Backend developer & database architect',
     team: 'With the AI, frontend and education teams',
     status: 'Live',

@@ -8,7 +8,7 @@
 //   - puts the right <title>, description, canonical link, preview tags and structured data
 //     (JSON-LD, which tells Google who you are and what each page is) in the home page
 //   - writes a copy of index.html for every other page with ITS tags:
-//       dist/blog.html, dist/blog/<slug>.html, dist/projects/<slug>.html
+//       dist/blog.html, dist/background.html, dist/blog/<slug>.html, dist/projects/<slug>.html
 //     (and dist/projects/<slug>/index.html: see "Project pages" below)
 //   - writes dist/404.html (not indexed) and dist/sitemap.xml (the list of pages for Google)
 // The page content is still drawn by React: only the <head> differs.
@@ -16,14 +16,18 @@
 // The web server has to serve those files: see "nginx" in README.md.
 // While developing (npm run dev), only the home page's tags are added.
 
+import { execFileSync } from 'node:child_process'
 import type { Plugin } from 'vite'
+import { blogBody, founderBody, homeBody, postBody, projectBody } from './prerender.ts'
 import { contacts } from '../src/data/contact.ts'
 import { profile } from '../src/data/profile.ts'
 import { projects } from '../src/data/projects.ts'
 import { updates } from '../src/data/updates.ts'
 import {
+  BACKGROUND_DESCRIPTION,
   BLOG_DESCRIPTION,
   DEFAULT_IMAGE,
+  FOUNDER_DESCRIPTION,
   HOME_DESCRIPTION,
   SITE_URL,
   absoluteUrl,
@@ -43,11 +47,39 @@ interface Page {
   published?: string // posts: 'YYYY-MM-DD'
   noindex?: boolean // keep this page out of Google (the 404 page)
   jsonLd?: object[] // structured data
+  body?: string // the page's text, written into <div id="root"> (prerender.ts)
 }
+
+// When some files last changed, from git (e.g. '2026-11-24'), for the sitemap. Undefined when git
+// can't tell (not a git checkout): the sitemap then simply leaves the date out.
+function lastChanged(...files: string[]) {
+  try {
+    return execFileSync('git', ['log', '-1', '--format=%cs', '--', ...files], { encoding: 'utf8' }).trim() || undefined
+  } catch {
+    return undefined
+  }
+}
+
+// The founder's page has its own link-preview picture (public/og-founder.png, made from
+// scripts/og-founder.html), with his avatar; the rest of the site shares the studio's.
+const FOUNDER_IMAGE = '/og-founder.png'
 
 // The tags go between these two comments in index.html, so they can be swapped for each page.
 const START = '<!-- seo:start -->'
 const END = '<!-- seo:end -->'
+// The app's box in index.html, where each page's text goes (prerender.ts), between two markers so
+// it can be swapped too: the other pages are made from the home page's HTML, text included.
+const ROOT = '<div id="root"></div>'
+const BODY_START = '<!-- prerender:start -->'
+const BODY_END = '<!-- prerender:end -->'
+
+function withBody(html: string, body = '') {
+  const start = html.indexOf(BODY_START)
+  // A function, not a string: a "$" in the text stays as it is.
+  if (start === -1) return html.replace(ROOT, () => `<div id="root">${BODY_START}${body}${BODY_END}</div>`)
+  const end = html.indexOf(BODY_END) + BODY_END.length
+  return html.slice(0, start) + BODY_START + body + BODY_END + html.slice(end)
+}
 
 const escapeHtml = (text: string) =>
   text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -68,7 +100,7 @@ const person = {
   url: absoluteUrl('/'),
   image: absoluteUrl(profile.photo),
   jobTitle: 'Software Engineer',
-  description: HOME_DESCRIPTION,
+  description: FOUNDER_DESCRIPTION,
   address: { '@type': 'PostalAddress', addressLocality: city, addressCountry: country },
   knowsAbout: ['Backend development', 'APIs', 'Databases', 'Mobile apps', 'React Native', 'LLMs', 'RAG', 'Web development', 'AWS'],
   sameAs,
@@ -81,7 +113,7 @@ const brand = {
   url: absoluteUrl('/'),
   logo: absoluteUrl('/favicon-192.png'),
   founder: { '@id': PERSON_ID },
-  description: `${profile.brand} is the software engineering identity of ${profile.name}: dependable applications, platforms and software products.`,
+  description: HOME_DESCRIPTION,
 }
 
 const website = {
@@ -91,7 +123,7 @@ const website = {
   name: profile.brand,
   alternateName: profile.name,
   inLanguage: 'en',
-  publisher: { '@id': PERSON_ID },
+  publisher: { '@id': BRAND_ID },
 }
 
 // "Home > Blog > Post": shown under the result in Google instead of the bare address.
@@ -110,22 +142,25 @@ const home: Page = {
   path: '/',
   title: pageTitle(),
   description: HOME_DESCRIPTION,
-  imageAlt: `${profile.name}, Software Engineer & Founder of ${profile.brand}`,
-  // ProfilePage: a page about one person, the kind Google shows for "who is …" searches.
-  jsonLd: [{ '@type': 'ProfilePage', url: absoluteUrl('/'), mainEntity: person }, brand, website],
+  imageAlt: `${profile.brand}, an independent software studio founded by ${profile.name}`,
+  // The home page is about the brand; its founder is described alongside it.
+  jsonLd: [{ '@type': 'WebPage', url: absoluteUrl('/'), about: { '@id': BRAND_ID } }, brand, person, website],
+  body: homeBody(sortedPosts),
 }
 
 const blog: Page = {
   path: '/blog',
   title: pageTitle('Blog'),
   description: BLOG_DESCRIPTION,
+  body: blogBody(sortedPosts, BLOG_DESCRIPTION),
   jsonLd: [
     {
       '@type': 'Blog',
       url: absoluteUrl('/blog'),
-      name: `${profile.name}'s blog`,
+      name: `${profile.brand} blog`,
       description: BLOG_DESCRIPTION,
       author: { '@id': PERSON_ID },
+      publisher: { '@id': BRAND_ID },
       blogPost: sortedPosts.map((post) => ({
         '@type': 'BlogPosting',
         headline: post.title,
@@ -137,6 +172,7 @@ const blog: Page = {
       { name: 'Home', path: '/' },
       { name: 'Blog', path: '/blog' },
     ]),
+    brand,
     person,
   ],
 }
@@ -152,6 +188,7 @@ const posts: Page[] = sortedPosts.map((post) => {
     imageAlt: post.title,
     type: 'article',
     published: post.date,
+    body: postBody(post),
     jsonLd: [
       {
         '@type': 'BlogPosting',
@@ -166,13 +203,15 @@ const posts: Page[] = sortedPosts.map((post) => {
         keywords: post.tags?.join(', '),
         inLanguage: 'en',
         author: { '@id': PERSON_ID },
-        publisher: { '@id': PERSON_ID },
+        publisher: { '@id': BRAND_ID },
       },
       breadcrumbs([
         { name: 'Home', path: '/' },
         { name: 'Blog', path: '/blog' },
         { name: post.title, path },
       ]),
+      // The publisher (BRAND_ID) and the author (PERSON_ID) must both be on the page.
+      brand,
       person,
     ],
   }
@@ -187,6 +226,7 @@ const projectPages: Page[] = projects.map((project) => {
     description: projectDescription(project),
     image,
     imageAlt: project.title,
+    body: projectBody(project),
     jsonLd: [
       {
         '@type': 'CreativeWork',
@@ -198,14 +238,31 @@ const projectPages: Page[] = projects.map((project) => {
         creator: { '@id': PERSON_ID },
       },
       breadcrumbs([
+        // Home > the project ("Work" is a section of the home page, not a page with its own address).
         { name: 'Home', path: '/' },
-        { name: 'Projects', path: '/#projects' },
         { name: project.title, path },
       ]),
       person,
     ],
   }
 })
+
+const background: Page = {
+  path: '/background',
+  title: pageTitle(`${profile.name}, Founder`),
+  description: BACKGROUND_DESCRIPTION,
+  image: FOUNDER_IMAGE,
+  imageAlt: `${profile.name}, software engineer and founder of ${profile.brand}`,
+  body: founderBody(),
+  jsonLd: [
+    { '@type': 'ProfilePage', url: absoluteUrl('/background'), mainEntity: { '@id': PERSON_ID } },
+    breadcrumbs([
+      { name: 'Home', path: '/' },
+      { name: 'Founder', path: '/background' },
+    ]),
+    person,
+  ],
+}
 
 const notFound: Page = {
   path: '/404',
@@ -260,7 +317,7 @@ function withPage(html: string, page: Page) {
   const start = html.indexOf(START)
   const end = html.indexOf(END)
   if (start === -1 || end === -1) throw new Error(`seo-plugin: ${START} … ${END} not found in index.html`)
-  return html.slice(0, start) + headTags(page) + html.slice(end + END.length)
+  return withBody(html.slice(0, start) + headTags(page) + html.slice(end + END.length), page.body)
 }
 
 // The list of pages for Google (https://axihex.com/sitemap.xml), with when each last changed
@@ -270,7 +327,11 @@ function sitemap() {
   const entries = [
     { path: '/', lastmod: latestPost },
     { path: '/blog', lastmod: latestPost },
-    ...projects.map((project) => ({ path: `/projects/${project.slug}`, lastmod: undefined })),
+    {
+      path: '/background',
+      lastmod: lastChanged('src/data/experience.ts', 'src/data/founder.ts', 'src/data/education.ts', 'src/data/profile.ts'),
+    },
+    ...projects.map((project) => ({ path: `/projects/${project.slug}`, lastmod: lastChanged('src/data/projects.ts') })),
     ...sortedPosts.map((post) => ({ path: `/blog/${post.slug}`, lastmod: post.date })),
   ]
   const urls = entries
@@ -308,6 +369,7 @@ export default function seoPlugin(): Plugin {
         // /projects/<slug> to that folder; this index.html makes the page open there too.
         emit(`${page.path.slice(1)}/index.html`, pageHtml)
       }
+      emit('background.html', withPage(html, background))
       emit('404.html', withPage(html, notFound))
       emit('sitemap.xml', sitemap())
     },

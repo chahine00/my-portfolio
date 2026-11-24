@@ -1,4 +1,7 @@
-// The big welcome section at the top of the page.
+// The big welcome section at the top of a page. Two versions, same drawing, robot and night desk:
+// - "studio" (the home page): Axihex. "Building what's next." with the Axihex mark (HeroMark.tsx).
+// - "founder" (/background, the founder's professional page): the original personal hero,
+//   "Meet Ali Chahine" with the avatar, ali.build(...), "View my work" and "Download CV".
 // The text comes from src/data/profile.ts.
 
 import { useEffect, useRef, useState } from 'react'
@@ -6,21 +9,20 @@ import { profile } from '../../data/profile.ts'
 import Icon from '../../components/Icon.tsx'
 import SocialLinks from '../../components/SocialLinks.tsx'
 import GradientText from '../../components/GradientText.tsx'
-import { asset } from '../../utils/asset.ts'
 import { BACK_AT_TOP_EVENT } from '../../utils/goToTop.ts'
-import { callRobotOut, isRobotDismissed, useRobotDismissed, useRobotHome } from '../../components/robotStore.ts'
-import RobotSprite from '../../components/RobotSprite.tsx'
+import { asset } from '../../utils/asset.ts'
+import { useRobotHome } from '../../components/robotStore.ts'
 import RobotLab from './RobotLab.tsx'
 import HeroRobot from '../../components/HeroRobot.tsx'
-
-// The robot pops up on the welcome box when the word is typed (~2.2s, see .hero__art-robot in
-// global.css), then comes out by itself this long after the drawing starts (times ART_TIME).
-const ROBOT_OUT_AFTER_MS = 2900
+import { Link } from 'react-router'
+import { proof } from '../../data/studio.ts'
+import HeroMark from './HeroMark.tsx'
+import { LAYER_R, LAYER_Y_OPEN } from './heroMarkLayers.ts'
+import RobotPerch from './RobotPerch.tsx'
+import StudioBoard from './StudioBoard.tsx'
 
 // How fast the welcome plays is --art-time in global.css (faster with a mouse, as it plays while
-// you hover; as before on touch screens). The inline delays below are multiplied by it in CSS, and
-// the robot's exit reads it from the drawing, so everything follows it.
-const artTime = (el: Element | null) => (el && parseFloat(getComputedStyle(el).getPropertyValue('--art-time'))) || 1
+// you hover; as before on touch screens). The inline delays below are multiplied by it in CSS.
 // Rounded: sums like 1.45 + 5 * 0.07 give 1.8000000000000003, and a delay like that once left a
 // letter of the welcome invisible.
 const artDelay = (seconds: number) => `calc(${Math.round(seconds * 1000)}ms * var(--art-time))`
@@ -44,13 +46,14 @@ function isTouchScreen() {
 
 // Types each phrase from profile.building, waits, deletes it, then moves to the next one.
 // Returns the text typed so far.
-function useTypingLoop(phrases: string[]) {
+// enabled: false when there's no code line to type (the founder's hero), so nothing runs.
+function useTypingLoop(phrases: string[], enabled = true) {
   // People who turn off animations just see the first phrase, already written.
   const [reduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const [text, setText] = useState(reduceMotion ? phrases[0] : '')
 
   useEffect(() => {
-    if (reduceMotion) return
+    if (reduceMotion || !enabled) return
 
     let phrase = 0
     let length = 0
@@ -76,7 +79,7 @@ function useTypingLoop(phrases: string[]) {
 
     timer = window.setTimeout(step, 600)
     return () => window.clearTimeout(timer)
-  }, [phrases, reduceMotion])
+  }, [phrases, reduceMotion, enabled])
 
   return text
 }
@@ -101,6 +104,90 @@ const CODE_RIGHT: [number, number][] = [[0, 96], [16, 70], [16, 70], [32, 80], [
 // Every few lines a short "token" in the accent color, like syntax highlighting.
 const ACCENT_LINES = new Set([1, 4, 7])
 
+// The home page's drawing around the Axihex mark (the founder's page has the "<Welcome />" one).
+// It uses the mark's own coordinates (HeroMark.tsx: center 0,0), and the CSS centers it on the mark
+// at the same scale (.hero__art--mark), so its lines meet the layers. While it plays, the stack is
+// opened up (LAYER_Y_OPEN), and:
+// - on the left, an assembly guide (a dashed bracket) draws along the three layers' left corners;
+// - on the right, lines draw from the middle and bottom layers out to small module blocks
+//   (abstract parts of a system: no technology named), and data flows along them into the stack;
+// - from the top layer, a pill types "status: live": the robot's home.
+// Plays on hover (by itself on touch screens), like the founder's.
+const [TOP_Y, MID_Y, BOTTOM_Y] = LAYER_Y_OPEN
+const MODULES = [
+  { d: `M${LAYER_R} ${MID_Y} H186`, x: 214, y: MID_Y },
+  { d: `M${LAYER_R} ${BOTTOM_Y} H186`, x: 214, y: BOTTOM_Y },
+]
+const GUIDE = `M${-LAYER_R} ${TOP_Y} H-150 V${BOTTOM_Y} H${-LAYER_R} M-150 ${MID_Y} H${-LAYER_R}`
+const BLOCK = { width: 48, height: 32 }
+const STATUS = 'status: live'
+const PILL = { x: 130, y: TOP_Y - 45, height: 40, width: BUBBLE.padding * 2 + STATUS.length * CHAR_W + 4 }
+
+function MarkArt({ robotHome }: { robotHome: boolean }) {
+  const textX = PILL.x + BUBBLE.padding
+  return (
+    <svg className="hero__art hero__art--mark" viewBox="-275 -230 550 460" aria-hidden="true">
+      {/* The assembly guide on the left, drawn as the stack opens. */}
+      <path className="hero__art-line hero__art-guide" style={{ animationDelay: artDelay(0.35) }} pathLength={1} d={GUIDE} />
+
+      {/* The lines to the module blocks, then the data flowing in along them. */}
+      {MODULES.map((module, i) => (
+        <g key={module.d}>
+          <path
+            className="hero__art-line hero__art-link"
+            style={{ animationDelay: artDelay(0.45 + i * 0.15) }}
+            pathLength={1}
+            d={module.d}
+          />
+          <path className="hero__art-flow" style={{ animationDelay: artDelay(1.1 + i * 0.15) }} d={module.d} />
+        </g>
+      ))}
+      <path
+        className="hero__art-line hero__art-link"
+        style={{ animationDelay: artDelay(0.75) }}
+        pathLength={1}
+        d={`M${LAYER_R} ${TOP_Y} V${PILL.y + PILL.height / 2} H${PILL.x}`}
+      />
+
+      {/* The module blocks, popping in as their line arrives: a small card with a light and two
+          short lines, like a part of a system. */}
+      {MODULES.map((module, i) => {
+        const left = module.x - BLOCK.width / 2
+        const top = module.y - BLOCK.height / 2
+        return (
+          <g key={`block-${module.d}`} className="hero__art-chip" style={{ animationDelay: artDelay(0.75 + i * 0.15) }}>
+            <rect x={left} y={top} width={BLOCK.width} height={BLOCK.height} rx={8} />
+            <circle className="hero__art-chip-light" cx={left + 12} cy={module.y} r={4} />
+            <path className="hero__art-chip-lines" d={`M${left + 22} ${module.y - 5} h16 M${left + 22} ${module.y + 5} h10`} />
+          </g>
+        )
+      })}
+
+      {/* The status pill: pops in, then types "status: live" (same timing as the founder's bubble). */}
+      <g className="hero__art-bubble" style={{ transformOrigin: `${PILL.x}px ${PILL.y + PILL.height / 2}px` }}>
+        <rect className="hero__art-bubble-shape" x={PILL.x} y={PILL.y} width={PILL.width} height={PILL.height} rx={PILL.height / 2} />
+        <text className="hero__art-text" x={textX} y={PILL.y + 26} textLength={STATUS.length * CHAR_W} lengthAdjust="spacing">
+          {[...STATUS].map((char, i) => (
+            <tspan key={i} className="hero__art-char" style={{ animationDelay: artDelay(1.45 + i * 0.07) }}>
+              {char}
+            </tspan>
+          ))}
+        </text>
+        {robotHome && <RobotPerch box={PILL} />}
+        <rect
+          className="hero__art-cursor"
+          style={{ '--typed': `${STATUS.length * CHAR_W}px`, '--chars': STATUS.length } as React.CSSProperties}
+          x={textX + 1}
+          y={PILL.y + 12}
+          width="2"
+          height="18"
+          rx="1"
+        />
+      </g>
+    </svg>
+  )
+}
+
 // The drawing behind the photo: a code editor window in thin lines (muted text color) with you in
 // front of it, and a speech bubble (accent color) that types "<Welcome />". Both colors are CSS
 // variables, so it follows the theme. pathLength="1" lets the CSS "draw" every line the same way,
@@ -110,31 +197,8 @@ const ACCENT_LINES = new Set([1, 4, 7])
 // photo turned solid black (the filter). The cut-out sits exactly where the photo is on screen,
 // which differs on wide screens (4:5 photo) and phones (square photo), so there are two copies
 // and the CSS shows one. Without a cut-out photo there is no mask (the white photo hides it anyway).
-// robotHome: the tiny robot is at home on the "<Welcome />" box. It pops up there once the word is
-// typed, and a moment later comes out into the hero by itself (HeroRobot.tsx). After its "×" beamed
-// it back (robotDismissed), it stays on the box, patrolling with a "click me!" tag, until clicked.
-function PhotoArt({ cutout, robotHome, robotDismissed }: { cutout?: string; robotHome: boolean; robotDismissed: boolean }) {
-  const robotRef = useRef<SVGGElement>(null)
-
-  // Comes out by itself after the welcome (unless it was sent home with its "×"). If the drawing
-  // goes away first (the mouse left the hero), this is cancelled and tried again next time.
-  useEffect(() => {
-    if (!robotHome || robotDismissed) return
-    const timer = window.setTimeout(() => {
-      const robot = robotRef.current
-      if (robot && !isRobotDismissed()) callRobotOut(robot.getBoundingClientRect())
-    }, ROBOT_OUT_AFTER_MS * artTime(robotRef.current))
-    return () => window.clearTimeout(timer)
-  }, [robotHome, robotDismissed])
-
-  // Pointer down (not click): on phones a touch also restarts the drawing, which would rebuild
-  // the box before a click could land. The robot comes out from where it stands.
-  function letRobotOut(event: React.PointerEvent<SVGGElement> | React.KeyboardEvent<SVGGElement>) {
-    event.stopPropagation()
-    const robot = event.currentTarget.querySelector('.hero__art-robot-body') ?? event.currentTarget
-    callRobotOut(robot.getBoundingClientRect())
-  }
-
+// robotHome: the tiny robot is at home on the "<Welcome />" box (RobotPerch), once the word is typed.
+function PhotoArt({ cutout, robotHome }: { cutout?: string; robotHome: boolean }) {
   const codeLine = (x: number, y: number, [indent, length]: [number, number], i: number, side: string) => (
     <g key={`${side}${i}`}>
       <path
@@ -193,49 +257,7 @@ function PhotoArt({ cutout, robotHome, robotDismissed }: { cutout?: string; robo
             </tspan>
           ))}
         </text>
-        {robotHome && (
-          <g
-            className="hero__art-robot"
-            role="button"
-            tabIndex={0}
-            aria-label="Tiny robot. Click to let it out."
-            data-waiting={robotDismissed ? 'true' : undefined}
-            onPointerDown={letRobotOut}
-            onKeyDown={(event) => (event.key === 'Enter' || event.key === ' ') && letRobotOut(event)}
-          >
-            {/* Standing on the top edge of the box, near its right end. The inner group patrols it
-                along the box and back in robot steps (see .hero__art-robot-patrol in global.css). */}
-            {/* Touch screens: a bigger, invisible tap area around the robot (fingers are less precise
-                than a mouse): the robot, the tag and the space above them, the welcome box, and the
-                top of the avatar next to it. */}
-            <rect
-              className="hero__art-robot-hitbox"
-              x={BUBBLE.x - 80}
-              y={BUBBLE.y - 92}
-              width={BUBBLE_W + 94}
-              height={BUBBLE.height + 92}
-            />
-            {/* A small tag above the box that invites a click (it says "tap me!" on touch screens).
-                Clicking it lets the robot out too, so it's easier to hit. */}
-            <g className="hero__art-robot-hint">
-              <rect x={BUBBLE.x + BUBBLE_W / 2 - 34} y={BUBBLE.y - 56} width={68} height={20} rx={10} />
-              <text className="hero__art-robot-hint--mouse" x={BUBBLE.x + BUBBLE_W / 2} y={BUBBLE.y - 42}>
-                click me!
-              </text>
-              <text className="hero__art-robot-hint--touch" x={BUBBLE.x + BUBBLE_W / 2} y={BUBBLE.y - 42}>
-                tap me!
-              </text>
-            </g>
-            <g className="hero__art-robot-patrol">
-              {/* A soft ring pulsing out from under the robot: "you can tap this". */}
-              <circle className="hero__art-robot-pulse" cx={BUBBLE.x + BUBBLE_W - 28} cy={BUBBLE.y - 13} r={16} />
-              {/* data-robot="walk": its legs and arms step while it patrols (same CSS as HeroRobot). */}
-              <g ref={robotRef} className="hero__art-robot-body" data-robot="walk">
-                <RobotSprite x={BUBBLE.x + BUBBLE_W - 44} y={BUBBLE.y - 31} width={32} height={32} />
-              </g>
-            </g>
-          </g>
-        )}
+        {robotHome && <RobotPerch box={{ x: BUBBLE.x, y: BUBBLE.y, width: BUBBLE_W, height: BUBBLE.height }} />}
         {/* The cursor steps one character right each time one is typed, then blinks. */}
         <rect
           className="hero__art-cursor"
@@ -277,8 +299,28 @@ function useReturnSwap(enabled: boolean) {
   return swapped
 }
 
-function Hero() {
-  const typed = useTypingLoop(profile.building)
+// Home page: the Axihex mark and the studio board (StudioBoard.tsx) take turns by themselves, every
+// SWAP_MS, while the hero is on screen and the tab is visible. With a mouse on the hero it waits
+// (so it doesn't change under the pointer). Visitors who turn off animations keep the mark.
+const SWAP_MS = 8000
+
+function useAutoSwap(enabled: boolean, pointerInside: React.RefObject<boolean>) {
+  const [swapped, setSwapped] = useState(false)
+  useEffect(() => {
+    if (!enabled || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const timer = window.setInterval(() => {
+      if (document.hidden || pointerInside.current || window.scrollY > window.innerHeight * 0.6) return
+      setSwapped((current) => !current)
+    }, SWAP_MS)
+    return () => window.clearInterval(timer)
+  }, [enabled, pointerInside])
+  return swapped
+}
+
+function Hero({ variant = 'studio' }: { variant?: 'studio' | 'founder' }) {
+  const founder = variant === 'founder'
+  // The phrases typed on the home page's code line (the founder's page has no code line).
+  const typed = useTypingLoop(profile.building, !founder)
   const nameRef = useRef<HTMLSpanElement>(null)
   // The hover drawing behind the photo. "hovered": the pointer is on the photo (drawing shown).
   // "drawing": the drawing is on the page; it stays a moment after you leave, so it can fade out.
@@ -292,11 +334,12 @@ function Hero() {
   const replayTimer = useRef<number | undefined>(undefined)
   // The tiny robot is at home on the welcome box (see PhotoArt).
   const robotHome = useRobotHome()
-  // Sent home with its "×": it then waits on the welcome box for a click (see PhotoArt).
-  const robotDismissed = useRobotDismissed()
-  // The avatar, or the night desk once a visitor comes back to the top (see useReturnSwap).
-  // While the desk shows, the hover drawing steps aside (the tiny robot out in the hero stays).
-  const lab = useReturnSwap(profile.lab)
+  // Founder: the avatar, or the night desk once a visitor comes back to the top (useReturnSwap).
+  // Home: the Axihex mark and the studio board take turns by themselves (useAutoSwap).
+  // While the desk or the board shows, the hover drawing steps aside.
+  const lab = useReturnSwap(founder && profile.lab)
+  const board = useAutoSwap(!founder, pointerInside)
+  const away = founder ? lab : board
 
   function startDrawing() {
     window.clearTimeout(hideTimer.current)
@@ -397,7 +440,7 @@ function Hero() {
     // Hovering anywhere in it plays the drawing behind the photo (see PhotoArt; phones: see above).
     <section
       id="home"
-      className="section hero"
+      className={`section hero hero--${variant}`}
       onPointerEnter={(event) => {
         if (event.pointerType === 'touch') return
         pointerInside.current = true
@@ -410,74 +453,134 @@ function Hero() {
       }}
     >
       <div className="hero__text">
-        <p className="eyebrow">{profile.role}</p>
+        {/* Founder's page: the way back to the studio, where the "Meet the founder" card is. */}
+        {founder && (
+          <Link to="/#studio" className="back-link hero__back">
+            <span aria-hidden="true">←</span> Back to Axihex
+          </Link>
+        )}
+        <p className="eyebrow">
+          {founder ? (
+            // On narrow phones the line wraps before "Founder of Axihex", never inside it.
+            <>
+              {profile.founderTitle} · <span style={{ whiteSpace: 'nowrap' }}>Founder of {profile.brand}</span>
+            </>
+          ) : (
+            profile.role
+          )}
+        </p>
         {/* Hover the heading, or scroll down: a color sweep runs across the name. */}
         <h1 className="hero__title">
-          Meet{' '}
+          {founder ? 'Meet' : profile.headline}{' '}
           <span className="hero__name" ref={nameRef}>
-            <GradientText text={profile.name} />
+            <GradientText text={founder ? profile.name : profile.headlineAccent} />
           </span>
         </h1>
 
-        <p className="hero__intro">{profile.intro}</p>
+        {!founder && <p className="hero__intro">{profile.intro}</p>}
 
-        {/* A line of "code" that keeps typing what you build. Screen readers get the full list once instead. */}
-        <p className="hero__code" aria-label={`I build ${profile.building.join(', ')}`}>
-          {/* An invisible copy of the LONGEST phrase sits in the same spot and sets the line's size,
-              so the page (and your photo next to it) doesn't jump when a long phrase wraps. */}
-          <span className="hero__code-ghost" aria-hidden="true">
-            &gt; ali.build('{longestPhrase}')
-          </span>
-          <span aria-hidden="true">
-            <span className="hero__code-prompt">&gt;</span> ali.build(<span className="hero__code-string">'{typed}</span>
-            <span className="hero__code-caret" />
-            <span className="hero__code-string">'</span>)
-          </span>
-        </p>
+        {/* Home page only: a line of "code" that keeps typing what Axihex builds. Screen readers get
+            the full list once instead. */}
+        {!founder && (
+          <p className="hero__code" aria-label={`Axihex builds ${profile.building.join(', ')}`}>
+            {/* An invisible copy of the LONGEST phrase sits in the same spot and sets the line's size,
+                so the page (and the picture next to it) doesn't jump when a long phrase wraps. */}
+            <span className="hero__code-ghost" aria-hidden="true">
+              &gt; axihex.build('{longestPhrase}')
+            </span>
+            <span aria-hidden="true">
+              <span className="hero__code-prompt">&gt;</span> axihex.build(<span className="hero__code-string">'{typed}</span>
+              <span className="hero__code-caret" />
+              <span className="hero__code-string">'</span>)
+            </span>
+          </p>
+        )}
 
-        <ul className="hero__meta">
-          <li>
-            <Icon name="pin" size={16} /> {profile.location}
-          </li>
-          {profile.availability && (
-            // Every few seconds the line gives a little shake (see global.css).
-            <li className="hero__available">
-              <span className="hero__available-dot" /> {profile.availability}
+        {/* Founder's page only: where he is and what he's open to. The home page stays about Axihex. */}
+        {founder && (
+          <ul className="hero__meta">
+            <li>
+              <Icon name="pin" size={16} /> {profile.location}
             </li>
-          )}
-        </ul>
+            {profile.founderAvailability && (
+              // Every few seconds the line gives a little shake (see global.css).
+              <li className="hero__available">
+                <span className="hero__available-dot" /> {profile.founderAvailability}
+              </li>
+            )}
+          </ul>
+        )}
 
         {/* Buttons and icon links sit side by side in a row. */}
         <div className="hero-actions">
-          <a href="#projects" className="button">
-            Explore projects
-          </a>
-          {/* The PDF lives in /public, so it is served from the site root. */}
-          <a href={asset('/Ali_Chahine_CV.pdf')} download="Ali_Chahine_CV.pdf" className="button button-outline">
-            Download CV
-          </a>
+          {founder ? (
+            <>
+              {/* The PDF lives in /public, so it is served from the site root. "Get in touch" is at
+                  the end of the founder page, once (see BackgroundPage.tsx). */}
+              <a href={asset('/Ali_Chahine_CV.pdf')} download="Ali_Chahine_CV.pdf" className="button">
+                Download CV
+              </a>
+            </>
+          ) : (
+            <>
+              <Link to="/#projects" className="button">
+                Explore our work <span aria-hidden="true">→</span>
+              </Link>
+              <Link to="/#studio" className="button button-outline">
+                About the studio
+              </Link>
+            </>
+          )}
           <SocialLinks />
         </div>
+
+        {/* Home only: proof the work is real, where it has shipped (src/data/studio.ts). */}
+        {!founder && (
+          <div className="hero__proof">
+            <span className="hero__proof-label">Shipped to</span>
+            <ul>
+              {proof.map((item) => (
+                <li key={item.label}>
+                  <Icon name={item.icon} size={15} /> {item.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
       </div>
 
-      {/* The avatar, on a transparent background, so it suits light and dark mode as it is. Every
-          other return to the top, the night desk takes its place (RobotLab.tsx). */}
-      {profile.photo && (
+      {/* Studio: the Axihex mark (HeroMark.tsx). Founder: the avatar, on a transparent background.
+          Every other return to the top, the night desk takes its place (RobotLab.tsx). */}
+      {(
         // Behind it: a line drawing (see PhotoArt above) that plays while the hero is hovered (or a
         // finger is on a phone's screen). Moving away fades it out; coming back redraws it.
-        <div className={`hero__visual${hovered ? ' hero__visual--on' : ''}`}>
+        <div className={`hero__visual${founder ? ' hero__visual--avatar' : ''}${hovered ? ' hero__visual--on' : ''}`}>
           {/* An invisible area exactly where the drawing appears (it's bigger than the photo,
               and reaches past the hero on the right): hovering or touching anywhere in it plays the
               drawing too, not only the photo. It sits under the drawing, so the robot on the
               welcome box stays clickable. */}
           <span className="hero__hit" aria-hidden="true" />
-          {drawing && !lab && <PhotoArt key={run} cutout={asset(profile.photo)} robotHome={robotHome} robotDismissed={robotDismissed} />}
-          <div className={`hero__photo${lab ? ' hero__photo--away' : ''}`}>
-            {/* The first big picture on the page: "high" priority makes the browser fetch it before
-                anything less important, and width/height reserve its space so nothing jumps. */}
-            <img src={asset(profile.photo)} alt={profile.name} width={1024} height={1024} fetchPriority="high" />
+          {/* Founder: the "<Welcome />" drawing, with the avatar's silhouette cut out of it.
+              Studio: the "build" drawing around the Axihex mark (MarkArt). */}
+          {drawing &&
+            !away &&
+            (founder ? (
+              <PhotoArt key={run} cutout={asset(profile.photo)} robotHome={robotHome} />
+            ) : (
+              <MarkArt key={run} robotHome={robotHome} />
+            ))}
+          <div className={`hero__photo${away ? ' hero__photo--away' : ''}`}>
+            {founder ? (
+              // The first big picture on the page: "high" priority makes the browser fetch it first,
+              // and width/height reserve its space so nothing jumps.
+              <img src={asset(profile.photo)} alt={profile.name} width={1024} height={1024} fetchPriority="high" />
+            ) : (
+              <HeroMark />
+            )}
           </div>
-          {lab && <RobotLab robotHome={robotHome} robotDismissed={robotDismissed} />}
+          {founder && lab && <RobotLab robotHome={robotHome} />}
+          {!founder && board && <StudioBoard robotHome={robotHome} />}
         </div>
       )}
 

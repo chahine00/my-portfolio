@@ -10,9 +10,8 @@
 //   with its glow on the desk in front of it;
 // - a desk lamp lighting the desk, a mug of coffee with rising steam, and a plant swaying a little.
 // - The tiny robot (HeroRobot.tsx) has its home here while the desk shows, instead of the welcome
-//   box behind the avatar: it stands on the desk, between the laptop and the mug. Like on the
-//   welcome box, it comes out into the hero by itself after a moment, and once sent home with its
-//   "Hide" button, it waits there with a "click me!" tag until clicked.
+//   box: it stands on the desk, between the laptop and the mug, and comes out into the hero by
+//   itself after a moment. Once sent home with its "×", it waits there with a "click me!" tag.
 // Apart from the tiny robot, it's only decoration (the avatar's picture keeps its alt text), so
 // screen readers skip it.
 // The looks and the moves are in global.css under "night desk". Visitors who turn off animations
@@ -21,9 +20,10 @@
 
 import { useEffect, useId, useRef, type KeyboardEvent, type PointerEvent } from 'react'
 import RobotSprite from '../../components/RobotSprite.tsx'
-import { callRobotOut, isRobotDismissed } from '../../components/robotStore.ts'
+import { callRobotOut, isRobotDismissed, useRobotDismissed } from '../../components/robotStore.ts'
 
 const KID_OUT_AFTER_MS = 2200 // the tiny robot comes out by itself this long after the desk appears
+
 
 // The scene is drawn in a 260 × 220 box. The desk's top is at DESK_Y.
 const DESK_Y = 176
@@ -58,24 +58,24 @@ const STARS = [
 ]
 
 interface RobotLabProps {
-  robotHome: boolean // the tiny robot is at home (not out in the hero)
-  robotDismissed: boolean // it was sent home with "Hide": it waits for a click
+  robotHome: boolean // the tiny robot is at home (not out in the hero): it waits there for a click
 }
 
-function RobotLab({ robotHome, robotDismissed }: RobotLabProps) {
+function RobotLab({ robotHome }: RobotLabProps) {
   const kidRef = useRef<SVGGElement>(null)
-  // Unique ids for the SVG's gradients and masks.
-  const id = useId().replace(/:/g, '')
+  const dismissed = useRobotDismissed()
 
-  // Comes out by itself a moment after the desk appears (unless it was sent home with "Hide").
+  // Comes out by itself a moment after the desk appears (unless it was sent home with its "×").
   useEffect(() => {
-    if (!robotHome || robotDismissed) return
+    if (!robotHome || dismissed) return
     const timer = window.setTimeout(() => {
       const kid = kidRef.current
       if (kid && !isRobotDismissed()) callRobotOut(kid.getBoundingClientRect())
     }, KID_OUT_AFTER_MS)
     return () => window.clearTimeout(timer)
-  }, [robotHome, robotDismissed])
+  }, [robotHome, dismissed])
+  // Unique ids for the SVG's gradients and masks.
+  const id = useId().replace(/:/g, '')
 
   // Pointer down (not click), like on the welcome box: it comes out from where it stands.
   function letKidOut(event: PointerEvent<SVGGElement> | KeyboardEvent<SVGGElement>) {
@@ -224,7 +224,7 @@ function RobotLab({ robotHome, robotDismissed }: RobotLabProps) {
             role="button"
             tabIndex={0}
             aria-label="Tiny robot. Click to let it out."
-            data-waiting={robotDismissed ? 'true' : undefined}
+            data-waiting={dismissed ? 'true' : undefined}
             onPointerDown={letKidOut}
             onKeyDown={(event) => (event.key === 'Enter' || event.key === ' ') && letKidOut(event)}
           >

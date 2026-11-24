@@ -1,0 +1,35 @@
+// The names of the small icons drawn by Icon.tsx. In a plain .ts file, so data files (which the
+// build also reads, see scripts/prerender.ts) can use the type too.
+
+export type IconName =
+  | 'email'
+  | 'linkedin'
+  | 'github'
+  | 'whatsapp'
+  | 'sun'
+  | 'moon'
+  | 'pin'
+  | 'arrow-up'
+  | 'arrow-right'
+  | 'external'
+  | 'phone'
+  | 'search'
+  // The menu's section icons (shown on phones, see Navbar.tsx):
+  | 'user'
+  | 'folder'
+  | 'briefcase'
+  | 'code'
+  | 'cap'
+  | 'pen'
+  | 'chat'
+  | 'home'
+  | 'more'
+  // Small pictures: the hero's proof strip, the studio's principles, the founder's "Currently".
+  | 'smartphone'
+  | 'globe'
+  | 'cloud'
+  | 'compass'
+  | 'layers'
+  | 'share'
+  | 'book'
+  | 'spark'

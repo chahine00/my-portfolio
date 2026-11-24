@@ -1,27 +1,45 @@
-// The "Projects" section: shows one card per project.
+// The "Work" section: the projects in groups, so it's always clear who delivered what:
+// Studio Work (under Axihex), Founder-led Projects (the founder's own client work), and the
+// Founder's Experience (work at previous employers). Empty groups are left out.
 
-// Import the data (the list of projects) and the component that draws ONE project.
-import { projects } from '../../data/projects.ts'
+import { projectCategories, projects } from '../../data/projects.ts'
 import ProjectCard from './ProjectCard.tsx'
 import SectionTitle from '../../components/SectionTitle.tsx'
 import { useReveal } from '../../utils/useReveal.ts'
 
 function Projects() {
   // The cards fade in one after another as you scroll to them (see src/utils/useReveal.ts).
-  const gridRef = useReveal<HTMLDivElement>('.project-card')
+  const groupsRef = useReveal<HTMLDivElement>('.project-card')
+
+  const groups = projectCategories
+    .map((category) => ({ ...category, items: projects.filter((project) => project.category === category.id) }))
+    .filter((group) => group.items.length > 0)
 
   return (
     <section id="projects" className="section">
-      <SectionTitle label="Projects" title="Things I've" accent="built" />
-      <div className="grid" ref={gridRef}>
-        {/*
-          For each project in the list, render a <ProjectCard />.
-          project={project} passes the data INTO the card. This is called a "prop".
-          Props are how a parent component gives information to a child component.
-        */}
-        {/* "slideOffset" spreads the cards' photo slides over time, so they don't all move at once. */}
-        {projects.map((project, i) => (
-          <ProjectCard key={project.slug} project={project} slideOffset={i / projects.length} />
+      <SectionTitle label="Selected Work" title="Engineering in" accent="practice" />
+      <p className="page-intro">What Axihex is built on, and where it's going: from the founder's work to the studio's own.</p>
+      <div className="work-groups" ref={groupsRef}>
+        {groups.map((group) => (
+          <div key={group.id} className="work-group">
+            <header className="work-group__head">
+              <h3>{group.title}</h3>
+              <p>{group.intro}</p>
+            </header>
+            {/* A group with a single project: the card on the left and a short line on the right,
+                so the row is balanced on wide screens instead of half empty. */}
+            <div className={group.items.length === 1 && group.aside ? 'grid work-group__solo' : 'grid'}>
+              {/* "slideOffset" spreads the cards' photo slides over time, so they don't all move at once. */}
+              {group.items.map((project) => (
+                <ProjectCard
+                  key={project.slug}
+                  project={project}
+                  slideOffset={projects.indexOf(project) / projects.length}
+                />
+              ))}
+              {group.items.length === 1 && group.aside && <p className="work-group__aside">{group.aside}</p>}
+            </div>
+          </div>
         ))}
       </div>
     </section>

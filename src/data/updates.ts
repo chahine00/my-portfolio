@@ -31,6 +31,64 @@ export interface Update {
 // These posts come from my LinkedIn (linkedin.com/in/chahine21).
 export const updates: Update[] = [
   {
+    slug: 'introducing-axihex',
+    category: 'Milestones',
+    title: 'Think bigger, because AI is faster: introducing Axihex',
+    date: '2026-11-22',
+    summary:
+      'How a simple question about building an identity that grows led to Axihex: my work, experience and engineering mindset, brought together as the start of a software studio.',
+    content: `It started with a simple question: how can I build an identity that represents my work today and grows into something bigger tomorrow?
+
+That question led me to create Axihex, inspired by a mindset I've developed throughout my journey.
+
+Today, Axihex brings my work, experience, and engineering mindset together. It's the beginning of a bigger vision: growing into a software studio and sharing online tools and projects from my work with the public.
+
+As AI accelerates development, I believe the real value lies in thinking bigger, adapting faster, and delivering meaningful things faster.
+
+My studies in business and computer science, combined with my hands-on experience in the industry and freelancing, have shaped how I approach technology, business thinking, and creativity.
+
+This is just the beginning.`,
+    images: ['/updates/introducing-axihex/1.png'],
+    tags: ['Axihex', 'Software Engineering', 'Building in Public'],
+  },
+  {
+    slug: 'domain-naming-in-the-ai-era',
+    category: 'Ideas',
+    title: 'Domain naming in the AI era: why the old playbook is broken',
+    date: '2026-10-29',
+    summary:
+      'Hunting for a domain for a new product taught me that keyword-stuffed .coms no longer work. Brand authority now comes from distinct names, clean engineering, and AI discovery.',
+    content: `I've spent the last few days hunting for a domain name for a new product I'm building.
+
+If you've launched a project recently, you know the pain: every clean .com is either squatted for thousands of dollars, taken, or crowded with lookalike competitors.
+
+My first instinct was to do what most of us do: add a hyphen, slap on a suffix (-hub, -app, -platform), or stuff exact-match keywords together.
+
+But as I dug deeper into modern branding, trademark risks, and how software is discovered today, I realized that playbook is completely broken. Here is what I learned from going down this rabbit hole, and why the rules of domain naming have fundamentally changed.
+
+The trap of exact-match keywords
+- The commodity trap: generic names (like DataPlatform or AIIndex) make your product sound like an incremental feature rather than a defensible brand.
+- The lookalike sea: when ten competitors use variations of the same three keywords, you become invisible and easily forgotten by users.
+- The legal minefield: fighting for crowded keyword space increases trademark disputes and accidentally routes your hard-earned traffic to incumbents.
+
+From SEO to AI discovery (LLMO)
+For years, the goal was optimizing meta tags and backlinks for Googlebot. But modern discovery has shifted.
+- Developers and buyers aren't just scanning search results anymore: they ask AI agents, LLMs, and RAG pipelines ("Find me an open-source framework for semantic vector caching").
+- AI agents don't care about keyword .coms: LLMs evaluate your actual semantic authority, code quality, API cleanliness, and vector footprint, not whether your URL crams keywords in.
+- The silicon audience: we aren't just optimizing for human eyes scanning a page; we are building for AI parsers reading code, documentation, and metadata.
+
+Boundary naming and semantic TLDs
+Instead of paying squatter prices for bad .com pairings, forward-thinking builders are pivoting to better strategies:
+- Proprietary portmanteaus (boundary naming): instead of placing two words side by side (Syntax Axis), fuse them seamlessly at their phonetic boundaries (Syntaxis). This creates a fully ownable, trademarkable brand where you own the whole search and vector space.
+- Semantic TLDs (.ai, .dev, .io): modern extensions act as built-in context tags. To both tech-savvy users and AI crawlers, extensions like .dev or .ai instantly signal a next-gen, API-first architecture.
+
+The takeaway: in the AI era, brand authority isn't bought through keyword-stuffed URLs. It's built through clean engineering, RAG-friendly documentation, and a distinct name that sticks in both human memory and AI vectors.
+
+If you're building or launching something right now, how are you handling the domain naming nightmare?`,
+    images: [],
+    tags: ['Branding', 'AI Discovery', 'Startups'],
+  },
+  {
     slug: 'first-ios-app-submission',
     category: 'Tech Notes',
     title: 'Submitting my first iOS app to the App Store',

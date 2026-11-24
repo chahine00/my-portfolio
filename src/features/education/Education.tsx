@@ -28,7 +28,7 @@ function Logo({ item }: { item: EducationItem }) {
 function Education() {
   return (
     <section id="education" className="section">
-      <SectionTitle label="Education" title="Where I" accent="studied" />
+      <SectionTitle label="Education" title="Education &" accent="languages" />
 
       <p className="edu-group">University</p>
       <ul className="edu-degrees">

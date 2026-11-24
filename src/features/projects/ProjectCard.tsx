@@ -1,7 +1,6 @@
 // A REUSABLE component: it draws one project card on the home page.
 // The card is a short preview; clicking ANYWHERE on it opens the full page (ProjectPage.tsx).
 // The title link is stretched over the whole card with CSS (see .card-link in global.css).
-// GitHub / Live demo sit on top of it, so they still open their own links.
 // A project with several photos shows them as a banner that slides to the next one by itself,
 // and that visitors can swipe, drag or move with its arrows and dots.
 
@@ -229,50 +228,48 @@ function CoverBanner({ images, slideOffset = 0, pageUrl }: { images: string[]; s
 function ProjectCard({ project, slideOffset }: ProjectCardProps) {
   const pageUrl = `/projects/${project.slug}`
 
-  // Role and period on one line, e.g. "Solo developer · 2026". .filter(Boolean) drops missing ones.
-  const meta = [project.role, project.period].filter(Boolean).join(' · ')
-
   return (
     // data-project-slug: coming back from a project's page, the home page scrolls to its card.
     <article className="card project-card card-clickable" data-project-slug={project.slug}>
+      {/* Where the product is now (Live, In production…), on the cover's corner. */}
+      {project.status && (
+        <span className={`project-card__status${/live/i.test(project.status) ? ' project-card__status--live' : ''}`}>
+          <span className="project-card__status-dot" aria-hidden="true" /> {project.status}
+        </span>
+      )}
       {/* ?. means "only if there are images"; an empty list shows no cover. */}
       {project.images?.length ? <CoverBanner images={project.images} slideOffset={slideOffset} pageUrl={pageUrl} /> : null}
 
+      {/* What kind of work it is (Client Project, Engineering Work…), so ownership is clear at a glance. */}
+      {project.context && <p className="project-card__context">{project.context}</p>}
       <h3>
         <Link to={pageUrl} className="project-card__title card-link">
           {project.title}
         </Link>
       </h3>
-      {meta && <p className="project-card__role">{meta}</p>}
 
-      <p>{project.problem}</p>
+      {/* One sentence and a few technologies: the card reads in seconds. The full story, and the
+          links to the live product, are on the project's page. */}
+      <p>{project.summary ?? project.problem}</p>
 
-      {/* The result gets its own highlighted box: it's what recruiters remember. */}
-      {project.result && <p className="project-card__result">{project.result}</p>}
+      {/* One short, true result: what came of it. */}
+      {project.highlight && (
+        <p className="project-card__highlight">
+          <Icon name="spark" size={15} /> {project.highlight}
+        </p>
+      )}
 
       <ul className="tags">
-        {project.tech.map((tech) => (
+        {(project.cardTech ?? project.tech.slice(0, 4)).map((tech) => (
           <li key={tech}>{tech}</li>
         ))}
       </ul>
 
-      {/* Two separate pill buttons: "View project" (filled) and the outside links (outlined). */}
       <div className="card__links">
         {/* Looks like a button, but the whole card is the link. */}
         <span className="card-pill card-pill--primary" aria-hidden="true">
           View project <Icon name="arrow-right" size={16} />
         </span>
-        {/* target="_blank" opens the link in a new tab. */}
-        {project.githubUrl && (
-          <a className="card-pill" href={project.githubUrl} target="_blank" rel="noreferrer">
-            <Icon name="github" size={15} /> GitHub
-          </a>
-        )}
-        {project.liveUrl && (
-          <a className="card-pill" href={project.liveUrl} target="_blank" rel="noreferrer">
-            {project.liveLabel ?? 'Live demo'} <Icon name="external" size={15} />
-          </a>
-        )}
       </div>
     </article>
   )

@@ -1,4 +1,4 @@
-// Your work history, newest first. Shown in the Experience section.
+// Your work history, newest first. Shown on the /background page.
 // Keep it short: max 4 points per role, each one line. The details live on the project pages.
 
 export interface Role {
@@ -10,20 +10,21 @@ export interface Role {
 export interface Job {
   company: string
   url?: string // company page, linked from the name
+  logo?: string // the company's logo in /public, e.g. '/logos/boxmind.png'; its initials are shown without one
   roles: Role[] // several roles at one company show your growth there
   tech?: string[]
 }
 
 export const experience: Job[] = [
   {
-    company: 'Freelance',
+    company: 'Independent Engineering',
     roles: [
       {
         title: 'Full-Stack Developer (Backend, Web & Mobile)',
         period: '2025 – present',
         points: [
           'I take client ideas from zero to live: API, database, web, mobile and cloud',
-          'Latest: Cinetwork, live on Google Play, the App Store and the web',
+          'Latest: The CI Network (client project), live on Google Play, the App Store and the web',
         ],
       },
     ],
@@ -57,7 +58,7 @@ export const experience: Job[] = [
       {
         title: 'Mobile Developer & Intern',
         period: 'Jul 2022 – Nov 2022',
-        points: ['Where it studied: React Native and Xamarin apps, published on Google Play'],
+        points: ['Built React Native and Xamarin mobile apps and published them on Google Play'],
       },
     ],
     tech: ['C#', 'ASP.NET Core', 'Node.js', 'Angular', 'React Native', 'AWS Lambda'],

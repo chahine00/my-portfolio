@@ -1,0 +1,30 @@
+<!-- Makes the PNG copies of the site's icon (public/favicon.svg) for browsers and devices that
+     don't use SVG icons. From the project folder:
+     C="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+     for s in 48 192; do "$C" --headless=new --hide-scrollbars --force-device-scale-factor=1 --virtual-time-budget=3000 --default-background-color=00000000 --window-size=$s,$s --screenshot=public/favicon-$s.png "file://$PWD/scripts/favicon.html?size=$s"; done
+     "$C" --headless=new --hide-scrollbars --force-device-scale-factor=1 --virtual-time-budget=3000 --window-size=180,180 --screenshot=public/apple-touch-icon.png "file://$PWD/scripts/favicon.html?size=180&square"
+     (The iPhone one is a full square: iOS rounds the corners itself and fills see-through parts
+     with black, so it gets the dark background edge to edge, and the mark a little smaller.) -->
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{margin:0}html,body{overflow:hidden;background:transparent}
+body{position:relative}
+img,.tile{position:absolute;left:0;top:0;display:block}
+</style></head><body>
+<script>
+  const params = new URLSearchParams(location.search)
+  const size = Number(params.get('size')) || 48
+  document.documentElement.style.width = document.documentElement.style.height = size + 'px'
+  document.body.style.width = document.body.style.height = size + 'px'
+  const img = document.createElement('img')
+  img.src = '../public/favicon.svg'
+  if (params.has('square')) {
+    // Dark background edge to edge, and the mark at 84%, centered.
+    document.body.style.background = '#0d1117'
+    const inner = Math.round(size * 0.84), offset = Math.round((size - inner) / 2)
+    img.style.cssText = `width:${inner}px;height:${inner}px;left:${offset}px;top:${offset}px`
+  } else {
+    img.style.cssText = `width:${size}px;height:${size}px`
+  }
+  document.body.appendChild(img)
+</script>
+</body></html>

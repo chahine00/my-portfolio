@@ -56,3 +56,12 @@ export function goToTop() {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })
 }
+
+// Keeps the address clean: once a section link (like /#contact) has done its job and the page has
+// scrolled there, the "#contact" is taken out of the address bar, so it shows axihex.com/ (or
+// /background). Only the address changes: no reload, no new history entry, no scroll. Links with
+// a # (old ones in a CV or a bookmark, or the menu's) still work, they just don't leave it behind.
+export function clearHash() {
+  if (!window.location.hash) return
+  window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search)
+}

@@ -1,28 +1,8 @@
 // Small inline icons. Drawn with SVG, so they take the text color and need no image files.
 
-export type IconName =
-  | 'email'
-  | 'linkedin'
-  | 'github'
-  | 'whatsapp'
-  | 'sun'
-  | 'moon'
-  | 'pin'
-  | 'arrow-up'
-  | 'arrow-right'
-  | 'external'
-  | 'phone'
-  | 'search'
-  // The menu's section icons (shown on phones, see Navbar.tsx):
-  | 'user'
-  | 'folder'
-  | 'briefcase'
-  | 'code'
-  | 'cap'
-  | 'pen'
-  | 'chat'
-  | 'home'
-  | 'more'
+import type { IconName } from './iconNames.ts'
+
+export type { IconName }
 
 interface IconProps {
   name: IconName
@@ -132,6 +112,62 @@ function Icon({ name, size = 20 }: IconProps) {
         <svg {...stroke}>
           <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z" />
           <path d="m13.5 6.5 4 4" />
+        </svg>
+      )
+    case 'smartphone':
+      return (
+        <svg {...stroke}>
+          <rect x="6" y="2.5" width="12" height="19" rx="2.5" />
+          <path d="M10.5 18.5h3" />
+        </svg>
+      )
+    case 'globe':
+      return (
+        <svg {...stroke}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+        </svg>
+      )
+    case 'cloud':
+      return (
+        <svg {...stroke}>
+          <path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4.25 4.25 0 0 1-.5 8.5Z" />
+        </svg>
+      )
+    case 'compass':
+      return (
+        <svg {...stroke}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="m15.5 8.5-2 5-5 2 2-5Z" />
+        </svg>
+      )
+    case 'layers':
+      return (
+        <svg {...stroke}>
+          <path d="m12 3 9 5-9 5-9-5Z" />
+          <path d="m3 13 9 5 9-5" />
+        </svg>
+      )
+    case 'share':
+      return (
+        <svg {...stroke}>
+          <circle cx="18" cy="5.5" r="2.5" />
+          <circle cx="6" cy="12" r="2.5" />
+          <circle cx="18" cy="18.5" r="2.5" />
+          <path d="m8.2 10.8 7.6-4.1M8.2 13.2l7.6 4.1" />
+        </svg>
+      )
+    case 'book':
+      return (
+        <svg {...stroke}>
+          <path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2Z" />
+          <path d="M4 20a2 2 0 0 0 2 2h13v-4" />
+        </svg>
+      )
+    case 'spark':
+      return (
+        <svg {...stroke}>
+          <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8" />
         </svg>
       )
     case 'home':

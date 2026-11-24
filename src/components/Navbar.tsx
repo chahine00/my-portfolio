@@ -1,6 +1,6 @@
 // The navigation bar at the top of the page.
-// On phones every link shows an icon with a small label. Six tabs fit on the row (Home, About,
-// Projects, Experience, Contact, and "More"); Skills, Education and Blog open from the More button. The menu
+// Five links: Studio, Work, Founder, Blog, Contact. On bigger screens the Axihex logo is the way home; on
+// phones every link shows an icon with a small label, and a Home tab comes first (six tabs). The menu
 // "moves" to the bottom of the screen once you scroll: the top bar scrolls away with the page and a
 // matching bar slides up at the bottom (the "tab bar", see the end of this file). Same on every
 // page, except the Blog list, where the Blog bar (search + categories) sticks at the top instead.
@@ -31,97 +31,25 @@ interface NavItem {
   section?: string // a page link that also has a section on the home page (its id): highlight it there too
   dot?: boolean // show the pulsing "new" dot
   icon: IconName // shown on phones, above the label
-  more?: boolean // phones: tucked into the "More" menu instead of having its own tab
+  phoneOnly?: boolean // only on phones, where the logo isn't always on screen (Home)
 }
 
 const links: NavItem[] = [
-  { to: '/#home', label: 'Home', icon: 'home' },
-  { to: '/#about', label: 'About', icon: 'user' },
-  { to: '/#projects', label: 'Projects', match: '/projects', icon: 'folder' },
-  { to: '/#experience', label: 'Experience', icon: 'briefcase' },
-  { to: '/#skills', label: 'Skills', icon: 'code', more: true },
-  { to: '/#education', label: 'Education', icon: 'cap', more: true },
-  { to: '/blog', label: 'Blog', section: 'blog', dot: hasRecentUpdate, icon: 'pen', more: true },
-  // Contact keeps its own tab on phones too: getting in touch should always be one tap away.
+  { to: '/#home', label: 'Home', icon: 'home', phoneOnly: true },
+  // The studio first, then the work, then the founder's own page (his professional portfolio,
+  // /background), then the writing. Contact always last.
+  { to: '/#studio', label: 'Studio', icon: 'code' },
+  { to: '/#projects', label: 'Work', match: '/projects', icon: 'folder' },
+  { to: '/background', label: 'Founder', icon: 'user' },
+  { to: '/blog', label: 'Blog', section: 'blog', dot: hasRecentUpdate, icon: 'pen' },
   { to: '/#contact', label: 'Contact', icon: 'chat' },
 ]
-const moreLinks = links.filter((link) => link.more)
 
 // Phones: how far back above the top bar's row of links you scroll before the tab bar hides again.
 const TABBAR_HIDE_MARGIN = 40
 
-// How long the More menu stays open if you don't pick anything, in milliseconds.
-const MENU_CLOSE_AFTER_MS = 5000
-
-// The phones-only "More" button at the end of the row, and the small menu it opens with the links
-// that don't have their own tab. "up": in the tab bar at the bottom, the menu opens above the button.
-function MoreMenu({ isActive, up }: { isActive: (link: NavItem) => boolean; up: boolean }) {
-  const [open, setOpen] = useState(false)
-  const boxRef = useRef<HTMLLIElement>(null)
-  // Left open, it closes by itself after a few seconds.
-  useEffect(() => {
-    if (!open) return
-    const timer = window.setTimeout(() => setOpen(false), MENU_CLOSE_AFTER_MS)
-    return () => window.clearTimeout(timer)
-  }, [open])
-
-  // A tap anywhere else, or Escape, closes it. (Following a link closes it as well: the menu is
-  // given a new key whenever the address changes, see below.)
-  useEffect(() => {
-    if (!open) return
-    function onPointerDown(event: PointerEvent) {
-      if (!boxRef.current?.contains(event.target as Node)) setOpen(false)
-    }
-    function onKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') setOpen(false)
-    }
-    document.addEventListener('pointerdown', onPointerDown)
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown)
-      document.removeEventListener('keydown', onKey)
-    }
-  }, [open])
-
-  const active = moreLinks.some(isActive)
-
-  return (
-    <li className="navbar__more" ref={boxRef}>
-      <button
-        type="button"
-        className={`navbar__more-button${active ? ' active' : ''}${open ? ' open' : ''}`}
-        aria-expanded={open}
-        aria-haspopup="true"
-        onClick={() => setOpen((value) => !value)}
-      >
-        <span className="navbar__icon" aria-hidden="true">
-          <Icon name="more" size={20} />
-        </span>
-        <span className="navbar__label">
-          More
-          {/* Blog lives in this menu on phones, so its "new post" dot shows here. */}
-          {moreLinks.some((link) => link.dot) && <span className="navbar__dot" aria-label="new post" />}
-        </span>
-      </button>
-      {open && (
-        <ul className={up ? 'navbar__menu navbar__menu--up' : 'navbar__menu'}>
-          {moreLinks.map((link) => (
-            <li key={link.to}>
-              <Link to={link.to} className={isActive(link) ? 'active' : undefined} onClick={() => setOpen(false)}>
-                <Icon name={link.icon} size={18} />
-                {link.label}
-                {link.dot && <span className="navbar__dot" aria-label="new post" />}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </li>
-  )
-}
-
 function Navbar() {
-  const { pathname, hash } = useLocation()
+  const { pathname } = useLocation()
   // Which home section is on screen right now, e.g. 'skills'. Used to light up its link.
   const [activeSection, setActiveSection] = useState('')
   // True once the page is scrolled a little: the navbar then gets a soft shadow.
@@ -183,9 +111,8 @@ function Navbar() {
     return onSection || (match !== undefined && pathname.startsWith(match))
   }
 
-  // The list of links, used by the top bar and by the tab bar. Links marked "more" hide on phones
-  // (CSS), where the More button (hidden on bigger screens) offers them instead.
-  const linkList = (up: boolean) => (
+  // The list of links, used by the top bar and by the tab bar.
+  const linkList = () => (
     <ul className="navbar__links">
       {/*
         Curly braces { } let you write JavaScript inside JSX.
@@ -193,7 +120,7 @@ function Navbar() {
         React needs a unique "key" on each item in a list so it can keep track of them.
       */}
       {links.map((link) => (
-        <li key={link.to} className={link.more ? 'navbar__extra' : undefined}>
+        <li key={link.to} className={link.phoneOnly ? 'navbar__phone-only' : undefined}>
           <Link
             to={link.to}
             className={isActive(link) ? 'active' : undefined}
@@ -201,7 +128,8 @@ function Navbar() {
             // From another page, the home page opens at the top and plays it (see HomePage.tsx).
             state={link.to === '/#home' ? { replayWelcome: true } : undefined}
             onClick={(event) => {
-              if (link.to === '/#home' && onHome) {
+              // Home on the home page, or Founder on the founder page: a smooth trip to the top.
+              if ((link.to === '/#home' && onHome) || (link.to === '/background' && pathname === '/background')) {
                 event.preventDefault()
                 goToTop()
               }
@@ -219,7 +147,6 @@ function Navbar() {
           </Link>
         </li>
       ))}
-      <MoreMenu isActive={isActive} up={up} key={`${up}-${pastTopBar}-${pathname}${hash}`} />
     </ul>
   )
 
@@ -266,7 +193,7 @@ function Navbar() {
           </Link>
         </div>
         <nav className="navbar__nav" ref={linksRowRef}>
-          {linkList(false)}
+          {linkList()}
         </nav>
         <ThemeToggle />
       </header>
@@ -280,7 +207,7 @@ function Navbar() {
           aria-label="Sections"
           inert={!pastTopBar}
         >
-          {linkList(true)}
+          {linkList()}
         </nav>
       )}
     </>

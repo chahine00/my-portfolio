@@ -6,16 +6,24 @@ export const profile = {
   // The studio this site belongs to: shown in the navbar, the tab title and the footer.
   brand: 'Axihex',
   site: 'https://axihex.com',
-  role: 'Software Engineer · Building Axihex',
-  // One or two sentences under your name in the hero.
-  intro: "I'm Ali Chahine, the software engineer behind Axihex. I design and build thoughtful digital solutions, from idea to implementation.",
+  // The small label above the hero's headline: what Axihex is.
+  role: 'Independent software studio',
+  // The hero's headline. The words in "headlineAccent" are shown in the accent gradient.
+  headline: 'Building',
+  headlineAccent: "what's next.",
+  // One or two sentences under the headline.
+  intro: 'Exploring ideas, engineering digital products, and creating useful technology.',
+  // The founder line at the bottom of the hero.
+  founderTitle: 'Software Engineer',
   location: 'Beirut, Lebanon',
-  availability: 'Open to opportunities & software projects', // set to '' to hide it
-  // Your picture in /public: the 3D avatar, on a transparent background so it suits light AND
-  // dark mode. WebP (77 KB instead of the 670 KB PNG it was made from), so it loads fast. Its
-  // outline also cuts your silhouette out of the welcome drawing, so the drawing stays behind you.
+  // The founder's page (/background): a short status line with a pulsing dot, for recruiters and
+  // companies. Set to '' to hide it. (The home page has no status line.)
+  founderAvailability: 'Open to engineering opportunities',
+  // The founder's picture in /public: the 3D avatar, on a transparent background so it suits light
+  // AND dark mode. Shown on the founder card (Studio section) and the /background page, not in the
+  // hero (the hero shows the Axihex mark). Also the person's image in the structured data.
   photo: '/avatar.webp',
-  // Typed out one by one under your name, like code being written. Keep each one short.
+  // Typed out one by one under the home page's headline, like code being written. Keep each one short.
   building: [
     'secure APIs & databases',
     'cross-platform mobile apps',         // Focus on business/internal use
@@ -27,7 +35,7 @@ export const profile = {
   lab: true,
 }
 
-// The small numbers in the About section.
+// The small numbers in the Experience section.
 export const stats = [
   { value: '3+', label: 'years experience' },
   { value: '2', label: 'companies' },

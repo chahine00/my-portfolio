@@ -410,24 +410,29 @@ main {
   z-index: 1;
 }
 
-/* The photo's box in the row. It holds the photo and, behind it, the hover drawing. */
+/* The picture's box in the row. It holds the Axihex mark and, behind it, the hover drawing. */
 .hero__visual {
   position: relative;
   flex-shrink: 0;
-  width: 260px;
+  width: 300px;
   aspect-ratio: 4 / 5;
+}
+
+/* Founder's page (/background): the full-body avatar. Narrower, and tucked a little under the
+   text (the text sits above it), like the original hero. */
+.hero__visual--avatar {
+  width: 260px;
   margin-left: -70px;
 }
 
-/* The picture is a full-body avatar on a transparent background, so it needs no fades or
-   vignettes: it stands on the page as it is, in light and dark mode. */
+/* The Axihex mark (HeroMark.tsx), or the avatar, on a transparent background in light and dark mode. */
 .hero__photo {
   position: relative; /* sits above the drawing */
   width: 100%;
   height: 100%;
 }
 
-.hero__photo img {
+.hero__photo > * {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -440,13 +445,13 @@ main {
    code, a lamp, a mug of coffee and a plant. No words on it.
    The tiny robot out in the hero keeps playing around it.
    ------------------------------------------------------------------------------------------------ */
-.hero__photo img {
+.hero__photo > * {
   transition:
     opacity 0.6s ease,
     transform 0.6s ease;
 }
 
-.hero__photo--away img {
+.hero__photo--away > * {
   opacity: 0;
   transform: scale(0.92) translateY(12px);
 }
@@ -871,7 +876,7 @@ main {
     display: none;
   }
 
-  .hero__photo img {
+  .hero__photo > * {
     transition: opacity 0.3s;
     transform: none;
   }
@@ -920,6 +925,84 @@ main {
 
 .hero__visual:not(.hero__visual--on) .hero__art {
   opacity: 0;
+}
+
+/* The home page's "build" drawing (MarkArt in Hero.tsx): drawn in the Axihex mark's own
+   coordinates, so it's centered on the mark at the mark's scale. The mark fills the box's width
+   (its viewBox is 370 wide, this one 550), on wide screens and phones alike. */
+.hero__art.hero__art--mark {
+  left: 50%;
+  top: 50%;
+  bottom: auto;
+  width: calc(100% * 550 / 370);
+  aspect-ratio: 550 / 460;
+  transform: translate(-50%, -50%);
+}
+
+/* The lines from the mark's corners to the module chips: accent, a little stronger than the code
+   lines of the founder's drawing. */
+.hero__art-link {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  opacity: 0.6;
+  animation-duration: calc(0.35s * var(--art-time));
+}
+
+/* The assembly guide on the left of the opened stack: thin and dashed-looking, quieter than the links. */
+.hero__art-guide {
+  stroke: var(--muted);
+  stroke-width: 1.2;
+  opacity: 0.5;
+  animation-duration: calc(0.6s * var(--art-time));
+}
+
+/* Data flowing into the mark along each line, once it's drawn: short accent dashes moving inward. */
+.hero__art-flow {
+  fill: none;
+  stroke: var(--accent-2);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 3 15;
+  opacity: 0;
+  animation:
+    hero-art-type 0.3s linear both,
+    hero-art-flow 0.9s linear infinite;
+}
+
+@keyframes hero-art-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: 18; }
+}
+
+/* The module chips: small pills in the page color with an accent outline, popping in. */
+.hero__art-chip {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hero-art-pop calc(0.3s * var(--art-time)) cubic-bezier(0.34, 1.6, 0.64, 1) both;
+}
+
+.hero__art-chip rect {
+  fill: var(--bg);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+.hero__art-chip-light {
+  fill: var(--accent-2);
+}
+
+.hero__art-chip-lines {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__art-flow {
+    animation: hero-art-type 0.3s linear both;
+  }
 }
 
 /* Which silhouette copy cuts the drawing (see PhotoArt in Hero.tsx). */
@@ -1242,12 +1325,16 @@ main {
 
 }
 
-/* Dark mode: a soft accent glow behind the avatar. Two glows: one behind the head, and a wider
-   one behind the body, so the black t-shirt and jeans have something lit to stand against
-   instead of melting into the dark page. Written twice: once for "computer is dark", once for
+/* Dark mode: a soft accent glow behind the Axihex mark. Written twice: once for "computer is dark", once for
    "picked dark with the toggle". */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .hero__photo {
+    background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 62%);
+  }
+
+  /* The avatar: one glow behind the head, a wider one behind the body, so the black t-shirt and
+     jeans have something lit to stand against. */
+  :root:not([data-theme='light']) .hero__visual--avatar .hero__photo {
     background:
       radial-gradient(ellipse 45% 30% at 50% 24%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%),
       radial-gradient(ellipse 60% 45% at 50% 62%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 75%);
@@ -1255,9 +1342,111 @@ main {
 }
 
 :root[data-theme='dark'] .hero__photo {
+  background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 62%);
+}
+
+:root[data-theme='dark'] .hero__visual--avatar .hero__photo {
   background:
     radial-gradient(ellipse 45% 30% at 50% 24%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 70%),
     radial-gradient(ellipse 60% 45% at 50% 62%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 75%);
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Hero mark (HeroMark.tsx): the Axihex mark as three hexagon layers in perspective. At rest they
+   float, each on its own beat, and light climbs up through them; while the hero is hovered the
+   stack opens up (an "exploded view") for the hover drawing (MarkArt in Hero.tsx).
+   ------------------------------------------------------------------------------------------------ */
+.hero-mark {
+  overflow: visible;
+}
+
+.hero-mark__shadow {
+  fill: color-mix(in srgb, var(--accent) 22%, transparent);
+  filter: blur(10px);
+  opacity: 0.7;
+}
+
+/* Where each layer sits: at rest, and opened up while the hero is hovered. */
+.hero-mark__layer {
+  transition: transform 0.6s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.hero-mark__layer--0 { transform: translateY(-70px); }
+.hero-mark__layer--1 { transform: translateY(0); }
+.hero-mark__layer--2 { transform: translateY(70px); }
+
+.hero__visual--on .hero-mark__layer--0 { transform: translateY(-105px); }
+.hero__visual--on .hero-mark__layer--2 { transform: translateY(105px); }
+
+.hero-mark__float {
+  animation: hero-mark-float 6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -2s);
+}
+
+.hero-mark__side {
+  fill: color-mix(in srgb, var(--accent) 35%, var(--bg));
+  stroke: color-mix(in srgb, var(--accent) 60%, transparent);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.hero-mark__face {
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+/* The climbing light: each layer's edge brightens in turn, bottom (2) to top (0). */
+.hero-mark__light {
+  fill: color-mix(in srgb, var(--accent) 18%, transparent);
+  stroke: var(--accent-2);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  opacity: 0;
+  animation: hero-mark-light 4.5s ease-in-out infinite;
+  animation-delay: calc((2 - var(--i)) * 0.6s);
+}
+
+.hero-mark__logo {
+  fill: var(--bg);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.hero-mark__lines {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+.hero-mark__ring {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 8;
+  opacity: 0.6;
+}
+
+@keyframes hero-mark-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes hero-mark-light {
+  0%, 40%, 100% { opacity: 0; }
+  12%, 24% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-mark__float,
+  .hero-mark__light {
+    animation: none;
+  }
+
+  .hero-mark__layer {
+    transition: none;
+  }
 }
 
 /* The bar is a grid of three columns: name | links | theme button. The two outer columns
@@ -1475,62 +1664,6 @@ main {
 @media (max-width: 760px) {
   .mindset__list {
     grid-template-columns: 1fr;
-  }
-}
-
-/* About: "The idea behind Axihex", a card under the numbers with the hexagon mark on the left. */
-.axihex {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-top: 16px;
-  padding: 20px 24px;
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: 14px;
-  background: var(--card);
-  transition: border-color 0.3s;
-}
-
-.axihex:hover {
-  border-color: var(--accent);
-}
-
-.axihex__mark {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 1.8;
-  stroke-linejoin: round;
-  transition: transform 0.6s ease;
-}
-
-.axihex__mark circle {
-  fill: var(--accent);
-  stroke: none;
-}
-
-.axihex:hover .axihex__mark {
-  transform: rotate(60deg);
-}
-
-.axihex__title {
-  margin: 0 0 6px;
-  font-size: 1.05rem;
-}
-
-.axihex__text {
-  margin: 0;
-  max-width: 72ch;
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .axihex__mark {
-    transition: none;
   }
 }
 
@@ -2083,6 +2216,364 @@ main {
 
 .project-card__title:hover {
   color: var(--accent);
+}
+
+/* Studio (About.tsx): a minimal, editorial introduction.
+   Desktop: 40px less space above it than other sections, so it reads as the hero's continuation
+   (phones keep their usual spacing). */
+@media (min-width: 721px) {
+  .studio {
+    padding-top: 24px;
+  }
+}
+
+/* Studio: the eyebrow, a big title and one line,
+   then three principles in a row (Explore, Build, Share), then "Behind Axihex" with the founder card. */
+.studio__title {
+  max-width: 22ch;
+  margin: 6px 0 16px;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+}
+
+.studio__text {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* The principles: three columns divided by a thin line on top, one under the other on phones. */
+.studio__principles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: clamp(32px, 5vw, 48px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.studio__principles li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.studio__num {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.studio__principles strong {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+}
+
+.studio__note {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* "Behind Axihex": a small title on the left, the text and the founder card on the right. */
+.behind-axihex {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  gap: 12px 40px;
+  margin-top: clamp(40px, 6vw, 64px);
+}
+
+.behind-axihex__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+}
+
+.behind-axihex p {
+  max-width: 62ch;
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* The founder card: the avatar stands on the card's bottom edge on the left and steps out above
+   its top edge (no frame around him), with a soft glow behind. A short line and a pill link on the
+   right. Hovering lifts the card, the avatar rises a little and the arrow fills in. */
+.founder-card {
+  --avatar: 164px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 640px;
+  min-height: 150px;
+  margin-top: 48px; /* room for the avatar's head above the card */
+  padding: 24px 24px 24px calc(var(--avatar) + 28px);
+  border: 1px solid transparent;
+  border-radius: 20px;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 55%, var(--border)), var(--border) 45%, color-mix(in srgb, var(--accent-2) 45%, var(--border))) border-box;
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.founder-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift);
+}
+
+/* The avatar's spot: from the card's bottom edge up past its top. */
+.founder-card__visual {
+  position: absolute;
+  left: 20px;
+  bottom: 0;
+  width: var(--avatar);
+}
+
+/* The glow behind him: a soft accent circle around his upper body. */
+.founder-card__visual::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  width: 120%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent), transparent 65%);
+  transform: translateX(-50%);
+}
+
+.founder-card__avatar {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  transform-origin: 50% 100%;
+  transition: transform 0.3s ease;
+}
+
+.founder-card:hover .founder-card__avatar {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.founder-card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.founder-card__title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.founder-card__text {
+  color: var(--muted);
+  font-size: 0.93rem;
+  line-height: 1.55;
+}
+
+/* The link as a small pill; its arrow sits in a circle that fills with the accent on hover. */
+.founder-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  padding: 6px 6px 6px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color 0.3s;
+}
+
+.founder-card__arrow {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  transition: background 0.3s, color 0.3s, transform 0.3s;
+}
+
+.founder-card:hover .founder-card__link {
+  border-color: var(--accent);
+}
+
+.founder-card:hover .founder-card__arrow {
+  background: var(--accent-fill);
+  color: #fff;
+  transform: translateX(2px);
+}
+
+@media (max-width: 720px) {
+  /* Phones: one compact card, a row per principle: the number, the word, and its note on the
+     right, split by thin lines (instead of three tall blocks stacked down the screen). */
+  .studio__principles {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 4px 16px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--card);
+  }
+
+  .studio__principles li {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 12px;
+    padding: 14px 0;
+    border-top: none;
+  }
+
+  .studio__principles li + li {
+    border-top: 1px solid var(--border);
+  }
+
+  .studio__num {
+    flex-shrink: 0;
+    width: 2.4em;
+  }
+
+  .studio__principles strong {
+    font-size: 1.1rem;
+  }
+
+  .studio__note {
+    margin-left: auto;
+    font-size: 0.85rem;
+    text-align: right;
+  }
+
+  .behind-axihex {
+    grid-template-columns: 1fr;
+  }
+
+  /* Phones: stacked. The avatar stands on a thin line at the top of the card (stepping out above
+     the card's top edge), and the text sits under it. */
+  .founder-card {
+    --avatar: 108px;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+    margin-top: 48px;
+    padding: 0;
+  }
+
+  .founder-card__visual {
+    position: relative;
+    left: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    width: 100%;
+    height: 96px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .founder-card__visual::before {
+    width: 180px;
+  }
+
+  .founder-card__avatar {
+    width: var(--avatar);
+  }
+
+  .founder-card__body {
+    padding: 18px 18px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .founder-card,
+  .founder-card__avatar,
+  .founder-card__arrow {
+    transition: none;
+  }
+
+  .founder-card:hover,
+  .founder-card:hover .founder-card__avatar,
+  .founder-card:hover .founder-card__arrow {
+    transform: none;
+  }
+}
+
+/* Work: the projects in groups (Studio Work, Founder-led Projects, Founder's Experience). */
+.work-group + .work-group {
+  margin-top: 48px;
+}
+
+.work-group__head {
+  margin-bottom: 18px;
+}
+
+.work-group__head h3 {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+}
+
+.work-group__head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* One project in a group: two equal columns, the card and a short line beside it. */
+.work-group__solo {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+}
+
+.work-group__aside {
+  margin: 0;
+  padding: clamp(8px, 3vw, 40px);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 720px) {
+  .work-group__solo {
+    grid-template-columns: 1fr;
+  }
+
+  /* Phones: the card is full width, so the line isn't needed. */
+  .work-group__aside {
+    display: none;
+  }
+}
+
+
+
+.project-card__context {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.project-card__context + h3 {
+  margin-top: 0;
 }
 
 .project-card__role {
@@ -4336,6 +4827,12 @@ a {
   border-left: 1px solid var(--border);
 }
 
+/* In Work history (/background): as wide as the timeline under it, with room before the first job. */
+#experience .stats {
+  max-width: 720px;
+  margin: 0 0 32px;
+}
+
 /* Phones: a little more compact. */
 @media (max-width: 480px) {
   .stats__item {
@@ -4426,6 +4923,26 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+/* The founder's page: "← Back to Axihex" above the hero's label, and again at the page's end. */
+.hero__back {
+  margin-bottom: 18px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.hero__back:hover {
+  color: var(--accent);
+}
+
+.founder-back {
+  margin-top: 40px;
+  color: var(--muted);
+}
+
+.founder-back:hover {
+  color: var(--accent);
 }
 
 .back-link span,
@@ -5979,117 +6496,10 @@ a {
   }
 }
 
-/* ------------------------------------------------------------------------------------------------
-   Phones: six tabs (Home, About, Projects, Experience, Contact, More). Skills, Education and Blog
-   move into the small menu the "More" button opens (Navbar.tsx). Bigger screens show
-   every link in the row, and no More button.
-   ------------------------------------------------------------------------------------------------ */
-.navbar__more {
-  display: none;
-  position: relative;
-}
-
-@media (max-width: 720px) {
-  .navbar__links .navbar__extra {
+/* Home is a tab on phones only: on bigger screens the Axihex logo is the way home (Navbar.tsx). */
+@media (min-width: 721px) {
+  .navbar__links .navbar__phone-only {
     display: none;
-  }
-
-  .navbar__links .navbar__more {
-    display: block;
-  }
-
-  /* Looks exactly like the other tabs. */
-  .navbar__more-button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    width: 100%;
-    padding: 4px 0 2px;
-    border: 0;
-    background: none;
-    color: var(--muted);
-    font: inherit;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-
-  .navbar__more-button.active,
-  .navbar__more-button.open {
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  /* The menu: a small frosted card under the button (top bar) or above it (tab bar). */
-  .navbar__menu {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 4px;
-    z-index: 20;
-    min-width: 170px;
-    margin: 0;
-    padding: 6px;
-    list-style: none;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: color-mix(in srgb, var(--bg) 94%, transparent);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
-    box-shadow: 0 10px 30px rgb(0 0 0 / 0.16);
-    font-size: 0.95rem;
-    animation: navbar-menu-in 0.16s ease;
-  }
-
-  .navbar__menu--up {
-    top: auto;
-    bottom: calc(100% + 12px);
-  }
-
-  .navbar__menu li {
-    flex: none;
-  }
-
-  .navbar .navbar__menu a,
-  .tabbar .navbar__menu a {
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 10px;
-    min-height: 44px;
-    padding: 0 12px;
-    border-radius: 10px;
-    color: var(--text);
-    font-weight: 500;
-    letter-spacing: 0;
-  }
-
-  .navbar__menu a:hover,
-  .navbar__menu a:focus-visible {
-    background: var(--card);
-  }
-
-  .navbar .navbar__menu a.active,
-  .tabbar .navbar__menu a.active {
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .navbar__menu .navbar__dot {
-    width: 6px;
-    height: 6px;
-    margin-left: 0;
-  }
-}
-
-@keyframes navbar-menu-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: none; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .navbar__menu {
-    animation: none;
   }
 }
 
@@ -6114,12 +6524,6 @@ a {
   cursor: pointer;
 }
 
-/* While the More menu is open, the back-to-top button steps aside: the menu sits where it floats. */
-body:has(.navbar__menu) .back-to-top {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
 
 /* Phones: no empty space under the Blog banner's text. */
 @media (max-width: 720px) {
@@ -6174,12 +6578,6 @@ body:has(.navbar__menu) .back-to-top {
   /* Above the tab bar while it shows, centered on the back-to-top button's height. */
   body:has(.tabbar--visible) .scroll-up-back {
     bottom: calc(86px + env(safe-area-inset-bottom));
-  }
-
-  /* The More menu opens over this corner: step aside while it's open. */
-  body:has(.navbar__menu) .scroll-up-back {
-    opacity: 0;
-    visibility: hidden;
   }
 }
 
@@ -6241,3 +6639,583 @@ body:has(.navbar__menu) .back-to-top {
 .project-card {
   scroll-margin-top: calc(var(--navbar-height, 64px) + 16px);
 }
+
+/* A button ending in an arrow that nudges right on hover (e.g. "View selected projects →"). */
+.arrow-button span {
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.arrow-button:hover span {
+  transform: translateX(4px);
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Studio board (StudioBoard.tsx): what the home hero shows instead of the Axihex mark every few
+   seconds. A board on a stand with three columns (Idea, Build, Live); cards move across it by
+   themselves. It uses the night desk's box and entrance (.lab, .desk).
+   ------------------------------------------------------------------------------------------------ */
+.board {
+  /* The robot's pop-up and hint timings read this (like in the hover drawings). */
+  --art-time: 0.5;
+}
+
+.board__frame {
+  fill: var(--card);
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+
+.board__rule {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.board__stand {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.board__floor {
+  stroke: var(--border);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.board__title {
+  fill: var(--muted);
+  font: 700 9px ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  letter-spacing: 0.06em;
+  text-anchor: middle;
+  text-transform: uppercase;
+}
+
+.board__live {
+  fill: #22c55e;
+  animation: board-live 1.6s ease-in-out infinite;
+}
+
+@keyframes board-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* A card: it appears in Idea, waits, steps to Build, waits, steps to Live, waits, and leaves.
+   Each card runs the same loop on its own beat (its delay is set in StudioBoard.tsx). */
+.board__card {
+  animation: board-card 7.2s cubic-bezier(0.5, 0, 0.3, 1) infinite both;
+}
+
+.board__card rect {
+  fill: color-mix(in srgb, var(--accent) 16%, var(--card));
+  stroke: var(--accent);
+  stroke-width: 1;
+}
+
+.board__card-line {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+@keyframes board-card {
+  0% { transform: translateX(0); opacity: 0; }
+  6%, 30% { transform: translateX(0); opacity: 1; }
+  38%, 62% { transform: translateX(var(--step)); opacity: 1; }
+  70%, 92% { transform: translateX(calc(var(--step) * 2)); opacity: 1; }
+  100% { transform: translateX(calc(var(--step) * 2)); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board__card,
+  .board__live {
+    animation: none;
+  }
+}
+
+/* The page's text written into the HTML at build time (scripts/prerender.ts), for search engines.
+   React replaces it as soon as the app starts, so visitors don't see it; it only fades in if the
+   app hasn't started after a moment (no JavaScript, or a very slow connection). */
+.prerender {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  opacity: 0;
+  animation: prerender-show 0.4s ease 2s forwards;
+}
+
+.prerender nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+@keyframes prerender-show {
+  to { opacity: 1; }
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Home upgrades: the hero's proof strip, the studio's principle icons, the project cards' status
+   badge and highlight, and the two-column Contact section.
+   ------------------------------------------------------------------------------------------------ */
+
+/* Under the hero's buttons: "Shipped to" and where the work is live, small and quiet. */
+.hero__proof {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.hero__proof-label {
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero__proof ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero__proof li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card) 70%, transparent);
+}
+
+.hero__proof svg {
+  color: var(--accent);
+}
+
+/* The studio's principles: an icon in a soft tile above each one. On desktop each principle is a
+   card that lifts a little on hover. (Phones keep their compact one-card list, below.) */
+.studio__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+@media (min-width: 721px) {
+  .studio__principles li {
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--card);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+
+  .studio__principles li:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+  }
+}
+
+@media (max-width: 720px) {
+  .studio__icon {
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    align-self: center;
+    border-radius: 9px;
+  }
+
+  .studio__icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .studio__principles li {
+    align-items: center;
+  }
+
+  /* The icon takes the number's place on phones: one row stays short. */
+  .studio__num {
+    display: none;
+  }
+}
+
+/* Project cards: where the product is now, on the cover's top-left corner. */
+.project-card__status {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgb(13 17 23 / 0.78);
+  color: #e6edf3;
+  font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+.project-card__status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f5b400;
+}
+
+.project-card__status--live .project-card__status-dot {
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgb(34 197 94 / 0.25);
+}
+
+/* The card's one result line, with a small spark. */
+.project-card__highlight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.project-card__highlight svg {
+  flex-shrink: 0;
+  color: var(--accent-2);
+}
+
+/* Contact: the ways to reach out on the left, the form in a card on the right. */
+.contact-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: 32px;
+}
+
+.contact-aside .contact-tiles {
+  grid-template-columns: 1fr;
+}
+
+.contact-panel {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: var(--shadow-lift);
+}
+
+.contact-panel .contact-form-label {
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.contact-panel .contact-form {
+  max-width: none;
+}
+
+/* A visible label above each field (not only a placeholder that disappears while typing). */
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.contact-field > span {
+  color: var(--muted);
+}
+
+.contact-panel .contact-form input,
+.contact-panel .contact-form textarea {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--bg);
+  font-weight: 400;
+}
+
+.contact-panel .contact-form .button {
+  align-self: flex-start;
+}
+
+@media (max-width: 860px) {
+  .contact-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .contact-panel {
+    padding: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio__principles li {
+    transition: none;
+  }
+
+  .studio__principles li:hover {
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Site-wide polish: the footer, the scroll progress line, the card spotlight, page transitions.
+   ------------------------------------------------------------------------------------------------ */
+
+/* The footer: the mark, its line and the social icons on the left; quick links in columns on the
+   right; the last line (with its robot) under both. */
+.footer {
+  padding: 48px 16px 24px;
+  text-align: left;
+}
+
+.footer__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr);
+  gap: 32px;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.footer__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.footer__mark {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.footer__mark circle {
+  fill: var(--accent);
+  stroke: none;
+}
+
+.footer__brand p {
+  max-width: 30ch;
+  margin: 10px 0 16px;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.footer .footer__brand .social-links {
+  justify-content: flex-start;
+}
+
+.footer__nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.footer__heading {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.footer__nav ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer__nav a {
+  color: var(--muted);
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer__nav a:hover {
+  color: var(--accent);
+}
+
+.footer__line {
+  max-width: 1040px;
+  margin: 32px auto 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .footer__inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .footer__nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* The scroll progress line: at the very top of the screen, over the navbar, in the brand gradient. */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+/* Card spotlight (Spotlight.tsx): a soft accent light under the mouse, only while hovering. */
+@media (hover: hover) and (pointer: fine) {
+  :is(.card, .studio__principles li, .mindset__item, .contact-panel, .contact-tile):hover {
+    background-image: radial-gradient(
+      260px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+      color-mix(in srgb, var(--accent) 12%, transparent),
+      transparent 70%
+    );
+  }
+}
+
+/* Page transitions: each page fades in and rises a little when you move to it (App.tsx). */
+.page-transition {
+  /* "backwards", not "both": once it's over, no transform stays on the page (a lasting one would
+     break position: fixed inside it, like the photo viewer). */
+  animation: page-in 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
+  }
+
+  .scroll-progress {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Founder page upgrades: the work timeline's company badge and duration, and the testimonials.
+   ------------------------------------------------------------------------------------------------ */
+/* The work timeline: each company's card starts with its logo (or initials), its name and how long. */
+.job__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.job__head h3 {
+  margin: 0;
+}
+
+.job__logo {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #fff;
+}
+
+.job__logo--initials {
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--accent) 16%, var(--card));
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.job__duration {
+  margin-left: auto;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+/* Testimonials: quote cards side by side, wrapping on smaller screens. */
+.testimonials {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.testimonial blockquote {
+  margin: 0 0 16px;
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.testimonial blockquote p {
+  margin: 0;
+}
+
+.testimonial__by {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.testimonial__by span {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+

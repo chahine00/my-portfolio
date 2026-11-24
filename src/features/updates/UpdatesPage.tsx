@@ -139,13 +139,13 @@ function UpdatesPage() {
           the title on the left. The space on the right keeps the banner at its usual size. */}
       <header className="blog-hero">
         <div className="blog-hero__text">
-          <p className="eyebrow">The blog</p>
+          <p className="eyebrow">Blog</p>
           <h1>
             Notes, ideas <span className="blog-hero__amp">&</span> <span className="blog-hero__accent">
               <GradientText text="milestones" />
             </span>
           </h1>
-          <p>Lessons from real work, how I think about software, and the moments along the way.</p>
+          <p>Lessons from real work, how we think about software at Axihex, and the moments along the way.</p>
         </div>
 
         <div className="blog-hero__space" aria-hidden="true" />

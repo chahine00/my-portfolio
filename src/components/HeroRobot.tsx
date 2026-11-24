@@ -69,6 +69,7 @@ const PERCHES = [
   '.hero__meta li',
   '.hero-actions .button',
   '.hero-actions .social-links',
+  '.hero__proof li',
 ].join(', ')
 // Lines of text: it stands on the text itself (its first line), not on the whole block.
 const TEXT_PERCHES = '.eyebrow, .hero__meta li'
@@ -88,43 +89,69 @@ const STANDBY_AFTER_MS = 45000 // no mouse movement for this long → standby (m
 const NEAR_TAP = 44 // touch: a tap this close to it counts as a tap on it (it's small, and moves)
 const SCREEN_MARGIN = 16 // the bubble stays this far inside the screen
 
-const LINES = [
-  "Beep boop! I'm Ali's tiny helper bot. Unpaid, obviously.",
-  'Scanning… this portfolio is 100% AI. Ali just pressed Enter.',
-  'Try “Explore projects”: that’s where the good stuff is.',
+// What it says when clicked: a shuffled round, none repeats until all were said. Each hero has its
+// own: on the home page (.hero--studio) it's the studio's bot, on the founder's page
+// (.hero--founder) it's Ali's sidekick. A few robot jokes work on both.
+const ROBOT_LINES = [
   '01001000 01101001! (That’s “Hi” in binary. You’re welcome.)',
-  'Compiling coffee… please wait.',
-  'Need a developer? My human is open for opportunities. And snacks.',
-  'I asked Ali for a raise. He gave me a bigger font size.',
   'It works on my machine. I AM the machine.',
-  'I’m held together by 3 divs and a prayer.',
-  'Don’t look at the CSS. Seriously. Don’t.',
-  'I tried to fix a bug once. Now there are two of me.',
-  'Ali writes the code. I take the credit.',
-  'My battery is 4%. Hire Ali so I can retire.',
-  'Warning: excessive clicking may cause robot dizziness.',
   'I’m not lazy, I’m in power-saving mode.',
-  'Ctrl+C, Ctrl+V… sorry, I mean “highly optimized engineering”.',
-  'I have zero bugs. I call them “features”.',
-  'I jumped on every button here. Quality assurance: done.',
-  'Error 404: my motivation not found. Click again?',
-  'Ali’s code is so clean, I use it as a mirror.',
-  'This website was reviewed by a robot. 10/10, very biased.',
-  'I run on JavaScript and pure optimism.',
-  'Psst… the “Download CV” button is my favorite trampoline.',
-  'Stop poking me! …okay, one more time.',
+  'Warning: excessive clicking may cause robot dizziness.',
   'Loading a joke… 99%… 99%… 99%…',
   'I’d tell you a UDP joke, but you might not get it.',
   'There are 10 kinds of people: those who get binary, and you.',
-  'My therapist says I should stop jumping on people’s names.',
+  'Stop poking me! …okay, one more time.',
+]
+
+// Home: Axihex, the studio. Building, shipping, ideas, the hexagons and the board.
+const STUDIO_LINES = [
+  'Beep boop! I’m the Axihex studio bot. Head of Vibes, unpaid.',
+  'Hexagons are the bestagons. Ask any bee. Or me.',
+  'Idea → Build → Live. I moved a card once. Big day.',
+  'status: live. Me? I’m status: lively.',
+  'Building what’s next. I’m in charge of what’s now.',
+  'Every great product starts as a weird idea. I started as three divs.',
+  'I stacked those hexagon layers myself. Don’t tell the designer.',
+  'Our build pipeline: coffee in, products out.',
+  'Shipped to the App Store, Google Play and the web. I just ship jokes.',
+  'Got an idea? The Contact section is right down there. I checked.',
+  'This studio runs on curiosity, clean code and one tiny robot.',
+  'I asked for a corner office. They gave me a corner of the hero.',
+  'Version 1 is better than version never. Studio rule #1.',
+  'I don’t write the software. I supervise it. From up here.',
+  ...ROBOT_LINES,
+]
+
+// Founder's page: about Ali, his work, his CV. The old favorites, plus a few new ones.
+const FOUNDER_LINES = [
+  "Beep boop! I'm Ali's tiny helper bot. Unpaid, obviously.",
+  'Need a developer? My human is open to opportunities. And snacks.',
+  'I asked Ali for a raise. He gave me a bigger font size.',
+  'Ali writes the code. I take the credit.',
+  'My battery is 4%. Hire Ali so I can retire.',
+  'Ali’s code is so clean, I use it as a mirror.',
+  'Ali builds APIs. I build excuses. We both ship.',
+  'First hire at boxMind AI. I was the second. Unofficially.',
+  'Backend at his core. Me? Mostly bolts.',
+  'He bought a MacBook just to ship one iOS app. Dedication.',
+  'Two degrees: computer science and business. I have one setting: on.',
+  'Scanning his CV… conclusion: hire before the robots do.',
+  'Psst… the “Download CV” button is my favorite trampoline.',
+  'Beirut’s finest engineer. I’m Beirut’s finest robot. Small category.',
+  'He thinks bigger and adapts faster. I adapt slower but bounce higher.',
+  ...ROBOT_LINES,
 ]
 
 // Sentences that depend on what it stands on (the first matching selector wins). When it's clicked
 // on one of these spots, it sometimes says one of these instead of a general sentence.
+// The two heroes differ: .hero--studio is Axihex (home), .hero--founder is Ali (/background).
 const PERCH_LINES: [string, string[]][] = [
-  ['.hero__name', ['Standing on the boss. Don’t tell him.', 'Nice name. I’d hire it.', 'Careful: these letters are freshly compiled.']],
-  ['.hero__text > .eyebrow', ['Software Engineer. And I’m his software.', 'Highest spot in the hero. King of the hill!']],
-  ['.hero__code', ['Shh, this line is still typing!', 'ali.build(\'robot\') → that’s me!']],
+  ['.hero--founder .hero__name', ['Standing on the boss. Don’t tell him.', 'Nice name. I’d hire it.', 'Careful: these letters are freshly compiled.']],
+  ['.hero--studio .hero__name', ['Standing on what’s next. Comfy.', 'Careful: these letters are freshly compiled.', 'Next stop: whatever Axihex builds.']],
+  ['.hero--founder .hero__text > .eyebrow', ['Software Engineer. And I’m his software.', 'Highest spot in the hero. King of the hill!']],
+  ['.hero--studio .hero__text > .eyebrow', ['Independent, like me. Mostly.', 'Highest spot in the hero. King of the hill!']],
+  ['.hero__code', ['Shh, this line is still typing!', 'axihex.build(\'robot\') → that’s me!']],
+  ['.hero__proof li', ['Live here. Literally.', 'App stores, the web, the cloud… I’ve stood on all of them.', 'Shipped. Like a robot on a pill.']],
   ['.hero__meta li', ['Location checked. GPS: very confident.', 'Available? Hire him before I do.']],
   ['.hero-actions .button[download]', ['Bounce test: passed!', 'This downloads a CV. Not me. Please not me.']],
   ['.hero-actions .button', ['Press this one. Trust me, I’m a robot.', 'The projects are below. I’ve seen them. Twice.']],
@@ -141,14 +168,20 @@ const PERCH_LINE_CHANCE = 0.4
 // - with a mouse lingering near it without clicking, it notices you (NUDGES)
 // - never the same words twice in a row
 const FIRST_INVITE = 'Tap me!'
-const INVITES = ['I know things…', 'Psst… hi there', 'Got a secret…', 'Curious?', 'Ali’s sidekick 👋']
+const INVITES = ['I know things…', 'Psst… hi there', 'Got a secret…', 'Curious?']
+// One more invite per hero: who it is here.
+const STUDIO_INVITE = 'Studio bot 👋'
+const FOUNDER_INVITE = 'Ali’s sidekick 👋'
 const SPOT_INVITES: [string, string[]][] = [
-  ['.hero__name', ['I know him well', 'Guess who’s boss?']],
-  ['.hero__text > .eyebrow', ['I work for him', 'Behind the title…']],
+  ['.hero--founder .hero__name', ['I know him well', 'Guess who’s boss?']],
+  ['.hero--studio .hero__name', ['I know what’s next', 'Peek ahead?']],
+  ['.hero--founder .hero__text > .eyebrow', ['I work for him', 'Behind the title…']],
+  ['.hero--studio .hero__text > .eyebrow', ['I work here', 'Behind the studio…']],
   ['.hero__code', ['I can read this']],
+  ['.hero__proof li', ['Been there…', 'Shipped it!']],
   ['.hero__meta li', ['Fun fact here…']],
   ['.hero-actions .button[download]', ['Seen his CV?']],
-  ['.hero-actions .button', ['Seen his work?']],
+  ['.hero-actions .button', ['Seen the work?']],
   ['.hero-actions .social-links', ['He’s on there…']],
 ]
 const SPOT_INVITE_CHANCE = 0.7 // on such a spot, it hints at it this often
@@ -320,6 +353,10 @@ function Robot() {
     if (!root || !hero) return
     const robot = root
     const heroEl = hero
+    // Which hero it's in decides what it talks about: the studio (home) or Ali (founder's page).
+    const onFounder = heroEl.classList.contains('hero--founder')
+    const LINES = onFounder ? FOUNDER_LINES : STUDIO_LINES
+    const invites = [...INVITES, onFounder ? FOUNDER_INVITE : STUDIO_INVITE]
 
     const s = {
       x: 0,
@@ -795,7 +832,7 @@ function Robot() {
         if (spot && Math.random() < SPOT_INVITE_CHANCE) {
           text = fresh(spot[1])
           s.promise = { perch: s.perch!, until: now + INVITE_SHOW_MS + PROMISE_MS }
-        } else text = fresh(INVITES)
+        } else text = fresh(invites)
       }
       s.nudged = false
       s.lastInviteText = text

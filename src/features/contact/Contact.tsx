@@ -15,6 +15,10 @@ import SectionTitle from '../../components/SectionTitle.tsx'
 // TypeScript will show an error if you try to set anything else (like 'done').
 type Status = 'idle' | 'sending' | 'sent' | 'error'
 
+// Phone numbers (and their WhatsApp buttons) stay off the page to keep it light. They're still in
+// src/data/contact.ts: set this to true to show them again, each with its copy button and WhatsApp.
+const SHOW_PHONE_NUMBERS = false
+
 function Contact() {
   // useState returns two things: [currentValue, functionToChangeIt].
   // The value in useState(...) is the starting value.
@@ -72,156 +76,171 @@ function Contact() {
 
   return (
     <section id="contact" className="section">
-      <SectionTitle label="Contact" title="Let's work" accent="together" />
-      {/* One question for every kind of visitor (companies hiring, clients, people saying hi), then the next step. */}
-      <p className="contact-intro">
-        Hiring for a team, have a project to discuss, or just want to say hi? Send me a message below or{' '}
-        <a href={asset('/Ali_Chahine_CV.pdf')} download="Ali_Chahine_CV.pdf">
-          download my CV
-        </a>
-        .
-      </p>
+      <SectionTitle label="Contact" title="Let's" accent="talk." />
+      {/* Open to any reason to write (a question, a problem with a service, a job, an idea…), so the
+          text doesn't name one. */}
+      <p className="contact-intro">Reach out any time by email, on LinkedIn, or with the form below.</p>
 
       {/* One box per contact, read from src/data/contact.ts. Clicking the box opens the contact
           (email, LinkedIn…); on a phone box it copies the number. A number that's on WhatsApp also gets a small
           "WhatsApp" button: only that button opens the chat. Links starting with https open in a new tab. */}
-      <ul className="contact-tiles">
-        {contacts.map((contact) => {
-          const icon = contact.icon ?? (contact.href.startsWith('tel:') ? 'phone' : undefined)
-          const isCopied = copied === contact.label
-          // The inside of the box, the same for a link and for a copy button.
-          const content = (
-            <>
-              {icon && (
-                <span className="contact-tile__icon">
-                  <Icon name={icon} size={22} />
-                </span>
-              )}
-              <span className="contact-tile__text">
-                <strong>
-                  {contact.label}
-                  {/* "&&" only renders the flag when the contact has one. */}
-                  {contact.flag && <img src={asset(contact.flag)} alt="" className="contact-flag" />}
-                </strong>
-                {/* role="status" makes screen readers say "Copied!" when it appears. */}
-                <span className={isCopied ? 'contact-tile__copied' : undefined} role="status">
-                  {isCopied ? 'Copied!' : contact.value}
-                </span>
-              </span>
-            </>
-          )
-          return (
-            <li key={contact.label} className="contact-tile">
-              {contact.href.startsWith('tel:') ? (
-                // Phone numbers: a button that copies the number. title and aria-label say so.
-                <button
-                  type="button"
-                  className="contact-tile__main"
-                  onClick={() => copyNumber(contact.label, contact.value)}
-                  aria-label={`Copy ${contact.value}`}
-                  title="Click to copy"
-                >
-                  {content}
-                </button>
-              ) : (
-                <a
-                  href={contact.href}
-                  className="contact-tile__main"
-                  {...(contact.href.startsWith('http') && { target: '_blank', rel: 'noreferrer' })}
-                >
-                  {content}
-                </a>
-              )}
-              {contact.whatsapp && (
-                <a
-                  href={contact.whatsapp}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="contact-tile__whatsapp"
-                  aria-label={`WhatsApp ${contact.value}`}
-                  title="Chat on WhatsApp"
-                >
-                  <Icon name="whatsapp" size={16} />
-                  {/* The visible word; screen readers get the fuller aria-label above. */}
-                  <span aria-hidden="true">WhatsApp</span>
-                </a>
-              )}
-            </li>
-          )
-        })}
-      </ul>
-
-      <p className="contact-form-label">Or send me a message:</p>
-
-      {/* After sending, a clear success box replaces the form. */}
-      {status === 'sent' ? (
-        // role="status" makes screen readers announce it; tabIndex={-1} lets us focus it from code.
-        <div className="form-alert form-alert--success" role="status" ref={successRef} tabIndex={-1}>
-          <span className="form-alert__icon" aria-hidden="true">
-            ✓
-          </span>
-          <div>
-            <p className="form-alert__title">Message sent!</p>
-            <p>Thanks{sentName && `, ${sentName}`}. I've received your message and will get back to you soon.</p>
-            <button type="button" className="button button-outline" onClick={() => setStatus('idle')}>
-              Send another message
-            </button>
-          </div>
+      {/* Two columns on wide screens: the ways to reach out on the left, the message form in a card
+          on the right. Stacked on phones. */}
+      <div className="contact-layout">
+        <div className="contact-aside">
+          <ul className="contact-tiles">
+            {/* Phone numbers only when SHOW_PHONE_NUMBERS is on (see the top of this file). */}
+            {contacts.filter((contact) => SHOW_PHONE_NUMBERS || !contact.href.startsWith('tel:')).map((contact) => {
+              const icon = contact.icon ?? (contact.href.startsWith('tel:') ? 'phone' : undefined)
+              const isCopied = copied === contact.label
+              // The inside of the box, the same for a link and for a copy button.
+              const content = (
+                <>
+                  {icon && (
+                    <span className="contact-tile__icon">
+                      <Icon name={icon} size={22} />
+                    </span>
+                  )}
+                  <span className="contact-tile__text">
+                    <strong>
+                      {contact.label}
+                      {/* "&&" only renders the flag when the contact has one. */}
+                      {contact.flag && <img src={asset(contact.flag)} alt="" className="contact-flag" />}
+                    </strong>
+                    {/* role="status" makes screen readers say "Copied!" when it appears. */}
+                    <span className={isCopied ? 'contact-tile__copied' : undefined} role="status">
+                      {isCopied ? 'Copied!' : contact.value}
+                    </span>
+                  </span>
+                </>
+              )
+              return (
+                <li key={contact.label} className="contact-tile">
+                  {contact.href.startsWith('tel:') ? (
+                    // Phone numbers: a button that copies the number. title and aria-label say so.
+                    <button
+                      type="button"
+                      className="contact-tile__main"
+                      onClick={() => copyNumber(contact.label, contact.value)}
+                      aria-label={`Copy ${contact.value}`}
+                      title="Click to copy"
+                    >
+                      {content}
+                    </button>
+                  ) : (
+                    <a
+                      href={contact.href}
+                      className="contact-tile__main"
+                      {...(contact.href.startsWith('http') && { target: '_blank', rel: 'noreferrer' })}
+                    >
+                      {content}
+                    </a>
+                  )}
+                  {contact.whatsapp && (
+                    <a
+                      href={contact.whatsapp}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="contact-tile__whatsapp"
+                      aria-label={`WhatsApp ${contact.value}`}
+                      title="Chat on WhatsApp"
+                    >
+                      <Icon name="whatsapp" size={16} />
+                      {/* The visible word; screen readers get the fuller aria-label above. */}
+                      <span aria-hidden="true">WhatsApp</span>
+                    </a>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
         </div>
-      ) : (
-        <form className="contact-form" onSubmit={handleSubmit}>
-          {/*
-          A "CONTROLLED INPUT":
-          - value={name} → the input always shows what's stored in state
-          - onChange     → every time you type, update the state with the new text
-          event.target is the input element, and .value is the text inside it.
-        */}
-          <input
-            name="name"
-            placeholder="Your name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-          />
-          <input
-            name="email"
-            type="email"
-            placeholder="Your email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-          <textarea
-            name="message"
-            placeholder="Your message"
-            rows={5}
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-            required
-          />
 
-          {/* The button is disabled while sending, so it can't be clicked twice.
-            "condition ? A : B" is the ternary operator: if condition is true use A, else B. */}
-          <button type="submit" className="button" disabled={status === 'sending'}>
-            {status === 'sending' ? 'Sending…' : 'Send message'}
-          </button>
+        <div className="contact-panel">
+          <p className="contact-form-label">Send a message</p>
 
-          {/* role="alert" makes screen readers read the error out right away. */}
-          {status === 'error' && (
-            <div className="form-alert form-alert--error" role="alert">
+          {/* After sending, a clear success box replaces the form. */}
+          {status === 'sent' ? (
+            // role="status" makes screen readers announce it; tabIndex={-1} lets us focus it from code.
+            <div className="form-alert form-alert--success" role="status" ref={successRef} tabIndex={-1}>
               <span className="form-alert__icon" aria-hidden="true">
-                !
+                ✓
               </span>
               <div>
-                <p className="form-alert__title">Your message wasn't sent.</p>
-                <p>
-                  Please try again, or email me directly at <a href={contacts[0].href}>{contacts[0].value}</a>.
-                </p>
+                <p className="form-alert__title">Message sent!</p>
+                <p>Thanks{sentName && `, ${sentName}`}. I've received your message and will get back to you soon.</p>
+                <button type="button" className="button button-outline" onClick={() => setStatus('idle')}>
+                  Send another message
+                </button>
               </div>
             </div>
+          ) : (
+            <form className="contact-form" onSubmit={handleSubmit}>
+              {/*
+              A "CONTROLLED INPUT":
+              - value={name} → the input always shows what's stored in state
+              - onChange     → every time you type, update the state with the new text
+              event.target is the input element, and .value is the text inside it.
+            */}
+              <label className="contact-field">
+                <span>Name</span>
+                <input
+                  name="name"
+                  autoComplete="name"
+                  placeholder="Your name"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  required
+                />
+              </label>
+              <label className="contact-field">
+                <span>Email</span>
+                <input
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
+              </label>
+              <label className="contact-field">
+                <span>Message</span>
+                <textarea
+                  name="message"
+                  placeholder="Your message"
+                  rows={5}
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
+                  required
+                />
+              </label>
+
+              {/* The button is disabled while sending, so it can't be clicked twice.
+                "condition ? A : B" is the ternary operator: if condition is true use A, else B. */}
+              <button type="submit" className="button" disabled={status === 'sending'}>
+                {status === 'sending' ? 'Sending…' : 'Send message'}
+              </button>
+
+              {/* role="alert" makes screen readers read the error out right away. */}
+              {status === 'error' && (
+                <div className="form-alert form-alert--error" role="alert">
+                  <span className="form-alert__icon" aria-hidden="true">
+                    !
+                  </span>
+                  <div>
+                    <p className="form-alert__title">Your message wasn't sent.</p>
+                    <p>
+                      Please try again, or email me directly at <a href={contacts[0].href}>{contacts[0].value}</a>.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </form>
           )}
-        </form>
-      )}
+        </div>
+      </div>
     </section>
   )
 }

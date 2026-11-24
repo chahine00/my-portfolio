@@ -39,75 +39,22 @@ export interface GuideTip extends GuideSpot {
   pose?: 'wave' | 'stand'
   leaveBelow?: number
   phone?: GuideSpot
+  desktopOnly?: boolean // never on phones (they get as few appearances as possible)
 }
 
 // On phones: over the first post, on the right (next to the short title), bubble above it.
 const PHONE_FIRST_POST = (anchor: string): GuideSpot => ({ anchor, index: 0, align: 'right', bubble: 'above' })
 
+// Kept to a few stops on purpose: the guide is a small, distinctive detail, not a narrator.
+// No tip for Work or Experience, where it took room beside the cards and the timeline.
+// The hexagon is Axihex's brand symbol; the avatar is the founder, the robot a small assistant.
 export const guideTips: GuideTip[] = [
-  {
-    // Over the third "mindset" card, on its right (the text above it stops before that).
-    section: 'about',
-    text: "This is how I think and work.",
-    robotText: "Beep! This is how Ali thinks and works.",
-    anchor: '.mindset__item',
-    index: 2,
-    align: 'right',
-    bubble: 'above',
-    // It leaves once you scroll back up to the home screen (the top of About is past mid-screen).
-    leaveBelow: 0.5,
-    // Phones: the intro paragraph runs the full width right above the first card, so it stands on
-    // that paragraph instead, on the right, next to the short "Think bigger. / Adapt faster." title.
-    phone: PHONE_FIRST_POST('.mindset__lead'),
-  },
-  {
-    // Standing in the page's margin on the left of a project card, its feet level with the
-    // bottom of the card's picture, bubble above it. Where the margin is too narrow for it (smaller
-    // laptop screens), it uses the free space above the heading instead.
-    section: 'projects',
-    text: 'Real projects I shipped. Click a card for details.',
-    robotText: "Beep! Ali's shipped projects. Open a card for details.",
-    anchor: '.project-card__cover',
-    edge: 'beside-left',
-    bubble: 'above',
-    phone: PHONE_FIRST_POST('.project-card'),
-  },
-  {
-    // Standing beside the first job, in the empty column right of the timeline.
-    section: 'experience',
-    text: 'My jobs and what I delivered at each one.',
-    robotText: "Work history loaded: Ali's jobs and results.",
-    anchor: '.card.job',
-    edge: 'beside',
-    bubble: 'above',
-    phone: PHONE_FIRST_POST('.card.job'),
-  },
-  {
-    // Over the middle of the stack card.
-    section: 'skills',
-    text: 'The tools I use every day.',
-    robotText: "Scanning… Ali's everyday tools.",
-    anchor: '.stack',
-    align: 'center',
-    bubble: 'right',
-    phone: PHONE_FIRST_POST('.stack'),
-  },
-  {
-    // Over the second degree card, on its right.
-    section: 'education',
-    text: 'My degrees and the languages I speak.',
-    robotText: "Ali's degrees and languages, all in one place.",
-    anchor: '.edu-degree',
-    index: 1,
-    align: 'right',
-    bubble: 'left',
-    phone: PHONE_FIRST_POST('.edu-degree'),
-  },
   {
     // Over the post in the right column, on its left (clear of "See all" on the far right).
     section: 'blog',
-    text: 'My latest posts and events.',
-    robotText: "Fresh data: Ali's latest posts and events.",
+    desktopOnly: true,
+    text: 'The latest posts and events.',
+    robotText: 'Fresh data: the latest posts and events.',
     anchor: '.blog-preview__item',
     index: 1,
     align: 'left',
@@ -117,8 +64,8 @@ export const guideTips: GuideTip[] = [
   {
     // Standing beside the contact form, in the empty space on its right.
     section: 'contact',
-    text: 'Want to work together? Message me here.',
-    robotText: 'Want to work with Ali? Send a message here.',
+    text: 'Want to reach out? Message me here.',
+    robotText: 'Want to connect with Axihex? Send a message here.',
     anchor: '.contact-form',
     edge: 'beside',
     bubble: 'above',

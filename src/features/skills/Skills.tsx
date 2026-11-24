@@ -8,25 +8,7 @@
 import type { CSSProperties } from 'react'
 import { useReveal } from '../../utils/useReveal.ts'
 import SectionTitle from '../../components/SectionTitle.tsx'
-
-const coreStack = [
-  {
-    category: 'Backend',
-    skills: ['Python', 'FastAPI', 'Flask', 'REST APIs', 'JWT / OAuth2', 'Node.js', 'C# / ASP.NET Core'],
-  },
-  {
-    category: 'AI Integration',
-    skills: ['LLMs', 'RAG Pipelines', 'Milvus', 'Prompt Engineering', 'AI Agents'],
-  },
-  {
-    category: 'Data & Cloud',
-    skills: ['SQL (MySQL)', 'Docker', 'AWS', 'Nginx', 'CI/CD'],
-  },
-  {
-    category: 'Mobile',
-    skills: ['React Native'],
-  },
-]
+import { coreStack } from '../../data/founder.ts'
 
 function Skills() {
   // Adds "is-visible" to the frame once it's on screen, which starts the animation.
@@ -34,7 +16,7 @@ function Skills() {
 
   return (
     <section id="skills" className="section" ref={sectionRef}>
-      <SectionTitle label="Skills" title="My core" accent="stack" />
+      <SectionTitle label="Expertise" title="Core" accent="capabilities" />
 
       {/* One frame, one row per group: the group name on the left, its skills on the right. */}
       <div className="card stack stack--screen">

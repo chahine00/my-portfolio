@@ -23,7 +23,7 @@ function Updates() {
           </Link>
         }
       />
-      <p className="page-intro">News, thoughts and things I've been working on.</p>
+      <p className="page-intro">Technical articles, lessons from real projects, and knowledge shared along the way.</p>
 
       <nav className="blog-topics" aria-label="Blog categories">
         <span>Browse:</span>
@@ -39,7 +39,7 @@ function Updates() {
 
       <div className="updates-footer">
         <Link to="/blog" className="button">
-          View all posts ({sortedUpdates.length})
+          View all insights ({sortedUpdates.length})
         </Link>
       </div>
     </section>
