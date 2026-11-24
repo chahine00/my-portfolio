@@ -90,7 +90,7 @@ export const projects: Project[] = [
     problem:
       "boxMind, Allied Engineering Group's AI arm, builds privacy-first AI for banks, government, telecoms, insurers and healthcare. Each product needed a secure backend for production.",
     result:
-      "For almost three years, I built the backend behind many of its AI products, turning the AI team's work into secure APIs and live-streamed answers.",
+      "For almost three years, the founder built the backend behind many of its AI products, turning the AI team's work into secure APIs and live-streamed answers.",
     tech: ['Python', 'FastAPI', 'Flask', 'Socket.IO', 'MySQL', 'Milvus', 'LLMs & RAG', 'Docker', 'AWS'],
     images: [
       '/projects/boxmind-ai-backend/1.svg',
@@ -99,15 +99,15 @@ export const projects: Project[] = [
     ],
     overview: `boxMind is the AI arm of Allied Engineering Group (AEG). It designs and deploys enterprise AI for organizations where data sovereignty, regulatory compliance and reliability are non-negotiable: banks, government entities, telecoms, insurers and healthcare providers across the Middle East and Africa. Its products combine large language models, computer vision and structured-data AI, with role-based access and full audit trails, and are often deployed on the client's own servers.
 
-I joined in the company's early days as its first hire, and for almost three years I was the backend developer working between the AI team and the frontend team. That meant taking care of the database, the APIs, security, testing and deployment.
+The founder joined in the company's early days as its first hire, and for almost three years was the backend developer working between the AI team and the frontend team. That meant taking care of the database, the APIs, security, testing and deployment.
 
 It wasn't one project but many: AI chatbots and RAG assistants that answer questions over an organization's own documents, AI models for predictions and inference, an AI learning platform for schools (boxMind Academy, which has its own page here), and solutions for banks and hospitals.
 
-My focus was the backend, but working next to the AI team gave me hands-on experience with AI: I connected their work to the products through LLM calls, retrieval-augmented generation (RAG) over Milvus vector databases, background AI workers and data pipelines, and I worked on prompts and AI agents along the way.
+The focus was the backend, but working next to the AI team brought hands-on experience with AI: connecting their work to the products through LLM calls, retrieval-augmented generation (RAG) over Milvus vector databases, background AI workers and data pipelines, and working on prompts and AI agents along the way.
 
-To make the AI feel instant, I streamed the LLM's answers to the frontend in real time over Socket.IO, word by word as they were generated, with controls like stopping a generation mid-answer.
+To make the AI feel instant, the LLM's answers were streamed to the frontend in real time over Socket.IO, word by word as they were generated, with controls like stopping a generation mid-answer.
 
-The role went beyond code: I was part of the discussions and decisions on which features to build and how to grow the product.`,
+The role went beyond code: it included the discussions and decisions on which features to build and how to grow the product.`,
     built: [
       'Architected the MySQL database from scratch: schema, relationships, data models and query tuning',
       'Built the APIs in FastAPI and Flask, with clear API, business-logic and data layers, and the folder structure and coding principles behind them',
@@ -116,7 +116,7 @@ The role went beyond code: I was part of the discussions and decisions on which 
       "Exposed the AI team's logic to the frontend through secure endpoints, with JWT authentication and middleware guards",
       'Designed strict data isolation: every user\'s data is private to them, with their own vector database for RAG, so documents and answers never mix between users',
       'Designed roles and permissions (RBAC), with private rooms open only to their members',
-      "Integrated the AI team's LLM, RAG and inference features into the backend, with retrieval from Milvus vector databases that I managed",
+      "Integrated the AI team's LLM, RAG and inference features into the backend, with retrieval from self-managed Milvus vector databases",
       'Helped write and refine the prompts behind the AI features',
       'Set up background workers and data pipelines for long-running AI jobs',
       'Took care of QA: tested the APIs, tracked down bugs and fixed them before release',
@@ -168,7 +168,7 @@ The role went beyond code: I was part of the discussions and decisions on which 
   },
   {
     slug: 'cinetwork',
-    title: 'The CI Network',
+    title: 'Cinetwork',
     category: 'founder-led',
     context: 'Founder-led · Client Project',
     summary: 'Engineered a film-industry networking platform across iOS, Android, web, backend, and cloud.',
@@ -183,20 +183,20 @@ The role went beyond code: I was part of the discussions and decisions on which 
     result:
       'Engineered the app, API, database and cloud setup, and shipped it live on Google Play, the App Store and the web.',
     tech: ['React Native', 'Flask', 'MySQL', 'AWS', 'Nginx', 'AdMob'],
+    // Mobile screenshots of the live app (thecinetwork.com, phone-size), shown in phone frames:
+    // it's a mobile app first, so it shouldn't look like a website.
     images: [
       '/projects/cinetwork/1.jpg',
       '/projects/cinetwork/2.jpg',
       '/projects/cinetwork/3.jpg',
-      '/projects/cinetwork/4.jpg',
-      '/projects/cinetwork/5.jpg',
     ],
-    overview: `The CI Network is a professional networking platform for filmmakers, audiovisual professionals, students and creatives, owned and run by the client. In one place, its members can build a professional profile, connect with the industry, find jobs and projects, and discover films, talent and services. Its motto: Connect. Create. Work.
+    overview: `Cinetwork is a professional networking platform for filmmakers, audiovisual professionals, students and creatives, owned and run by the client. In one place, its members can build a professional profile, connect with the industry, find jobs and projects, and discover films, talent and services. Its motto: Connect. Create. Work.
 
-My part was the engineering, working closely with the client from the database to the app stores. The app started mobile-first; when the client asked for a web version too, I adapted the same React Native codebase to run on the web. It's now live on Android, iOS and at thecinetwork.com.
+The founder's part was the engineering, working closely with the client from the database to the app stores. The app started mobile-first; when the client asked for a web version too, the same React Native codebase was adapted to run on the web. It's now live on Android, iOS and at thecinetwork.com.
 
-The product, its vision and its business belong to the client. On the engineering side, I implemented the in-app subscriptions and AdMob ads behind its business model.
+The product, its vision and its business belong to the client. On the engineering side, the founder implemented the in-app subscriptions and AdMob ads behind its business model.
 
-Before its official launch, The CI Network got an exclusive sneak peek at the Byblos International Film Festival.`,
+Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos International Film Festival.`,
     built: [
       'Built the app in React Native, from one codebase for Android, iOS and the web',
       'Built the backend API in Flask (Python) with a MySQL relational database',
@@ -219,7 +219,7 @@ Before its official launch, The CI Network got an exclusive sneak peek at the By
       {
         challenge: 'Turning a mobile-first React Native app into a production web app.',
         solution:
-          'Adapted the build for the web and set up EC2, Nginx SPA routing, DNS and SSL. Then I fixed the mixed-content, CORS and API-routing issues between the frontend, the backend and CloudFront.',
+          'Adapted the build for the web and set up EC2, Nginx SPA routing, DNS and SSL. Then fixed the mixed-content, CORS and API-routing issues between the frontend, the backend and CloudFront.',
       },
       {
         challenge: 'Making money from the app without hurting the experience, on two stores with different payment rules.',
@@ -237,9 +237,9 @@ Before its official launch, The CI Network got an exclusive sneak peek at the By
       'Cross-platform code saves a lot of time, but each platform still has its own rules for permissions, signing, payments and release.',
       'Engineering for a client teaches you to care about everything: the product, the code, the release and the relationship.',
     ],
-    note: 'The CI Network is a client project: the product and its brand belong to the client. This page describes my engineering contributions.',
+    note: "Cinetwork is a client project: the product and its brand belong to the client. This page describes the founder's engineering contributions.",
     liveUrl: 'https://www.thecinetwork.com',
-    liveLabel: 'Visit The CI Network',
+    liveLabel: 'Visit Cinetwork',
   },
   {
     slug: 'boxmind-academy',
@@ -255,7 +255,7 @@ Before its official launch, The CI Network got an exclusive sneak peek at the By
     problem:
       'Schools wanted to teach Generative AI and robotics, and use AI to improve learning. They needed a platform to run school-wide courses, guide each student with AI, and handle contracts and pricing.',
     result:
-      'An AI-guided learning platform (courses, levels, chapters) used by schools under contract. I built its entire backend and designed its database.',
+      'An AI-guided learning platform (courses, levels, chapters) used by schools under contract. Its entire backend and database were designed and built by the founder.',
     tech: ['Python', 'MySQL', 'LLMs', 'Socket.IO', 'Docker', 'AWS'],
     images: [
       '/projects/boxmind-academy/1.jpg',
@@ -268,9 +268,9 @@ Before its official launch, The CI Network got an exclusive sneak peek at the By
 
 The courses are built by boxMind's AI engineers together with experienced educators, and the program is accredited by the USA Accreditation Council and Approval Commission (USAAC). Students progress through levels made for their age, from Adventurer for beginners, to Explorer, to Mastermind for advanced learners, and the curriculum grows with them from the first grades up to 12th grade.
 
-I was the backend developer and database architect of the platform. I designed the database from scratch and built the whole backend behind it: schools and their contracts, pricing, courses, levels, chapters and lessons, students and teachers, progress tracking, and the AI features that create content and guide learning.
+The founder was the backend developer and database architect of the platform, designing the database from scratch and building the whole backend behind it: schools and their contracts, pricing, courses, levels, chapters and lessons, students and teachers, progress tracking, and the AI features that create content and guide learning.
 
-It reuses what I built across boxMind's AI products: secure APIs, strict data privacy for every student, and AI answers streamed live to the screen.`,
+It reuses what was built across boxMind's AI products: secure APIs, strict data privacy for every student, and AI answers streamed live to the screen.`,
     built: [
       'Designed the database from scratch: schools, contracts and pricing, courses, levels, chapters and lessons, students, teachers and their progress',
       'Built the whole backend: the APIs, the business logic and the data layer behind every screen of the platform',

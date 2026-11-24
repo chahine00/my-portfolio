@@ -137,7 +137,7 @@ function ProjectPage() {
 
       {project.built && (
         <section className="project-page__block">
-          <h2>What I built</h2>
+          <h2>What was built</h2>
           <ul className="check-list">
             {project.built.map((point) => (
               <li key={point}>{point}</li>
@@ -177,7 +177,7 @@ function ProjectPage() {
 
       {project.learnings && (
         <section className="project-page__block">
-          <h2>What I learned</h2>
+          <h2>Lessons learned</h2>
           <ul className="check-list">
             {project.learnings.map((learning) => (
               <li key={learning}>{learning}</li>

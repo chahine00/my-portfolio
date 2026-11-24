@@ -41,7 +41,7 @@ export const DEFAULT_IMAGE = { path: '/og-image.png', width: 1440, height: 740 }
 const TITLE_MAX = 60
 const DESCRIPTION_MAX = 155
 
-// A page's title in the browser tab and in Google: "The CI Network | Axihex". A long title keeps
+// A page's title in the browser tab and in Google: "Cinetwork | Axihex". A long title keeps
 // its own words and drops "| Axihex", so Google doesn't cut it off in the middle.
 export function pageTitle(title?: string) {
   if (!title) return SITE_TITLE

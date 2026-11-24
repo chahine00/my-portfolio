@@ -148,7 +148,7 @@ export function projectBody(project: Project) {
       `${project.summary ? el('p', project.summary) : ''}</header>` +
       section('The problem', el('p', project.problem)) +
       section('Overview', paragraphs(project.overview)) +
-      section('What I built', list((project.built ?? []).map(esc))) +
+      section('What was built', list((project.built ?? []).map(esc))) +
       section('Features', list((project.features ?? []).map(esc))) +
       section('Result', project.result ? el('p', project.result) : '') +
       section('Tech', el('p', project.tech.join(', '))) +
