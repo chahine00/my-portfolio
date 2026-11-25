@@ -2,12 +2,11 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useNavigationType } from 'react-router'
-import Hero from './Hero.tsx'
+import HomeHero from './HomeHero.tsx'
 import About from '../about/About.tsx'
 import Projects from '../projects/Projects.tsx'
 import Updates from '../updates/Updates.tsx'
 import Contact from '../contact/Contact.tsx'
-import Direction from './Direction.tsx'
 import AvatarGuide from '../../components/AvatarGuide.tsx'
 import { BACK_AT_TOP_EVENT, clearHash } from '../../utils/goToTop.ts'
 import { forgetProjectLeft, projectJustLeft, scrollToProjectCard } from '../projects/projectReturn.ts'
@@ -17,6 +16,8 @@ import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 // LinkedIn, in bookmarks) to /#experience and the like are sent there instead of the page's top.
 const MOVED_SECTIONS: Record<string, string> = {
   '#about': '/#studio',
+  // The Direction section left the home page; mission and vision are on the Studio page.
+  '#direction': '/studio#values',
   '#background': '/background',
   '#mindset': '/background#mindset',
   '#experience': '/background#experience',
@@ -80,17 +81,14 @@ function HomePage() {
 
   return (
     <>
-      <Hero />
-      {/* Studio-first: Hero → Studio (pillars, capabilities, Behind Axihex) → Work → Blog →
-          Direction (mission, vision, today → next) → Contact.
-          The founder's background has its own page (/background), linked from "Meet the founder";
-          the full identity has its own page too (/studio). */}
+      <HomeHero />
+      {/* Studio-first: Hero → Studio (pillars, traits, capabilities, process, Behind Axihex) → Work →
+          Blog → Contact. The founder's background has its own page (/background), linked from
+          "Meet the founder"; the full identity has its own page too (/studio, "Studio" in the navbar). */}
       <About />
       <Projects />
       {/* The blog sits just before Contact: the latest news, then a way to get in touch. */}
       <Updates />
-      {/* Where Axihex is going, right before the invitation to get in touch. */}
-      <Direction />
       <Contact />
       {/* The avatar peeks out at each section to say what it is (see AvatarGuide.tsx). */}
       <AvatarGuide />

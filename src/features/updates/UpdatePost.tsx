@@ -8,6 +8,8 @@ import { filterUpdates, formatDate, readingTime, sortedUpdates } from '../../dat
 import { readListSpot } from './listSpot.ts'
 import Gallery from '../../components/Gallery.tsx'
 import ScrollUpBack from '../../components/ScrollUpBack.tsx'
+import BackLink from '../../components/BackLink.tsx'
+import { useBack } from '../../utils/pageHistory.ts'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import { postDescription } from '../../data/seo.ts'
 
@@ -84,6 +86,14 @@ function UpdatePost() {
   // "All posts" (top and bottom of the post): to the Blog list, where you left it. Opened straight from the list: just step back
   // (the list remembers its scroll spot). Otherwise (after Older/Newer, or a shared link), open the
   // list at this post's card, keeping the last search/category if this post is in it.
+  // "Back to …" at the top: the page you came from (the Blog list, the home page, a project…).
+  // Back to the Blog list: the same as "All posts" (where you left the list).
+  const back = useBack(`/blog/${slug}`, '/blog')
+  function goBackToPast() {
+    if (back.path === '/blog') goBack()
+    else back.go({ homeHash: 'blog' })
+  }
+
   function goBack() {
     if ((location.state as { fromList?: boolean } | null)?.fromList) {
       navigate(-1)
@@ -112,9 +122,7 @@ function UpdatePost() {
       <section className="section">
         <h1>Post not found</h1>
         <p>This post doesn't exist or was removed.</p>
-        <Link to="/blog" className="back-link">
-          <span aria-hidden="true">←</span> See all posts
-        </Link>
+        <BackLink back={back} onClick={goBackToPast} />
       </section>
     )
   }
@@ -129,9 +137,7 @@ function UpdatePost() {
   return (
     <article className="section post page-enter" key={post.slug}>
       {/* A button styled like the other back links: it returns to the list where you left it. */}
-      <button type="button" className="back-link back-button" onClick={goBack}>
-        <span aria-hidden="true">←</span> All posts
-      </button>
+      <BackLink back={back} onClick={goBackToPast} />
 
       <header className="post__header">
         {/* The category opens the Blog page showing only that category. */}
@@ -186,7 +192,7 @@ function UpdatePost() {
       </nav>
 
       {/* Phones, in the middle of the post: the same way back, under the thumb when you scroll up. */}
-      <ScrollUpBack key={post.slug} label="All posts" onClick={goBack} />
+      <ScrollUpBack key={post.slug} label={back.label} onClick={goBackToPast} />
     </article>
   )
 }

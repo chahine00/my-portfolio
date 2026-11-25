@@ -14,9 +14,7 @@ import { studio } from '../src/data/studio.ts'
 import {
   capabilities,
   definition,
-  horizon,
   isRather,
-  measure,
   mission,
   notLimitedTo,
   philosophy,
@@ -29,7 +27,7 @@ import {
   vision,
 } from '../src/data/identity.ts'
 import { coreStack, mindset, testimonials } from '../src/data/founder.ts'
-import { projectCategories, projects, type Project } from '../src/data/projects.ts'
+import { projects, selectedProjects, type Project } from '../src/data/projects.ts'
 import { formatDate, type Update } from '../src/data/updates.ts'
 import { contacts } from '../src/data/contact.ts'
 import { experience } from '../src/data/experience.ts'
@@ -54,8 +52,8 @@ const paragraphs = (text?: string) =>
 // The site's menu, on every page.
 const nav = `<nav>${[
   link('/', profile.brand),
-  link('/#studio', 'Studio'),
-  link('/studio', 'Identity & vision'),
+  link('/#home', 'Home'),
+  link('/studio', 'Studio'),
   link('/#projects', 'Work'),
   link('/background', 'Founder'),
   link('/blog', 'Blog'),
@@ -72,16 +70,9 @@ const cv = link('/Ali_Chahine_CV.pdf', 'Download CV')
 // --- The pages ---
 
 export function homeBody(posts: Update[]) {
-  const work = projectCategories
-    .map((group) => ({ ...group, items: projects.filter((p) => p.category === group.id) }))
-    .filter((group) => group.items.length)
-    .map(
-      (group) =>
-        el('h3', group.title) +
-        el('p', group.intro) +
-        list(group.items.map((p) => `${link(`/projects/${p.slug}`, p.title)}${p.summary ? ` ${esc(p.summary)}` : ''}`)),
-    )
-    .join('')
+  const work = list(
+    selectedProjects.map((p) => `${link(`/projects/${p.slug}`, p.title)}${p.context ? ` (${esc(p.context)})` : ''}${p.summary ? ` ${esc(p.summary)}` : ''}`),
+  )
 
   return wrap(
     `<header>${el('p', profile.role)}${el('h1', `${profile.headline} ${profile.headlineAccent}`)}${el('p', profile.intro)}</header>` +
@@ -91,19 +82,13 @@ export function homeBody(posts: Update[]) {
       list(pillars.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.statement)}`)) +
       el('h3', 'Core engineering capabilities') +
       list(capabilities.map((c) => `<strong>${esc(c.title)}</strong>: ${esc(c.text)}`)) +
-      el('h3', studio.behindTitle) +
-      studio.behind.map((p) => el('p', p)).join('') +
-      `<p>${link('/background', studio.founderCard.title)} ${esc(studio.founderCard.text)} ${esc(studio.founderCard.availability)}.</p></section>` +
-      `<section id="projects">${el('h2', 'Selected Work: engineering in practice')}${work}</section>` +
-      `<section id="blog">${el('h2', 'Blog: notes, ideas & milestones')}` +
+      `<p>${esc(studio.founderNote)} ${link('/background', studio.founderLink)}</p></section>` +
+      `<section id="projects">${el('h2', 'Selected work')}${work}</section>` +
+      `<section id="blog">${el('h2', 'Blog: latest notes')}` +
       list(posts.slice(0, 3).map((post) => `${link(`/blog/${post.slug}`, post.title)} ${esc(post.summary)}`)) +
       `<p>${link('/blog', 'All posts')}</p></section>` +
-      `<section id="direction">${el('h2', 'Direction: where we’re going')}` +
-      el('h3', 'Mission') + el('p', mission) + el('h3', 'Vision') + el('p', vision) +
-      list(horizon.filter((h) => h.home).map((h) => `<strong>${esc(h.aspect)}</strong>: today ${esc(h.today)}; next ${esc(h.next)}`)) +
-      `<p>${link('/studio', 'Identity, purpose & vision')}</p></section>` +
       `<section id="contact">${el('h2', 'Let’s talk.')}` +
-      el('p', 'A project in mind, an idea to build together, or a role for the founder? Reach out by email, on LinkedIn, or with the form.') +
+      el('p', 'A project in mind, an idea to build together, a collaboration, or an engineering role. Reach out by email, on LinkedIn, or with the form.') +
       `${contactLinks}</section>`,
   )
 }
@@ -170,10 +155,6 @@ export function studioBody() {
       '</section>' +
       `<section id="brand">${el('h2', 'One brand, many forms')}` +
       list(umbrella.map((u) => `<strong>${esc(u.title)}</strong>: ${esc(u.text)}`)) +
-      '</section>' +
-      `<section id="direction">${el('h2', 'Today, and what’s next')}` +
-      list(horizon.map((h) => `<strong>${esc(h.aspect)}</strong>: today ${esc(h.today)}; next ${esc(h.next)}`)) +
-      el('p', measure) +
       '</section>' +
       `<section id="values">${el('h2', 'What we stand for')}` +
       el('h3', 'Mission') + el('p', mission) + el('h3', 'Long-term vision') + el('p', vision) +

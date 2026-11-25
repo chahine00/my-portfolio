@@ -1,13 +1,12 @@
-// The five pillars of Axihex, drawn as the brand's own shape: the Axihex hexagon in the middle and
-// a hexagon per pillar around it (Explore at the top, then clockwise: Build, Showcase, Share, Grow).
-// Spokes join each pillar to the center, and a dashed ring joins the pillars in order, back to
-// Explore: growth feeds new exploration.
+// The five pillars of Axihex, as a honeycomb: the Axihex hexagon in the middle and a hexagon per
+// pillar around it (Explore at the top left, then clockwise: Build, Showcase, Share, Grow). The sixth
+// cell, on the left, is the visitor's: "Your idea" opens the Contact form. Growth feeds new ideas.
 //
 // The pillars are tabs: choosing one (click, hover with a mouse, or arrow keys) shows its panel on
 // the right (below on phones), with a link to where that pillar lives on this site. While nobody
 // has touched it and it's on screen, it moves to the next pillar by itself every few seconds.
-// Visitors who turn off animations get it still. Text: src/data/identity.ts. Looks: global.css,
-// under "pillar hive".
+// At rest the cells float in a slow wave. Visitors who turn off animations get it still.
+// Text: src/data/identity.ts. Looks: global.css, under "pillar hive".
 
 import { useEffect, useId, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent } from 'react'
@@ -16,17 +15,28 @@ import { pillars } from '../../data/identity.ts'
 import AxihexMark from '../../components/AxihexMark.tsx'
 import Icon from '../../components/Icon.tsx'
 
-// Where each pillar's center sits, in % of the (square) hive: on a circle around the middle,
-// starting at the top and going clockwise (one fifth of a turn each).
-const RADIUS = 36
-const spots = pillars.map((_, i) => {
-  const angle = (-90 + i * 72) * (Math.PI / 180)
-  return { x: 50 + RADIUS * Math.cos(angle), y: 50 + RADIUS * Math.sin(angle) }
-})
-const ring = `M${spots.map((s) => `${s.x.toFixed(2)} ${s.y.toFixed(2)}`).join(' L')} Z`
+// The honeycomb, in % of the hive's width (cqw), around its center. PITCH: from one cell's center to
+// its neighbor's (a cell's width plus the gap); ROW: the height between two rows of cells.
+const PITCH = 32
+const ROW = PITCH * 0.866
+// Clockwise from the top left: the five pillars, then the visitor's cell on the left.
+const spots = [
+  { x: -PITCH / 2, y: -ROW },
+  { x: PITCH / 2, y: -ROW },
+  { x: PITCH, y: 0 },
+  { x: PITCH / 2, y: ROW },
+  { x: -PITCH / 2, y: ROW },
+  { x: -PITCH, y: 0 },
+]
+const place = (spot: { x: number; y: number }, i: number) =>
+  ({ left: `calc(50cqw + ${spot.x}cqw)`, top: `calc(46cqw + ${spot.y}cqw)`, '--i': i }) as CSSProperties
 
 // How long each pillar shows by itself (also the progress bar's length, --hive-step in CSS).
 const STEP_MS = 5200
+
+// With a mouse, a pillar opens only once the pointer rests on it this long (in milliseconds), so
+// sweeping across the honeycomb on the way to the card doesn't change the card. A click is instant.
+const HOVER_INTENT_MS = 280
 
 function PillarHive() {
   const [active, setActive] = useState(0)
@@ -36,6 +46,7 @@ function PillarHive() {
   const [onScreen, setOnScreen] = useState(false)
   const hiveRef = useRef<HTMLDivElement>(null)
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const hoverTimer = useRef<number | undefined>(undefined)
   const id = useId()
   const cycling = auto && onScreen && !reduceMotion
 
@@ -57,9 +68,12 @@ function PillarHive() {
   }, [cycling, active])
 
   function choose(index: number) {
+    window.clearTimeout(hoverTimer.current)
     setAuto(false)
     setActive(index)
   }
+
+  useEffect(() => () => window.clearTimeout(hoverTimer.current), [])
 
   // Arrow keys move between the pillars (around the ring), like any set of tabs.
   function handleKey(event: KeyboardEvent<HTMLDivElement>) {
@@ -78,30 +92,14 @@ function PillarHive() {
 
   return (
     <div className="hive-layout">
-      <div className="hive" ref={hiveRef} style={{ '--active': active } as CSSProperties}>
-        <svg className="hive__lines" viewBox="0 0 100 100" aria-hidden="true">
-          <path className="hive__ring" d={ring} />
-          {spots.map((spot, i) => (
-            <path
-              key={i}
-              className={`hive__spoke${i === active ? ' hive__spoke--on' : ''}`}
-              d={`M50 50 L${spot.x.toFixed(2)} ${spot.y.toFixed(2)}`}
-            />
-          ))}
-          {/* A spark travelling the ring: the pillars feed each other. */}
-          {!reduceMotion && (
-            <circle className="hive__spark" r="0.9">
-              <animateMotion dur="14s" repeatCount="indefinite" path={ring} />
-            </circle>
-          )}
-        </svg>
-
+      <div className="hive" ref={hiveRef}>
         {/* The center: the Axihex mark itself. */}
-        <div className="hive__core" aria-hidden="true">
-          <span className="hive__core-inner">
-            <AxihexMark className="hive__mark" />
-            <strong>Axihex</strong>
-            <span>Software studio</span>
+        <div className="hive__cell hive__cell--core" style={place({ x: 0, y: 0 }, 6)} aria-hidden="true">
+          <span className="hive__hex">
+            <span className="hive__hex-inner">
+              <AxihexMark className="hive__mark" />
+              <strong>Axihex</strong>
+            </span>
           </span>
         </div>
 
@@ -119,19 +117,35 @@ function PillarHive() {
               aria-controls={`${id}-panel`}
               tabIndex={i === active ? 0 : -1}
               className={`hive__cell${i === active ? ' hive__cell--on' : ''}`}
-              style={{ left: `${spots[i].x}%`, top: `${spots[i].y}%` } as CSSProperties}
+              style={place(spots[i], i)}
               onClick={() => choose(i)}
               onPointerEnter={(event) => {
-                if (event.pointerType === 'mouse') choose(i)
+                if (event.pointerType !== 'mouse') return
+                window.clearTimeout(hoverTimer.current)
+                hoverTimer.current = window.setTimeout(() => choose(i), HOVER_INTENT_MS)
               }}
+              onPointerLeave={() => window.clearTimeout(hoverTimer.current)}
             >
-              <span className="hive__cell-inner">
-                <span className="hive__num">0{i + 1}</span>
-                <span className="hive__word">{item.word}</span>
+              <span className="hive__hex">
+                <span className="hive__hex-inner">
+                  <Icon name={item.icon} size={20} />
+                  <span className="hive__word">{item.word}</span>
+                  <span className="hive__num">0{i + 1}</span>
+                </span>
               </span>
             </button>
           ))}
         </div>
+
+        {/* The sixth cell: the visitor's idea, the start of the next exploration. */}
+        <Link to="/#contact" state={{ topic: 'project' }} className="hive__cell hive__cell--you" style={place(spots[5], 5)}>
+          <span className="hive__hex">
+            <span className="hive__hex-inner">
+              <span className="hive__plus" aria-hidden="true">+</span>
+              <span className="hive__word">Your idea</span>
+            </span>
+          </span>
+        </Link>
       </div>
 
       <div className="hive-panel" role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-tab-${active}`}>

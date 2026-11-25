@@ -2,7 +2,9 @@
 // its job is to put all the other components together in order.
 
 // To use a component from another file, import it first.
+import { useEffect } from 'react'
 import { Navigate, Route, Routes, useLocation, useParams } from 'react-router'
+import { recordVisit, rememberHomeSection } from '../utils/pageHistory.ts'
 import Navbar from '../components/Navbar.tsx'
 import BackgroundGlow from '../components/BackgroundGlow.tsx'
 import Footer from '../components/Footer.tsx'
@@ -28,7 +30,18 @@ function OldPostRedirect() {
 function App() {
   // Each page gets a short fade-in when you move to it (the wrapper below is rebuilt per address;
   // a #section or ?search change on the same page doesn't count).
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
+  // Every "Back to …" link returns to the page you were really on before (src/utils/pageHistory.ts):
+  // record each page, and on the home page, which section was on screen when a link took you away.
+  useEffect(() => recordVisit(pathname, search), [pathname, search])
+  useEffect(() => {
+    if (pathname !== '/') return
+    function onClick(event: MouseEvent) {
+      if (event.target instanceof Element && event.target.closest('a[href]')) rememberHomeSection()
+    }
+    document.addEventListener('click', onClick, true)
+    return () => document.removeEventListener('click', onClick, true)
+  }, [pathname])
 
   return (
     // <> ... </> is a "Fragment": an invisible wrapper.
@@ -49,7 +62,7 @@ function App() {
           "/updates…" → the blog's old address. Old shared links are sent on to /blog.
           "/projects/:slug" → one project's page, e.g. /projects/cinetwork
           "/background" → the founder's full background: experience, capabilities, education
-          "/studio" → Axihex's identity, purpose and vision in full
+          "/studio" → Axihex's identity, purpose and vision in full ("Studio" in the navbar)
           To add a new page: create its component, add a <Route> here,
           and add a link to it in Navbar.tsx.
           The last route ("*") catches any unknown URL and shows a "Page not found" page.

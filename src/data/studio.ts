@@ -14,23 +14,14 @@ export const proof: { icon: IconName; label: string }[] = [
 
 export const studio = {
   eyebrow: 'The Studio',
-  title: 'Ideas deserve to be',
-  titleAccent: 'built.', // in the accent gradient
-  text: 'Axihex is an independent, founder-led software studio. It brings engineering, experimentation, and product thinking together to turn ideas into useful technology, for its own products and for clients.',
+  title: 'Small studio.',
+  titleAccent: 'Serious engineering.', // in the accent gradient
+  // One short paragraph: what Axihex does, for whom. The details are on the Studio page (/studio).
+  text: 'Axihex is a founder-led software studio. We explore ideas, build products of our own, and engineer web, mobile, backend, AI and cloud software for clients.',
   // The pillars, capabilities and the rest of the identity live in src/data/identity.ts.
   pillarsTitle: 'Five pillars.',
   pillarsAccent: 'One studio.',
-  behindTitle: 'Behind Axihex',
-  behind: [
-    'Axihex is rooted in real engineering experience: robust backends, practical AI, mobile apps people use every day, and the cloud that keeps it all running.',
-    'Founder-led today and open to collaboration: Axihex grows through real work and real relationships, not an artificial impression of size.',
-  ],
-  // The founder card under it (no name here: the home page stays about Axihex). "availability":
-  // running a studio doesn't mean the founder isn't open to a role, so it says so.
-  founderCard: {
-    title: 'Meet the founder.',
-    text: 'The engineering behind the studio: backend systems, AI integration, mobile development, and cloud infrastructure.',
-    availability: 'Open to engineering opportunities',
-    link: 'Experience & CV',
-  },
+  // The one line about who is behind it, with a quiet link to the founder's page (/background).
+  founderNote: 'Founder-led, rooted in years of real engineering work.',
+  founderLink: 'Meet the founder',
 }

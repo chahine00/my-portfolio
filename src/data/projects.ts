@@ -16,7 +16,7 @@
 export interface Project {
   slug: string // the page's address: 'my-app' → /projects/my-app (lowercase, dashes, no spaces)
   title: string
-  // Which group of the Work section it's in (see "projectCategories" below). Be honest about who did it:
+  // Who delivered it (sets its place in the Work grid, see "selectedProjects" at the end). Be honest:
   //   'studio'      → delivered under Axihex
   //   'founder-led' → independent client work the founder delivered personally, not contracted under Axihex
   //   'experience'  → work done as an employee at a previous company
@@ -56,20 +56,6 @@ export interface Project {
 }
 
 export type ProjectCategory = 'studio' | 'founder-led' | 'experience'
-
-// The Work section's groups, in the order they're shown. A group with no projects is left out,
-// so "Studio Work" appears by itself once the first Axihex project is added.
-// "aside": shown next to the card when a group has only ONE project, so the row doesn't look half empty.
-export const projectCategories: { id: ProjectCategory; title: string; intro: string; aside?: string }[] = [
-  { id: 'studio', title: 'Studio Work', intro: 'Projects delivered under Axihex.' },
-  {
-    id: 'founder-led',
-    title: 'Founder-led Projects',
-    intro: 'Independent client projects delivered by the founder.',
-    aside: 'Client work, built from concept to launch.',
-  },
-  { id: 'experience', title: "Founder's Experience", intro: 'Engineering work at previous employers.' },
-]
 
 // "Project[]" means "an array of Project objects".
 // To show a new project on the website, just add a new object to this list.
@@ -171,7 +157,7 @@ The role went beyond code: it included the discussions and decisions on which fe
     title: 'Cinetwork',
     category: 'founder-led',
     context: 'Founder-led · Client Project',
-    summary: 'Engineered a film-industry networking platform across iOS, Android, web, backend, and cloud.',
+    summary: 'One film community, three platforms.',
     highlight: 'Live on Google Play, the App Store and the web',
     cardTech: ['React Native', 'Flask', 'MySQL', 'AWS'],
     role: 'Mobile, web & backend engineering',
@@ -318,3 +304,8 @@ It reuses what was built across boxMind's AI products: secure APIs, strict data 
     liveLabel: 'Visit website',
   },
 ]
+
+// The order of the home page's "Selected work" grid: studio work first, then the founder's client
+// work, then his work at previous employers (each group in the order of the list above).
+const categoryOrder: ProjectCategory[] = ['studio', 'founder-led', 'experience']
+export const selectedProjects = categoryOrder.flatMap((category) => projects.filter((p) => p.category === category))

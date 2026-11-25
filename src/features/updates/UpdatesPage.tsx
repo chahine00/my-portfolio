@@ -4,9 +4,11 @@
 // so a filtered list can be shared, and the home page can open the page already filtered.
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate, useNavigationType, useSearchParams } from 'react-router'
+import { Link, useLocation, useNavigationType, useSearchParams } from 'react-router'
 import { filterUpdates, sortedUpdates } from '../../data/updates.ts'
 import { readListSpot, saveListSpot } from './listSpot.ts'
+import { useBack } from '../../utils/pageHistory.ts'
+import BackLink from '../../components/BackLink.tsx'
 import BlogFilters from './BlogFilters.tsx'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import { BLOG_DESCRIPTION } from '../../data/seo.ts'
@@ -21,8 +23,9 @@ function UpdatesPage() {
 
   const location = useLocation()
   const navigationType = useNavigationType()
-  const navigate = useNavigate()
   useDocumentTitle('Blog', { description: BLOG_DESCRIPTION })
+  // Where "Back" goes: the page visited before the Blog (the home page if there's none).
+  const back = useBack('/blog', '/')
 
   // Whether the Blog bar is stuck under the navbar right now. Adds .blog-bar--stuck, which fades in
   // the cover behind the bar's items so the posts scrolling under it are hidden (see global.css).
@@ -130,10 +133,8 @@ function UpdatesPage() {
 
   return (
     <section className="section">
-      {/* Goes back to the home page and scrolls to the Blog section. */}
-      <Link to="/#blog" className="back-link">
-        <span aria-hidden="true">←</span> Back to home
-      </Link>
+      {/* Goes back to the page visited before the Blog (src/utils/pageHistory.ts). */}
+      <BackLink back={back} />
 
       {/* A banner, so the page looks like its own place and not like a section of the home page:
           the title on the left. The space on the right keeps the banner at its usual size. */}
@@ -186,9 +187,8 @@ function UpdatesPage() {
         )}
       </div>
 
-      {/* Phones: a "← Home" pill when you scroll up mid-list. It goes to the very top of the home
-          page (the hero), like the navbar's Home link, and replays the hero's welcome drawing. */}
-      <ScrollUpBack label="Home" onClick={() => navigate('/#home', { state: { replayWelcome: true } })} />
+      {/* Phones: a "← Back" pill when you scroll up mid-list, to the same place as the link at the top. */}
+      <ScrollUpBack label={back.label} onClick={() => back.go()} />
     </section>
   )
 }

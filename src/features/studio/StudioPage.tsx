@@ -1,14 +1,13 @@
-// The Studio page (/studio): Axihex's identity, purpose and vision in full. The home page's Studio
-// and Direction sections are the short version; they both link here.
+// The Studio page (/studio, "Studio" in the navbar): Axihex's identity, purpose and vision in full.
+// The home page's Studio section is the short version and links here.
 //   1. Identity: the definition, and what Axihex is not limited to
 //   2. What defines Axihex: four traits
 //   3. Purpose: the five pillars, in depth
 //   4. Capabilities: focused in engineering, flexible in what gets built
 //   5. Approach: product thinking (how vs why) and the process, from a need to an improved product
 //   6. One brand, many forms: what can live under Axihex, and where it ships
-//   7. Direction: today, and what's next
-//   8. Values, mission and philosophy
-//   9. An invitation: start a project, or meet the founder
+//   7. Values, mission and philosophy
+//   8. An invitation: start a project, or meet the founder
 // Text: src/data/identity.ts.
 
 import { useLayoutEffect } from 'react'
@@ -23,7 +22,6 @@ import {
   definition,
   essence,
   isRather,
-  measure,
   mission,
   notLimitedTo,
   philosophy,
@@ -39,7 +37,6 @@ import { STUDIO_DESCRIPTION } from '../../data/seo.ts'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import { useReveal } from '../../utils/useReveal.ts'
 import Capabilities from './Capabilities.tsx'
-import Horizon from './Horizon.tsx'
 
 function StudioPage() {
   useDocumentTitle('Identity, Purpose & Vision', { description: STUDIO_DESCRIPTION })
@@ -55,9 +52,6 @@ function StudioPage() {
     <div className="page-enter studio-page">
       {/* 1. Identity */}
       <section id="identity" className="section identity">
-        <Link to="/#studio" className="back-link hero__back">
-          <span aria-hidden="true">←</span> Back to Axihex
-        </Link>
         <p className="eyebrow">Identity, purpose &amp; vision</p>
         <h1 className="identity__title">
           Where engineering meets <GradientText text="curiosity." />
@@ -230,17 +224,7 @@ function StudioPage() {
         </div>
       </section>
 
-      {/* 7. Direction */}
-      <section id="direction" className="section">
-        <SectionTitle label="Direction" title="Today, and" accent="what's next." />
-        <p className="studio-page__intro">
-          Axihex grows from its engineering foundation, without presenting future achievements as current realities.
-        </p>
-        <Horizon />
-        <p className="direction__measure">{measure}</p>
-      </section>
-
-      {/* 8. Mission, vision, values */}
+      {/* 7. Mission, vision, values */}
       <section id="values" className="section">
         <SectionTitle label="Values" title="What we" accent="stand for." />
         <div className="mv">
@@ -270,7 +254,7 @@ function StudioPage() {
         </blockquote>
       </section>
 
-      {/* 9. An invitation */}
+      {/* 8. An invitation */}
       <section id="studio-contact" className="section studio-cta">
         <p className="studio-cta__essence">{essence}</p>
         <h2 className="studio-cta__title">

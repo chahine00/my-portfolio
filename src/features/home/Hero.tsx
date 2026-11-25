@@ -1,6 +1,5 @@
-// The big welcome section at the top of a page. Two versions, same drawing, robot and night desk:
-// - "studio" (the home page): Axihex. "Building what's next." with the Axihex mark (HeroMark.tsx).
-// - "founder" (/background, the founder's professional page): the original personal hero,
+// The founder's welcome section (/background, the founder's professional page). The home page has
+// its own hero (HomeHero.tsx). This one is the original personal hero:
 //   "Meet Ali Chahine" with the avatar, ali.build(...), "View my work" and "Download CV".
 // The text comes from src/data/profile.ts.
 
@@ -15,11 +14,9 @@ import { useRobotHome } from '../../components/robotStore.ts'
 import RobotLab from './RobotLab.tsx'
 import HeroRobot from '../../components/HeroRobot.tsx'
 import { Link } from 'react-router'
-import { proof } from '../../data/studio.ts'
-import HeroMark from './HeroMark.tsx'
-import { LAYER_R, LAYER_Y_OPEN } from './heroMarkLayers.ts'
+import BackLink from '../../components/BackLink.tsx'
+import { useBack } from '../../utils/pageHistory.ts'
 import RobotPerch from './RobotPerch.tsx'
-import StudioBoard from './StudioBoard.tsx'
 
 // How fast the welcome plays is --art-time in global.css (faster with a mouse, as it plays while
 // you hover; as before on touch screens). The inline delays below are multiplied by it in CSS.
@@ -44,48 +41,6 @@ function isTouchScreen() {
   )
 }
 
-// Types each phrase from profile.building, waits, deletes it, then moves to the next one.
-// Returns the text typed so far.
-// enabled: false when there's no code line to type (the founder's hero), so nothing runs.
-function useTypingLoop(phrases: string[], enabled = true) {
-  // People who turn off animations just see the first phrase, already written.
-  const [reduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-  const [text, setText] = useState(reduceMotion ? phrases[0] : '')
-
-  useEffect(() => {
-    if (reduceMotion || !enabled) return
-
-    let phrase = 0
-    let length = 0
-    let deleting = false
-    let timer: number
-
-    function step() {
-      const full = phrases[phrase]
-      length += deleting ? -1 : 1
-      setText(full.slice(0, length))
-
-      let delay = deleting ? 35 : 75 // deleting is faster than typing
-      if (!deleting && length === full.length) {
-        deleting = true
-        delay = 1800 // pause so the finished phrase can be read
-      } else if (deleting && length === 0) {
-        deleting = false
-        phrase = (phrase + 1) % phrases.length
-        delay = 400
-      }
-      timer = window.setTimeout(step, delay)
-    }
-
-    timer = window.setTimeout(step, 600)
-    return () => window.clearTimeout(timer)
-  }, [phrases, reduceMotion, enabled])
-
-  return text
-}
-
-// The longest phrase, used to reserve room for the typing line.
-const longestPhrase = profile.building.reduce((a, b) => (b.length > a.length ? b : a))
 
 // The bubble's word, typed one character at a time (see ".hero__art-char" in global.css).
 // It's monospace and squeezed to an exact width (textLength), so every character is CHAR_W wide
@@ -104,89 +59,6 @@ const CODE_RIGHT: [number, number][] = [[0, 96], [16, 70], [16, 70], [32, 80], [
 // Every few lines a short "token" in the accent color, like syntax highlighting.
 const ACCENT_LINES = new Set([1, 4, 7])
 
-// The home page's drawing around the Axihex mark (the founder's page has the "<Welcome />" one).
-// It uses the mark's own coordinates (HeroMark.tsx: center 0,0), and the CSS centers it on the mark
-// at the same scale (.hero__art--mark), so its lines meet the layers. While it plays, the stack is
-// opened up (LAYER_Y_OPEN), and:
-// - on the left, an assembly guide (a dashed bracket) draws along the three layers' left corners;
-// - on the right, lines draw from the middle and bottom layers out to small module blocks
-//   (abstract parts of a system: no technology named), and data flows along them into the stack;
-// - from the top layer, a pill types "status: live": the robot's home.
-// Plays on hover (by itself on touch screens), like the founder's.
-const [TOP_Y, MID_Y, BOTTOM_Y] = LAYER_Y_OPEN
-const MODULES = [
-  { d: `M${LAYER_R} ${MID_Y} H186`, x: 214, y: MID_Y },
-  { d: `M${LAYER_R} ${BOTTOM_Y} H186`, x: 214, y: BOTTOM_Y },
-]
-const GUIDE = `M${-LAYER_R} ${TOP_Y} H-150 V${BOTTOM_Y} H${-LAYER_R} M-150 ${MID_Y} H${-LAYER_R}`
-const BLOCK = { width: 48, height: 32 }
-const STATUS = 'status: live'
-const PILL = { x: 130, y: TOP_Y - 45, height: 40, width: BUBBLE.padding * 2 + STATUS.length * CHAR_W + 4 }
-
-function MarkArt({ robotHome }: { robotHome: boolean }) {
-  const textX = PILL.x + BUBBLE.padding
-  return (
-    <svg className="hero__art hero__art--mark" viewBox="-275 -230 550 460" aria-hidden="true">
-      {/* The assembly guide on the left, drawn as the stack opens. */}
-      <path className="hero__art-line hero__art-guide" style={{ animationDelay: artDelay(0.35) }} pathLength={1} d={GUIDE} />
-
-      {/* The lines to the module blocks, then the data flowing in along them. */}
-      {MODULES.map((module, i) => (
-        <g key={module.d}>
-          <path
-            className="hero__art-line hero__art-link"
-            style={{ animationDelay: artDelay(0.45 + i * 0.15) }}
-            pathLength={1}
-            d={module.d}
-          />
-          <path className="hero__art-flow" style={{ animationDelay: artDelay(1.1 + i * 0.15) }} d={module.d} />
-        </g>
-      ))}
-      <path
-        className="hero__art-line hero__art-link"
-        style={{ animationDelay: artDelay(0.75) }}
-        pathLength={1}
-        d={`M${LAYER_R} ${TOP_Y} V${PILL.y + PILL.height / 2} H${PILL.x}`}
-      />
-
-      {/* The module blocks, popping in as their line arrives: a small card with a light and two
-          short lines, like a part of a system. */}
-      {MODULES.map((module, i) => {
-        const left = module.x - BLOCK.width / 2
-        const top = module.y - BLOCK.height / 2
-        return (
-          <g key={`block-${module.d}`} className="hero__art-chip" style={{ animationDelay: artDelay(0.75 + i * 0.15) }}>
-            <rect x={left} y={top} width={BLOCK.width} height={BLOCK.height} rx={8} />
-            <circle className="hero__art-chip-light" cx={left + 12} cy={module.y} r={4} />
-            <path className="hero__art-chip-lines" d={`M${left + 22} ${module.y - 5} h16 M${left + 22} ${module.y + 5} h10`} />
-          </g>
-        )
-      })}
-
-      {/* The status pill: pops in, then types "status: live" (same timing as the founder's bubble). */}
-      <g className="hero__art-bubble" style={{ transformOrigin: `${PILL.x}px ${PILL.y + PILL.height / 2}px` }}>
-        <rect className="hero__art-bubble-shape" x={PILL.x} y={PILL.y} width={PILL.width} height={PILL.height} rx={PILL.height / 2} />
-        <text className="hero__art-text" x={textX} y={PILL.y + 26} textLength={STATUS.length * CHAR_W} lengthAdjust="spacing">
-          {[...STATUS].map((char, i) => (
-            <tspan key={i} className="hero__art-char" style={{ animationDelay: artDelay(1.45 + i * 0.07) }}>
-              {char}
-            </tspan>
-          ))}
-        </text>
-        {robotHome && <RobotPerch box={PILL} />}
-        <rect
-          className="hero__art-cursor"
-          style={{ '--typed': `${STATUS.length * CHAR_W}px`, '--chars': STATUS.length } as React.CSSProperties}
-          x={textX + 1}
-          y={PILL.y + 12}
-          width="2"
-          height="18"
-          rx="1"
-        />
-      </g>
-    </svg>
-  )
-}
 
 // The drawing behind the photo: a code editor window in thin lines (muted text color) with you in
 // front of it, and a speech bubble (accent color) that types "<Welcome />". Both colors are CSS
@@ -299,29 +171,12 @@ function useReturnSwap(enabled: boolean) {
   return swapped
 }
 
-// Home page: the Axihex mark and the studio board (StudioBoard.tsx) take turns by themselves, every
-// SWAP_MS, while the hero is on screen and the tab is visible. With a mouse on the hero it waits
-// (so it doesn't change under the pointer). Visitors who turn off animations keep the mark.
-const SWAP_MS = 8000
-
-function useAutoSwap(enabled: boolean, pointerInside: React.RefObject<boolean>) {
-  const [swapped, setSwapped] = useState(false)
-  useEffect(() => {
-    if (!enabled || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const timer = window.setInterval(() => {
-      if (document.hidden || pointerInside.current || window.scrollY > window.innerHeight * 0.6) return
-      setSwapped((current) => !current)
-    }, SWAP_MS)
-    return () => window.clearInterval(timer)
-  }, [enabled, pointerInside])
-  return swapped
-}
-
-function Hero({ variant = 'studio' }: { variant?: 'studio' | 'founder' }) {
-  const founder = variant === 'founder'
-  // The phrases typed on the home page's code line (the founder's page has no code line).
-  const typed = useTypingLoop(profile.building, !founder)
+// "variant" is kept for the CSS (.hero--founder); there is only the founder's version now.
+function Hero({ variant = 'founder' }: { variant?: 'founder' }) {
+  const founder = true
   const nameRef = useRef<HTMLSpanElement>(null)
+  // The way back to the page you came from (the home page if there's none).
+  const back = useBack('/background', '/')
   // The hover drawing behind the photo. "hovered": the pointer is on the photo (drawing shown).
   // "drawing": the drawing is on the page; it stays a moment after you leave, so it can fade out.
   // "run" changes on every hover, which rebuilds the drawing so it starts again from nothing.
@@ -335,11 +190,8 @@ function Hero({ variant = 'studio' }: { variant?: 'studio' | 'founder' }) {
   // The tiny robot is at home on the welcome box (see PhotoArt).
   const robotHome = useRobotHome()
   // Founder: the avatar, or the night desk once a visitor comes back to the top (useReturnSwap).
-  // Home: the Axihex mark and the studio board take turns by themselves (useAutoSwap).
-  // While the desk or the board shows, the hover drawing steps aside.
-  const lab = useReturnSwap(founder && profile.lab)
-  const board = useAutoSwap(!founder, pointerInside)
-  const away = founder ? lab : board
+  const lab = useReturnSwap(profile.lab)
+  const away = lab
 
   function startDrawing() {
     window.clearTimeout(hideTimer.current)
@@ -453,12 +305,8 @@ function Hero({ variant = 'studio' }: { variant?: 'studio' | 'founder' }) {
       }}
     >
       <div className="hero__text">
-        {/* Founder's page: the way back to the studio, where the "Meet the founder" card is. */}
-        {founder && (
-          <Link to="/#studio" className="back-link hero__back">
-            <span aria-hidden="true">←</span> Back to Axihex
-          </Link>
-        )}
+        {/* Founder's page: the way back to the page you came from. */}
+        {founder && <BackLink back={back} className="hero__back" />}
         <p className="eyebrow">
           {founder ? (
             // On narrow phones the line wraps before "Founder of Axihex", never inside it.
@@ -476,25 +324,6 @@ function Hero({ variant = 'studio' }: { variant?: 'studio' | 'founder' }) {
             <GradientText text={founder ? profile.name : profile.headlineAccent} />
           </span>
         </h1>
-
-        {!founder && <p className="hero__intro">{profile.intro}</p>}
-
-        {/* Home page only: a line of "code" that keeps typing what Axihex builds. Screen readers get
-            the full list once instead. */}
-        {!founder && (
-          <p className="hero__code" aria-label={`Axihex builds ${profile.building.join(', ')}`}>
-            {/* An invisible copy of the LONGEST phrase sits in the same spot and sets the line's size,
-                so the page (and the picture next to it) doesn't jump when a long phrase wraps. */}
-            <span className="hero__code-ghost" aria-hidden="true">
-              &gt; axihex.build('{longestPhrase}')
-            </span>
-            <span aria-hidden="true">
-              <span className="hero__code-prompt">&gt;</span> axihex.build(<span className="hero__code-string">'{typed}</span>
-              <span className="hero__code-caret" />
-              <span className="hero__code-string">'</span>)
-            </span>
-          </p>
-        )}
 
         {/* Founder's page only: where he is and what he's open to. The home page stays about Axihex. */}
         {founder && (
@@ -536,19 +365,6 @@ function Hero({ variant = 'studio' }: { variant?: 'studio' | 'founder' }) {
           <SocialLinks />
         </div>
 
-        {/* Home only: proof the work is real, where it has shipped (src/data/studio.ts). */}
-        {!founder && (
-          <div className="hero__proof">
-            <span className="hero__proof-label">Shipped to</span>
-            <ul>
-              {proof.map((item) => (
-                <li key={item.label}>
-                  <Icon name={item.icon} size={15} /> {item.label}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
 
       </div>
 
@@ -570,19 +386,16 @@ function Hero({ variant = 'studio' }: { variant?: 'studio' | 'founder' }) {
             (founder ? (
               <PhotoArt key={run} cutout={asset(profile.photo)} robotHome={robotHome} />
             ) : (
-              <MarkArt key={run} robotHome={robotHome} />
+              null
             ))}
           <div className={`hero__photo${away ? ' hero__photo--away' : ''}`}>
             {founder ? (
               // The first big picture on the page: "high" priority makes the browser fetch it first,
               // and width/height reserve its space so nothing jumps.
               <img src={asset(profile.photo)} alt={profile.name} width={1024} height={1024} fetchPriority="high" />
-            ) : (
-              <HeroMark />
-            )}
+            ) : null}
           </div>
           {founder && lab && <RobotLab robotHome={robotHome} />}
-          {!founder && board && <StudioBoard robotHome={robotHome} />}
         </div>
       )}
 

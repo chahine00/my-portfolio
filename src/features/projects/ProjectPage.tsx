@@ -6,6 +6,8 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { projects } from '../../data/projects.ts'
 import Gallery from '../../components/Gallery.tsx'
 import ScrollUpBack from '../../components/ScrollUpBack.tsx'
+import BackLink from '../../components/BackLink.tsx'
+import { useBack } from '../../utils/pageHistory.ts'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import { projectDescription } from '../../data/seo.ts'
 import { rememberProjectLeft } from './projectReturn.ts'
@@ -35,6 +37,14 @@ function ProjectPage() {
     navigate('/#projects', { state: { returnToProject: slug } })
   }
 
+  // "Back to …" at the top: the page you came from. Back to the home page: at this project's card,
+  // like "All projects", when you left the home page from its Work section.
+  const back = useBack(`/projects/${slug}`, '/')
+  function goBackToPast() {
+    if (back.path === '/' && back.homeSection === 'projects') back.go({ state: { returnToProject: slug } })
+    else back.go()
+  }
+
   // Start at the top whenever you open a project (including via Previous/Next links).
   useLayoutEffect(() => {
     // 'instant': skip the smooth scrolling set in global.css, so the page opens at the top
@@ -47,9 +57,7 @@ function ProjectPage() {
       <section className="section">
         <h1>Project not found</h1>
         <p>This project doesn't exist or was removed.</p>
-        <Link to="/#projects" className="back-link">
-          <span aria-hidden="true">←</span> Back to the work
-        </Link>
+        <BackLink back={back} onClick={goBackToPast} />
       </section>
     )
   }
@@ -70,11 +78,8 @@ function ProjectPage() {
 
   return (
     <article className="section project-page page-enter" key={project.slug}>
-      {/* Back to the home page's Projects section, at this project's card. A button styled like
-          the other back links. */}
-      <button type="button" className="back-link back-button" onClick={goBack}>
-        <span aria-hidden="true">←</span> All projects
-      </button>
+      {/* Back to the page you came from (src/utils/pageHistory.ts). */}
+      <BackLink back={back} onClick={goBackToPast} />
 
       <header className="project-page__header">
         {project.context && <p className="eyebrow">{project.context}</p>}
@@ -221,7 +226,7 @@ function ProjectPage() {
       </nav>
 
       {/* Phones, in the middle of the page: the same way back, under the thumb when you scroll up. */}
-      <ScrollUpBack key={project.slug} label="All projects" onClick={goBack} />
+      <ScrollUpBack key={project.slug} label={back.label} onClick={goBackToPast} />
     </article>
   )
 }

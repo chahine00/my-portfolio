@@ -91,21 +91,21 @@ function Contact() {
 
   return (
     <section id="contact" className="section">
-      <SectionTitle label="Contact" title="Let's" accent="talk." />
-      {/* Axihex welcomes client projects and collaborations, and the founder is open to roles:
-          the intro names all three, the form's topic choices (src/data/identity.ts) too. */}
-      <p className="contact-intro">
-        A project in mind, an idea to build together, or a role for the founder? Reach out by email, on LinkedIn, or with
-        the form.
-      </p>
-
       {/* One box per contact, read from src/data/contact.ts. Clicking the box opens the contact
           (email, LinkedIn…); on a phone box it copies the number. A number that's on WhatsApp also gets a small
           "WhatsApp" button: only that button opens the chat. Links starting with https open in a new tab. */}
-      {/* Two columns on wide screens: the ways to reach out on the left, the message form in a card
-          on the right. Stacked on phones. */}
+      {/* Two columns on wide screens: the title, the intro, the and the ways to reach out
+          on the left; the message form in a card on the
+          right. Stacked on phones. */}
       <div className="contact-layout">
         <div className="contact-aside">
+          <SectionTitle label="Contact" title="Let's" accent="talk." />
+          {/* Axihex welcomes client projects and collaborations, and the founder is open to roles:
+              the intro names all three, the form's topic choices (src/data/identity.ts) too. */}
+          <p className="contact-intro">
+            A project in mind, an idea to build together, a collaboration, or an engineering role. Reach out by email, on
+            LinkedIn, or with the form.
+          </p>
           <ul className="contact-tiles">
             {/* Phone numbers only when SHOW_PHONE_NUMBERS is on (see the top of this file). */}
             {contacts.filter((contact) => SHOW_PHONE_NUMBERS || !contact.href.startsWith('tel:')).map((contact) => {

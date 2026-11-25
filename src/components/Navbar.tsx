@@ -1,6 +1,7 @@
 // The navigation bar at the top of the page.
-// Five links: Studio, Work, Founder, Blog, Contact. On bigger screens the Axihex logo is the way home; on
-// phones every link shows an icon with a small label, and a Home tab comes first (six tabs). The menu
+// Six links: Home, Studio, Work, Founder, Blog, Contact. "Studio" opens Axihex's identity, purpose and
+// vision (/studio); "Home" goes to the top of the home page. On phones every link shows an icon with a
+// small label (six tabs). The menu
 // "moves" to the bottom of the screen once you scroll: the top bar scrolls away with the page and a
 // matching bar slides up at the bottom (the "tab bar", see the end of this file). Same on every
 // page, except the Blog list, where the Blog bar (search + categories) sticks at the top instead.
@@ -28,20 +29,20 @@ interface NavItem {
   to: string
   label: string
   match?: string // highlight this link while the address starts with this
-  section?: string // a page link that also has a section on the home page (its id): highlight it there too
+  sections?: string[] // home page sections (their ids) that highlight this link while on screen
   dot?: boolean // show the pulsing "new" dot
   icon: IconName // shown on phones, above the label
-  phoneOnly?: boolean // only on phones, where the logo isn't always on screen (Home)
 }
 
 const links: NavItem[] = [
-  { to: '/#home', label: 'Home', icon: 'home', phoneOnly: true },
-  // The studio first, then the work, then the founder's own page (his professional portfolio,
+  // Home stays lit over the hero and the home page's Studio section (the short version of /studio).
+  { to: '/#home', label: 'Home', icon: 'home', sections: ['home', 'studio'] },
+  // The studio's own page, then the work, then the founder's own page (his professional portfolio,
   // /background), then the writing. Contact always last.
-  { to: '/#studio', label: 'Studio', match: '/studio', icon: 'code' },
+  { to: '/studio', label: 'Studio', icon: 'code' },
   { to: '/#projects', label: 'Work', match: '/projects', icon: 'folder' },
   { to: '/background', label: 'Founder', icon: 'user' },
-  { to: '/blog', label: 'Blog', section: 'blog', dot: hasRecentUpdate, icon: 'pen' },
+  { to: '/blog', label: 'Blog', sections: ['blog'], dot: hasRecentUpdate, icon: 'pen' },
   { to: '/#contact', label: 'Contact', icon: 'chat' },
 ]
 
@@ -107,7 +108,7 @@ function Navbar() {
   function isActive(link: NavItem) {
     // Page links are highlighted on their own address; section links (/#…) only through "match".
     const match = link.match ?? (link.to.startsWith('/#') ? undefined : link.to)
-    const onSection = onHome && (link.to === `/#${activeSection}` || link.section === activeSection)
+    const onSection = onHome && (link.to === `/#${activeSection}` || (link.sections?.includes(activeSection) ?? false))
     return onSection || (match !== undefined && pathname.startsWith(match))
   }
 
@@ -120,7 +121,7 @@ function Navbar() {
         React needs a unique "key" on each item in a list so it can keep track of them.
       */}
       {links.map((link) => (
-        <li key={link.to} className={link.phoneOnly ? 'navbar__phone-only' : undefined}>
+        <li key={link.to}>
           <Link
             to={link.to}
             className={isActive(link) ? 'active' : undefined}
@@ -128,8 +129,8 @@ function Navbar() {
             // From another page, the home page opens at the top and plays it (see HomePage.tsx).
             state={link.to === '/#home' ? { replayWelcome: true } : undefined}
             onClick={(event) => {
-              // Home on the home page, or Founder on the founder page: a smooth trip to the top.
-              if ((link.to === '/#home' && onHome) || (link.to === '/background' && pathname === '/background')) {
+              // Home on the home page, or Studio / Founder on their own page: a smooth trip to the top.
+              if ((link.to === '/#home' && onHome) || (!link.to.startsWith('/#') && pathname === link.to)) {
                 event.preventDefault()
                 goToTop()
               }

@@ -17,6 +17,8 @@ import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import { clearHash } from '../../utils/goToTop.ts'
 import SectionTitle from '../../components/SectionTitle.tsx'
 import Hero from '../home/Hero.tsx'
+import BackLink from '../../components/BackLink.tsx'
+import { useBack } from '../../utils/pageHistory.ts'
 import Mindset from './Mindset.tsx'
 import Testimonials from './Testimonials.tsx'
 import Experience from '../experience/Experience.tsx'
@@ -39,6 +41,7 @@ function SelectedWorkLink() {
 
 // The page's last step: a message. (The CV is in the hero, once.)
 function FounderContact() {
+  const back = useBack('/background', '/')
   return (
     <section id="founder-contact" className="section">
       <SectionTitle label="Contact" title="Let's" accent="talk." />
@@ -51,10 +54,8 @@ function FounderContact() {
           Get in touch
         </Link>
       </div>
-      {/* The end of the page: the way back to the studio, like the link at the top. */}
-      <Link to="/#studio" className="back-link founder-back">
-        <span aria-hidden="true">←</span> Back to Axihex
-      </Link>
+      {/* The end of the page: the way back to the page you came from, like the link at the top. */}
+      <BackLink back={back} className="founder-back" />
     </section>
   )
 }
