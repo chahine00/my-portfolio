@@ -80,6 +80,14 @@ function kindOf(path: string) {
   return path
 }
 
+// A real page of the site (not a "Page not found" address, nor an old one that redirects).
+function isPage(path: string) {
+  if (['/', '/blog', '/studio', '/background'].includes(path)) return true
+  if (path.startsWith('/projects/')) return projects.some((p) => `/projects/${p.slug}` === path)
+  if (path.startsWith('/blog/')) return sortedUpdates.some((u) => `/blog/${u.slug}` === path)
+  return false
+}
+
 // The page's name, for "← Back to …".
 function nameOf(path: string) {
   if (path === '/') return 'Home'
@@ -108,7 +116,8 @@ export function useBack(currentPath: string, fallback: string): Back {
     const trail = withVisit(read<Visit[]>(TRAIL_KEY, []), currentPath, '')
     const kind = kindOf(currentPath)
     for (let i = trail.length - 2; i >= 0; i--) {
-      if (trail[i].path !== currentPath && kindOf(trail[i].path) !== kind) return { index: i, visit: trail[i] }
+      const path = trail[i].path
+      if (path !== currentPath && kindOf(path) !== kind && isPage(path)) return { index: i, visit: trail[i] }
     }
     return null
   })

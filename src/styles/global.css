@@ -2574,11 +2574,10 @@ a.card-pill:hover svg {
   color: var(--muted);
 }
 
-/* On phones, keep the intro on one line by scaling the text down to fit. */
+/* On phones the intro wraps onto as many lines as it needs, a little smaller. */
 @media (max-width: 720px) {
   .page-intro {
-    white-space: nowrap;
-    font-size: clamp(12px, 3.6vw, 16px);
+    font-size: 0.95rem;
   }
 }
 
@@ -7801,10 +7800,13 @@ a {
   height: 40px;
   border: 1px solid var(--border);
   border-radius: 50%;
-  background: var(--bg);
-  color: var(--accent);
-  font-size: 1.3rem;
-  font-weight: 700;
+  /* The "+" is drawn with two bars, exactly centered (a text "+" sits off-center in most fonts). */
+  background:
+    linear-gradient(var(--accent), var(--accent)) center / 14px 2px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) center / 2px 14px no-repeat,
+    var(--bg);
+  color: transparent;
+  font-size: 0;
 }
 
 .thinking__principle {
@@ -7885,10 +7887,11 @@ a {
 .umbrella__root {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
+  gap: 8px;
   padding-bottom: 24px;
+  text-align: center;
 }
 
 .umbrella__root::after {
@@ -7908,6 +7911,7 @@ a {
 
 .umbrella__root strong {
   display: block;
+  line-height: 1.2;
   font-family: var(--font-display);
   font-size: 1.4rem;
   letter-spacing: 0.05em;
@@ -7915,8 +7919,12 @@ a {
 }
 
 .umbrella__root span {
+  display: block;
+  margin-top: 4px;
   color: var(--muted);
   font-size: 0.9rem;
+  line-height: 1.4;
+  text-wrap: balance;
 }
 
 .umbrella__branches {
@@ -8912,7 +8920,7 @@ a {
 
 .work-copy > p.work-highlight {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
   color: var(--accent);
   font-size: 0.85rem;
@@ -8942,6 +8950,11 @@ a {
   list-style: none;
   color: var(--muted);
   font: 0.76rem/1.6 ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+.work-highlight svg {
+  flex-shrink: 0;
+  margin-top: 0.22em;
 }
 
 .case-link {

@@ -17,9 +17,9 @@ import SectionTitle from '../../components/SectionTitle.tsx'
 // TypeScript will show an error if you try to set anything else (like 'done').
 type Status = 'idle' | 'sending' | 'sent' | 'error'
 
-// Phone numbers (and their WhatsApp buttons) stay off the page to keep it light. They're still in
-// src/data/contact.ts: set this to true to show them again, each with its copy button and WhatsApp.
-const SHOW_PHONE_NUMBERS = false
+// Phone numbers (src/data/contact.ts), each with its copy button and WhatsApp button.
+// Set this to false to hide them from the page.
+const SHOW_PHONE_NUMBERS = true
 
 function Contact() {
   // useState returns two things: [currentValue, functionToChangeIt].
