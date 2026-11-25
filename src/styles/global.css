@@ -107,6 +107,19 @@
   box-sizing: border-box;
 }
 
+/* No tap highlight anywhere: phones flash a see-through box over a button or link when it's tapped
+   (shaped like its rectangle, not like the button). Every button already shows the press itself. */
+html,
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* No focus outline after a click or a tap either, only when moving around with the keyboard
+   (:focus-visible), so keyboard users still see where they are. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 body {
   margin: 0;
   /* The drawing behind the hero photo reaches past the photo's right edge; this keeps it from
@@ -6827,7 +6840,7 @@ a {
 
 /* Card spotlight (Spotlight.tsx): a soft accent light under the mouse, only while hovering. */
 @media (hover: hover) and (pointer: fine) {
-  :is(.card, .caps__item, .hive-panel, .trait, .value-grid li, .mindset__item, .contact-panel, .contact-tile):hover {
+  :is(.card, .caps__item, .hive-panel, .trait, .mindset__item, .contact-panel, .contact-tile):hover {
     background-image: radial-gradient(
       260px circle at var(--spot-x, 50%) var(--spot-y, 50%),
       color-mix(in srgb, var(--accent) 12%, transparent),
@@ -7167,6 +7180,70 @@ a {
   background: var(--text);
 }
 
+/* The shine: when the page is scrolled while the hive is on screen (PillarHive.tsx adds
+   .hive--shine for one pass), a band of light sweeps across each cell, one after another around the
+   ring (--i), and its edge brightens for a moment, so the cells look like buttons to press. Nothing
+   plays while the page is still. The band is on the inner hexagon, so it's clipped to it. */
+.hive__hex-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 38%,
+    color-mix(in srgb, var(--accent) 30%, rgb(255 255 255 / 0.75)) 50%,
+    transparent 62%
+  );
+  background-size: 300% 100%;
+  background-position: 120% 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* One pass: 0.9s per cell, each starting 0.12s after the one before (7 cells: about 1.6s in all,
+   SHINE_MS in PillarHive.tsx). */
+.hive--shine .hive__hex-inner::after {
+  animation: hive-shine 0.9s ease-in-out both;
+  animation-delay: calc(var(--i) * 0.12s);
+}
+
+.hive--shine .hive__hex {
+  animation: hive-edge-glint 0.9s ease-in-out both;
+  animation-delay: calc(var(--i) * 0.12s);
+}
+
+@keyframes hive-shine {
+  0% {
+    background-position: 120% 0;
+    opacity: 0;
+  }
+  12%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    background-position: -20% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes hive-edge-glint {
+  0%,
+  100% {
+    filter: none;
+  }
+  45% {
+    filter: brightness(1.5) saturate(1.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hive--shine .hive__hex-inner::after,
+  .hive--shine .hive__hex {
+    animation: none;
+  }
+}
+
 @keyframes hive-wave {
   0%,
   100% {
@@ -7252,25 +7329,7 @@ a {
 }
 
 .hive-panel__examples,
-.pillar-row__examples {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 0 0 16px;
-  padding: 0;
-  list-style: none;
-}
-
 .hive-panel__examples li,
-.pillar-row__examples li {
-  padding: 3px 10px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--bg);
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-
 .hive-panel__link {
   color: var(--accent);
   font-weight: 600;
@@ -7337,7 +7396,7 @@ a {
 }
 
 /* Items that rise in as they scroll into view (useReveal adds .is-visible and --reveal-delay). */
-:is(.caps__item, .pillar-row, .process__step) {
+:is(.caps__item, .process__step) {
   opacity: 0;
   translate: 0 14px;
   transition:
@@ -7346,7 +7405,7 @@ a {
     border-color 0.3s;
 }
 
-:is(.caps__item, .pillar-row, .process__step).is-visible {
+:is(.caps__item, .process__step).is-visible {
   opacity: 1;
   translate: none;
 }
@@ -7375,16 +7434,14 @@ a {
   text-transform: uppercase;
 }
 
-.direction__statement p:last-child,
-.mv__item p:last-child {
+.direction__statement p:last-child {
   margin: 0;
   color: var(--muted);
   line-height: 1.7;
 }
 
 /* The mission, bigger, with an accent bar on its left. */
-.direction__statement p.direction__mission,
-.mv__item p.direction__mission {
+.direction__statement p.direction__mission {
   padding-left: 18px;
   background: linear-gradient(var(--accent), var(--accent-2)) left / 3px 100% no-repeat;
   color: var(--text);
@@ -7397,13 +7454,6 @@ a {
 .direction__more {
   color: var(--accent);
   font-weight: 600;
-}
-
-.direction__measure {
-  margin: 16px 0 0;
-  color: var(--muted);
-  font-size: 0.88rem;
-  font-style: italic;
 }
 
 /* --- Horizon (Horizon.tsx): today in solid lines, next in dashed ones. */
@@ -7604,6 +7654,87 @@ a {
   line-height: 1.6;
 }
 
+/* Its purpose: the five pillars in one line each, under the definition (Studio page). */
+.purpose {
+  margin-top: 32px;
+}
+
+.purpose__label {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.purpose__list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.purpose__list li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.purpose__num {
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+
+.purpose__list strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.purpose__list li > span:last-child {
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.purpose__more {
+  display: inline-block;
+  margin-top: 14px;
+}
+
+/* Tablets: two columns, phones: one. */
+@media (max-width: 900px) {
+  .purpose__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .purpose__list {
+    grid-template-columns: 1fr;
+  }
+
+  .purpose__list li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 10px;
+    align-items: baseline;
+  }
+
+  .purpose__list li > span:last-child {
+    grid-column: 2;
+  }
+}
+
 .identity__not {
   margin-top: 36px;
   padding: 22px 24px;
@@ -7660,9 +7791,8 @@ a {
   font-size: 0.9rem;
 }
 
-/* Small cards: the traits, the umbrella's branches, the values. */
-.trait-grid,
-.value-grid {
+/* Small cards: the traits, the umbrella's branches. */
+.trait-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
@@ -7671,11 +7801,7 @@ a {
   list-style: none;
 }
 
-.value-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-:is(.trait, .value-grid li, .umbrella__branches li) {
+:is(.trait, .umbrella__branches li) {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -7685,12 +7811,12 @@ a {
   background: var(--card);
 }
 
-:is(.trait, .value-grid li, .umbrella__branches li) strong {
+:is(.trait, .umbrella__branches li) strong {
   font-family: var(--font-display);
   font-size: 1.05rem;
 }
 
-:is(.trait, .value-grid li, .umbrella__branches li) > span:last-child {
+:is(.trait, .umbrella__branches li) > span:last-child {
   color: var(--muted);
   font-size: 0.87rem;
   line-height: 1.5;
@@ -7703,82 +7829,6 @@ a {
 }
 
 /* The five pillars, one row each: a numbered hexagon, then the text. */
-.pillar-rows {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.pillar-row {
-  display: grid;
-  grid-template-columns: 64px minmax(0, 1fr);
-  gap: 24px;
-  padding: 28px 0;
-  border-top: 1px solid var(--border);
-}
-
-.pillar-row__hex {
-  position: relative;
-  width: 60px;
-  aspect-ratio: 0.866;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  background: linear-gradient(150deg, var(--accent), var(--accent-2));
-}
-
-.pillar-row__hex span {
-  position: absolute;
-  inset: 2px;
-  display: grid;
-  place-items: center;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  background: color-mix(in srgb, var(--accent) 10%, var(--bg));
-  color: var(--accent);
-  font-family: var(--font-display);
-  font-weight: 700;
-}
-
-.pillar-row h3 {
-  margin: 0 0 10px;
-  font-family: var(--font-display);
-  font-size: 1.7rem;
-  letter-spacing: -0.02em;
-}
-
-.pillar-row__statement {
-  display: block;
-  margin-top: 2px;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0;
-}
-
-.pillar-row p {
-  max-width: 64ch;
-  margin: 0 0 14px;
-  color: var(--muted);
-  line-height: 1.7;
-}
-
-.pillar-row .forward-link {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.pillar-row .pillar-row__objective {
-  color: var(--text);
-  font-weight: 500;
-}
-
-.pillar-row__objective span {
-  margin-right: 8px;
-  color: var(--accent);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
 /* Product thinking: engineering's questions + product thinking's questions. */
 .thinking {
   display: grid;
@@ -8067,41 +8117,9 @@ a {
   font-size: 0.95rem;
 }
 
-/* Mission and vision, the values, the philosophy. */
-.mv {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
-.mv__item {
-  padding: 22px;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--card);
-}
-
-.value-grid li {
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  column-gap: 12px;
-}
-
-.value-grid .trait__icon {
-  width: 34px;
-  height: 34px;
-  margin: 0;
-}
-
-.value-grid li > span:last-child {
-  flex-basis: 100%;
-  margin-top: 6px;
-}
-
+/* The Axihex philosophy (Studio page): a quote on its own, so no space above it. */
 .philosophy {
-  margin: 32px 0 0;
+  margin: 0;
   padding: 30px clamp(20px, 4vw, 40px);
   border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
   border-radius: 22px;
@@ -8248,7 +8266,6 @@ a {
 
   .direction__layout,
   .channels,
-  .mv,
   .thinking {
     grid-template-columns: 1fr;
   }
@@ -8302,22 +8319,8 @@ a {
     padding: 18px;
   }
 
-  .trait-grid,
-  .value-grid {
+  .trait-grid {
     grid-template-columns: 1fr;
-  }
-
-  .pillar-row {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .pillar-row__hex {
-    width: 48px;
-  }
-
-  .pillar-row h3 {
-    font-size: 1.45rem;
   }
 
   /* The process down the screen: a line on the left joining the steps. */
@@ -8365,7 +8368,7 @@ a {
     transition: none;
   }
 
-  :is(.caps__item, .pillar-row, .process__step),
+  :is(.caps__item, .process__step),
   .horizon__next,
   .horizon__arrow {
     opacity: 1;
@@ -8430,6 +8433,17 @@ a {
   .home-hero__label::before {
     animation: none;
   }
+}
+
+/* The studio's name in the label: in the text color, so it stands out from the tag line. */
+.home-hero__brand {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.home-hero__sep {
+  margin: 0 -0.15rem;
+  opacity: 0.6;
 }
 
 .home-hero .home-hero__label + h1 {
@@ -8533,7 +8547,7 @@ a {
   fill: none;
   stroke: var(--fig-axis);
   stroke-dasharray: 3 5;
-  animation: layer-axis-flow 1.6s linear infinite;
+  animation: layer-axis-flow 0.9s linear infinite;
 }
 
 /* The dark theme: picked with the toggle, or the system's when nothing was picked. */
@@ -8599,16 +8613,35 @@ a {
   }
 }
 
-/* A soft shadow under the stack. */
+/* A soft shadow under the stack. It breathes with the plates: tighter and darker as they come
+   down, wider and lighter as they rise. */
 .layer-shadow {
   fill: var(--fig-shadow);
   filter: blur(8px);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: layer-shadow-breathe 3.2s ease-in-out infinite;
 }
 
-/* The wave: each plate floats on its own beat (like the old hero mark). */
+@keyframes layer-shadow-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.12, 1.2);
+    opacity: 0.65;
+  }
+}
+
+/* The wave: a quick ripple up the stack. Each plate bobs a moment after the one under it, and the
+   higher a plate, the higher it rises (bottom 7px, middle 11px, top 15px), so the stack keeps
+   opening and closing with a little bounce at the top of each lift. */
 .plate-float {
-  animation: plate-float 6s ease-in-out infinite;
-  animation-delay: calc(var(--i) * -2s);
+  --lift: calc(7px + (2 - var(--i)) * 4px);
+  animation: plate-float 3.2s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  animation-delay: calc(var(--i) * 0.22s);
 }
 
 @keyframes plate-float {
@@ -8616,8 +8649,11 @@ a {
   100% {
     transform: translateY(0);
   }
-  50% {
-    transform: translateY(-6px);
+  45% {
+    transform: translateY(calc(var(--lift) * -1));
+  }
+  55% {
+    transform: translateY(calc(var(--lift) * -0.85));
   }
 }
 
@@ -8645,19 +8681,24 @@ a {
   stroke-linejoin: round;
   opacity: 0;
   pointer-events: none;
-  animation: plate-light 4.5s ease-in-out infinite;
-  animation-delay: calc((2 - var(--i)) * 0.6s);
+  /* Faster and brighter: a pulse of light shoots up the stack every 2.4s, with a glow. */
+  stroke-width: 3;
+  filter: drop-shadow(0 0 5px var(--plate-light));
+  animation: plate-light 2.4s ease-out infinite;
+  animation-delay: calc((2 - var(--i)) * 0.25s);
 }
 
 @keyframes plate-light {
   0%,
-  40%,
+  45%,
   100% {
     opacity: 0;
   }
-  12%,
-  24% {
-    opacity: 0.9;
+  10% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 0.7;
   }
 }
 
@@ -8666,7 +8707,8 @@ a {
    ignores the pointer, so its float, lift and spin can't send a click to the wrong plate. */
 .plate {
   pointer-events: none;
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* A springy lift: it overshoots a little and settles. */
+  transition: transform 0.45s cubic-bezier(0.34, 1.7, 0.64, 1);
 }
 
 .plate-hit {
@@ -8676,7 +8718,7 @@ a {
 }
 
 .plate--active {
-  transform: translateY(-9px);
+  transform: translateY(-12px);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -8800,6 +8842,7 @@ a {
   .plate-slot,
   .plate-float,
   .plate-light,
+  .layer-shadow,
   .layer-axis,
   .layer-figure figcaption::before {
     animation: none;
@@ -8896,8 +8939,9 @@ a {
   .home-hero__label {
     gap: 0.45rem;
     padding: 0.35rem 0.75rem 0.35rem 0.6rem;
-    font-size: clamp(0.58rem, 2.75vw, 0.72rem);
-    letter-spacing: 0.08em;
+    /* A bit smaller than before, so "Axihex · Independent software studio" fits on small phones. */
+    font-size: clamp(0.5rem, 2.45vw, 0.72rem);
+    letter-spacing: 0.07em;
     white-space: nowrap;
   }
 
@@ -9284,11 +9328,6 @@ a {
   font-size: 0.82rem;
 }
 
-/* Studio page: the "success is measured by…" line between mission/vision and the values. */
-.mv + .direction__measure {
-  margin: 18px 0 28px;
-  text-align: center;
-}
 
 /* While an inner page's file downloads (App.tsx): keeps the footer down, so the page doesn't jump. */
 .page-loading {
@@ -9369,5 +9408,61 @@ a {
   .post__header h1 {
     font-size: clamp(1.65rem, 7.2vw, 2rem);
     line-height: 1.18;
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Phones: an app-style layout on every page. The top bar stays at the top and only holds the
+   Axihex title (bigger) and the theme button; the menu is always in the tab bar at the bottom.
+   ------------------------------------------------------------------------------------------------ */
+@media (max-width: 720px) {
+  /* Always on top, on every page (it used to scroll away on most pages, and on the Blog). */
+  .navbar,
+  body:has(.tabbar) .navbar,
+  body:has(.blog-bar) .navbar {
+    position: sticky;
+  }
+
+  .navbar {
+    grid-template-areas: 'brand toggle';
+    align-items: center;
+    padding: 10px 16px;
+  }
+
+  /* The links live in the tab bar only. */
+  .navbar__nav {
+    display: none;
+  }
+
+  /* The name, as the page's title. */
+  .navbar__brand {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .brand__mark {
+    width: 1.1em;
+    height: 1.1em;
+    margin-right: 10px;
+  }
+
+  /* The tab bar: always shown. */
+  .tabbar {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* The Blog bar sticks right under the top bar, which now stays. */
+  .blog-bar {
+    top: var(--navbar-height, 56px);
+    padding-top: 8px;
+  }
+
+  /* The founder hero fills the first screen between the top bar and the tab bar. */
+  .hero {
+    min-height: calc(100vh - var(--topbar-height, 60px) - 64px - env(safe-area-inset-bottom));
+    min-height: calc(100svh - var(--topbar-height, 60px) - 64px - env(safe-area-inset-bottom));
   }
 }

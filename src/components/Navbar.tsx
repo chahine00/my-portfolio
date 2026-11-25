@@ -1,10 +1,9 @@
 // The navigation bar at the top of the page.
 // Six links: Home, Studio, Work, Founder, Blog, Contact. "Studio" opens Axihex's identity, purpose and
 // vision (/studio); "Home" goes to the top of the home page. On phones every link shows an icon with a
-// small label (six tabs). The menu
-// "moves" to the bottom of the screen once you scroll: the top bar scrolls away with the page and a
-// matching bar slides up at the bottom (the "tab bar", see the end of this file). Same on every
-// page, except the Blog list, where the Blog bar (search + categories) sticks at the top instead.
+// small label (six tabs). On phones the menu is always at the bottom of the screen (the "tab bar",
+// see the end of this file), on every page, and the top bar stays at the top with only the Axihex
+// title and the theme button.
 
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
@@ -46,24 +45,14 @@ const links: NavItem[] = [
   { to: '/#contact', label: 'Contact', icon: 'chat' },
 ]
 
-// Phones: how far back above the top bar's row of links you scroll before the tab bar hides again.
-const TABBAR_HIDE_MARGIN = 40
-
 function Navbar() {
   const { pathname } = useLocation()
   // Which home section is on screen right now, e.g. 'skills'. Used to light up its link.
   const [activeSection, setActiveSection] = useState('')
   // True once the page is scrolled a little: the navbar then gets a soft shadow.
   const [scrolled, setScrolled] = useState(false)
-  // Phones: true once the top bar's row of links starts scrolling out of view, which brings up the
-  // tab bar. (Not waiting for the whole bar to leave: a half-hidden row of links is hard to tap,
-  // so there's always one usable menu on screen.)
-  const [pastTopBar, setPastTopBar] = useState(false)
   const headerRef = useRef<HTMLElement>(null)
-  const linksRowRef = useRef<HTMLElement>(null)
   const onHome = pathname === '/'
-  // The Blog list has its own sticky bar at the top; a tab bar too would leave too little room for the posts.
-  const showTabbar = pathname !== '/blog'
 
   // Share the navbar's height with the CSS (--navbar-height), so section links stop right
   // under the bar. It changes with the screen size (on phones the links get their own row).
@@ -90,14 +79,6 @@ function Navbar() {
   useEffect(() => {
     function handleScroll() {
       setScrolled(window.scrollY > 8)
-      // Where the row of links starts on the page (the header sits at the very top of the page).
-      const row = linksRowRef.current
-      const rowTop = row ? row.getBoundingClientRect().top + window.scrollY : (headerRef.current?.offsetHeight ?? 0)
-      // Two lines instead of one: it shows once you're past the row, but only hides again once
-      // you're back well above it. With a single line, momentum scrolling and the phone's address
-      // bar moving could flip it back and forth for a moment, so the tab bar half slid away
-      // (its labels dropped below the screen edge) and came back.
-      setPastTopBar((was) => (was ? window.scrollY > rowTop - TABBAR_HIDE_MARGIN : window.scrollY > rowTop))
     }
     handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -193,24 +174,17 @@ function Navbar() {
             </span>
           </Link>
         </div>
-        <nav className="navbar__nav" ref={linksRowRef}>
+        <nav className="navbar__nav">
           {linkList()}
         </nav>
         <ThemeToggle />
       </header>
 
-      {/* The tab bar: the same links at the bottom of the screen. On every page but the Blog list,
-          and only shown on phones (CSS), once the top bar has scrolled away. While hidden, "inert"
-          keeps it out of reach of the keyboard and screen readers. */}
-      {showTabbar && (
-        <nav
-          className={pastTopBar ? 'tabbar tabbar--visible' : 'tabbar'}
-          aria-label="Sections"
-          inert={!pastTopBar}
-        >
-          {linkList()}
-        </nav>
-      )}
+      {/* The tab bar: the same links at the bottom of the screen, on every page. Only shown on
+          phones (CSS: display none elsewhere, which also hides it from screen readers). */}
+      <nav className="tabbar tabbar--visible" aria-label="Sections">
+        {linkList()}
+      </nav>
     </>
   )
 }

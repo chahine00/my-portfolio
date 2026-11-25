@@ -16,16 +16,6 @@ export const essence = 'Where engineering meets curiosity, creativity, and ambit
 export const philosophy =
   'The best software is the kind people stop noticing: it simply works, every day.'
 
-export const mission =
-  'To transform ideas into useful digital solutions through thoughtful engineering, experimentation, creativity, and practical problem-solving.'
-
-export const vision =
-  'To establish Axihex as a sustainable and recognized technology brand that develops, launches, and maintains its own digital products, while remaining open to client projects, partnerships, and professional opportunities.'
-
-// Measured by the work, not the headcount.
-export const measure =
-  'Success is measured by the quality, usefulness, and integrity of the work, not by the number of products, services, or people behind it.'
-
 // What Axihex is more than (PDF §1: "not limited to"), shown as chips on /studio, then what it is.
 export const moreThan = ['A software agency', 'A freelance business', 'A personal portfolio', 'A single-product startup']
 export const isRather = 'A software studio rooted in engineering, with the freedom to pursue what comes next.'
@@ -39,7 +29,9 @@ export const traits: { title: string; text: string; icon: IconName }[] = [
 ]
 
 // The five pillars, in order around the hexagon (clockwise from the top).
-// "link": where that pillar lives on this site.
+// "link": where that pillar lives on this site. Each pillar has its own place, so the five don't
+// blur together (Showcase → the work, Share → the blog). "state" goes with the link: { topic } picks
+// the Contact form's topic for the visitor.
 export interface Pillar {
   word: string
   statement: string
@@ -47,18 +39,20 @@ export interface Pillar {
   objective: string
   examples: string[]
   icon: IconName
-  link: { to: string; label: string }
+  link: { to: string; label: string; state?: { topic: Topic } }
 }
 
 export const pillars: Pillar[] = [
   {
     word: 'Explore',
     statement: 'Discover ideas and new technological opportunities.',
-    text: 'Curiosity, research, and experimentation to find where software can add real value: prototyping, testing new frameworks, and investigating better ways to solve existing problems.',
+    // Where Axihex sees an opportunity, it builds and tries it: not limited to one kind of product.
+    text: 'Where we see an opportunity, we build it and try it. Research, quick prototypes, and new frameworks show where software can add real value before we invest in it.',
     objective: 'An environment where curiosity can lead to meaningful innovation.',
     examples: ['Experimenting with LLMs', 'Prototyping to validate ideas', 'Researching everyday digital problems'],
     icon: 'compass',
-    link: { to: '/blog', label: 'Read the experiments' },
+    // The blog's Ideas posts, not the whole blog (that's Share's link).
+    link: { to: '/blog?category=Ideas', label: 'Read our ideas' },
   },
   {
     word: 'Build',
@@ -67,20 +61,23 @@ export const pillars: Pillar[] = [
     objective: 'Software that delivers genuine value, for Axihex or for its clients.',
     examples: ['Original products & tools', 'Client web & mobile apps', 'Backends, AI & cloud solutions'],
     icon: 'layers',
+    // Build is the doing: the action is to build something together. (The work is Showcase's link.)
+    link: { to: '/#contact', label: 'Start a project', state: { topic: 'project' } },
+  },
+  {
+    // Showcase shows the work (proof); Share gives the knowledge away. Different links make it clear.
+    word: 'Showcase',
+    statement: 'Proof through real, shipped work.',
+    // About the work only: the founder's own experience lives on the Founder page (/background).
+    text: 'Credibility comes from genuine work: shipped projects, client products, and engineering achievements, each attributed accurately.',
+    objective: 'Credibility through genuine work and achievements.',
+    examples: ['Studio & client projects', 'Shipped products', 'Engineering milestones'],
+    icon: 'spark',
     link: { to: '/#projects', label: 'See the work' },
   },
   {
-    word: 'Showcase',
-    statement: 'Real projects and achievements, from the studio and its founder.',
-    text: "Credibility comes from genuine work: studio projects, client work, engineering achievements, and the founder's experience, each attributed accurately.",
-    objective: 'Credibility through genuine work and achievements.',
-    examples: ['Studio & client projects', 'Engineering milestones', "The founder's experience"],
-    icon: 'spark',
-    link: { to: '/background', label: 'Meet the founder' },
-  },
-  {
     word: 'Share',
-    statement: 'Technical knowledge, insights, and useful tools for the community.',
+    statement: 'What we learn, given back: articles, tutorials, and free tools.',
     text: 'What is learned while building is worth passing on: articles, case studies, and lessons from real projects, shared without exposing anything confidential.',
     objective: 'Contribute to the community through meaningful technical work.',
     examples: ['Technical articles', 'Engineering case studies', 'Open-source & free tools'],
@@ -94,7 +91,7 @@ export const pillars: Pillar[] = [
     objective: 'A sustainable foundation for technical, professional, and business growth.',
     examples: ['Client & partner relationships', 'Collaborating with makers', 'Reinvesting in new ideas'],
     icon: 'trend',
-    link: { to: '/#contact', label: 'Collaborate with us' },
+    link: { to: '/#contact', label: 'Collaborate with us', state: { topic: 'collab' } },
   },
 ]
 
@@ -149,16 +146,6 @@ export const horizon: { aspect: string; today: string; next: string; home?: bool
   { aspect: 'Knowledge', today: 'Technical insights & articles', next: 'Wider community contributions', home: true },
   { aspect: 'Collaboration', today: 'Professional relationships', next: 'Partnerships & a team', home: true },
   { aspect: 'Distribution', today: 'axihex.com', next: 'Product sites & app stores' },
-]
-
-// The core values.
-export const values: { title: string; text: string; icon: IconName }[] = [
-  { title: 'Curiosity', text: 'Explore ideas and keep learning.', icon: 'bulb' },
-  { title: 'Engineering excellence', text: 'Reliable, maintainable software.', icon: 'code' },
-  { title: 'Usefulness', text: 'Technology with genuine value.', icon: 'target' },
-  { title: 'Integrity', text: 'Trust, privacy, and transparency.', icon: 'shield' },
-  { title: 'Creativity', text: 'New approaches and possibilities.', icon: 'spark' },
-  { title: 'Sustainable growth', text: 'Evolve through meaningful work.', icon: 'trend' },
 ]
 
 // Why people write: the Contact section's choices. Each adds a short tag to the message, so the

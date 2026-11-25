@@ -97,9 +97,8 @@ export const founderGuideTips: GuideTip[] = [
     edge: 'beside-left',
     bubble: 'above',
   }),
-  founderTip('experience', 'Where I worked, and what I built there.'),
-  founderTip('selected-work', 'Want to see it in practice? Have a look at the projects.'),
-  founderTip('skills', 'The tools I work with every day.'),
-  founderTip('education', 'Where I learned, and I keep learning.'),
+  founderTip('experience', 'I was lucky to explore different roles across the industry.'),
+  // No tip for "Experience in practice" (selected-work) or Education: they speak for themselves.
+  founderTip('skills', 'These are my weapons of choice.'),
   founderTip('founder-contact', 'Looking for an engineer? Let’s talk.'),
 ]

@@ -22,10 +22,10 @@ export const HOME_DESCRIPTION =
   'and engineers web, mobile, AI and cloud apps for clients.'
 
 // The Studio page (/studio): the identity, the five pillars and the direction.
-export const STUDIO_TITLE = 'About the studio: identity, purpose & vision'
+export const STUDIO_TITLE = 'About the studio: identity, purpose & approach'
 export const STUDIO_DESCRIPTION =
   `What ${profile.brand} is and where it's going: five pillars, core engineering capabilities, ` +
-  'product thinking, mission, vision and values.'
+  'product thinking and how it ships.'
 
 // Who the founder is: used for the person in the structured data (scripts/seo-plugin.ts).
 export const FOUNDER_DESCRIPTION =

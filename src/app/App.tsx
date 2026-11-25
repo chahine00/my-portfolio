@@ -87,7 +87,7 @@ function App() {
           "/updates…" → the blog's old address. Old shared links are sent on to /blog.
           "/projects/:slug" → one project's page, e.g. /projects/cinetwork
           "/background" → the founder's full background: experience, capabilities, education
-          "/studio" → Axihex's identity, purpose and vision in full ("Studio" in the navbar)
+          "/studio" → Axihex's identity, purpose and approach ("Studio" in the navbar)
           To add a new page: create its component, add a <Route> here,
           and add a link to it in Navbar.tsx.
           The last route ("*") catches any unknown URL and shows a "Page not found" page.

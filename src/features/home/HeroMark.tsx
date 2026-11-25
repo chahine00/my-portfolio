@@ -1,10 +1,12 @@
 // The home hero's picture: the Axihex hexagon reimagined as the three layers of an application
 // (Interface, Backend, Infrastructure).
-// - At rest the plates float in a slow wave, each on its own beat, and light climbs up through them.
+// - At rest the plates bob in a quick ripple up the stack (it keeps opening and closing), the shadow
+//   breathes with them, and a pulse of light shoots up through them every few seconds.
 // - Hovering the drawing with a mouse opens the stack up (an "exploded view"): the top plate rises,
 //   the bottom sinks. Not on touch screens, where a tap would move the plates under the finger.
 // - Click a plate (or its button below) to select it: it lifts, spins once around its own axis (top
-//   and sides together, like a real hexagonal plate), and the caption explains that layer.
+//   and sides together, like a real hexagonal plate, overshooting a little and springing back), and
+//   the caption explains that layer.
 // Colors follow the theme (light / dark): see "Home hero" in global.css.
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
@@ -20,7 +22,7 @@ const layers = [
 const R = 115
 const SQUASH = 44 / (R * Math.sin(Math.PI / 3))
 const THICK = 9
-const SPIN_MS = 800
+const SPIN_MS = 700
 
 // The six corners after turning the plate by "turn" degrees around its vertical axis.
 function corners(turn: number) {
@@ -69,7 +71,9 @@ function HeroMark() {
     const step = (now: number) => {
       if (start < 0) start = now
       const t = Math.min((now - start) / SPIN_MS, 1)
-      const eased = 1 - Math.pow(1 - t, 3) // fast start, soft landing
+      // Fast start, then a small overshoot past a full turn that springs back (an "ease out back").
+      const c = 1.6
+      const eased = 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2)
       setTurn(t < 1 ? eased * 360 : 0)
       if (t < 1) frame.current = requestAnimationFrame(step)
     }

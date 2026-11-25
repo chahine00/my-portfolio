@@ -1,12 +1,12 @@
-// The Studio page (/studio, "Studio" in the navbar): Axihex's identity, purpose and vision in full.
+// The Studio page (/studio, "Studio" in the navbar): Axihex's identity, purpose and approach.
 // The home page's Studio section is the short version and links here.
-//   1. Identity: the official definition, and what Axihex is more than
+//   1. Identity: the official definition, its five purposes in one line each (the pillars in full
+//      are the home page's honeycomb, not repeated here), and what Axihex is more than
 //   2. What defines Axihex: four traits
-//   3. Purpose: the five pillars, in depth
 //   4. Capabilities: focused in engineering, flexible in what gets built
 //   5. Approach: product thinking (how vs why) and the process, from a need to an improved product
 //   6. One brand, many forms: what can live under Axihex, and where it ships
-//   7. Values, mission and philosophy
+//   7. The Axihex philosophy: one quote
 //   8. An invitation: start a project, or meet the founder
 // Text: src/data/identity.ts.
 
@@ -21,18 +21,14 @@ import {
   channels,
   definition,
   essence,
-  measure,
   moreThan,
   isRather,
-  mission,
   philosophy,
   pillars,
   process,
   thinking,
   traits,
   umbrella,
-  values,
-  vision,
 } from '../../data/identity.ts'
 import { STUDIO_DESCRIPTION, STUDIO_TITLE } from '../../data/seo.ts'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
@@ -44,7 +40,6 @@ import { useBack } from '../../utils/pageHistory.ts'
 
 function StudioPage() {
   useDocumentTitle(STUDIO_TITLE, { description: STUDIO_DESCRIPTION })
-  const pillarsRef = useReveal<HTMLOListElement>('.pillar-row')
   const processRef = useReveal<HTMLOListElement>('.process__step')
   // The way back to the page you came from (the home page if there's none).
   const back = useBack('/studio', '/')
@@ -59,11 +54,32 @@ function StudioPage() {
       {/* 1. Identity */}
       <section id="identity" className="section identity">
         <BackLink back={back} className="hero__back" />
-        <p className="eyebrow">Identity, purpose &amp; vision</p>
+        <p className="eyebrow">Identity &amp; purpose</p>
         <h1 className="identity__title">
-          Where engineering meets <GradientText text="curiosity." />
+          {/* The studio's main idea: it looks for opportunities and builds them. */}
+          Where we see an opportunity, <GradientText text="we build it." />
         </h1>
         <p className="identity__lead">{definition}</p>
+
+        {/* Its purpose, the five pillars in one line each (as in the official definition). The full
+            pillars, with examples and links, are the home page's honeycomb. */}
+        <div className="purpose">
+          <p className="purpose__label">Its purpose</p>
+          <ol className="purpose__list">
+            {pillars.map((pillar, i) => (
+              <li key={pillar.word}>
+                <span className="purpose__num" aria-hidden="true">
+                  0{i + 1}
+                </span>
+                <strong>{pillar.word}</strong>
+                <span>{pillar.statement}</span>
+              </li>
+            ))}
+          </ol>
+          <Link to="/#studio" className="forward-link purpose__more">
+            Explore the five pillars <span aria-hidden="true">→</span>
+          </Link>
+        </div>
 
         <div className="identity__not">
           <p className="identity__not-label">More than</p>
@@ -97,38 +113,6 @@ function StudioPage() {
           Independent doesn't mean solo: Axihex collaborates with clients, partners, and other organizations, and its founder
           stays open to engineering roles.
         </p>
-      </section>
-
-      {/* 3. The five pillars, in depth */}
-      <section id="pillars" className="section">
-        <SectionTitle label="Purpose" title="Five pillars." accent="One studio." />
-        <p className="studio-page__intro">Five complementary purposes. One consistent technology brand.</p>
-        <ol className="pillar-rows" ref={pillarsRef}>
-          {pillars.map((pillar, i) => (
-            <li key={pillar.word} className="pillar-row">
-              <span className="pillar-row__hex" aria-hidden="true">
-                <span>0{i + 1}</span>
-              </span>
-              <div className="pillar-row__body">
-                <h3>
-                  {pillar.word} <span className="pillar-row__statement">{pillar.statement}</span>
-                </h3>
-                <p>{pillar.text}</p>
-                <ul className="pillar-row__examples" aria-label="For example">
-                  {pillar.examples.map((example) => (
-                    <li key={example}>{example}</li>
-                  ))}
-                </ul>
-                <p className="pillar-row__objective">
-                  <span>Objective</span> {pillar.objective}
-                </p>
-                <Link to={pillar.link.to} className="forward-link">
-                  {pillar.link.label} <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-            </li>
-          ))}
-        </ol>
       </section>
 
       {/* 4. Capabilities */}
@@ -229,31 +213,8 @@ function StudioPage() {
         </div>
       </section>
 
-      {/* 7. Mission, vision, values */}
-      <section id="values" className="section">
-        <SectionTitle label="Values" title="What we" accent="stand for." />
-        <div className="mv">
-          <div className="mv__item">
-            <p className="direction__kicker">Mission</p>
-            <p className="direction__mission">{mission}</p>
-          </div>
-          <div className="mv__item">
-            <p className="direction__kicker">Long-term vision</p>
-            <p>{vision}</p>
-          </div>
-        </div>
-        <p className="direction__measure">{measure}</p>
-        <ul className="value-grid">
-          {values.map((value) => (
-            <li key={value.title}>
-              <span className="trait__icon" aria-hidden="true">
-                <Icon name={value.icon} size={18} />
-              </span>
-              <strong>{value.title}</strong>
-              <span>{value.text}</span>
-            </li>
-          ))}
-        </ul>
+      {/* 7. The Axihex philosophy: one quote on its own, before the invitation. */}
+      <section id="philosophy" className="section" aria-label="Axihex philosophy">
         <blockquote className="philosophy">
           <p>{philosophy}</p>
           <footer>Axihex philosophy</footer>

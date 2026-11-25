@@ -16,7 +16,12 @@ function HomeHero() {
     // id="home" lets the navbar link "/#home" scroll here.
     <section id="home" className="home-hero" aria-labelledby="home-title">
       <div className="home-hero__text">
-        <p className="eyebrow home-hero__label">{profile.role}</p>
+        {/* The studio's name, then what it is: the name shows in the hero without a big logo title. */}
+        <p className="eyebrow home-hero__label">
+          <span className="home-hero__brand">{profile.brand}</span>
+          <span className="home-hero__sep" aria-hidden="true">·</span>
+          {profile.role}
+        </p>
         <h1 id="home-title">
           {profile.headline} <GradientText text={profile.headlineAccent} />
         </h1>
@@ -38,9 +43,12 @@ function HomeHero() {
           <Link to="/#projects" className="button">
             Explore our work <span aria-hidden="true">→</span>
           </Link>
-          {/* The whole studio, not only client work: its pillars, products and direction (/studio). */}
-          <Link to="/studio" className="button button-outline">
-            Discover the studio
+          {/* Axihex welcomes client projects, so the second way in is the Contact form, with "project"
+              already chosen (like the honeycomb's "Your idea" cell). An outline button, so the offer
+              shows without making the studio look like a freelance agency. The Studio page is in the
+              navbar and the Studio section starts right below the hero. */}
+          <Link to="/#contact" state={{ topic: 'project' }} className="button button-outline">
+            Start a project
           </Link>
         </div>
 

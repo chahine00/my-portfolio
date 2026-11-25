@@ -5,7 +5,10 @@
 // The pillars are tabs: choosing one (click, hover with a mouse, or arrow keys) shows its panel on
 // the right (below on phones), with a link to where that pillar lives on this site. While nobody
 // has touched it and it's on screen, it moves to the next pillar by itself every few seconds.
-// At rest the cells float in a slow wave. Visitors who turn off animations get it still.
+// At rest the cells float in a slow wave. While the hive is on screen and the page is scrolled (up
+// or down), a shine sweeps across every cell, one after another, so the cells read as buttons to
+// press (phones have no hover to show it). It doesn't play while the page is still. Visitors who
+// turn off animations get it still.
 // Text: src/data/identity.ts. Looks: global.css, under "pillar hive".
 
 import { useEffect, useId, useRef, useState } from 'react'
@@ -38,12 +41,18 @@ const STEP_MS = 5200
 // sweeping across the honeycomb on the way to the card doesn't change the card. A click is instant.
 const HOVER_INTENT_MS = 280
 
+// How long one shine takes across all the cells (the last cell's delay plus its sweep, in global.css
+// under "The shine"). Scrolling during a shine doesn't restart it; the next scroll after it does.
+const SHINE_MS = 1700
+
 function PillarHive() {
   const [active, setActive] = useState(0)
   // True until the visitor picks a pillar themselves.
   const [auto, setAuto] = useState(true)
   const [reduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const [onScreen, setOnScreen] = useState(false)
+  const [shining, setShining] = useState(false)
+  const shineTimer = useRef<number | undefined>(undefined)
   const hiveRef = useRef<HTMLDivElement>(null)
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
   const hoverTimer = useRef<number | undefined>(undefined)
@@ -58,6 +67,23 @@ function PillarHive() {
     observer.observe(hive)
     return () => observer.disconnect()
   }, [])
+
+  // The shine: plays when the page scrolls while the hive is on screen, once per scroll gesture.
+  useEffect(() => {
+    if (!onScreen || reduceMotion) return
+    function handleScroll() {
+      if (shineTimer.current !== undefined) return // a shine is already playing
+      setShining(true)
+      shineTimer.current = window.setTimeout(() => {
+        shineTimer.current = undefined
+        setShining(false)
+      }, SHINE_MS)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [onScreen, reduceMotion])
+
+  useEffect(() => () => window.clearTimeout(shineTimer.current), [])
 
   useEffect(() => {
     if (!cycling) return
@@ -92,7 +118,7 @@ function PillarHive() {
 
   return (
     <div className="hive-layout">
-      <div className="hive" ref={hiveRef}>
+      <div className={shining ? 'hive hive--shine' : 'hive'} ref={hiveRef}>
         {/* The center: the Axihex mark itself. */}
         <div className="hive__cell hive__cell--core" style={place({ x: 0, y: 0 }, 6)} aria-hidden="true">
           <span className="hive__hex">
@@ -165,7 +191,7 @@ function PillarHive() {
               <li key={example}>{example}</li>
             ))}
           </ul>
-          <Link to={pillar.link.to} className="forward-link hive-panel__link">
+          <Link to={pillar.link.to} state={pillar.link.state} className="forward-link hive-panel__link">
             {pillar.link.label} <span aria-hidden="true">→</span>
           </Link>
         </div>

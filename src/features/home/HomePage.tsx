@@ -17,8 +17,8 @@ import { restoringTo } from '../../utils/pageHistory.ts'
 // LinkedIn, in bookmarks) to /#experience and the like are sent there instead of the page's top.
 const MOVED_SECTIONS: Record<string, string> = {
   '#about': '/#studio',
-  // The Direction section left the home page; mission and vision are on the Studio page.
-  '#direction': '/studio#values',
+  // The Direction section left the home page (and the site): the Studio page has the rest.
+  '#direction': '/studio',
   '#background': '/background',
   '#mindset': '/background#mindset',
   '#experience': '/background#experience',

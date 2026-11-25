@@ -277,7 +277,7 @@ const studioPage: Page = {
   path: '/studio',
   title: pageTitle(STUDIO_TITLE),
   description: STUDIO_DESCRIPTION,
-  imageAlt: `${profile.brand}: identity, purpose and vision`,
+  imageAlt: `${profile.brand}: identity, purpose and approach`,
   body: studioBody(),
   jsonLd: [
     { '@type': 'AboutPage', url: absoluteUrl('/studio'), about: { '@id': BRAND_ID } },

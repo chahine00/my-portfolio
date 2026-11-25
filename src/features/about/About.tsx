@@ -3,7 +3,7 @@
 // 2. The five pillars (PillarHive.tsx): a honeycomb around the Axihex mark; each pillar explains itself.
 // 3. The core engineering capabilities: what gets built.
 // 4. One quiet line about who is behind it, linking to the founder's page.
-// Everything else (traits, process, values, mission) lives on the Studio page.
+// Everything else (traits, process, philosophy) lives on the Studio page.
 // Text: src/data/studio.ts and src/data/identity.ts.
 
 import { Link } from 'react-router'
@@ -23,7 +23,7 @@ function About() {
         </h2>
         <p className="studio__text">{studio.text}</p>
         <Link to="/studio" className="forward-link studio__more">
-          Identity, purpose &amp; vision <span aria-hidden="true">→</span>
+          Identity &amp; purpose <span aria-hidden="true">→</span>
         </Link>
       </div>
 

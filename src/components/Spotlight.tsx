@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 
 // The cards that get the light. Keep in sync with the "card spotlight" selectors in global.css.
 export const SPOTLIGHT_CARDS =
-  '.card, .caps__item, .hive-panel, .trait, .value-grid li, .mindset__item, .contact-panel, .contact-tile'
+  '.card, .caps__item, .hive-panel, .trait, .mindset__item, .contact-panel, .contact-tile'
 
 function Spotlight() {
   useEffect(() => {

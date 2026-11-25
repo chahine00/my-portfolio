@@ -14,18 +14,14 @@ import { studio } from '../src/data/studio.ts'
 import {
   capabilities,
   definition,
-  measure,
   moreThan,
   isRather,
-  mission,
   philosophy,
   pillars,
   process,
   thinking,
   traits,
   umbrella,
-  values,
-  vision,
 } from '../src/data/identity.ts'
 import { coreStack, mindset, testimonials } from '../src/data/founder.ts'
 import { projects, selectedProjects, type Project } from '../src/data/projects.ts'
@@ -78,7 +74,7 @@ export function homeBody(posts: Update[]) {
   return wrap(
     `<header>${el('p', profile.role)}${el('h1', `${profile.headline} ${profile.headlineAccent}`)}${el('p', profile.intro)}</header>` +
       `<section id="studio">${el('h2', `${studio.title} ${studio.titleAccent}`)}${el('p', studio.text)}` +
-      `<p>${link('/studio', 'Identity, purpose & vision')}</p>` +
+      `<p>${link('/studio', 'Identity & purpose')}</p>` +
       el('h3', `${studio.pillarsTitle} ${studio.pillarsAccent}`) +
       list(pillars.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.statement)}`)) +
       el('h3', 'Core engineering capabilities') +
@@ -134,16 +130,13 @@ export function founderBody() {
 
 export function studioBody() {
   return wrap(
-    `<header>${el('p', 'Identity, purpose & vision')}${el('h1', 'Where engineering meets curiosity.')}${el('p', definition)}` +
+    `<header>${el('p', 'Identity & purpose')}${el('h1', 'Where we see an opportunity, we build it.')}${el('p', definition)}` +
+      el('p', 'Its purpose:') +
+      list(pillars.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.statement)}`)) +
       el('p', `More than: ${moreThan.join(', ')}. ${isRather}`) +
       '</header>' +
       `<section id="defines">${el('h2', 'What defines Axihex')}` +
       list(traits.map((t) => `<strong>${esc(t.title)}</strong>: ${esc(t.text)}`)) +
-      '</section>' +
-      `<section id="pillars">${el('h2', 'Five pillars. One studio.')}` +
-      pillars
-        .map((p, i) => el('h3', `0${i + 1} ${p.word}: ${p.statement}`) + el('p', p.text) + el('p', `Objective: ${p.objective}`))
-        .join('') +
       '</section>' +
       `<section id="capabilities">${el('h2', 'Core engineering capabilities')}` +
       list(capabilities.map((c) => `<strong>${esc(c.title)}</strong>: ${esc(c.text)}`)) +
@@ -157,10 +150,7 @@ export function studioBody() {
       `<section id="brand">${el('h2', 'One brand, many forms')}` +
       list(umbrella.map((u) => `<strong>${esc(u.title)}</strong>: ${esc(u.text)}`)) +
       '</section>' +
-      `<section id="values">${el('h2', 'What we stand for')}` +
-      el('h3', 'Mission') + el('p', mission) + el('h3', 'Long-term vision') + el('p', vision) + el('p', measure) +
-      list(values.map((v) => `<strong>${esc(v.title)}</strong>: ${esc(v.text)}`)) +
-      el('p', philosophy) +
+      `<section id="philosophy">${el('p', philosophy)}` +
       `<p>${link('/#contact', 'Start a project')} · ${link('/background', 'Meet the founder')}</p>` +
       '</section>',
   )
