@@ -7603,11 +7603,6 @@ a {
   font-size: 0.9rem;
 }
 
-.identity__not s {
-  text-decoration-color: color-mix(in srgb, var(--accent) 75%, transparent);
-  text-decoration-thickness: 2px;
-}
-
 .identity__is {
   display: flex;
   align-items: center;
@@ -9139,4 +9134,10 @@ a {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+/* Studio page: the "success is measured by…" line between mission/vision and the values. */
+.mv + .direction__measure {
+  margin: 18px 0 28px;
+  text-align: center;
 }

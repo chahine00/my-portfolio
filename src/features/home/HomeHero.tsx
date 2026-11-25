@@ -38,15 +38,15 @@ function HomeHero() {
           <Link to="/#projects" className="button">
             Explore our work <span aria-hidden="true">→</span>
           </Link>
-          {/* The Contact form opens with "A project" chosen (Contact.tsx). */}
-          <Link to="/#contact" state={{ topic: 'project' }} className="button button-outline">
-            Start a project
+          {/* The whole studio, not only client work: its pillars, products and direction (/studio). */}
+          <Link to="/studio" className="button button-outline">
+            Discover the studio
           </Link>
         </div>
 
         {/* Proof the work is real: where it has shipped. */}
         <div className="hero__proof">
-          <span className="hero__proof-label">Shipped to</span>
+          <span className="hero__proof-label">Our work is live on</span>
           <ul>
             {proof.map((item) => (
               <li key={item.label}>

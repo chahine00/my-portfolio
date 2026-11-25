@@ -21,7 +21,7 @@ export interface Project {
   //   'founder-led' → independent client work the founder delivered personally, not contracted under Axihex
   //   'experience'  → work done as an employee at a previous company
   category: ProjectCategory
-  // A short label on the card and the page, e.g. 'Founder-led · Client Project'.
+  // A short label on the card and the page, e.g. 'Client project'.
   context?: string
   role?: string // your role, e.g. 'Backend & AI engineer' or 'Solo developer'
   period?: string // when, e.g. 'Jan – Jun 2025' or '2024 – present'
@@ -63,9 +63,9 @@ export type ProjectCategory = 'studio' | 'founder-led' | 'experience'
 export const projects: Project[] = [
   {
     slug: 'boxmind-ai-backend',
-    title: 'boxMind AI: Enterprise AI Products',
+    title: 'boxMind AI: the backend behind its AI products',
     category: 'experience',
-    context: "Founder's Experience · boxMind AI",
+    context: 'As backend engineer at boxMind AI',
     summary: 'Built secure backend systems and AI integrations that helped bring enterprise AI products into production.',
     highlight: '~3 years building AI products for enterprises',
     cardTech: ['Python', 'FastAPI', 'RAG', 'AWS'],
@@ -156,7 +156,7 @@ The role went beyond code: it included the discussions and decisions on which fe
     slug: 'cinetwork',
     title: 'Cinetwork',
     category: 'founder-led',
-    context: 'Founder-led · Client Project',
+    context: 'Independent client project',
     summary: 'One film community, three platforms.',
     highlight: 'Live on Google Play, the App Store and the web',
     cardTech: ['React Native', 'Flask', 'MySQL', 'AWS'],
@@ -164,6 +164,12 @@ The role went beyond code: it included the discussions and decisions on which fe
     period: '2025 – present',
     team: 'Engineered for the client, in close collaboration',
     status: 'Live',
+    // The case study's key facts, shown big on the project's page.
+    metrics: [
+      { value: '3', label: 'platforms from one codebase: Android, iOS & web' },
+      { value: '2', label: 'app stores, live: Google Play & the App Store' },
+      { value: '1', label: 'engineer, from the database to the stores' },
+    ],
     problem:
       "The client's professional network for the film community needed to be engineered end to end: one app for Android, iOS and the web, with its backend and cloud.",
     result:
@@ -229,9 +235,9 @@ Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos 
   },
   {
     slug: 'boxmind-academy',
-    title: 'boxMind Academy: AI Learning for Schools',
+    title: 'boxMind Academy: the backend for AI learning in schools',
     category: 'experience',
-    context: "Founder's Experience · boxMind AI",
+    context: 'As backend engineer at boxMind AI',
     summary: 'Designed the database and built the backend for an AI-supported learning platform used by schools.',
     highlight: 'Used by schools under contract',
     cardTech: ['Python', 'MySQL', 'AI Integration', 'AWS'],

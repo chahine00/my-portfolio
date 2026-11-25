@@ -15,11 +15,11 @@ import type { Update } from './updates.ts'
 export const SITE_URL = profile.site // 'https://axihex.com', no slash at the end
 
 // The brand first, its founder after it (people also search for the founder by name).
-export const SITE_TITLE = `${profile.brand} | Building what's next · Founded by ${profile.name}`
+export const SITE_TITLE = `${profile.brand} | Independent software studio`
 
 export const HOME_DESCRIPTION =
-  `${profile.brand} is an independent, founder-led software studio by ${profile.name}: ` +
-  'exploring ideas, engineering digital products, and creating useful technology.'
+  `${profile.brand} is an independent software studio by ${profile.name}. It explores ideas, develops products ` +
+  'of its own, and engineers web and mobile apps for clients, from the interface to the backend, AI and cloud.'
 
 // The Studio page (/studio): the identity, the five pillars and the direction.
 export const STUDIO_DESCRIPTION =

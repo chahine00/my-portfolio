@@ -14,20 +14,20 @@ export const definition =
 export const essence = 'Where engineering meets curiosity, creativity, and ambition.'
 
 export const philosophy =
-  'Ideas deserve to be explored, engineered, and transformed into technology that provides genuine value.'
+  'The best software is the kind people stop noticing: it simply works, every day.'
 
 export const mission =
   'To transform ideas into useful digital solutions through thoughtful engineering, experimentation, creativity, and practical problem-solving.'
 
 export const vision =
-  'To establish Axihex as a sustainable, recognized technology brand that develops, launches, and maintains its own products, while staying open to client projects, partnerships, and professional opportunities.'
+  'To establish Axihex as a sustainable and recognized technology brand that develops, launches, and maintains its own digital products, while remaining open to client projects, partnerships, and professional opportunities.'
 
 // Measured by the work, not the headcount.
 export const measure =
   'Success is measured by the quality, usefulness, and integrity of the work, not by the number of products, services, or people behind it.'
 
-// What Axihex is not limited to (shown struck through on /studio), then what it is.
-export const notLimitedTo = ['A software agency', 'A freelance business', 'A personal portfolio', 'A single-product startup']
+// What Axihex is more than (PDF §1: "not limited to"), shown as chips on /studio, then what it is.
+export const moreThan = ['A software agency', 'A freelance business', 'A personal portfolio', 'A single-product startup']
 export const isRather = 'A software studio rooted in engineering, with the freedom to pursue what comes next.'
 
 // What defines Axihex.
@@ -71,7 +71,7 @@ export const pillars: Pillar[] = [
   },
   {
     word: 'Showcase',
-    statement: 'Engineering expertise, proven through real work.',
+    statement: 'Real projects and achievements, from the studio and its founder.',
     text: "Credibility comes from genuine work: studio projects, client work, engineering achievements, and the founder's experience, each attributed accurately.",
     objective: 'Credibility through genuine work and achievements.',
     examples: ['Studio & client projects', 'Engineering milestones', "The founder's experience"],
@@ -80,7 +80,7 @@ export const pillars: Pillar[] = [
   },
   {
     word: 'Share',
-    statement: 'Technical knowledge and useful resources for the community.',
+    statement: 'Technical knowledge, insights, and useful tools for the community.',
     text: 'What is learned while building is worth passing on: articles, case studies, and lessons from real projects, shared without exposing anything confidential.',
     objective: 'Contribute to the community through meaningful technical work.',
     examples: ['Technical articles', 'Engineering case studies', 'Open-source & free tools'],
@@ -89,7 +89,7 @@ export const pillars: Pillar[] = [
   },
   {
     word: 'Grow',
-    statement: 'Foster innovation, collaboration, and opportunity.',
+    statement: 'Innovation, collaboration, and professional opportunities.',
     text: 'Growth through real work and relationships, not an artificial impression of size: new clients, partnerships, collaborators, and a team when the work justifies it.',
     objective: 'A sustainable foundation for technical, professional, and business growth.',
     examples: ['Client & partner relationships', 'Collaborating with makers', 'Reinvesting in new ideas'],
@@ -128,7 +128,7 @@ export const process: { title: string; text: string }[] = [
 // One brand, many forms: what can live under Axihex, and where it ships.
 export const umbrella: { title: string; text: string; icon: IconName }[] = [
   { title: 'Original products', text: 'Owned applications, platforms, and digital tools.', icon: 'box' },
-  { title: 'Client solutions', text: 'Freelance development and custom software projects.', icon: 'briefcase' },
+  { title: 'Client solutions', text: 'Custom web and mobile software, built for clients.', icon: 'briefcase' },
   { title: 'Research & innovation', text: 'Experiments, prototypes, and emerging technologies.', icon: 'flask' },
   { title: 'Knowledge & resources', text: 'Technical articles, insights, and community contributions.', icon: 'book' },
 ]

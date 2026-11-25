@@ -7,12 +7,13 @@ export const profile = {
   brand: 'Axihex',
   site: 'https://axihex.com',
   // The small label above the hero's headline: what Axihex is.
-  role: 'Independent, founder-led software studio',
-  // The hero's headline. The words in "headlineAccent" are shown in the accent gradient.
-  headline: 'Building',
-  headlineAccent: "what's next.",
-  // One or two sentences under the headline.
-  intro: 'Exploring ideas, engineering digital products, and creating useful technology.',
+  role: 'Independent software studio',
+  // The hero's headline. The words in "headlineAccent" are shown in the accent gradient. It names
+  // the three layers drawn next to it (interface, backend, infrastructure): what Axihex engineers.
+  headline: 'From the screen',
+  headlineAccent: 'to the server.',
+  // One or two sentences under the headline: what Axihex does, concretely.
+  intro: 'We explore ideas, develop products of our own, and engineer web and mobile apps for clients, from the interface to the backend, AI and cloud.',
   // The founder line at the bottom of the hero.
   founderTitle: 'Software Engineer',
   location: 'Beirut, Lebanon',
@@ -26,6 +27,7 @@ export const profile = {
   // Typed out one by one under the home page's headline, like code being written. Keep each one short.
   // One per core capability (src/data/identity.ts): web, mobile, backend, AI, cloud.
   building: [
+    'products of our own',
     'web apps, end to end',
     'cross-platform mobile apps',
     'secure APIs & databases',

@@ -14,9 +14,10 @@ import { studio } from '../src/data/studio.ts'
 import {
   capabilities,
   definition,
+  measure,
+  moreThan,
   isRather,
   mission,
-  notLimitedTo,
   philosophy,
   pillars,
   process,
@@ -88,7 +89,7 @@ export function homeBody(posts: Update[]) {
       list(posts.slice(0, 3).map((post) => `${link(`/blog/${post.slug}`, post.title)} ${esc(post.summary)}`)) +
       `<p>${link('/blog', 'All posts')}</p></section>` +
       `<section id="contact">${el('h2', 'Let’s talk.')}` +
-      el('p', 'A project in mind, an idea to build together, a collaboration, or an engineering role. Reach out by email, on LinkedIn, or with the form.') +
+      el('p', 'A project in mind, an idea to build together, or a collaboration. Reach out by email, on LinkedIn, or with the form.') +
       `${contactLinks}</section>`,
   )
 }
@@ -134,7 +135,7 @@ export function founderBody() {
 export function studioBody() {
   return wrap(
     `<header>${el('p', 'Identity, purpose & vision')}${el('h1', 'Where engineering meets curiosity.')}${el('p', definition)}` +
-      el('p', `Not limited to: ${notLimitedTo.join(', ')}. ${isRather}`) +
+      el('p', `More than: ${moreThan.join(', ')}. ${isRather}`) +
       '</header>' +
       `<section id="defines">${el('h2', 'What defines Axihex')}` +
       list(traits.map((t) => `<strong>${esc(t.title)}</strong>: ${esc(t.text)}`)) +
@@ -157,7 +158,7 @@ export function studioBody() {
       list(umbrella.map((u) => `<strong>${esc(u.title)}</strong>: ${esc(u.text)}`)) +
       '</section>' +
       `<section id="values">${el('h2', 'What we stand for')}` +
-      el('h3', 'Mission') + el('p', mission) + el('h3', 'Long-term vision') + el('p', vision) +
+      el('h3', 'Mission') + el('p', mission) + el('h3', 'Long-term vision') + el('p', vision) + el('p', measure) +
       list(values.map((v) => `<strong>${esc(v.title)}</strong>: ${esc(v.text)}`)) +
       el('p', philosophy) +
       `<p>${link('/#contact', 'Start a project')} · ${link('/background', 'Meet the founder')}</p>` +

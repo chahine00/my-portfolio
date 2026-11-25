@@ -1,6 +1,6 @@
 // The Studio page (/studio, "Studio" in the navbar): Axihex's identity, purpose and vision in full.
 // The home page's Studio section is the short version and links here.
-//   1. Identity: the definition, and what Axihex is not limited to
+//   1. Identity: the official definition, and what Axihex is more than
 //   2. What defines Axihex: four traits
 //   3. Purpose: the five pillars, in depth
 //   4. Capabilities: focused in engineering, flexible in what gets built
@@ -21,9 +21,10 @@ import {
   channels,
   definition,
   essence,
+  measure,
+  moreThan,
   isRather,
   mission,
-  notLimitedTo,
   philosophy,
   pillars,
   process,
@@ -59,12 +60,10 @@ function StudioPage() {
         <p className="identity__lead">{definition}</p>
 
         <div className="identity__not">
-          <p className="identity__not-label">Not limited to</p>
+          <p className="identity__not-label">More than</p>
           <ul>
-            {notLimitedTo.map((item) => (
-              <li key={item}>
-                <s>{item}</s>
-              </li>
+            {moreThan.map((item) => (
+              <li key={item}>{item}</li>
             ))}
           </ul>
           <p className="identity__is">
@@ -90,7 +89,7 @@ function StudioPage() {
         </ul>
         <p className="identity__footnote">
           Independent doesn't mean solo: Axihex collaborates with clients, partners, and other organizations, and its founder
-          remains open to employment.
+          stays open to engineering roles.
         </p>
       </section>
 
@@ -237,6 +236,7 @@ function StudioPage() {
             <p>{vision}</p>
           </div>
         </div>
+        <p className="direction__measure">{measure}</p>
         <ul className="value-grid">
           {values.map((value) => (
             <li key={value.title}>
@@ -258,7 +258,7 @@ function StudioPage() {
       <section id="studio-contact" className="section studio-cta">
         <p className="studio-cta__essence">{essence}</p>
         <h2 className="studio-cta__title">
-          Building <GradientText text="what's next." />
+          Have a project in mind? <GradientText text="Let's scope it." />
         </h2>
         <div className="hero-actions studio-cta__actions">
           <Link to="/#contact" state={{ topic: 'project' }} className="button">

@@ -1,6 +1,6 @@
 // The "Selected work" section: every project in one grid, studio work first, then the founder's
 // client work, then his work at previous employers. The first card is featured (full width).
-// Each card's label (its "context", e.g. 'Founder-led · Client Project') says who delivered it.
+// Each card's label (its "context", e.g. 'Client project') says who delivered it.
 
 import { selectedProjects } from '../../data/projects.ts'
 import ProjectCard from './ProjectCard.tsx'

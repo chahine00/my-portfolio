@@ -1,12 +1,11 @@
 import type { IconName } from '../components/iconNames.ts'
 
-// The proof strip under the home hero's buttons: where the work has actually shipped (The CI
-// Network is live on all three; everything runs on AWS). Keep it true: only places it's live.
+// The proof strip under the home hero's buttons: where the work has actually shipped (Cinetwork
+// is live on all three). Keep it true: only places it's live.
 export const proof: { icon: IconName; label: string }[] = [
   { icon: 'smartphone', label: 'App Store' },
   { icon: 'smartphone', label: 'Google Play' },
   { icon: 'globe', label: 'Web' },
-  { icon: 'cloud', label: 'AWS' },
 ]
 
 // The home page's Studio section (About.tsx). Also read by the build (scripts/prerender.ts), which
@@ -17,11 +16,11 @@ export const studio = {
   title: 'Small studio.',
   titleAccent: 'Serious engineering.', // in the accent gradient
   // One short paragraph: what Axihex does, for whom. The details are on the Studio page (/studio).
-  text: 'Axihex is a founder-led software studio. We explore ideas, build products of our own, and engineer web, mobile, backend, AI and cloud software for clients.',
+  text: 'Axihex is a founder-led software studio. We explore ideas, develop products of our own, and engineer web, mobile, backend, AI and cloud software for clients.',
   // The pillars, capabilities and the rest of the identity live in src/data/identity.ts.
   pillarsTitle: 'Five pillars.',
   pillarsAccent: 'One studio.',
   // The one line about who is behind it, with a quiet link to the founder's page (/background).
-  founderNote: 'Founder-led, rooted in years of real engineering work.',
+  founderNote: 'Rooted in years of real engineering work.',
   founderLink: 'Meet the founder',
 }

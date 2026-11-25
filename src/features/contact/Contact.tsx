@@ -103,8 +103,8 @@ function Contact() {
           {/* Axihex welcomes client projects and collaborations, and the founder is open to roles:
               the intro names all three, the form's topic choices (src/data/identity.ts) too. */}
           <p className="contact-intro">
-            A project in mind, an idea to build together, a collaboration, or an engineering role. Reach out by email, on
-            LinkedIn, or with the form.
+            A project in mind, an idea to build together, or a collaboration. Reach out by email, on LinkedIn, or with the
+            form.
           </p>
           <ul className="contact-tiles">
             {/* Phone numbers only when SHOW_PHONE_NUMBERS is on (see the top of this file). */}
@@ -198,7 +198,9 @@ function Contact() {
               <fieldset className="contact-topics">
                 <legend>What brings you here?</legend>
                 <div className="contact-topics__list">
-                  {topics.map((item) => (
+                  {/* "A role for the founder" only shows when you come from the founder's page (its
+                      "Get in touch"): the studio's own pages stay about the studio's work. */}
+                  {topics.filter((item) => item.id !== 'role' || wantedTopic === 'role').map((item) => (
                     <button
                       key={item.id}
                       type="button"
