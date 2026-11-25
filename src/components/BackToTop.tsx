@@ -1,6 +1,7 @@
 // A round "back to top" button that floats near the bottom of every page.
 // It appears while you scroll (once you're past the top of the page) and fades out
-// 2 seconds after you stop, so it doesn't sit on top of what you're reading.
+// 2 seconds after you stop, so it doesn't sit on top of what you're reading. Once the footer is on
+// screen it stays shown, floating over the footer at the same spot.
 // It never shows over the Skills section.
 
 import { useEffect, useRef, useState } from 'react'
@@ -21,6 +22,12 @@ function isOverSkills() {
   return top < buttonZone && bottom > buttonZone
 }
 
+// True once the footer is on screen: the end of the page, where the button stays shown.
+function isAtFooter() {
+  const footer = document.querySelector('.footer')
+  return !!footer && footer.getBoundingClientRect().top < window.innerHeight
+}
+
 function BackToTop() {
   const [visible, setVisible] = useState(false)
   // True while the mouse is over the button: it then stays, so it can't vanish under the cursor.
@@ -34,7 +41,7 @@ function BackToTop() {
       // React only re-draws when the value actually changes, so this stays cheap while scrolling.
       const show = window.scrollY > 400 && !isOverSkills()
       setVisible(show)
-      if (show) {
+      if (show && !isAtFooter()) {
         hideTimer.current = window.setTimeout(() => setVisible(false), HIDE_AFTER_MS)
       }
     }

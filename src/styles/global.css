@@ -4113,17 +4113,21 @@ button.contact-tile__main {
   }
 }
 
-/* Back to top: fixed to the bottom-right corner of the screen (shown once you scroll down) */
+/* Back to top: fixed to the bottom of the screen (shown once you scroll down). It keeps the same
+   spot all the way down, floating over the footer too. */
 .back-to-top {
   position: fixed;
-  /* At the end of the page it rises above the footer (--footer-lift, set by Footer.tsx). */
-  translate: 0 calc(-1 * var(--footer-lift, 0px));
   /* Its center sits 85% of the way across the screen on desktop (75% on phones, see below).
      "- 28px" is half its width, used instead of a transform so the hover and press effects
      still work. The bottom grows with the screen (32px to 64px) and clears the iPhone home bar. */
   left: calc(85% - 28px);
   bottom: calc(clamp(32px, 5vw, 64px) + env(safe-area-inset-bottom));
   z-index: 20;
+  /* Its own graphics layer, like the tab bar: iPhone Safari otherwise shifts or clips a button
+     fixed to the bottom while its toolbar shrinks or grows during a scroll, which happens at the
+     end of the page, over the footer. */
+  will-change: transform;
+  backface-visibility: hidden;
   width: 56px;
   height: 56px;
   /* A solid deep indigo in both themes (the dark theme's lighter accent looked see-through),
@@ -8773,9 +8777,69 @@ a {
     padding-top: 22px;
   }
 
+  /* Phones: a softer opening. A smaller, lighter headline with a little more air between its
+     letters and lines, calmer body text, and two equal buttons side by side instead of two big
+     stacked blocks, so the first screen reads gently instead of shouting. */
+  .home-hero {
+    gap: 1.6rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .home-hero h1 {
+    margin-top: 8px;
+    font-size: clamp(2.1rem, 9.2vw, 2.55rem);
+    font-weight: 650;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+  }
+
+  .home-hero__lede {
+    margin-top: 0.9rem;
+    font-size: 0.98rem;
+    line-height: 1.62;
+  }
+
   .home-hero .hero__code {
-    font-size: clamp(0.7rem, 3.3vw, 0.95rem);
+    margin-top: 10px;
+    font-size: clamp(0.7rem, 3.1vw, 0.86rem);
     white-space: nowrap;
+    opacity: 0.85;
+  }
+
+  .home-hero .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .home-hero .hero-actions .button {
+    padding: 11px 8px;
+    border-radius: 10px;
+    font-size: clamp(0.8rem, 3.6vw, 0.93rem);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .home-hero .hero__proof {
+    margin-top: 22px;
+    padding-top: 14px;
+  }
+
+  /* The figure under the text: a little lighter, so it doesn't crowd the intro. */
+  .home-hero .layer-figure {
+    padding: 1rem 0.9rem 0.9rem;
+    border-radius: 14px;
+    box-shadow: none;
+  }
+
+  .home-hero .layer-switch label span {
+    min-height: 34px;
+    font-size: 0.8rem;
+  }
+
+  .home-hero .layer-caption {
+    font-size: 0.83rem;
   }
 
   /* Phones: the label above the headline stays on one line (smaller, shorter dash). */

@@ -1,9 +1,6 @@
 // The footer at the bottom of every page, kept compact: one row on wide screens (the Axihex mark
 // with what it is and where | the links | the social icons), two short rows on phones.
-// At the end of the page, the floating back-to-top button lifts to sit just above the footer, so it
-// never covers the footer's links or icons.
 
-import { useEffect, useRef } from 'react'
 import { Link } from 'react-router'
 import SocialLinks from './SocialLinks.tsx'
 import AxihexMark from './AxihexMark.tsx'
@@ -19,31 +16,8 @@ const links = [
 ]
 
 function Footer() {
-  const footerRef = useRef<HTMLElement>(null)
-
-  // How far the back-to-top button must rise to clear the footer (--footer-lift, used in global.css).
-  useEffect(() => {
-    const root = document.documentElement
-    function update() {
-      const footer = footerRef.current
-      const button = document.querySelector<HTMLElement>('.back-to-top')
-      if (!footer || !button) return
-      const overlap = window.innerHeight - footer.getBoundingClientRect().top
-      const gap = parseFloat(getComputedStyle(button).bottom) || 0
-      root.style.setProperty('--footer-lift', `${Math.max(0, Math.round(overlap - gap + 12))}px`)
-    }
-    update()
-    window.addEventListener('scroll', update, { passive: true })
-    window.addEventListener('resize', update)
-    return () => {
-      window.removeEventListener('scroll', update)
-      window.removeEventListener('resize', update)
-      root.style.removeProperty('--footer-lift')
-    }
-  }, [])
-
   return (
-    <footer className="footer" ref={footerRef}>
+    <footer className="footer">
       <div className="footer__inner">
         <div className="footer__brand">
           <Link to="/#home" className="footer__logo" state={{ replayWelcome: true }}>
