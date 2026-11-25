@@ -17,6 +17,8 @@ import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import { clearHash } from '../../utils/goToTop.ts'
 import SectionTitle from '../../components/SectionTitle.tsx'
 import Hero from '../home/Hero.tsx'
+import AvatarGuide from '../../components/AvatarGuide.tsx'
+import { founderGuideTips } from '../../data/guide.ts'
 import BackLink from '../../components/BackLink.tsx'
 import { useBack } from '../../utils/pageHistory.ts'
 import Mindset from './Mindset.tsx'
@@ -84,6 +86,9 @@ function BackgroundPage() {
       <Skills />
       <Education />
       <FounderContact />
+      {/* Your avatar peeks out at each section, waving at one and standing at the next (see
+          AvatarGuide.tsx). On phones it comes out up to 3 times, more than on the home page. */}
+      <AvatarGuide tips={founderGuideTips} turns={['wave', 'stand']} phoneMax={3} />
     </div>
   )
 }

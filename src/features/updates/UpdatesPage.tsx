@@ -7,7 +7,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation, useNavigationType, useSearchParams } from 'react-router'
 import { filterUpdates, sortedUpdates } from '../../data/updates.ts'
 import { readListSpot, saveListSpot } from './listSpot.ts'
-import { useBack } from '../../utils/pageHistory.ts'
+import { restoringTo, useBack } from '../../utils/pageHistory.ts'
 import BackLink from '../../components/BackLink.tsx'
 import BlogFilters from './BlogFilters.tsx'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
@@ -47,9 +47,12 @@ function UpdatesPage() {
     returnTo: (location.state as { returnTo?: string } | null)?.returnTo,
     back: navigationType === 'POP',
     search: location.search,
+    // Being brought back to an exact saved spot (App.tsx does it): no scrolling of its own.
+    restoring: restoringTo('/blog', navigationType === 'POP') !== undefined,
   }))
 
   useLayoutEffect(() => {
+    if (opening.restoring) return
     let top = 0
     const { returnTo, back, search } = opening
     if (returnTo || back) {

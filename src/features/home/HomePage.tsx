@@ -11,6 +11,7 @@ import AvatarGuide from '../../components/AvatarGuide.tsx'
 import { BACK_AT_TOP_EVENT, clearHash } from '../../utils/goToTop.ts'
 import { forgetProjectLeft, projectJustLeft, scrollToProjectCard } from '../projects/projectReturn.ts'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
+import { restoringTo } from '../../utils/pageHistory.ts'
 
 // Sections that used to be on the home page, and where they are now. Old links (in the CV, on
 // LinkedIn, in bookmarks) to /#experience and the like are sent there instead of the page's top.
@@ -45,7 +46,11 @@ function HomePage() {
 
   // The phone's back gesture (or the browser's back button) from a project's page: open at that
   // project's card, like the page's "All projects" buttons do. Decided once, when the page opens.
-  const [backToCard] = useState(() => (navigationType === 'POP' ? projectJustLeft() : null))
+  // Going back to an exact saved spot (App.tsx brings the page back to exactly where it was): the
+  // page then does none of its own scrolling (project card, #section). Decided once, when it opens.
+  const [restoring] = useState(() => restoringTo('/', navigationType === 'POP') !== undefined)
+  const [backToCard] = useState(() => (navigationType === 'POP' && !restoring ? projectJustLeft() : null))
+  const skipFirstScroll = useRef(restoring)
   // Set once it has scrolled there: the #section scroll below then leaves the page where it is.
   const atCard = useRef(false)
   useLayoutEffect(() => {
@@ -65,6 +70,12 @@ function HomePage() {
       return
     }
     if (moved) return // on its way to the section's new place (above)
+    if (skipFirstScroll.current) {
+      // Being brought back to the exact spot you left (App.tsx): no #section jump on top of it.
+      skipFirstScroll.current = false
+      if (hash) clearHash()
+      return
+    }
     if (hash === '#home') {
       window.scrollTo(0, 0)
       if (replayWelcome) window.dispatchEvent(new Event(BACK_AT_TOP_EVENT))
@@ -90,8 +101,9 @@ function HomePage() {
       {/* The blog sits just before Contact: the latest news, then a way to get in touch. */}
       <Updates />
       <Contact />
-      {/* The avatar peeks out at each section to say what it is (see AvatarGuide.tsx). */}
-      <AvatarGuide />
+      {/* The tiny robot peeks out at a few sections to say what they are (see AvatarGuide.tsx). The
+          founder's avatar appears on the founder's page only. */}
+      <AvatarGuide turns={['robot']} />
     </>
   )
 }

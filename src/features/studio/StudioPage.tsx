@@ -38,11 +38,16 @@ import { STUDIO_DESCRIPTION, STUDIO_TITLE } from '../../data/seo.ts'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import { useReveal } from '../../utils/useReveal.ts'
 import Capabilities from './Capabilities.tsx'
+import BackLink from '../../components/BackLink.tsx'
+import ScrollUpBack from '../../components/ScrollUpBack.tsx'
+import { useBack } from '../../utils/pageHistory.ts'
 
 function StudioPage() {
   useDocumentTitle(STUDIO_TITLE, { description: STUDIO_DESCRIPTION })
   const pillarsRef = useReveal<HTMLOListElement>('.pillar-row')
   const processRef = useReveal<HTMLOListElement>('.process__step')
+  // The way back to the page you came from (the home page if there's none).
+  const back = useBack('/studio', '/')
 
   // Open at the top, not where the previous page was scrolled to.
   useLayoutEffect(() => {
@@ -53,6 +58,7 @@ function StudioPage() {
     <div className="page-enter studio-page">
       {/* 1. Identity */}
       <section id="identity" className="section identity">
+        <BackLink back={back} className="hero__back" />
         <p className="eyebrow">Identity, purpose &amp; vision</p>
         <h1 className="identity__title">
           Where engineering meets <GradientText text="curiosity." />
@@ -272,6 +278,9 @@ function StudioPage() {
           </Link>
         </div>
       </section>
+
+      {/* Phones, in the middle of the page: the same way back, under the thumb when you scroll up. */}
+      <ScrollUpBack label={back.label} onClick={() => back.go()} />
     </div>
   )
 }

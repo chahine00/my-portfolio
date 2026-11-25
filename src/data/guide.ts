@@ -1,5 +1,8 @@
-// What the avatar says when you scroll to each home section, and where it comes out
-// (see AvatarGuide.tsx and avatarGuidePlacement.ts).
+// What the guide says when you scroll to each section, and where it comes out
+// (see AvatarGuide.tsx and avatarGuidePlacement.ts). Two sets of stops:
+// - guideTips: the home page, where the tiny robot speaks for the studio (robotText).
+// - founderGuideTips: the founder's page (/background), where your avatar speaks as you (text),
+//   waving at one stop and standing at the next.
 //
 // section: the id of the <section> (the same as the navbar link, e.g. 'projects' for #projects).
 // text: one or two short sentences. They're typed out letter by letter.
@@ -38,6 +41,8 @@ export interface GuideTip extends GuideSpot {
   // Which avatar picture, when by is 'avatar': waving or standing (also set by AvatarGuide.tsx).
   pose?: 'wave' | 'stand'
   leaveBelow?: number
+  // Only once you've scrolled down a little: for a section already on screen when the page opens.
+  afterScroll?: boolean
   phone?: GuideSpot
   desktopOnly?: boolean // never on phones (they get as few appearances as possible)
 }
@@ -50,16 +55,16 @@ const PHONE_FIRST_POST = (anchor: string): GuideSpot => ({ anchor, index: 0, ali
 // The hexagon is Axihex's brand symbol; the avatar is the founder, the robot a small assistant.
 export const guideTips: GuideTip[] = [
   {
-    // Over the post in the right column, on its left (clear of "See all" on the far right).
+    // Over the second post of the short list, on its left (clear of "All posts" on the far right).
     section: 'blog',
     desktopOnly: true,
     text: 'The latest posts and events.',
     robotText: 'Fresh data: the latest posts and events.',
-    anchor: '.blog-preview__item',
+    anchor: '.notes-list li',
     index: 1,
     align: 'left',
     bubble: 'right',
-    phone: PHONE_FIRST_POST('.blog-preview__item'),
+    phone: PHONE_FIRST_POST('.notes-list li'),
   },
   {
     // Standing beside the contact form, in the empty space on its right.
@@ -71,4 +76,30 @@ export const guideTips: GuideTip[] = [
     bubble: 'above',
     phone: PHONE_FIRST_POST('.contact-tile'),
   },
+]
+
+// The founder's page: your avatar, as you. More stops than the home page: this page is about you.
+// No set spot: each comes out in the free space by its section's heading (see the top of this file).
+const founderTip = (section: string, text: string, spot: Partial<GuideTip> = {}): GuideTip => ({
+  section,
+  text,
+  robotText: text,
+  ...spot,
+})
+
+export const founderGuideTips: GuideTip[] = [
+  // Right under the hero, so on screen as the page opens: it waits until you scroll. It stands in
+  // the empty space on the left of the "how I work" cards, its bubble above it.
+  founderTip('mindset', 'This is how I think about building software.', {
+    afterScroll: true,
+    anchor: '.mindset__item',
+    index: 0,
+    edge: 'beside-left',
+    bubble: 'above',
+  }),
+  founderTip('experience', 'Where I worked, and what I built there.'),
+  founderTip('selected-work', 'Want to see it in practice? Have a look at the projects.'),
+  founderTip('skills', 'The tools I work with every day.'),
+  founderTip('education', 'Where I learned, and I keep learning.'),
+  founderTip('founder-contact', 'Looking for an engineer? Let’s talk.'),
 ]

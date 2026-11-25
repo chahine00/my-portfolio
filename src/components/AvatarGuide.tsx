@@ -26,10 +26,11 @@
 //   still on screen there, and it carries on with its sentence.
 // - Each section's tip shows once per visit (unless you left before reading it). On phones it
 //   comes out at most PHONE_MAX_APPEARANCES times per visit, and only for tips without desktopOnly.
-// - It takes turns between three guides: the tiny robot from the hero (RobotSprite.tsx), waving
-//   its arm and saying the section's robotText (guide.ts); your avatar waving (avatar-wave.webp);
-//   and your main avatar standing (avatar-stand.webp), so it isn't the same face at every stop.
-//   The first one is the robot, the studio's small assistant; the avatars are the founder.
+// - Who comes out is chosen per page ("turns"): on the home page (about the studio) only the tiny
+//   robot from the hero (RobotSprite.tsx), waving its arm and saying the section's robotText
+//   (guide.ts); on the founder's page only your avatar, taking turns waving (avatar-wave.webp) and
+//   standing (avatar-stand.webp), one pose per stop. The robot is the studio's small assistant;
+//   the avatar is the founder, so it appears on the founder's page only.
 // - Both avatars are cropped to the upper body at the same size (520×600, head at the same place
 //   and scale), so they use the same spots and CSS. Each is one picture, so it moves as a whole
 //   (rises, tilts, bobs).
@@ -81,9 +82,13 @@ let appearances = 0
 let lastScrollAt = 0
 const scrolling = () => Date.now() - lastScrollAt < 200
 
-// Who comes out, in turn (see "takes turns" above). The robot goes first.
-const TURNS = ['robot', 'wave', 'stand'] as const
-type Turn = (typeof TURNS)[number]
+// Tips with afterScroll (guide.ts) wait until you've scrolled at least this far down since the page
+// opened: a section already on screen when the page opens doesn't get a guide popping up at once.
+const AFTER_SCROLL_PX = 40
+let scrolledDown = false
+
+// Who can come out (see "Who comes out" above). Each page passes its own list; they take turns.
+export type Turn = 'robot' | 'wave' | 'stand'
 let turn = 0
 
 // The avatar pictures, by pose (both 520×600, framed the same way).
@@ -133,12 +138,23 @@ interface Shown {
   spot: Placement
 }
 
-function AvatarGuide() {
-  // Leaving the home page ends the visit: the tips can show again next time (see "seen").
+interface AvatarGuideProps {
+  tips?: GuideTip[] // the page's stops (src/data/guide.ts)
+  turns?: Turn[] // who comes out, taking turns: the home page's robot, the founder's page's avatar
+  phoneMax?: number // on phones, how many times it may come out per visit
+}
+
+function AvatarGuide({ tips = guideTips, turns = ['robot'], phoneMax = PHONE_MAX_APPEARANCES }: AvatarGuideProps) {
+  // Read by the scroll watcher below (set up once), so it always sees this page's settings.
+  const settings = useRef({ tips, turns, phoneMax })
+  // Leaving the page ends the visit: the tips can show again next time (see "seen"), and the next
+  // page starts with its first guide.
   useEffect(
     () => () => {
       seen.clear()
       appearances = 0
+      turn = 0
+      scrolledDown = false
     },
     [],
   )
@@ -242,14 +258,16 @@ function AvatarGuide() {
       }
 
       // Phones: once it has come out PHONE_MAX_APPEARANCES times, that's it for this visit.
-      if (isPhone() && appearances >= PHONE_MAX_APPEARANCES) {
+      const { tips, turns, phoneMax } = settings.current
+      if (isPhone() && appearances >= phoneMax) {
         candidate = null
         return
       }
 
-      for (const plain of guideTips) {
+      for (const plain of tips) {
         if (plain.desktopOnly && isPhone()) continue
-        const tip = said(plain, TURNS[turn])
+        if (plain.afterScroll && !scrolledDown) continue
+        const tip = said(plain, turns[turn % turns.length])
         if (seen.has(tip.section) || !sectionOnScreen(tip)) continue
         const section = document.getElementById(tip.section)
         if (!section) continue
@@ -272,7 +290,7 @@ function AvatarGuide() {
         candidate = null
         seen.set(tip.section, { anchor: spot.anchor, at: now })
         unreadRef.current = false
-        turn = (turn + 1) % TURNS.length
+        turn = (turn + 1) % settings.current.turns.length
         appearances += 1
         setShown({ tip, spot })
         setQuick(false)
@@ -288,6 +306,8 @@ function AvatarGuide() {
     function onScroll() {
       scrolledAt = Date.now()
       lastScrollAt = scrolledAt
+      // Scrolled down a little since the page opened: tips with afterScroll may come out now.
+      if (window.scrollY > AFTER_SCROLL_PX) scrolledDown = true
       if (!frame) frame = requestAnimationFrame(check)
     }
 

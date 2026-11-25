@@ -2,9 +2,9 @@
 // its job is to put all the other components together in order.
 
 // To use a component from another file, import it first.
-import { lazy, Suspense, useEffect } from 'react'
-import { Navigate, Route, Routes, useLocation, useParams } from 'react-router'
-import { recordVisit, rememberHomeSection } from '../utils/pageHistory.ts'
+import { lazy, Suspense, useEffect, useLayoutEffect } from 'react'
+import { Navigate, Route, Routes, useLocation, useNavigationType, useParams } from 'react-router'
+import { recordVisit, rememberHomeSection, rememberScroll, restoreScroll } from '../utils/pageHistory.ts'
 import Navbar from '../components/Navbar.tsx'
 import BackgroundGlow from '../components/BackgroundGlow.tsx'
 import Footer from '../components/Footer.tsx'
@@ -35,7 +35,30 @@ function App() {
   const { pathname, search } = useLocation()
   // Every "Back to …" link returns to the page you were really on before (src/utils/pageHistory.ts):
   // record each page, and on the home page, which section was on screen when a link took you away.
-  useEffect(() => recordVisit(pathname, search), [pathname, search])
+  // Going back (a "Back" link or the browser's back button) returns to the exact spot you left.
+  const navigationType = useNavigationType()
+  // A layout effect: it runs before the page is painted, so going back never flashes the top first.
+  useLayoutEffect(() => {
+    const y = recordVisit(pathname, search, navigationType === 'POP')
+    if (y !== null) restoreScroll(y)
+    // navigationType only changes together with the address, so this runs once per page change.
+  }, [pathname, search, navigationType])
+  // Save how far down the page is: as you scroll (once per frame at most), and on any click, just
+  // before a link or back button takes you away.
+  useEffect(() => {
+    let frame = 0
+    const onScroll = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(rememberScroll)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    document.addEventListener('click', rememberScroll, true)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', onScroll)
+      document.removeEventListener('click', rememberScroll, true)
+    }
+  }, [])
   useEffect(() => {
     if (pathname !== '/') return
     function onClick(event: MouseEvent) {

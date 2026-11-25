@@ -6566,12 +6566,33 @@ a {
   color: var(--accent-2);
 }
 
-/* Contact: the title, intro and ways to reach out on the left, the form in a card on the right. */
+/* Contact: the ways to reach out on the left, the form in a card on the right. The two boxes start
+   and end at the same level: the contact tiles share the form's height evenly. */
 .contact-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  align-items: start;
-  gap: clamp(32px, 5vw, 56px);
+  align-items: stretch;
+  gap: clamp(24px, 4vw, 40px);
+}
+
+.contact-aside {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-aside .contact-tiles {
+  flex: 1;
+  grid-auto-rows: 1fr;
+  margin: 0;
+}
+
+.contact-aside .contact-tile {
+  display: flex;
+}
+
+.contact-aside .contact-tile__main {
+  flex: 1;
+  align-self: stretch;
 }
 
 .contact-aside .contact-intro {
@@ -8113,9 +8134,12 @@ a {
 .studio-cta__title {
   margin: 8px 0 0;
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  /* One line on every screen ("Have a project in mind? Let's scope it."): the size follows the
+     screen's width, up to 2.6rem on wide screens. */
+  font-size: min(4.2vw, 2.6rem);
   line-height: 1.05;
   letter-spacing: -0.03em;
+  white-space: nowrap;
 }
 
 .studio-cta__actions {

@@ -7,6 +7,8 @@
 //   project → next project → next project, "Back" returns to where you came from before the projects.
 // - Going back trims the trail (and so does the browser's back button), so the next "Back" from
 //   there keeps walking back instead of bouncing between two pages.
+// - Each page's scroll position is saved the moment you leave it (rememberScroll), and going back
+//   (a "Back" link or the browser's back button) returns to that exact spot (restoreScroll).
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -16,6 +18,7 @@ import { sortedUpdates } from '../data/updates.ts'
 interface Visit {
   path: string // e.g. '/blog' or '/projects/cinetwork'
   search: string // e.g. '?category=Ideas'
+  scroll?: number // how far down the page was when you left it, in pixels
 }
 
 const TRAIL_KEY = 'page-trail'
@@ -54,13 +57,83 @@ function withVisit(saved: Visit[], path: string, search: string) {
   } else if (last?.path !== path) {
     trail.push({ path, search })
   }
-  trail[trail.length - 1] = { path, search } // keep the latest search (filters) of this page
+  // Keep the latest search (filters) of this page, and its saved scroll position.
+  trail[trail.length - 1] = { ...trail[trail.length - 1], path, search }
   return trail.slice(-MAX)
 }
 
-export function recordVisit(path: string, search: string) {
-  write(TRAIL_KEY, withVisit(read<Visit[]>(TRAIL_KEY, []), path, search))
+// Records the page just opened. Returns the scroll position to go back to when this was a step back
+// (a "Back" link, or the browser's back button: "popped"), or null for any other visit.
+export function recordVisit(path: string, search: string, popped: boolean): number | null {
+  const saved = read<Visit[]>(TRAIL_KEY, [])
+  const scroll = restoringTo(path, popped)
+  write(TRAIL_KEY, withVisit(saved, path, search))
   backTo = null
+  return scroll ?? null
+}
+
+// The saved spot this page is about to be brought back to (App.tsx restores it right after), or
+// undefined. Pages call it when they open, to skip their own "where to open" scrolling in that case.
+// "popped": opened with the browser's back/forward buttons.
+export function restoringTo(path: string, popped: boolean): number | undefined {
+  const trail = read<Visit[]>(TRAIL_KEY, [])
+  if (backTo !== null && trail[backTo]?.path === path) return trail[backTo].scroll
+  const before = trail[trail.length - 2]
+  const last = trail[trail.length - 1]
+  if (popped && before?.path === path && last?.path !== path) return before.scroll
+  return undefined
+}
+
+// Saves how far down the current page is, on its trail entry. App.tsx calls it as you scroll and
+// just before you leave (any click). Only when the trail's last page is the one on screen: while
+// moving to another page, its "open at the top" must not overwrite the spot of the page you left.
+export function rememberScroll() {
+  const trail = read<Visit[]>(TRAIL_KEY, [])
+  const last = trail[trail.length - 1]
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+  const path = window.location.pathname.slice(base.length) || '/'
+  if (!last || last.path !== path) return
+  trail[trail.length - 1] = { ...last, scroll: Math.round(window.scrollY) }
+  write(TRAIL_KEY, trail)
+}
+
+// Brings the page back to a saved spot, and holds it there until it's settled: the page's own "open
+// at the top" step, a page whose file is still downloading (slow connections), and pictures
+// appearing above can all move it after the first jump. It holds until the page is tall enough to
+// reach the spot AND the position has stayed put for a moment (at most 5 seconds), and lets go as
+// soon as you scroll or touch the page yourself.
+const SETTLED_MS = 600
+const RESTORE_MAX_MS = 5000
+
+export function restoreScroll(y: number) {
+  const start = performance.now()
+  let steadySince = 0
+  let frame = 0
+  function letGo() {
+    cancelAnimationFrame(frame)
+    window.removeEventListener('wheel', letGo)
+    window.removeEventListener('touchstart', letGo)
+    window.removeEventListener('keydown', letGo)
+  }
+  function hold() {
+    const now = performance.now()
+    const maxY = document.documentElement.scrollHeight - window.innerHeight
+    const target = Math.min(y, Math.max(0, maxY))
+    if (Math.abs(window.scrollY - target) > 1) {
+      window.scrollTo({ top: target, left: 0, behavior: 'instant' })
+      steadySince = 0
+    } else if (!steadySince) {
+      steadySince = now
+    }
+    const reachable = maxY >= y - 1
+    const settled = reachable && steadySince > 0 && now - steadySince > SETTLED_MS
+    if (settled || now - start > RESTORE_MAX_MS) letGo()
+    else frame = requestAnimationFrame(hold)
+  }
+  window.addEventListener('wheel', letGo, { passive: true })
+  window.addEventListener('touchstart', letGo, { passive: true })
+  window.addEventListener('keydown', letGo)
+  hold() // right away (before the page is painted), then every frame until it's settled
 }
 
 // Called just before leaving the home page: the section crossing the middle of the screen.
@@ -121,7 +194,7 @@ export function useBack(currentPath: string, fallback: string): Back {
     }
     return null
   })
-  const visit = found?.visit ?? { path: fallback, search: '' }
+  const visit: Visit = found?.visit ?? { path: fallback, search: '' }
 
   const [homeSection] = useState(() => read<string>(HOME_SECTION_KEY, 'home'))
 
@@ -131,7 +204,10 @@ export function useBack(currentPath: string, fallback: string): Back {
     homeSection,
     go(options) {
       backTo = found ? found.index : null
-      if (visit.path === '/') {
+      if (visit.path === '/' && visit.scroll !== undefined) {
+        // The home page, at the exact spot you left it (App.tsx restores it): no #section to jump to.
+        navigate('/', { state: options?.state })
+      } else if (visit.path === '/') {
         // The home page: back to the section you left it at (or the one this page asks for).
         const section = options?.homeHash ?? homeSection
         navigate(`/#${section}`, { state: options?.state })
