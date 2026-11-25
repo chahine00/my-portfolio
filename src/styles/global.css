@@ -7015,6 +7015,9 @@ a {
   font: inherit;
   text-decoration: none;
   cursor: pointer;
+  /* Phones flash a box the size of the button on tap; the button is a rectangle around the
+     hexagon, so that box showed above it. The hexagon's own colors already show the tap. */
+  -webkit-tap-highlight-color: transparent;
   translate: -50% -50%;
   transition: scale 0.35s cubic-bezier(0.34, 1.4, 0.64, 1), filter 0.35s;
   animation: hive-wave 5s ease-in-out infinite;
