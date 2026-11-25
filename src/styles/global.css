@@ -6289,6 +6289,13 @@ a {
     transform: none;
   }
 
+  /* While the avatar guide is out (AvatarGuide.tsx; it often stands at the bottom left, where
+     the pill is), the pill steps aside so the two don't overlap. */
+  body:has(.avatar-guide:not([data-phase='out'])) .scroll-up-back {
+    opacity: 0;
+    visibility: hidden;
+  }
+
   /* Above the tab bar while it shows, centered on the back-to-top button's height. */
   body:has(.tabbar--visible) .scroll-up-back {
     bottom: calc(82px + env(safe-area-inset-bottom));

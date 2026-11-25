@@ -20,6 +20,7 @@ import Hero from '../home/Hero.tsx'
 import AvatarGuide from '../../components/AvatarGuide.tsx'
 import { founderGuideTips } from '../../data/guide.ts'
 import BackLink from '../../components/BackLink.tsx'
+import ScrollUpBack from '../../components/ScrollUpBack.tsx'
 import { useBack } from '../../utils/pageHistory.ts'
 import Mindset from './Mindset.tsx'
 import Testimonials from './Testimonials.tsx'
@@ -64,6 +65,8 @@ function FounderContact() {
 
 function BackgroundPage() {
   useDocumentTitle(`${profile.name}, Founder`, { description: BACKGROUND_DESCRIPTION })
+  // The way back to the page you came from (the home page if there's none).
+  const back = useBack('/background', '/')
 
   // Open at the top (the hero), not where the previous page was scrolled to; or, with a #section
   // in the address (e.g. an old /#experience link sent here), at that section.
@@ -89,6 +92,8 @@ function BackgroundPage() {
       {/* Your avatar peeks out at each section, waving at one and standing at the next (see
           AvatarGuide.tsx). On phones it comes out up to 3 times, more than on the home page. */}
       <AvatarGuide tips={founderGuideTips} turns={['wave', 'stand']} phoneMax={3} />
+      {/* Phones, in the middle of the page: the same way back, under the thumb when you scroll up. */}
+      <ScrollUpBack label={back.label} onClick={() => back.go()} />
     </div>
   )
 }

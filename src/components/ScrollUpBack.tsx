@@ -14,7 +14,8 @@ const HIDE_AFTER_DOWN_PX = 12 // scrolled down this far: it hides (you're readin
 const TOP_ZONE_PX = 400 // this close to the top, the page's own back link is in view: no button
 const HIDE_AFTER_MS = 4000 // after the last scroll, it fades out by itself
 // The page's own ways back: while one of them is on screen, the button isn't needed.
-const OWN_LINKS = '.section > .back-link, .post__nav'
+// (.hero__back: the founder and Studio pages' link at the top, inside the hero.)
+const OWN_LINKS = '.section > .back-link, .hero__back, .post__nav'
 
 interface ScrollUpBackProps {
   label: string
