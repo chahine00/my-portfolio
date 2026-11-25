@@ -4,14 +4,14 @@
 // so a filtered list can be shared, and the home page can open the page already filtered.
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigationType, useSearchParams } from 'react-router'
+import { useLocation, useNavigationType, useSearchParams } from 'react-router'
 import { filterUpdates, sortedUpdates } from '../../data/updates.ts'
 import { readListSpot, saveListSpot } from './listSpot.ts'
 import { useBack } from '../../utils/pageHistory.ts'
 import BackLink from '../../components/BackLink.tsx'
 import BlogFilters from './BlogFilters.tsx'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
-import { BLOG_DESCRIPTION } from '../../data/seo.ts'
+import { BLOG_DESCRIPTION, BLOG_TITLE } from '../../data/seo.ts'
 import UpdateTimeline from './UpdateTimeline.tsx'
 import GradientText from '../../components/GradientText.tsx'
 import ScrollUpBack from '../../components/ScrollUpBack.tsx'
@@ -23,7 +23,7 @@ function UpdatesPage() {
 
   const location = useLocation()
   const navigationType = useNavigationType()
-  useDocumentTitle('Blog', { description: BLOG_DESCRIPTION })
+  useDocumentTitle(BLOG_TITLE, { description: BLOG_DESCRIPTION })
   // Where "Back" goes: the page visited before the Blog (the home page if there's none).
   const back = useBack('/blog', '/')
 
@@ -161,10 +161,10 @@ function UpdatesPage() {
           <span className="blog-bar__count">
             {filtered ? `${matches.length} of ${sortedUpdates.length} posts` : `${sortedUpdates.length} posts`}
           </span>
-          {/* Always in reach while scrolling: the way back to the home page. */}
-          <Link to="/#blog" className="blog-bar__home">
-            <span aria-hidden="true">←</span> Home
-          </Link>
+          {/* Always in reach while scrolling: the way back to the page you came from. */}
+          <button type="button" className="blog-bar__home back-button" onClick={() => back.go()}>
+            <span aria-hidden="true">←</span> {back.label}
+          </button>
         </p>
         <BlogFilters
           query={query}

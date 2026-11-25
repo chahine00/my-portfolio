@@ -52,7 +52,13 @@ function UpdateTimeline({ updates }: UpdateTimelineProps) {
                 <div className="update-thumbs">
                   {update.images.slice(0, MAX_THUMBS).map((src, index) => (
                     <span className="update-thumbs__item" key={src}>
-                      <img src={thumb(src)} onError={fallbackTo(src)} alt="" loading="lazy" decoding="async" />
+                      <img
+                        src={thumb(src)}
+                        onError={fallbackTo(src)}
+                        alt={`${update.title}, photo ${index + 1}`}
+                        loading="lazy"
+                        decoding="async"
+                      />
                       {index === MAX_THUMBS - 1 && hiddenCount > 0 && (
                         <span className="update-thumbs__more">+{hiddenCount}</span>
                       )}

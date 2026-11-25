@@ -22,6 +22,7 @@ export interface Update {
   title: string
   date: string // written as 'YYYY-MM-DD', e.g. '2026-10-26'
   summary: string // one or two sentences, shown on the cards
+  seoDescription?: string // for Google, when the summary is over 155 characters (a full sentence, never cut)
   content: string // the full post. Leave an empty line between paragraphs.
   images: string[] // photos from /public, in order. The first one is the main photo. Can be empty: []
   tags?: string[]
@@ -32,6 +33,7 @@ export interface Update {
 export const updates: Update[] = [
   {
     slug: 'introducing-axihex',
+    seoDescription: "How a simple question about building an identity that grows led to Axihex: real work, experience and an engineering mindset, brought together as a studio.",
     category: 'Milestones',
     title: 'Think bigger, because AI is faster: introducing Axihex',
     date: '2026-11-22',
@@ -53,6 +55,7 @@ This is just the beginning.`,
   },
   {
     slug: 'domain-naming-in-the-ai-era',
+    seoDescription: "Hunting for a product domain showed me that keyword-stuffed .coms no longer work. Brand authority now comes from distinct names and clean engineering.",
     category: 'Ideas',
     title: 'Domain naming in the AI era: why the old playbook is broken',
     date: '2026-10-29',
@@ -132,6 +135,7 @@ More to come soon. 🍿✨`,
   },
   {
     slug: 'flamex-intelligence-hackathon',
+    seoDescription: "At the AI Product Development Hackathon, our team built FlameX Intelligence, an AI-powered fire detection and emergency response platform.",
     category: 'Milestones',
     title: 'FlameX Intelligence at the AOU AI Product Hackathon',
     date: '2026-08-03',
@@ -154,6 +158,7 @@ Grateful for the experience and the collaboration with my teammates!`,
   },
   {
     slug: 'react-native-to-web-on-aws',
+    seoDescription: "Turning a client's React Native mobile app into a deployed, HTTPS-secured web platform on AWS meant rethinking how it runs, builds and ships.",
     category: 'Tech Notes',
     title: 'From a React Native app to a production web platform on AWS',
     date: '2026-06-12',

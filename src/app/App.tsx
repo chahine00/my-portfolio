@@ -2,7 +2,7 @@
 // its job is to put all the other components together in order.
 
 // To use a component from another file, import it first.
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { Navigate, Route, Routes, useLocation, useParams } from 'react-router'
 import { recordVisit, rememberHomeSection } from '../utils/pageHistory.ts'
 import Navbar from '../components/Navbar.tsx'
@@ -12,12 +12,14 @@ import BackToTop from '../components/BackToTop.tsx'
 import ScrollProgress from '../components/ScrollProgress.tsx'
 import Spotlight from '../components/Spotlight.tsx'
 import HomePage from '../features/home/HomePage.tsx'
-import UpdatesPage from '../features/updates/UpdatesPage.tsx'
-import UpdatePost from '../features/updates/UpdatePost.tsx'
-import ProjectPage from '../features/projects/ProjectPage.tsx'
-import BackgroundPage from '../features/background/BackgroundPage.tsx'
-import StudioPage from '../features/studio/StudioPage.tsx'
-import NotFound from '../features/not-found/NotFound.tsx'
+// The home page loads with the app; every other page is its own small file, downloaded only when
+// it's opened (React.lazy), so the first visit to the home page downloads less.
+const UpdatesPage = lazy(() => import('../features/updates/UpdatesPage.tsx'))
+const UpdatePost = lazy(() => import('../features/updates/UpdatePost.tsx'))
+const ProjectPage = lazy(() => import('../features/projects/ProjectPage.tsx'))
+const BackgroundPage = lazy(() => import('../features/background/BackgroundPage.tsx'))
+const StudioPage = lazy(() => import('../features/studio/StudioPage.tsx'))
+const NotFound = lazy(() => import('../features/not-found/NotFound.tsx'))
 
 // Sends an old post link (/updates/<slug>) to the same post at its new address (/blog/<slug>).
 function OldPostRedirect() {
@@ -68,6 +70,8 @@ function App() {
           The last route ("*") catches any unknown URL and shows a "Page not found" page.
         */}
         <div key={pathname} className="page-transition">
+          {/* While a page's file downloads (a moment, the first time): an empty space of the page's height. */}
+          <Suspense fallback={<div className="page-loading" />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/blog" element={<UpdatesPage />} />
@@ -79,6 +83,7 @@ function App() {
             <Route path="/studio" element={<StudioPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </div>
       </main>
       <Footer />

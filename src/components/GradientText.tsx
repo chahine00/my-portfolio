@@ -8,8 +8,8 @@
 //
 // Each letter gets --p: its place in the text, from 0 (first) to 1 (last). The CSS (".grad__l" in
 // global.css) turns that into a color between the accent and the cyan.
-// Screen readers get the plain text once; the letters are hidden from them (one per letter would be
-// read out letter by letter).
+// The text is there only once (no hidden copy): Google and copy-paste see "what's next.", not the
+// words twice. Inline letter spans with no gaps between them are read by screen readers as one word.
 
 interface GradientTextProps {
   text: string
@@ -20,20 +20,17 @@ function GradientText({ text }: GradientTextProps) {
   const last = Math.max(letters.length - 1, 1)
 
   return (
-    <>
-      <span className="sr-only">{text}</span>
-      <span aria-hidden="true">
-        {letters.map((letter, i) =>
-          letter === ' ' ? (
-            ' '
-          ) : (
-            <span key={i} className="grad__l" style={{ '--p': i / last } as React.CSSProperties}>
-              {letter}
-            </span>
-          ),
-        )}
-      </span>
-    </>
+    <span className="grad">
+      {letters.map((letter, i) =>
+        letter === ' ' ? (
+          ' '
+        ) : (
+          <span key={i} className="grad__l" style={{ '--p': i / last } as React.CSSProperties}>
+            {letter}
+          </span>
+        ),
+      )}
+    </span>
   )
 }
 

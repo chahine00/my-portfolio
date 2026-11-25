@@ -34,13 +34,13 @@ import {
   values,
   vision,
 } from '../../data/identity.ts'
-import { STUDIO_DESCRIPTION } from '../../data/seo.ts'
+import { STUDIO_DESCRIPTION, STUDIO_TITLE } from '../../data/seo.ts'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import { useReveal } from '../../utils/useReveal.ts'
 import Capabilities from './Capabilities.tsx'
 
 function StudioPage() {
-  useDocumentTitle('Identity, Purpose & Vision', { description: STUDIO_DESCRIPTION })
+  useDocumentTitle(STUDIO_TITLE, { description: STUDIO_DESCRIPTION })
   const pillarsRef = useReveal<HTMLOListElement>('.pillar-row')
   const processRef = useReveal<HTMLOListElement>('.process__step')
 

@@ -9,7 +9,7 @@ import ScrollUpBack from '../../components/ScrollUpBack.tsx'
 import BackLink from '../../components/BackLink.tsx'
 import { useBack } from '../../utils/pageHistory.ts'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
-import { projectDescription } from '../../data/seo.ts'
+import { projectDescription, projectTitle } from '../../data/seo.ts'
 import { rememberProjectLeft } from './projectReturn.ts'
 
 function ProjectPage() {
@@ -18,7 +18,7 @@ function ProjectPage() {
   const index = projects.findIndex((project) => project.slug === slug)
   const project = projects[index]
   const navigate = useNavigate()
-  useDocumentTitle(project ? project.title : 'Project not found', {
+  useDocumentTitle(project ? projectTitle(project) : 'Project not found', {
     description: project && projectDescription(project),
     noindex: !project,
   })
@@ -115,7 +115,7 @@ function ProjectPage() {
 
       {/* key={project.slug} gives each project a fresh gallery, starting at photo 1. */}
       {project.images && project.images.length > 0 && (
-        <Gallery key={project.slug} images={project.images} title={project.title} />
+        <Gallery key={project.slug} images={project.images} title={project.title} descriptions={project.imageDescriptions} />
       )}
 
       {project.metrics && (

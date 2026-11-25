@@ -14,17 +14,18 @@ import type { Update } from './updates.ts'
 
 export const SITE_URL = profile.site // 'https://axihex.com', no slash at the end
 
-// The brand first, its founder after it (people also search for the founder by name).
-export const SITE_TITLE = `${profile.brand} | Independent software studio`
+// The brand first, then what it does and where: the words people actually search for.
+export const SITE_TITLE = `${profile.brand} | Web, mobile & AI app studio in Beirut`
 
 export const HOME_DESCRIPTION =
-  `${profile.brand} is an independent software studio by ${profile.name}. It explores ideas, develops products ` +
-  'of its own, and engineers web and mobile apps for clients, from the interface to the backend, AI and cloud.'
+  `${profile.brand} is an independent software studio in Beirut. It develops products of its own ` +
+  'and engineers web, mobile, AI and cloud apps for clients.'
 
 // The Studio page (/studio): the identity, the five pillars and the direction.
+export const STUDIO_TITLE = 'About the studio: identity, purpose & vision'
 export const STUDIO_DESCRIPTION =
-  `What ${profile.brand} is and where it's going: five pillars (Explore, Build, Showcase, Share, Grow), ` +
-  'core engineering capabilities, product thinking, mission, vision and values.'
+  `What ${profile.brand} is and where it's going: five pillars, core engineering capabilities, ` +
+  'product thinking, mission, vision and values.'
 
 // Who the founder is: used for the person in the structured data (scripts/seo-plugin.ts).
 export const FOUNDER_DESCRIPTION =
@@ -35,6 +36,7 @@ export const BACKGROUND_DESCRIPTION =
   `${profile.name}, software engineer and founder of ${profile.brand}: backend systems, AI integration, ` +
   'mobile and cloud. Work history, skills, education and CV.'
 
+export const BLOG_TITLE = 'Blog: backend, mobile & AI engineering'
 export const BLOG_DESCRIPTION =
   `The ${profile.brand} blog on backend engineering, mobile apps, AI and building software: ` +
   'lessons from real projects, ideas, milestones and events.'
@@ -72,10 +74,16 @@ export function shareImage(images?: string[]) {
   return images?.find((image) => !image.endsWith('.svg'))
 }
 
+// A project's title in Google: its own search title when it has one (more descriptive than the name).
+export function projectTitle(project: Project) {
+  return project.seoTitle ?? project.title
+}
+
+// Hand-written when the page has one (never cut mid-sentence), else the start of the text.
 export function projectDescription(project: Project) {
-  return clip(project.problem)
+  return project.seoDescription ?? clip(project.problem)
 }
 
 export function postDescription(post: Update) {
-  return clip(post.summary)
+  return post.seoDescription ?? clip(post.summary)
 }

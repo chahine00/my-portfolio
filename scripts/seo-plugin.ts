@@ -26,15 +26,18 @@ import { updates } from '../src/data/updates.ts'
 import {
   BACKGROUND_DESCRIPTION,
   BLOG_DESCRIPTION,
+  BLOG_TITLE,
   DEFAULT_IMAGE,
   FOUNDER_DESCRIPTION,
   HOME_DESCRIPTION,
   SITE_URL,
   STUDIO_DESCRIPTION,
+  STUDIO_TITLE,
   absoluteUrl,
   pageTitle,
   postDescription,
   projectDescription,
+  projectTitle,
   shareImage,
 } from '../src/data/seo.ts'
 
@@ -98,7 +101,7 @@ const person = {
   '@type': 'Person',
   '@id': PERSON_ID,
   name: profile.name,
-  url: absoluteUrl('/'),
+  url: absoluteUrl('/background'), // the founder's own page
   image: absoluteUrl(profile.photo),
   jobTitle: 'Software Engineer',
   description: FOUNDER_DESCRIPTION,
@@ -113,8 +116,13 @@ const brand = {
   name: profile.brand,
   url: absoluteUrl('/'),
   logo: absoluteUrl('/favicon-192.png'),
+  image: absoluteUrl(DEFAULT_IMAGE.path),
   founder: { '@id': PERSON_ID },
   description: HOME_DESCRIPTION,
+  slogan: `${profile.headline} ${profile.headlineAccent}`,
+  address: { '@type': 'PostalAddress', addressLocality: city, addressCountry: country },
+  // The core engineering capabilities (src/data/identity.ts): what the studio is known for.
+  knowsAbout: ['Web development', 'Mobile app development', 'Backend engineering', 'AI integration', 'Cloud infrastructure'],
 }
 
 const website = {
@@ -151,7 +159,7 @@ const home: Page = {
 
 const blog: Page = {
   path: '/blog',
-  title: pageTitle('Blog'),
+  title: pageTitle(BLOG_TITLE),
   description: BLOG_DESCRIPTION,
   body: blogBody(sortedPosts, BLOG_DESCRIPTION),
   jsonLd: [
@@ -223,10 +231,10 @@ const projectPages: Page[] = projects.map((project) => {
   const image = shareImage(project.images)
   return {
     path,
-    title: pageTitle(project.title),
+    title: pageTitle(projectTitle(project)),
     description: projectDescription(project),
     image,
-    imageAlt: project.title,
+    imageAlt: project.coverAlt ?? project.title,
     body: projectBody(project),
     jsonLd: [
       {
@@ -267,7 +275,7 @@ const background: Page = {
 
 const studioPage: Page = {
   path: '/studio',
-  title: pageTitle('Identity, Purpose & Vision'),
+  title: pageTitle(STUDIO_TITLE),
   description: STUDIO_DESCRIPTION,
   imageAlt: `${profile.brand}: identity, purpose and vision`,
   body: studioBody(),
@@ -343,7 +351,8 @@ function withPage(html: string, page: Page) {
 function sitemap() {
   const latestPost = sortedPosts[0]?.date
   const entries = [
-    { path: '/', lastmod: latestPost },
+    // The home page changes with its own text and with each new post: the later of the two.
+    { path: '/', lastmod: [latestPost, lastChanged('src/data/profile.ts', 'src/data/studio.ts', 'src/data/projects.ts')].filter(Boolean).sort().pop() },
     { path: '/blog', lastmod: latestPost },
     { path: '/studio', lastmod: lastChanged('src/data/identity.ts') },
     {

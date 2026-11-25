@@ -12,9 +12,10 @@ const AUTOPLAY_MS = 3000
 interface GalleryProps {
   images: string[]
   title: string // used to describe the photos for screen readers
+  descriptions?: string[] // what each photo shows (its alt text), in the same order as images
 }
 
-function Gallery({ images, title }: GalleryProps) {
+function Gallery({ images, title, descriptions }: GalleryProps) {
   // Which photo is shown (0 = the first one).
   const [index, setIndex] = useState(0)
   // <dialog> is a built-in HTML pop-up. The ref lets us open it with showModal().
@@ -66,7 +67,8 @@ function Gallery({ images, title }: GalleryProps) {
     if (event.key === 'ArrowRight') show(index + 1)
   }
 
-  const alt = `${title} — photo ${index + 1} of ${count}`
+  // What the photo shows (for Google Images and screen readers), or its place in the set.
+  const alt = descriptions?.[index] ?? `${title} — photo ${index + 1} of ${count}`
 
   // Previous / next buttons, used both in the gallery and in the full-screen view.
   const arrows = hasMany && (

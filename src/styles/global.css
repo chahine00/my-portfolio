@@ -9141,3 +9141,19 @@ a {
   margin: 18px 0 28px;
   text-align: center;
 }
+
+/* While an inner page's file downloads (App.tsx): keeps the footer down, so the page doesn't jump. */
+.page-loading {
+  min-height: 100vh;
+}
+
+/* The Blog bar's way back (UpdatesPage.tsx): a button, kept at the link's small size; a long page
+   name (a project's title) ends with "…". */
+.blog-bar__home.back-button {
+  max-width: 40%;
+  overflow: hidden;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

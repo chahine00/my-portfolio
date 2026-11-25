@@ -19,7 +19,7 @@ function ProjectCard({ project, featured }: { project: Project; featured: boolea
             className="work-image"
             src={featured ? asset(cover) : thumb(cover)}
             onError={fallbackTo(cover)}
-            alt=""
+            alt={project.coverAlt ?? project.title}
             width={1600}
             height={900}
             loading="lazy"

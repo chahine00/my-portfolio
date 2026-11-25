@@ -23,6 +23,11 @@ export interface Project {
   category: ProjectCategory
   // A short label on the card and the page, e.g. 'Client project'.
   context?: string
+  // --- For Google and link previews ---
+  seoTitle?: string // a more descriptive title for search results (the page title otherwise)
+  seoDescription?: string // 140–155 characters, a full sentence (the start of "problem" otherwise)
+  coverAlt?: string // what the cover photo shows (its alt text)
+  imageDescriptions?: string[] // what each photo in "images" shows, in the same order
   role?: string // your role, e.g. 'Backend & AI engineer' or 'Solo developer'
   period?: string // when, e.g. 'Jan – Jun 2025' or '2024 – present'
   team?: string // e.g. 'Team of 4' or 'Solo'
@@ -63,6 +68,9 @@ export type ProjectCategory = 'studio' | 'founder-led' | 'experience'
 export const projects: Project[] = [
   {
     slug: 'boxmind-ai-backend',
+    seoDescription: "Backend and AI integration for boxMind AI's enterprise products: secure APIs, databases and RAG features for banks, schools and healthcare, shipped on AWS.",
+    coverAlt: "boxMind AI enterprise product website",
+    imageDescriptions: ["Overview of the backend behind several enterprise AI products", "Introduction and video on the boxMind enterprise website", "The boxMind product suite arranged by business function"],
     title: 'boxMind AI: the backend behind its AI products',
     category: 'experience',
     context: 'As backend engineer at boxMind AI',
@@ -154,6 +162,10 @@ The role went beyond code: it included the discussions and decisions on which fe
   },
   {
     slug: 'cinetwork',
+    seoTitle: "Cinetwork: film network app for iOS, Android & web",
+    seoDescription: "Cinetwork, a networking app for filmmakers, engineered end to end: one React Native codebase for iOS, Android and web, with a Flask API and AWS cloud.",
+    coverAlt: "Three Cinetwork screens showing sign-in, film discovery and services for filmmakers",
+    imageDescriptions: ["Cinetwork sign-in, discovery and service directories on three phones", "Film discovery and service categories in the mobile app", "Service listings and professional categories for filmmakers"],
     title: 'Cinetwork',
     category: 'founder-led',
     context: 'Independent client project',
@@ -235,6 +247,9 @@ Before its official launch, Cinetwork got an exclusive sneak peek at the Byblos 
   },
   {
     slug: 'boxmind-academy',
+    seoDescription: "The database and backend for boxMind Academy, an AI-supported learning platform used by schools, where students learn with an AI tutor.",
+    coverAlt: "boxMind Academy learning platform for schools",
+    imageDescriptions: ["boxMind Academy’s introduction for schools", "Demonstration of the AI tutor on the Academy website", "Adventurer, Explorer and Mastermind learning levels", "Introduction to the generative AI program", "Introduction to the robotics program"],
     title: 'boxMind Academy: the backend for AI learning in schools',
     category: 'experience',
     context: 'As backend engineer at boxMind AI',
