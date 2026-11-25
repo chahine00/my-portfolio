@@ -1,7 +1,8 @@
 // The home hero's picture: the Axihex hexagon reimagined as the three layers of an application
 // (Interface, Backend, Infrastructure).
 // - At rest the plates float in a slow wave, each on its own beat, and light climbs up through them.
-// - Hovering the drawing opens the stack up (an "exploded view"): the top plate rises, the bottom sinks.
+// - Hovering the drawing with a mouse opens the stack up (an "exploded view"): the top plate rises,
+//   the bottom sinks. Not on touch screens, where a tap would move the plates under the finger.
 // - Click a plate (or its button below) to select it: it lifts, spins once around its own axis (top
 //   and sides together, like a real hexagonal plate), and the caption explains that layer.
 // Colors follow the theme (light / dark): see "Home hero" in global.css.
@@ -103,11 +104,11 @@ function HeroMark() {
               const { face, side } = plateTurn ? plateShape(plateTurn) : still
               return (
                 // Outer: the plate's place. Then: where it goes when the stack opens (hover), its
-                // float (the wave), and the clickable plate itself.
+                // float (the wave), and the plate's drawing.
                 <g key={layers[i].name} transform={`translate(0 ${layers[i].y})`}>
                   <g className={`plate-slot plate-slot--${i}`}>
                     <g className="plate-float" style={{ '--i': i } as CSSProperties}>
-                      <g className={active ? 'plate plate--active' : 'plate'} onClick={() => select(i)}>
+                      <g className={active ? 'plate plate--active' : 'plate'}>
                         <path className="plate-edge" d={side} />
                         <path className="plate-face" d={face} fill={active ? 'url(#plate-active)' : 'url(#plate-idle)'} />
                         <g transform={plateTurn ? glyphTurn(plateTurn) : undefined}>
@@ -124,6 +125,11 @@ function HeroMark() {
                         <path className="plate-light" d={face} />
                       </g>
                     </g>
+                    {/* The click area: an invisible plate that never floats, lifts or spins, so the
+                        plate under the pointer is always the one selected. (When the drawing itself
+                        was clicked, a plate could move out from under the pointer mid-click and the
+                        plate behind it got the click.) */}
+                    <path className="plate-hit" d={`${still.face} ${still.side}`} onClick={() => select(i)} />
                   </g>
                 </g>
               )

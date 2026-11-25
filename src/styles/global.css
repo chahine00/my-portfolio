@@ -4686,13 +4686,13 @@ a {
   color: var(--accent);
 }
 
-.back-link span,
+.back-link > span:first-child,
 .forward-link span {
   display: inline-block;
   transition: transform 0.2s;
 }
 
-.back-link:hover span {
+.back-link:hover > span:first-child {
   transform: translateX(-4px);
 }
 
@@ -4813,7 +4813,7 @@ a {
   .edu-chip:hover,
   .edu-degree:hover,
   .mindset__item:hover,
-  .back-link:hover span,
+  .back-link:hover > span:first-child,
   .forward-link:hover span,
   .post__nav a:hover,
   .card-clickable:hover .card-cta span,
@@ -6259,7 +6259,7 @@ a {
   .scroll-up-back {
     position: fixed;
     left: 16px;
-    bottom: calc(40px + env(safe-area-inset-bottom));
+    bottom: calc(34px + env(safe-area-inset-bottom));
     z-index: 20;
     display: inline-flex;
     align-items: center;
@@ -6291,7 +6291,7 @@ a {
 
   /* Above the tab bar while it shows, centered on the back-to-top button's height. */
   body:has(.tabbar--visible) .scroll-up-back {
-    bottom: calc(86px + env(safe-area-inset-bottom));
+    bottom: calc(82px + env(safe-area-inset-bottom));
   }
 }
 
@@ -8386,17 +8386,44 @@ a {
   min-width: 0;
 }
 
+/* The label above the headline: a small badge with a glowing dot, so it reads as the studio's
+   tag line, not as another section title (those are plain small capitals). */
 .home-hero__label {
-  display: flex;
-  gap: 0.65rem;
+  display: inline-flex;
   align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.85rem 0.4rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
 }
 
 .home-hero__label::before {
   content: '';
-  width: 1.9rem;
-  height: 2px;
-  background: currentColor;
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: hero-label-pulse 2.6s ease-out infinite;
+}
+
+@keyframes hero-label-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 7px transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero__label::before {
+    animation: none;
+  }
+}
+
+.home-hero .home-hero__label + h1 {
+  margin-top: 16px;
 }
 
 .home-hero h1 {
@@ -8584,17 +8611,20 @@ a {
   }
 }
 
-/* Hovering the drawing opens the stack up: an exploded view of the layers. */
+/* Hovering the drawing opens the stack up: an exploded view of the layers. Mouse only: on a touch
+   screen a tap counts as a hover, and the plates would move under the finger mid-tap. */
 .plate-slot {
   transition: transform 0.6s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
 
-.layer-drawing:hover .plate-slot--0 {
-  transform: translateY(-22px);
-}
+@media (hover: hover) and (pointer: fine) {
+  .layer-drawing:hover .plate-slot--0 {
+    transform: translateY(-22px);
+  }
 
-.layer-drawing:hover .plate-slot--2 {
-  transform: translateY(22px);
+  .layer-drawing:hover .plate-slot--2 {
+    transform: translateY(22px);
+  }
 }
 
 /* The climbing light: each plate's edge brightens in turn, bottom to top. */
@@ -8621,22 +8651,36 @@ a {
   }
 }
 
-/* Each plate is clickable: it selects its layer (and its button below). */
+/* Each plate is clickable: it selects its layer (and its button below). The clicks go to an
+   invisible copy of the plate that stays still (.plate-hit, see HeroMark.tsx); the drawing itself
+   ignores the pointer, so its float, lift and spin can't send a click to the wrong plate. */
 .plate {
-  cursor: pointer;
+  pointer-events: none;
   transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.plate:hover {
-  transform: translateY(-4px);
+.plate-hit {
+  fill: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .plate--active {
   transform: translateY(-9px);
 }
 
-.plate--active:hover {
-  transform: translateY(-11px);
+@media (hover: hover) and (pointer: fine) {
+  .plate-slot:has(> .plate-hit:hover) .plate {
+    transform: translateY(-4px);
+  }
+
+  .plate-slot:has(> .plate-hit:hover) .plate--active {
+    transform: translateY(-11px);
+  }
+
+  .plate-slot:has(> .plate-hit:hover) .plate-face {
+    stroke: var(--plate-on-2);
+  }
 }
 
 .plate-face {
@@ -8655,10 +8699,6 @@ a {
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
-}
-
-.plate:hover .plate-face {
-  stroke: var(--plate-on-2);
 }
 
 .plate--active .plate-glyph {
@@ -8842,17 +8882,17 @@ a {
     font-size: 0.83rem;
   }
 
-  /* Phones: the label above the headline stays on one line (smaller, shorter dash). */
+  /* Phones: the label above the headline stays on one line (smaller). */
   .home-hero__label {
     gap: 0.45rem;
-    font-size: clamp(0.58rem, 2.75vw, 0.8rem);
+    padding: 0.35rem 0.75rem 0.35rem 0.6rem;
+    font-size: clamp(0.58rem, 2.75vw, 0.72rem);
     letter-spacing: 0.08em;
     white-space: nowrap;
   }
 
-  .home-hero__label::before {
-    width: 1.1rem;
-    flex-shrink: 0;
+  .home-hero .home-hero__label + h1 {
+    margin-top: 12px;
   }
 
   /* Phones: "Shipped to" on its own line, then the four places on ONE line, sized to fit. */
@@ -9216,12 +9256,22 @@ a {
   margin-top: 0;
 }
 
-/* The phones' "← <page>" pill: a long page name (a project or post title) ends with "…". */
+/* The phones' "← <page>" pill: the arrow first, then the page name in a smaller size. A long
+   name (a project or post title) shrinks to fit the pill and ends with "…". */
 .scroll-up-back {
-  max-width: min(60vw, 260px);
-  overflow: hidden;
+  max-width: min(62vw, 260px);
   white-space: nowrap;
+}
+
+.scroll-up-back__arrow {
+  flex-shrink: 0;
+}
+
+.scroll-up-back__label {
+  min-width: 0;
+  overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 0.82rem;
 }
 
 /* Studio page: the "success is measured by…" line between mission/vision and the values. */
@@ -9244,4 +9294,70 @@ a {
   font-weight: 500;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Phones: UI/UX polish across every page. Calmer sizes, less dead space, nothing covering text.
+   ------------------------------------------------------------------------------------------------ */
+@media (max-width: 720px) {
+  /* Top bar: the name stays put at the left (no glide across the row) and the bar is slimmer,
+     so the page starts sooner. The letters still do their little wave. */
+  .navbar {
+    padding: 10px 16px 2px;
+  }
+
+  .navbar__brand {
+    animation: none;
+  }
+
+  /* Back to top: smaller and in the bottom-right corner, where it covers the ends of lines
+     instead of the middle of the text. */
+  .back-to-top {
+    left: auto;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .back-to-top svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  /* Less empty space between sections: the screen is short, so big gaps read as the page ending. */
+  .section {
+    padding: 44px 0;
+  }
+
+  /* Back links: one line at the left. A long page name ends with "…" instead of wrapping into
+     a centered two-line block. */
+  .back-link {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .back-link__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Page intros under the big titles: the same calm size as the home page's intro. */
+  .identity__lead,
+  .project-page__lead {
+    font-size: 1rem;
+    line-height: 1.62;
+  }
+
+  .identity__title {
+    font-size: clamp(1.9rem, 8.4vw, 2.3rem);
+    line-height: 1.1;
+  }
+
+  /* Blog post titles: smaller, with lines that sit together. */
+  .post__header h1 {
+    font-size: clamp(1.65rem, 7.2vw, 2rem);
+    line-height: 1.18;
+  }
 }

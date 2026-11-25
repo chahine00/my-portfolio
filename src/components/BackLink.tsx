@@ -6,7 +6,7 @@ import type { Back } from '../utils/pageHistory.ts'
 function BackLink({ back, onClick, className = '' }: { back: Back; onClick?: () => void; className?: string }) {
   return (
     <button type="button" className={`back-link back-button ${className}`.trim()} onClick={onClick ?? (() => back.go())}>
-      <span aria-hidden="true">←</span> Back to {back.label}
+      <span aria-hidden="true">←</span> <span className="back-link__label">Back to {back.label}</span>
     </button>
   )
 }

@@ -81,7 +81,9 @@ function ScrollUpBack({ label, onClick }: ScrollUpBackProps) {
       // links at the top and bottom do the same thing).
       inert={!visible}
     >
-      <span aria-hidden="true">←</span> {label}
+      {/* The arrow always shows first; a long page name shrinks and ends with "…". */}
+      <span className="scroll-up-back__arrow" aria-hidden="true">←</span>
+      <span className="scroll-up-back__label">{label}</span>
     </button>
   )
 }
