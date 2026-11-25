@@ -9,6 +9,7 @@
 // Descriptions: one or two plain sentences, about 150 characters. Longer ones get cut in Google.
 
 import { profile } from './profile.ts'
+import type { Product } from './products.ts'
 import type { Project } from './projects.ts'
 import type { Update } from './updates.ts'
 
@@ -18,14 +19,14 @@ export const SITE_URL = profile.site // 'https://axihex.com', no slash at the en
 export const SITE_TITLE = `${profile.brand} | Web, mobile & AI app studio in Beirut`
 
 export const HOME_DESCRIPTION =
-  `${profile.brand} is an independent software studio in Beirut. It develops products of its own ` +
-  'and engineers web, mobile, AI and cloud apps for clients.'
+  `${profile.brand} is an independent software studio in Beirut. It spots opportunities, builds its own ` +
+  'apps and tools around them, and builds software for clients.'
 
-// The Studio page (/studio): the identity, the five pillars and the direction.
-export const STUDIO_TITLE = 'About the studio: identity, purpose & approach'
+// The Studio page (/studio): what Axihex does, opportunity first, and how it builds.
+export const STUDIO_TITLE = 'The studio: from opportunity to product'
 export const STUDIO_DESCRIPTION =
-  `What ${profile.brand} is and where it's going: five pillars, core engineering capabilities, ` +
-  'product thinking and how it ships.'
+  `${profile.brand} spots opportunities and builds products around them: apps, online tools, ` +
+  'games and services, plus software for clients.'
 
 // Who the founder is: used for the person in the structured data (scripts/seo-plugin.ts).
 export const FOUNDER_DESCRIPTION =
@@ -86,4 +87,13 @@ export function projectDescription(project: Project) {
 
 export function postDescription(post: Update) {
   return post.seoDescription ?? clip(post.summary)
+}
+
+// A product's title in Google: its own search title when it has one, else its name.
+export function productTitle(product: Product) {
+  return product.seoTitle ?? product.name
+}
+
+export function productDescription(product: Product) {
+  return product.seoDescription ?? clip(product.tagline)
 }

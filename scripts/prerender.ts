@@ -11,20 +11,10 @@
 
 import { profile } from '../src/data/profile.ts'
 import { studio } from '../src/data/studio.ts'
-import {
-  capabilities,
-  definition,
-  moreThan,
-  isRather,
-  philosophy,
-  pillars,
-  process,
-  thinking,
-  traits,
-  umbrella,
-} from '../src/data/identity.ts'
+import { capabilities, channels, offerings, philosophy, pillars, process, studioLead, thinking, traits } from '../src/data/identity.ts'
 import { coreStack, mindset, testimonials } from '../src/data/founder.ts'
 import { projects, selectedProjects, type Project } from '../src/data/projects.ts'
+import { publishedProducts, statusLabel, type Product } from '../src/data/products.ts'
 import { formatDate, type Update } from '../src/data/updates.ts'
 import { contacts } from '../src/data/contact.ts'
 import { experience } from '../src/data/experience.ts'
@@ -51,6 +41,8 @@ const nav = `<nav>${[
   link('/', profile.brand),
   link('/#home', 'Home'),
   link('/studio', 'Studio'),
+  // Axihex's own products: only once one is published (src/data/products.ts).
+  ...(publishedProducts.length ? [link('/#products', 'Products')] : []),
   link('/#projects', 'Work'),
   link('/background', 'Founder'),
   link('/blog', 'Blog'),
@@ -73,8 +65,13 @@ export function homeBody(posts: Update[]) {
 
   return wrap(
     `<header>${el('p', profile.role)}${el('h1', `${profile.headline} ${profile.headlineAccent}`)}${el('p', profile.intro)}</header>` +
-      `<section id="studio">${el('h2', `${studio.title} ${studio.titleAccent}`)}${el('p', studio.text)}` +
-      `<p>${link('/studio', 'Identity & purpose')}</p>` +
+      (publishedProducts.length
+        ? `<section id="products">${el('h2', 'Products: made by Axihex')}` +
+          list(publishedProducts.map((p) => `${link(`/products/${p.slug}`, p.name)} (${esc(statusLabel[p.status])}) ${esc(p.tagline)}`)) +
+          '</section>'
+        : '') +
+      `<section id="studio">${el('h2', studio.eyebrow)}${el('p', studio.text)}` +
+      `<p>${link('/studio', 'How we work')}</p>` +
       el('h3', `${studio.pillarsTitle} ${studio.pillarsAccent}`) +
       list(pillars.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.statement)}`)) +
       el('h3', 'Core engineering capabilities') +
@@ -85,7 +82,7 @@ export function homeBody(posts: Update[]) {
       list(posts.slice(0, 3).map((post) => `${link(`/blog/${post.slug}`, post.title)} ${esc(post.summary)}`)) +
       `<p>${link('/blog', 'All posts')}</p></section>` +
       `<section id="contact">${el('h2', 'Let’s talk.')}` +
-      el('p', 'A project in mind, an idea to build together, or a collaboration. Reach out by email, on LinkedIn, or with the form.') +
+      el('p', 'Spotted an opportunity, have a project in mind, or want to work together? Reach out by email, on LinkedIn, or with the form.') +
       `${contactLinks}</section>`,
   )
 }
@@ -130,27 +127,31 @@ export function founderBody() {
 
 export function studioBody() {
   return wrap(
-    `<header>${el('p', 'Identity & purpose')}${el('h1', 'Where we see an opportunity, we build it.')}${el('p', definition)}` +
-      el('p', 'Its purpose:') +
-      list(pillars.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.statement)}`)) +
-      el('p', `More than: ${moreThan.join(', ')}. ${isRather}`) +
+    `<header>${el('p', 'The studio')}${el('h1', 'Where we see an opportunity, we build it.')}${el('p', studioLead)}` +
+      list(offerings.map((o) => `<strong>${esc(o.title)}</strong>: ${esc(o.text)}`)) +
       '</header>' +
-      `<section id="defines">${el('h2', 'What defines Axihex')}` +
+      `<section id="defines">${el('h2', 'What defines Axihex.')}` +
       list(traits.map((t) => `<strong>${esc(t.title)}</strong>: ${esc(t.text)}`)) +
       '</section>' +
-      `<section id="capabilities">${el('h2', 'Core engineering capabilities')}` +
-      list(capabilities.map((c) => `<strong>${esc(c.title)}</strong>: ${esc(c.text)}`)) +
-      '</section>' +
-      `<section id="approach">${el('h2', 'Product thinking, in practice')}` +
+      `<section id="approach">${el('h2', 'From opportunity to product')}` +
+      `<ol>${process.map((s) => `<li><strong>${esc(s.title)}</strong>: ${esc(s.text)}</li>`).join('')}</ol>` +
       el('p', `Engineering asks: ${thinking.how.join(' ')}`) +
       el('p', `Product thinking asks: ${thinking.why.join(' ')}`) +
+      el('p', `Opportunity thinking asks: ${thinking.when.join(' ')}`) +
       el('p', thinking.principle) +
-      `<ol>${process.map((s) => `<li><strong>${esc(s.title)}</strong>: ${esc(s.text)}</li>`).join('')}</ol>` +
+      el('p', thinking.founders) +
       '</section>' +
-      `<section id="brand">${el('h2', 'One brand, many forms')}` +
-      list(umbrella.map((u) => `<strong>${esc(u.title)}</strong>: ${esc(u.text)}`)) +
+      `<section id="pillars">${el('h2', 'Five pillars. One studio.')}` +
+      list(pillars.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.statement)}`)) +
       '</section>' +
-      `<section id="philosophy">${el('p', philosophy)}` +
+      `<section id="capabilities">${el('h2', 'The technical foundation')}` +
+      list(capabilities.map((c) => `<strong>${esc(c.title)}</strong>: ${esc(c.text)}`)) +
+      '</section>' +
+      `<section id="brand">${el('h2', 'Built by Axihex, wherever it lives')}` +
+      list(channels.map((c) => `<strong>${esc(c.title)}</strong>: ${esc(c.text)}`)) +
+      '</section>' +
+      `<section id="philosophy">${el('p', philosophy)}</section>` +
+      `<section id="studio-contact">${el('h2', 'Spotted an opportunity? Let’s build it.')}` +
       `<p>${link('/#contact', 'Start a project')} · ${link('/background', 'Meet the founder')}</p>` +
       '</section>',
   )
@@ -189,5 +190,20 @@ export function projectBody(project: Project) {
       section('Result', project.result ? el('p', project.result) : '') +
       section('Tech', el('p', project.tech.join(', '))) +
       `<p>${link('/#projects', 'All projects')}</p></article>`,
+  )
+}
+
+export function productBody(product: Product) {
+  const section = (title: string, html: string) => (html ? el('h2', title) + html : '')
+  const others = publishedProducts.filter((p) => p.slug !== product.slug)
+  return wrap(
+    `<article><header>${el('p', 'Built by Axihex')}${el('h1', product.name)}${el('p', product.tagline)}` +
+      el('p', [statusLabel[product.status], product.kind, product.platforms?.join(', ')].filter(Boolean).join(' · ')) +
+      (product.url ? `<p>${link(product.url, product.urlLabel ?? `Open ${product.name}`)}</p>` : '') +
+      '</header>' +
+      section(`About ${product.name}`, paragraphs(product.description)) +
+      section('What it does', list((product.features ?? []).map(esc))) +
+      section('More from Axihex', list(others.map((p) => `${link(`/products/${p.slug}`, p.name)} ${esc(p.tagline)}`))) +
+      `<p>${link('/', 'Visit axihex.com')} · ${link('/studio', 'About Axihex')}</p></article>`,
   )
 }

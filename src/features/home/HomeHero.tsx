@@ -7,6 +7,7 @@ import { proof } from '../../data/studio.ts'
 import GradientText from '../../components/GradientText.tsx'
 import Icon from '../../components/Icon.tsx'
 import HeroMark from './HeroMark.tsx'
+import { hasProducts } from '../products/shownProducts.ts'
 import { longestPhrase, useTypingLoop } from './typing.ts'
 
 function HomeHero() {
@@ -40,16 +41,31 @@ function HomeHero() {
         </p>
 
         <div className="hero-actions">
-          <Link to="/#projects" className="button">
-            Explore our work <span aria-hidden="true">→</span>
-          </Link>
-          {/* Axihex welcomes client projects, so the second way in is the Contact form, with "project"
-              already chosen (like the honeycomb's "Your idea" cell). An outline button, so the offer
-              shows without making the studio look like a freelance agency. The Studio page is in the
-              navbar and the Studio section starts right below the hero. */}
-          <Link to="/#contact" state={{ topic: 'project' }} className="button button-outline">
-            Start a project
-          </Link>
+          {/* Once Axihex has products to show, they lead: "See our products", then the work.
+              Until then: the work, then a way to start a project. */}
+          {hasProducts ? (
+            <>
+              <Link to="/#products" className="button">
+                See our products <span aria-hidden="true">→</span>
+              </Link>
+              <Link to="/#projects" className="button button-outline">
+                Explore our work
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/#projects" className="button">
+                Explore our work <span aria-hidden="true">→</span>
+              </Link>
+              {/* Axihex welcomes client projects, so the second way in is the Contact form, with "project"
+                  already chosen (like the honeycomb's "Your idea" cell). An outline button, so the offer
+                  shows without making the studio look like a freelance agency. The Studio page is in the
+                  navbar and the Studio section starts right below the hero. */}
+              <Link to="/#contact" state={{ topic: 'project' }} className="button button-outline">
+                Start a project
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Proof the work is real: where it has shipped. */}

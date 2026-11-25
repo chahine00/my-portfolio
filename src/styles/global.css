@@ -2240,20 +2240,11 @@ main {
   }
 }
 
-/* Studio: the eyebrow, a big title and one line, then the pillars (PillarHive.tsx), the
-   capabilities, and "Behind Axihex" with the founder card (see "Studio identity" further down). */
-.studio__title {
-  max-width: 22ch;
-  margin: 6px 0 16px;
-  font-family: var(--font-display);
-  font-size: clamp(2.2rem, 6vw, 4rem);
-  line-height: 1.04;
-  letter-spacing: -0.03em;
-}
-
+/* Studio: the eyebrow and one line, then the pillars (PillarHive.tsx), the capabilities, and
+   "Behind Axihex" with the founder card (see "Studio identity" further down). */
 .studio__text {
   max-width: 52ch;
-  margin: 0;
+  margin: 10px 0 0;
   color: var(--muted);
   font-size: 1.1rem;
   line-height: 1.6;
@@ -3864,7 +3855,8 @@ p.blog-empty {
 }
 
 /* On a phone box it's a button (it copies the number), styled to look the same as the links. */
-button.contact-tile__main {
+button.contact-tile__main,
+.contact-phones__number {
   border: 0;
   background: none;
   font: inherit;
@@ -3874,7 +3866,8 @@ button.contact-tile__main {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3.5 2.5v14l3.4-3.1 2.3 5.2 2-.9-2.3-5.1h4.6z' fill='%23111' stroke='%23fff' stroke-width='1.3' stroke-linejoin='round'/%3E%3Crect x='14.2' y='13.2' width='5' height='6.2' rx='1.3' fill='%23fff' stroke='%234f46e5' stroke-width='1.3'/%3E%3Crect x='16.4' y='15.4' width='5' height='6.2' rx='1.3' fill='%234f46e5' stroke='%23fff' stroke-width='1.1'/%3E%3C/svg%3E") 3 2, copy;
 }
 
-.contact-tile__text .contact-tile__copied {
+.contact-tile__text .contact-tile__copied,
+.contact-phones .contact-tile__copied {
   color: var(--success);
   font-weight: 600;
 }
@@ -4029,6 +4022,92 @@ button.contact-tile__main {
 /* "Or send me a message:" starts a new block, so more space above it than below. */
 .contact-form-label {
   margin: 32px 0 12px;
+}
+
+/* The "Phone numbers" box: the icon, the title, then a row per number (flag + number, which copies
+   on click, and the WhatsApp button). */
+.contact-tile--phones {
+  gap: 14px;
+  padding: 14px 14px 14px 16px;
+}
+
+.contact-phones {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Two columns shared by every row (subgrid): the numbers, then the WhatsApp icons, so the icons
+   line up under each other, right after the longest number. */
+.contact-phones__list {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 6px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-phones__row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+}
+
+.contact-phones__number {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* The number and "Copied!" share one spot: the box is always as wide as the number. */
+.contact-phones__value {
+  display: grid;
+}
+
+.contact-phones__value > span {
+  grid-area: 1 / 1;
+}
+
+.contact-phones__value .is-hidden {
+  visibility: hidden;
+}
+
+/* In the "Phone numbers" box, WhatsApp is a small round icon button, whatever the box's width. */
+.contact-phones .contact-tile__whatsapp {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+}
+
+.contact-phones__number:hover {
+  color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .contact-tile--phones {
+    gap: 12px;
+    padding: 9px 10px 9px 12px;
+  }
+
+  .contact-phones strong {
+    font-size: 0.9rem;
+  }
+
+  .contact-phones__number {
+    font-size: 0.8rem;
+  }
 }
 
 .contact-flag {
@@ -6954,7 +7033,7 @@ a {
    ------------------------------------------------------------------------------------------------ */
 
 /* The Axihex mark wherever it's drawn bigger than in the navbar: an accent hexagon, cyan dot. */
-:is(.hive__mark, .identity__mark, .umbrella__mark, .built-by__mark) {
+:is(.hive__mark, .built-by__mark) {
   flex-shrink: 0;
   fill: none;
   stroke: var(--accent);
@@ -6962,7 +7041,7 @@ a {
   stroke-linejoin: round;
 }
 
-:is(.hive__mark, .identity__mark, .umbrella__mark, .built-by__mark) circle {
+:is(.hive__mark, .built-by__mark) circle {
   fill: var(--accent-2);
   stroke: none;
 }
@@ -7654,20 +7733,7 @@ a {
   line-height: 1.6;
 }
 
-/* Its purpose: the five pillars in one line each, under the definition (Studio page). */
-.purpose {
-  margin-top: 32px;
-}
-
-.purpose__label {
-  margin: 0 0 12px;
-  color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
+/* The five pillars in one line each (Studio page). */
 .purpose__list {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -7706,11 +7772,6 @@ a {
   line-height: 1.45;
 }
 
-.purpose__more {
-  display: inline-block;
-  margin-top: 14px;
-}
-
 /* Tablets: two columns, phones: one. */
 @media (max-width: 900px) {
   .purpose__list {
@@ -7735,63 +7796,7 @@ a {
   }
 }
 
-.identity__not {
-  margin-top: 36px;
-  padding: 22px 24px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  background: var(--card);
-}
-
-.identity__not-label {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.identity__not ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 12px 0 18px;
-  padding: 0;
-  list-style: none;
-}
-
-.identity__not li {
-  padding: 5px 12px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.identity__is {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.identity__mark {
-  width: 30px;
-  height: 30px;
-}
-
-.identity__footnote {
-  margin: 18px 0 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-/* Small cards: the traits, the umbrella's branches. */
+/* Small cards: what Axihex makes (Studio page). */
 .trait-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -7801,7 +7806,21 @@ a {
   list-style: none;
 }
 
-:is(.trait, .umbrella__branches li) {
+/* What Axihex makes: three cards under the Studio page's opening. */
+.trait-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.offerings {
+  margin-top: 32px;
+}
+
+/* The two questions, under the steps. */
+.thinking--after {
+  margin-top: 32px;
+}
+
+.trait {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -7811,12 +7830,12 @@ a {
   background: var(--card);
 }
 
-:is(.trait, .umbrella__branches li) strong {
+.trait strong {
   font-family: var(--font-display);
   font-size: 1.05rem;
 }
 
-:is(.trait, .umbrella__branches li) > span:last-child {
+.trait > span:last-child {
   color: var(--muted);
   font-size: 0.87rem;
   line-height: 1.5;
@@ -7898,6 +7917,23 @@ a {
   line-height: 1.45;
 }
 
+/* Three sets of questions: engineering + product thinking + opportunity thinking. */
+.thinking--3 {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+}
+
+/* Working with founders, under the principle: one quiet boxed line. */
+.thinking-client {
+  max-width: 70ch;
+  margin: 24px 0 0;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 /* The process: six steps on a line, the last one filled (and then it starts again). */
 .process {
   position: relative;
@@ -7957,91 +7993,6 @@ a {
 }
 
 /* One brand, many forms: Axihex on top, four branches under it, joined by lines. */
-.umbrella {
-  padding: 24px;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  background: var(--card);
-}
-
-.umbrella__root {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding-bottom: 24px;
-  text-align: center;
-}
-
-.umbrella__root::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 1.5px;
-  height: 24px;
-  background: var(--border);
-}
-
-.umbrella__mark {
-  width: 40px;
-  height: 40px;
-}
-
-.umbrella__root strong {
-  display: block;
-  line-height: 1.2;
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.umbrella__root span {
-  display: block;
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.4;
-  text-wrap: balance;
-}
-
-.umbrella__branches {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin: 0;
-  padding: 20px 0 0;
-  list-style: none;
-}
-
-.umbrella__branches::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 12.5%;
-  right: 12.5%;
-  height: 1.5px;
-  background: var(--border);
-}
-
-.umbrella__branches li {
-  position: relative;
-  background: var(--bg);
-}
-
-.umbrella__branches li::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: -21px;
-  width: 1.5px;
-  height: 20px;
-  background: var(--border);
-}
-
 .channels {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -8158,15 +8109,16 @@ a {
   text-align: center;
 }
 
-.studio-cta__essence {
-  margin: 0;
+.studio-cta__note {
+  margin: 12px auto 0;
+  max-width: 52ch;
   color: var(--muted);
 }
 
 .studio-cta__title {
   margin: 8px 0 0;
   font-family: var(--font-display);
-  /* One line on every screen ("Have a project in mind? Let's scope it."): the size follows the
+  /* One line on every screen ("Spotted an opportunity? Let's build it."): the size follows the
      screen's width, up to 2.6rem on wide screens. */
   font-size: min(4.2vw, 2.6rem);
   line-height: 1.05;
@@ -8189,22 +8141,11 @@ a {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .trait-grid,
-  .umbrella__branches {
+  .trait-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   /* Two rows of branches: no joining lines. */
-  .umbrella__branches::before,
-  .umbrella__branches li::before,
-  .umbrella__root::after {
-    display: none;
-  }
-
-  .umbrella__branches {
-    padding-top: 4px;
-  }
-
   .process {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     row-gap: 28px;
@@ -8315,10 +8256,6 @@ a {
     padding-top: 24px;
   }
 
-  .identity__not {
-    padding: 18px;
-  }
-
   .trait-grid {
     grid-template-columns: 1fr;
   }
@@ -8353,9 +8290,6 @@ a {
 }
 
 @media (max-width: 420px) {
-  .umbrella__branches {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -9464,5 +9398,143 @@ a {
   .hero {
     min-height: calc(100vh - var(--topbar-height, 60px) - 64px - env(safe-area-inset-bottom));
     min-height: calc(100svh - var(--topbar-height, 60px) - 64px - env(safe-area-inset-bottom));
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Products (Products.tsx, ProductCard.tsx, ProductPage.tsx): Axihex's own apps, tools and services.
+   The cards reuse the Work cards (.work-card); these are the extras: the status badge, the picture
+   placeholder before a product has screenshots, and the product page's "Built by Axihex" parts.
+   ------------------------------------------------------------------------------------------------ */
+.product-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 0.6rem;
+}
+
+.product-card__kind {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* The status: green when people can use it, accent while it's being made. */
+.product-status {
+  --status: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border: 1px solid color-mix(in srgb, var(--status) 40%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--status) 12%, transparent);
+  color: var(--status);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.product-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.product-status--live,
+.product-status--beta {
+  --status: #16a34a;
+}
+
+:root[data-theme='dark'] :is(.product-status--live, .product-status--beta) {
+  --status: #4ade80;
+}
+
+/* No screenshot yet: the product's icon on a soft accent panel, the same shape as a cover. */
+.product-card__placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 2.2;
+  background:
+    radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%),
+    color-mix(in srgb, var(--accent) 7%, var(--card));
+  color: var(--accent);
+}
+
+.work-card--feature .product-card__placeholder {
+  aspect-ratio: 16 / 10;
+  height: 100%;
+}
+
+/* The product page: "Built by Axihex" above the name, and the studio card at the end. */
+.product-page__by {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.product-page__mark {
+  width: 1.3em;
+  height: 1.3em;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.product-page__mark circle {
+  fill: var(--accent);
+  stroke: none;
+}
+
+.product-page__studio {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  align-items: center;
+  margin-top: 48px;
+  padding: 22px 24px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--card));
+}
+
+.product-page__studio-mark {
+  grid-row: span 2;
+  width: 40px;
+  height: 40px;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.product-page__studio-mark circle {
+  fill: var(--accent);
+  stroke: none;
+}
+
+.product-page__studio p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.product-page__studio strong {
+  color: var(--text);
+}
+
+@media (max-width: 560px) {
+  .product-page__studio {
+    grid-template-columns: 1fr;
+  }
+
+  .product-page__studio-mark {
+    grid-row: auto;
   }
 }

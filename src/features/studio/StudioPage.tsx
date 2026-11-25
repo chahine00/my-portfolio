@@ -1,14 +1,15 @@
-// The Studio page (/studio, "Studio" in the navbar): Axihex's identity, purpose and approach.
-// The home page's Studio section is the short version and links here.
-//   1. Identity: the official definition, its five purposes in one line each (the pillars in full
-//      are the home page's honeycomb, not repeated here), and what Axihex is more than
+// The Studio page (/studio, "Studio" in the navbar): what Axihex is, told as a story, opportunity
+// first. The home page's Studio section is the short version and links here.
+//   1. Where we see an opportunity, we build it: what Axihex does, and the three things it makes
 //   2. What defines Axihex: four traits
-//   4. Capabilities: focused in engineering, flexible in what gets built
-//   5. Approach: product thinking (how vs why) and the process, from a need to an improved product
-//   6. One brand, many forms: what can live under Axihex, and where it ships
-//   7. The Axihex philosophy: one quote
-//   8. An invitation: start a project, or meet the founder
-// Text: src/data/identity.ts.
+//   3. From opportunity to product: the steps, the three sets of questions, and how we work with founders
+//   3. Five pillars: the purpose, one line each (in full: the home page's honeycomb)
+//   4. Capabilities: the five skills every product rests on
+//   5. Built by Axihex: where the products live, with or without the Axihex name
+//   6. The Axihex philosophy: one quote
+//   7. Spotted an opportunity? Start a project, collaborate, or meet the founder
+// Text: src/data/identity.ts. Writing rule: plain words, no slogans, nothing presented as launched
+// before it is.
 
 import { useLayoutEffect } from 'react'
 import type { CSSProperties } from 'react'
@@ -17,19 +18,7 @@ import SectionTitle from '../../components/SectionTitle.tsx'
 import GradientText from '../../components/GradientText.tsx'
 import AxihexMark from '../../components/AxihexMark.tsx'
 import Icon from '../../components/Icon.tsx'
-import {
-  channels,
-  definition,
-  essence,
-  moreThan,
-  isRather,
-  philosophy,
-  pillars,
-  process,
-  thinking,
-  traits,
-  umbrella,
-} from '../../data/identity.ts'
+import { channels, offerings, philosophy, pillars, process, studioLead, thinking, traits } from '../../data/identity.ts'
 import { STUDIO_DESCRIPTION, STUDIO_TITLE } from '../../data/seo.ts'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import { useReveal } from '../../utils/useReveal.ts'
@@ -37,6 +26,7 @@ import Capabilities from './Capabilities.tsx'
 import BackLink from '../../components/BackLink.tsx'
 import ScrollUpBack from '../../components/ScrollUpBack.tsx'
 import { useBack } from '../../utils/pageHistory.ts'
+import { hasProducts } from '../products/shownProducts.ts'
 
 function StudioPage() {
   useDocumentTitle(STUDIO_TITLE, { description: STUDIO_DESCRIPTION })
@@ -51,48 +41,27 @@ function StudioPage() {
 
   return (
     <div className="page-enter studio-page">
-      {/* 1. Identity */}
+      {/* 1. What Axihex does, opportunity first */}
       <section id="identity" className="section identity">
         <BackLink back={back} className="hero__back" />
-        <p className="eyebrow">Identity &amp; purpose</p>
+        <p className="eyebrow">The studio</p>
         <h1 className="identity__title">
-          {/* The studio's main idea: it looks for opportunities and builds them. */}
           Where we see an opportunity, <GradientText text="we build it." />
         </h1>
-        <p className="identity__lead">{definition}</p>
+        <p className="identity__lead">{studioLead}</p>
 
-        {/* Its purpose, the five pillars in one line each (as in the official definition). The full
-            pillars, with examples and links, are the home page's honeycomb. */}
-        <div className="purpose">
-          <p className="purpose__label">Its purpose</p>
-          <ol className="purpose__list">
-            {pillars.map((pillar, i) => (
-              <li key={pillar.word}>
-                <span className="purpose__num" aria-hidden="true">
-                  0{i + 1}
-                </span>
-                <strong>{pillar.word}</strong>
-                <span>{pillar.statement}</span>
-              </li>
-            ))}
-          </ol>
-          <Link to="/#studio" className="forward-link purpose__more">
-            Explore the five pillars <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-
-        <div className="identity__not">
-          <p className="identity__not-label">More than</p>
-          <ul>
-            {moreThan.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <p className="identity__is">
-            <AxihexMark className="identity__mark" />
-            {isRather}
-          </p>
-        </div>
+        {/* The three things you'll find from Axihex: our own products first. */}
+        <ul className="trait-grid trait-grid--3 offerings">
+          {offerings.map((offering) => (
+            <li key={offering.title} className="trait">
+              <span className="trait__icon" aria-hidden="true">
+                <Icon name={offering.icon} size={20} />
+              </span>
+              <strong>{offering.title}</strong>
+              <span>{offering.text}</span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* 2. What defines Axihex */}
@@ -109,26 +78,29 @@ function StudioPage() {
             </li>
           ))}
         </ul>
-        <p className="identity__footnote">
-          Independent doesn't mean solo: Axihex collaborates with clients, partners, and other organizations, and its founder
-          stays open to engineering roles.
-        </p>
       </section>
 
-      {/* 4. Capabilities */}
-      <section id="capabilities" className="section">
-        <SectionTitle label="Capabilities" title="The technical" accent="foundation." />
-        <p className="studio-page__intro">
-          A focused engineering identity, rather than a claim to specialize in every industry. These capabilities make
-          different kinds of products possible.
-        </p>
-        <Capabilities />
-      </section>
-
-      {/* 5. Approach: product thinking */}
+      {/* 3. From opportunity to product */}
       <section id="approach" className="section">
-        <SectionTitle label="Approach" title="Product thinking," accent="in practice." />
-        <div className="thinking">
+        <SectionTitle label="How it works" title="From opportunity" accent="to product." />
+        <p className="studio-page__intro">
+          Every Axihex product starts with an opportunity we spotted. With founders, we start from their idea and shape
+          the plan together.
+        </p>
+        <ol className="process" ref={processRef}>
+          {process.map((step, i) => (
+            <li key={step.title} className="process__step" style={{ '--i': i } as CSSProperties}>
+              <span className="process__num" aria-hidden="true">
+                {i + 1}
+              </span>
+              <strong>{step.title}</strong>
+              <span>{step.text}</span>
+            </li>
+          ))}
+        </ol>
+
+        {/* The questions behind every build: how (engineering), what and for whom (product), when (opportunity). */}
+        <div className="thinking thinking--3 thinking--after">
           <div className="thinking__col">
             <p className="thinking__label">Engineering asks</p>
             <ul>
@@ -148,52 +120,59 @@ function StudioPage() {
               ))}
             </ul>
           </div>
+          <span className="thinking__plus" aria-hidden="true">
+            +
+          </span>
+          <div className="thinking__col thinking__col--why">
+            <p className="thinking__label">Opportunity thinking asks</p>
+            <ul>
+              {thinking.when.map((question) => (
+                <li key={question}>{question}</li>
+              ))}
+            </ul>
+          </div>
         </div>
         <p className="thinking__principle">{thinking.principle}</p>
 
-        <ol className="process" ref={processRef}>
-          {process.map((step, i) => (
-            <li key={step.title} className="process__step" style={{ '--i': i } as CSSProperties}>
-              <span className="process__num" aria-hidden="true">
-                {i + 1}
+        {/* Working with founders: the same questions, applied to their idea and their plan. */}
+        <p className="thinking-client">{thinking.founders}</p>
+      </section>
+
+      {/* 3. The five pillars, one line each (in full: the home page's honeycomb). */}
+      <section id="pillars" className="section">
+        <SectionTitle label="Purpose" title="Five pillars." accent="One studio." />
+        <ol className="purpose__list">
+          {pillars.map((pillar, i) => (
+            <li key={pillar.word}>
+              <span className="purpose__num" aria-hidden="true">
+                0{i + 1}
               </span>
-              <strong>{step.title}</strong>
-              <span>{step.text}</span>
+              <strong>{pillar.word}</strong>
+              <span>{pillar.statement}</span>
             </li>
           ))}
         </ol>
       </section>
 
-      {/* 6. One brand, many forms */}
-      <section id="brand" className="section">
-        <SectionTitle label="Umbrella brand" title="One brand," accent="many forms." />
-        <div className="umbrella">
-          <div className="umbrella__root">
-            <AxihexMark className="umbrella__mark" />
-            <div>
-              <strong>Axihex</strong>
-              <span>Independent software studio &amp; technology brand</span>
-            </div>
-          </div>
-          <ul className="umbrella__branches">
-            {umbrella.map((branch) => (
-              <li key={branch.title}>
-                <span className="trait__icon" aria-hidden="true">
-                  <Icon name={branch.icon} size={18} />
-                </span>
-                <strong>{branch.title}</strong>
-                <span>{branch.text}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* 4. Capabilities */}
+      <section id="capabilities" className="section">
+        <SectionTitle label="Capabilities" title="The technical" accent="foundation." />
+        <p className="studio-page__intro">
+          Our products can be very different: an app, a game, an online tool. Underneath, they’re all built with the same
+          five skills below, so every new idea starts on solid ground.
+        </p>
+        <Capabilities />
+      </section>
 
+      {/* 5. Where the products live: a link shared on social media can lead to any of these. */}
+      <section id="brand" className="section">
+        <SectionTitle label="Built by Axihex" title="Wherever" accent="it lives." />
         <div className="channels">
           <div className="channels__text">
-            <h3>Where it ships.</h3>
+            <h3>Not everything we make is called Axihex.</h3>
             <p>
-              Not every product needs to live on axihex.com or carry its name. A small utility can live right here; a larger
-              app can have its own name and identity, endorsed by the studio.
+              A small tool can live right here on axihex.com. A bigger app or service gets its own name and website. Either
+              way, you’ll find this mark on it.
             </p>
             <span className="built-by">
               <AxihexMark className="built-by__mark" /> Built by Axihex
@@ -213,7 +192,7 @@ function StudioPage() {
         </div>
       </section>
 
-      {/* 7. The Axihex philosophy: one quote on its own, before the invitation. */}
+      {/* 6. The Axihex philosophy: one quote on its own, before the invitation. */}
       <section id="philosophy" className="section" aria-label="Axihex philosophy">
         <blockquote className="philosophy">
           <p>{philosophy}</p>
@@ -221,23 +200,34 @@ function StudioPage() {
         </blockquote>
       </section>
 
-      {/* 8. An invitation */}
+      {/* 7. The invitation: the page's question, turned to the visitor. */}
       <section id="studio-contact" className="section studio-cta">
-        <p className="studio-cta__essence">{essence}</p>
         <h2 className="studio-cta__title">
-          Have a project in mind? <GradientText text="Let's scope it." />
+          Spotted an opportunity? <GradientText text="Let’s build it." />
         </h2>
+        <p className="studio-cta__note">
+          Independent doesn’t mean solo: we work with clients, partners and other teams.
+        </p>
         <div className="hero-actions studio-cta__actions">
           <Link to="/#contact" state={{ topic: 'project' }} className="button">
             Start a project <span aria-hidden="true">→</span>
           </Link>
-          <Link to="/#contact" state={{ topic: 'collab' }} className="button button-outline">
-            Collaborate
-          </Link>
+          {/* Once Axihex has products to show, they're the other way in. */}
+          {hasProducts ? (
+            <Link to="/#products" className="button button-outline">
+              See our products
+            </Link>
+          ) : (
+            <Link to="/#contact" state={{ topic: 'collab' }} className="button button-outline">
+              Collaborate
+            </Link>
+          )}
           <Link to="/background" className="forward-link">
             Meet the founder <span aria-hidden="true">→</span>
           </Link>
         </div>
+        {/* The end of the page: the way back, like the link at the top (same look as the founder page's). */}
+        <BackLink back={back} className="founder-back" />
       </section>
 
       {/* Phones, in the middle of the page: the same way back, under the thumb when you scroll up. */}

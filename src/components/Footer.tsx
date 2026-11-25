@@ -23,10 +23,11 @@ function Footer() {
           <Link to="/#home" className="footer__logo" state={{ replayWelcome: true }}>
             <AxihexMark className="footer__mark" /> {profile.brand}
           </Link>
+          {/* The studio's line, the same as the Studio page's headline, then where it is. */}
           <p>
-            Independent software studio
+            Where we see an opportunity, we build it.
             <br />
-            {profile.location}
+            Independent software studio · {profile.location}
           </p>
         </div>
 

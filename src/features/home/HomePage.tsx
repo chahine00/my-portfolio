@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useNavigationType } from 'react-router'
 import HomeHero from './HomeHero.tsx'
+import Products from '../products/Products.tsx'
 import About from '../about/About.tsx'
 import Projects from '../projects/Projects.tsx'
 import Updates from '../updates/Updates.tsx'
@@ -93,6 +94,9 @@ function HomePage() {
   return (
     <>
       <HomeHero />
+      {/* Axihex's own products, the main highlight: right under the hero. Not shown at all until
+          there's a published product (src/data/products.ts). */}
+      <Products />
       {/* Studio-first: Hero → Studio (pillars, traits, capabilities, process, Behind Axihex) → Work →
           Blog → Contact. The founder's background has its own page (/background), linked from
           "Meet the founder"; the full identity has its own page too (/studio, "Studio" in the navbar). */}

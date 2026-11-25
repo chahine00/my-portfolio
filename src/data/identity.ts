@@ -1,5 +1,5 @@
-// Axihex's identity, purpose and vision: the text behind the Studio section (About.tsx, PillarHive.tsx),
-// the Direction section (Direction.tsx) and the full Studio page (/studio, StudioPage.tsx).
+// Axihex's identity and purpose: the text behind the Studio section (About.tsx, PillarHive.tsx) and
+// the full Studio page (/studio, StudioPage.tsx).
 // Condensed from "Axihex — Identity, Purpose & Vision". Plain data: the build also reads it
 // (scripts/prerender.ts), so search engines see the same words.
 //
@@ -7,24 +7,30 @@
 
 import type { IconName } from '../components/iconNames.ts'
 
-// The official one-line definition.
-export const definition =
-  'Axihex is an independent, founder-led software studio and emerging technology brand focused on exploring ideas, engineering digital products, and creating useful technology.'
+// The Studio page's opening (under "Where we see an opportunity, we build it."): what Axihex does,
+// opportunity first. Our own products lead; client work is welcome alongside them.
+// Writing rule for this page: plain words a visitor uses, no slogans ("transforming ideas",
+// "cutting-edge", "solutions"), and nothing presented as launched before it is.
+export const studioLead =
+  'Axihex is an independent software studio. We spot opportunities, build products around them, and put them in people’s hands. We also partner with founders who’ve spotted an opportunity of their own.'
 
-export const essence = 'Where engineering meets curiosity, creativity, and ambition.'
+// What we do: the three things you'll find from Axihex. Our own products first.
+export const offerings: { title: string; text: string; icon: IconName }[] = [
+  { title: 'Our own products', text: 'Apps, online tools, games and services we build, launch and keep improving.', icon: 'box' },
+  { title: 'Software for clients', text: 'Web, mobile, backend, AI and cloud, for people with an idea of their own.', icon: 'briefcase' },
+  { title: 'What we learn, shared', text: 'Notes, experiments and lessons from every build, on the blog.', icon: 'book' },
+]
 
 export const philosophy =
   'The best software is the kind people stop noticing: it simply works, every day.'
 
-// What Axihex is more than (PDF §1: "not limited to"), shown as chips on /studio, then what it is.
-export const moreThan = ['A software agency', 'A freelance business', 'A personal portfolio', 'A single-product startup']
-export const isRather = 'A software studio rooted in engineering, with the freedom to pursue what comes next.'
-
-// What defines Axihex.
+// What defines Axihex: four traits, on the Studio page. They sum up "How it works": opportunity
+// thinking for our own products, product thinking for every build (ours and founders'), solid
+// engineering, and the freedom to choose.
 export const traits: { title: string; text: string; icon: IconName }[] = [
-  { title: 'Engineering', text: 'Reliable, secure, maintainable, and scalable software.', icon: 'code' },
-  { title: 'Experimentation', text: 'Exploring technologies, testing ideas, finding new possibilities.', icon: 'flask' },
-  { title: 'Product thinking', text: 'Understanding users and building what delivers genuine value.', icon: 'target' },
+  { title: 'Opportunity first', text: 'We watch for rising demand and move when the timing is right.', icon: 'trend' },
+  { title: 'Product thinking', text: 'Who it’s for, what they need, and what it’s worth, for our products and for yours.', icon: 'target' },
+  { title: 'Engineering', text: 'Reliable, secure software, built fast and built to hold up as it grows.', icon: 'code' },
   { title: 'Independence', text: 'Free to choose ideas, projects, and partners, and to shape the direction.', icon: 'compass' },
 ]
 
@@ -36,7 +42,6 @@ export interface Pillar {
   word: string
   statement: string
   text: string
-  objective: string
   examples: string[]
   icon: IconName
   link: { to: string; label: string; state?: { topic: Topic } }
@@ -45,21 +50,19 @@ export interface Pillar {
 export const pillars: Pillar[] = [
   {
     word: 'Explore',
-    statement: 'Discover ideas and new technological opportunities.',
-    // Where Axihex sees an opportunity, it builds and tries it: not limited to one kind of product.
-    text: 'Where we see an opportunity, we build it and try it. Research, quick prototypes, and new frameworks show where software can add real value before we invest in it.',
-    objective: 'An environment where curiosity can lead to meaningful innovation.',
-    examples: ['Experimenting with LLMs', 'Prototyping to validate ideas', 'Researching everyday digital problems'],
+    statement: 'Spot opportunities and try ideas, fast.',
+    // Where Axihex sees an opportunity, it tries it: not limited to one kind of product.
+    text: 'Where we see an opportunity, we move on it. Quick research and prototypes tell us if the demand is real and the timing is right, before we invest more.',
+    examples: ['Watching trends & demand', 'Prototyping to test ideas', 'Experimenting with AI'],
     icon: 'compass',
     // The blog's Ideas posts, not the whole blog (that's Share's link).
     link: { to: '/blog?category=Ideas', label: 'Read our ideas' },
   },
   {
     word: 'Build',
-    statement: 'Original products, useful tools, and custom software for clients.',
-    text: 'The core of Axihex: turning ideas, experiments, and requirements into working software. Two directions that coexist: products owned by Axihex, and solutions delivered for clients.',
-    objective: 'Software that delivers genuine value, for Axihex or for its clients.',
-    examples: ['Original products & tools', 'Client web & mobile apps', 'Backends, AI & cloud solutions'],
+    statement: 'Our own apps, tools, games and services, and software for clients.',
+    text: 'The heart of Axihex: turning an opportunity into working software. Two directions side by side: products we own and run, and software we build for clients.',
+    examples: ['Our own apps, tools & games', 'Client web & mobile apps', 'Backends, AI & cloud'],
     icon: 'layers',
     // Build is the doing: the action is to build something together. (The work is Showcase's link.)
     link: { to: '/#contact', label: 'Start a project', state: { topic: 'project' } },
@@ -69,8 +72,7 @@ export const pillars: Pillar[] = [
     word: 'Showcase',
     statement: 'Proof through real, shipped work.',
     // About the work only: the founder's own experience lives on the Founder page (/background).
-    text: 'Credibility comes from genuine work: shipped projects, client products, and engineering achievements, each attributed accurately.',
-    objective: 'Credibility through genuine work and achievements.',
+    text: 'Trust comes from real work: shipped projects, client products and engineering milestones, each credited honestly.',
     examples: ['Studio & client projects', 'Shipped products', 'Engineering milestones'],
     icon: 'spark',
     link: { to: '/#projects', label: 'See the work' },
@@ -78,17 +80,15 @@ export const pillars: Pillar[] = [
   {
     word: 'Share',
     statement: 'What we learn, given back: articles, tutorials, and free tools.',
-    text: 'What is learned while building is worth passing on: articles, case studies, and lessons from real projects, shared without exposing anything confidential.',
-    objective: 'Contribute to the community through meaningful technical work.',
+    text: 'What we learn while building is worth passing on: articles, case studies and lessons from real projects, never anything confidential.',
     examples: ['Technical articles', 'Engineering case studies', 'Open-source & free tools'],
     icon: 'share',
     link: { to: '/blog', label: 'Read the blog' },
   },
   {
     word: 'Grow',
-    statement: 'Innovation, collaboration, and professional opportunities.',
-    text: 'Growth through real work and relationships, not an artificial impression of size: new clients, partnerships, collaborators, and a team when the work justifies it.',
-    objective: 'A sustainable foundation for technical, professional, and business growth.',
+    statement: 'More products, partners and opportunities, earned through the work.',
+    text: 'Growth through real work and relationships, not by looking bigger than we are: new clients, partners, collaborators, and a team when the work calls for it.',
     examples: ['Client & partner relationships', 'Collaborating with makers', 'Reinvesting in new ideas'],
     icon: 'trend',
     link: { to: '/#contact', label: 'Collaborate with us', state: { topic: 'collab' } },
@@ -106,35 +106,37 @@ export const capabilities: { title: string; text: string; icon: IconName }[] = [
 
 export const capabilitiesPrinciple = { title: 'Focused in engineering.', accent: 'Flexible in what we build.' }
 
-// Product thinking: the questions on each side, then the process.
+// From opportunity to product: the steps every Axihex product goes through, the same ones we
+// follow for clients.
+export const process: { title: string; text: string }[] = [
+  { title: 'Spot', text: 'A rising demand, a new trend, or a need nobody serves well yet: the right idea at the right moment.' },
+  { title: 'Explore', text: 'How big the demand is, what’s already out there, and how long the window stays open.' },
+  { title: 'Validate', text: 'A quick version in front of real people, to see if they want it before we invest more.' },
+  { title: 'Build', text: 'Fast, reliable software, ready while the opportunity is still there.' },
+  { title: 'Launch', text: 'On the web or in the app stores, then in front of the right people through social media.' },
+  { title: 'Improve', text: 'We grow what works. Some products run for a season, others for years.' },
+]
+
+// The two questions behind every build.
 export const thinking = {
   how: ['How should we build it?', 'Which technologies?', 'How should it scale?', 'How do we maintain it?'],
+  // Product thinking: for every build, ours or a founder's.
   why: ['Why should we build it?', 'Who will use it?', 'Which features are necessary?', 'What value does it provide?'],
-  principle: 'Engineering decides how to build something. Product thinking decides what to build, why, and for whom.',
+  // Opportunity thinking: for our own products, catching the right chance at the right time.
+  when: ['Is there real demand?', 'Is the timing right?', 'Can it pay off?', 'How do we reach people?'],
+  principle:
+    'Engineering decides how to build it. Product thinking decides what, why and for whom. Opportunity thinking decides when.',
+  // Working with founders: how these questions shape their idea and their plan.
+  founders:
+    'Have an idea? We bring the same questions to it and help shape the plan: who it’s for, which features come first, what it’s worth, and how it reaches people. Then we build it with you, all the way to launch.',
 }
 
-export const process: { title: string; text: string }[] = [
-  { title: 'Identify', text: 'Understand the problem or opportunity.' },
-  { title: 'Explore', text: 'Research users, alternatives, feasibility.' },
-  { title: 'Validate', text: 'Confirm it provides genuine value.' },
-  { title: 'Engineer', text: 'Reliable, secure, maintainable software.' },
-  { title: 'Launch', text: 'Put it in front of its audience.' },
-  { title: 'Improve', text: 'Learn from usage and feedback.' },
-]
-
-// One brand, many forms: what can live under Axihex, and where it ships.
-export const umbrella: { title: string; text: string; icon: IconName }[] = [
-  { title: 'Original products', text: 'Owned applications, platforms, and digital tools.', icon: 'box' },
-  { title: 'Client solutions', text: 'Custom web and mobile software, built for clients.', icon: 'briefcase' },
-  { title: 'Research & innovation', text: 'Experiments, prototypes, and emerging technologies.', icon: 'flask' },
-  { title: 'Knowledge & resources', text: 'Technical articles, insights, and community contributions.', icon: 'book' },
-]
-
+// Where Axihex products live. Not everything carries the Axihex name.
 export const channels: { title: string; text: string; icon: IconName }[] = [
-  { title: 'axihex.com', text: 'Small utilities, experiments, and product discovery.', icon: 'globe' },
-  { title: 'Product websites', text: 'Larger products with their own name and identity, “Built by Axihex”.', icon: 'external' },
-  { title: 'App Store & Google Play', text: 'Mobile apps and games under the right product identity.', icon: 'smartphone' },
-  { title: 'GitHub', text: 'Open-source projects, libraries, and technical resources.', icon: 'github' },
+  { title: 'axihex.com', text: 'Small online tools and experiments you can use right away.', icon: 'globe' },
+  { title: 'Their own websites', text: 'Bigger apps and services, with their own name.', icon: 'external' },
+  { title: 'App Store & Google Play', text: 'Mobile apps and games.', icon: 'smartphone' },
+  { title: 'GitHub', text: 'Open-source code and resources.', icon: 'github' },
 ]
 
 // Today, and where it's heading. "home": also shown in the home page's Direction section.

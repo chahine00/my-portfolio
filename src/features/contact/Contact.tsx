@@ -8,7 +8,7 @@ import type { SubmitEvent } from 'react'
 import { useLocation } from 'react-router'
 import { sendContactMessage } from '../../services/api.ts'
 import { topics, type Topic } from '../../data/identity.ts'
-import { contacts } from '../../data/contact.ts'
+import { contacts, type ContactLink } from '../../data/contact.ts'
 import { asset } from '../../utils/asset.ts'
 import Icon from '../../components/Icon.tsx'
 import SectionTitle from '../../components/SectionTitle.tsx'
@@ -20,6 +20,10 @@ type Status = 'idle' | 'sending' | 'sent' | 'error'
 // Phone numbers (src/data/contact.ts), each with its copy button and WhatsApp button.
 // Set this to false to hide them from the page.
 const SHOW_PHONE_NUMBERS = true
+
+const isPhone = (contact: ContactLink) => contact.href.startsWith('tel:')
+// The numbers shown in the "Phone numbers" box (none when SHOW_PHONE_NUMBERS is off).
+const phones = SHOW_PHONE_NUMBERS ? contacts.filter(isPhone) : []
 
 function Contact() {
   // useState returns two things: [currentValue, functionToChangeIt].
@@ -65,6 +69,62 @@ function Contact() {
     }
   }
 
+  // The "Phone numbers" box: one box for all the numbers, a row per number. Clicking a number copies it;
+  // a number that's on WhatsApp also gets the WhatsApp button.
+  function renderPhones() {
+    return (
+      <li key="phones" className="contact-tile contact-tile--phones">
+        <span className="contact-tile__icon">
+          <Icon name="phone" size={22} />
+        </span>
+        <div className="contact-phones">
+          <strong>Phone numbers</strong>
+          <ul className="contact-phones__list">
+            {phones.map((phone) => {
+              const isCopied = copied === phone.label
+              return (
+                <li key={phone.label} className="contact-phones__row">
+                  <button
+                    type="button"
+                    className="contact-phones__number"
+                    onClick={() => copyNumber(phone.label, phone.value)}
+                    aria-label={`Copy ${phone.value}`}
+                    title="Click to copy"
+                  >
+                    {phone.flag && <img src={asset(phone.flag)} alt="" className="contact-flag" />}
+                    {/* The number keeps its space while "Copied!" shows over it, so the WhatsApp icons
+                        don't move. role="status" makes screen readers say "Copied!" when it appears. */}
+                    <span className="contact-phones__value">
+                      <span className={isCopied ? 'is-hidden' : undefined} aria-hidden={isCopied}>
+                        {phone.value}
+                      </span>
+                      <span className="contact-tile__copied" role="status">
+                        {isCopied ? 'Copied!' : ''}
+                      </span>
+                    </span>
+                  </button>
+                  {phone.whatsapp && (
+                    <a
+                      href={phone.whatsapp}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="contact-tile__whatsapp"
+                      aria-label={`WhatsApp ${phone.value}`}
+                      title="Chat on WhatsApp"
+                    >
+                      {/* Icon only; screen readers get the aria-label above. */}
+                      <Icon name="whatsapp" size={14} />
+                    </a>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      </li>
+    )
+  }
+
   // This function runs when the form is submitted (button click or pressing Enter).
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     // By default the browser reloads the page when a form is submitted.
@@ -98,8 +158,8 @@ function Contact() {
       {/* Axihex welcomes client projects and collaborations, and the founder is open to roles:
           the intro names all three, the form's topic choices (src/data/identity.ts) too. */}
       <p className="contact-intro">
-        A project in mind, an idea to build together, or a collaboration. Reach out by email, on LinkedIn, or with the
-        form.
+        Spotted an opportunity, have a project in mind, or want to work together? Reach out by email, on LinkedIn, or
+        with the form.
       </p>
 
       {/* Two boxes side by side on wide screens, level at the top and the bottom: the ways to reach
@@ -107,11 +167,12 @@ function Contact() {
       <div className="contact-layout">
         <div className="contact-aside">
           <ul className="contact-tiles">
-            {/* Phone numbers only when SHOW_PHONE_NUMBERS is on (see the top of this file). */}
-            {contacts.filter((contact) => SHOW_PHONE_NUMBERS || !contact.href.startsWith('tel:')).map((contact) => {
-              const icon = contact.icon ?? (contact.href.startsWith('tel:') ? 'phone' : undefined)
-              const isCopied = copied === contact.label
-              // The inside of the box, the same for a link and for a copy button.
+            {/* The phone numbers share one "Phone numbers" box (renderPhones below), placed where the first number
+                is in the list; every other contact gets its own box. */}
+            {contacts.map((contact) => {
+              if (isPhone(contact)) return contact === phones[0] ? renderPhones() : null
+              const icon = contact.icon
+              // The inside of the box.
               const content = (
                 <>
                   {icon && (
@@ -125,49 +186,19 @@ function Contact() {
                       {/* "&&" only renders the flag when the contact has one. */}
                       {contact.flag && <img src={asset(contact.flag)} alt="" className="contact-flag" />}
                     </strong>
-                    {/* role="status" makes screen readers say "Copied!" when it appears. */}
-                    <span className={isCopied ? 'contact-tile__copied' : undefined} role="status">
-                      {isCopied ? 'Copied!' : contact.value}
-                    </span>
+                    <span>{contact.value}</span>
                   </span>
                 </>
               )
               return (
                 <li key={contact.label} className="contact-tile">
-                  {contact.href.startsWith('tel:') ? (
-                    // Phone numbers: a button that copies the number. title and aria-label say so.
-                    <button
-                      type="button"
-                      className="contact-tile__main"
-                      onClick={() => copyNumber(contact.label, contact.value)}
-                      aria-label={`Copy ${contact.value}`}
-                      title="Click to copy"
-                    >
-                      {content}
-                    </button>
-                  ) : (
-                    <a
-                      href={contact.href}
-                      className="contact-tile__main"
-                      {...(contact.href.startsWith('http') && { target: '_blank', rel: 'noreferrer' })}
-                    >
-                      {content}
-                    </a>
-                  )}
-                  {contact.whatsapp && (
-                    <a
-                      href={contact.whatsapp}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="contact-tile__whatsapp"
-                      aria-label={`WhatsApp ${contact.value}`}
-                      title="Chat on WhatsApp"
-                    >
-                      <Icon name="whatsapp" size={16} />
-                      {/* The visible word; screen readers get the fuller aria-label above. */}
-                      <span aria-hidden="true">WhatsApp</span>
-                    </a>
-                  )}
+                  <a
+                    href={contact.href}
+                    className="contact-tile__main"
+                    {...(contact.href.startsWith('http') && { target: '_blank', rel: 'noreferrer' })}
+                  >
+                    {content}
+                  </a>
                 </li>
               )
             })}

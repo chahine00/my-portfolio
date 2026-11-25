@@ -13,7 +13,8 @@ export const profile = {
   headline: 'From the screen',
   headlineAccent: 'to the server.',
   // One or two sentences under the headline: what Axihex does, concretely.
-  intro: 'We explore ideas, develop products of our own, and engineer web and mobile apps for clients, from the interface to the backend, AI and cloud.',
+  // Opportunity first, our own products before client work (like the Studio page).
+  intro: 'We spot opportunities and turn them into products. Web, mobile, AI and cloud, built end to end.',
   // The founder line at the bottom of the hero.
   founderTitle: 'Software Engineer',
   location: 'Beirut, Lebanon',

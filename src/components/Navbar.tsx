@@ -14,6 +14,7 @@ import ThemeToggle from './ThemeToggle.tsx'
 import { goToTop } from '../utils/goToTop.ts'
 import Icon from './Icon.tsx'
 import AxihexMark from './AxihexMark.tsx'
+import { hasProducts } from '../features/products/shownProducts.ts'
 import type { IconName } from './Icon.tsx'
 
 // Instead of writing each <li> by hand, we keep the links in an array.
@@ -39,6 +40,8 @@ const links: NavItem[] = [
   // The studio's own page, then the work, then the founder's own page (his professional portfolio,
   // /background), then the writing. Contact always last.
   { to: '/studio', label: 'Studio', icon: 'code' },
+  // Axihex's own products: only once there's one to show (src/data/products.ts).
+  ...(hasProducts ? [{ to: '/#products', label: 'Products', match: '/products', icon: 'box' as const }] : []),
   { to: '/#projects', label: 'Work', match: '/projects', icon: 'folder' },
   { to: '/background', label: 'Founder', icon: 'user' },
   { to: '/blog', label: 'Blog', sections: ['blog'], dot: hasRecentUpdate, icon: 'pen' },

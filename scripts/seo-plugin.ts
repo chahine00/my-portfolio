@@ -8,7 +8,8 @@
 //   - puts the right <title>, description, canonical link, preview tags and structured data
 //     (JSON-LD, which tells Google who you are and what each page is) in the home page
 //   - writes a copy of index.html for every other page with ITS tags:
-//       dist/blog.html, dist/background.html, dist/studio.html, dist/blog/<slug>.html, dist/projects/<slug>.html
+//       dist/blog.html, dist/background.html, dist/studio.html, dist/blog/<slug>.html, dist/projects/<slug>.html,
+//       dist/products/<slug>.html (published products only, src/data/products.ts)
 //     (and dist/projects/<slug>/index.html: see "Project pages" below)
 //   - writes dist/404.html (not indexed) and dist/sitemap.xml (the list of pages for Google)
 // The page content is still drawn by React: only the <head> differs.
@@ -18,10 +19,11 @@
 
 import { execFileSync } from 'node:child_process'
 import type { Plugin } from 'vite'
-import { blogBody, founderBody, homeBody, postBody, projectBody, studioBody } from './prerender.ts'
+import { blogBody, founderBody, homeBody, postBody, productBody, projectBody, studioBody } from './prerender.ts'
 import { contacts } from '../src/data/contact.ts'
 import { profile } from '../src/data/profile.ts'
 import { projects } from '../src/data/projects.ts'
+import { publishedProducts } from '../src/data/products.ts'
 import { updates } from '../src/data/updates.ts'
 import {
   BACKGROUND_DESCRIPTION,
@@ -36,6 +38,8 @@ import {
   absoluteUrl,
   pageTitle,
   postDescription,
+  productDescription,
+  productTitle,
   projectDescription,
   projectTitle,
   shareImage,
@@ -256,6 +260,40 @@ const projectPages: Page[] = projects.map((project) => {
   }
 })
 
+// Axihex's own products: each page has its own preview (its first picture), so a link shared on
+// social media shows the product itself. Published products only.
+const productPages: Page[] = publishedProducts.map((product) => {
+  const path = `/products/${product.slug}`
+  const image = shareImage(product.images)
+  return {
+    path,
+    title: pageTitle(productTitle(product)),
+    description: productDescription(product),
+    image,
+    imageAlt: product.imageAlt ?? product.name,
+    body: productBody(product),
+    jsonLd: [
+      {
+        '@type': 'SoftwareApplication',
+        name: product.name,
+        description: productDescription(product),
+        url: absoluteUrl(path),
+        image: image ? absoluteUrl(image) : undefined,
+        applicationCategory:
+          product.kind === 'Game' ? 'GameApplication' : product.kind === 'Mobile app' ? 'MobileApplication' : 'WebApplication',
+        operatingSystem: product.platforms?.join(', '),
+        publisher: { '@id': BRAND_ID },
+        creator: { '@id': BRAND_ID },
+      },
+      breadcrumbs([
+        { name: 'Home', path: '/' },
+        { name: product.name, path },
+      ]),
+      brand,
+    ],
+  }
+})
+
 const background: Page = {
   path: '/background',
   title: pageTitle(`${profile.name}, Founder`),
@@ -277,7 +315,7 @@ const studioPage: Page = {
   path: '/studio',
   title: pageTitle(STUDIO_TITLE),
   description: STUDIO_DESCRIPTION,
-  imageAlt: `${profile.brand}: identity, purpose and approach`,
+  imageAlt: `${profile.brand}: where we see an opportunity, we build it`,
   body: studioBody(),
   jsonLd: [
     { '@type': 'AboutPage', url: absoluteUrl('/studio'), about: { '@id': BRAND_ID } },
@@ -352,7 +390,7 @@ function sitemap() {
   const latestPost = sortedPosts[0]?.date
   const entries = [
     // The home page changes with its own text and with each new post: the later of the two.
-    { path: '/', lastmod: [latestPost, lastChanged('src/data/profile.ts', 'src/data/studio.ts', 'src/data/projects.ts')].filter(Boolean).sort().pop() },
+    { path: '/', lastmod: [latestPost, lastChanged('src/data/profile.ts', 'src/data/studio.ts', 'src/data/projects.ts', 'src/data/products.ts')].filter(Boolean).sort().pop() },
     { path: '/blog', lastmod: latestPost },
     { path: '/studio', lastmod: lastChanged('src/data/identity.ts') },
     {
@@ -360,6 +398,7 @@ function sitemap() {
       lastmod: lastChanged('src/data/experience.ts', 'src/data/founder.ts', 'src/data/education.ts', 'src/data/profile.ts'),
     },
     ...projects.map((project) => ({ path: `/projects/${project.slug}`, lastmod: lastChanged('src/data/projects.ts') })),
+    ...publishedProducts.map((product) => ({ path: `/products/${product.slug}`, lastmod: lastChanged('src/data/products.ts') })),
     ...sortedPosts.map((post) => ({ path: `/blog/${post.slug}`, lastmod: post.date })),
   ]
   const urls = entries
@@ -395,6 +434,12 @@ export default function seoPlugin(): Plugin {
         // Project pages: their photos live in a folder with the same name (public/projects/<slug>/).
         // A server that tries folders before falling back to the app (nginx "$uri/") sends
         // /projects/<slug> to that folder; this index.html makes the page open there too.
+        emit(`${page.path.slice(1)}/index.html`, pageHtml)
+      }
+      for (const page of productPages) {
+        const pageHtml = withPage(html, page)
+        emit(`${page.path.slice(1)}.html`, pageHtml)
+        // Same as the project pages: their pictures live in public/products/<slug>/.
         emit(`${page.path.slice(1)}/index.html`, pageHtml)
       }
       emit('background.html', withPage(html, background))

@@ -17,6 +17,7 @@ import HomePage from '../features/home/HomePage.tsx'
 const UpdatesPage = lazy(() => import('../features/updates/UpdatesPage.tsx'))
 const UpdatePost = lazy(() => import('../features/updates/UpdatePost.tsx'))
 const ProjectPage = lazy(() => import('../features/projects/ProjectPage.tsx'))
+const ProductPage = lazy(() => import('../features/products/ProductPage.tsx'))
 const BackgroundPage = lazy(() => import('../features/background/BackgroundPage.tsx'))
 const StudioPage = lazy(() => import('../features/studio/StudioPage.tsx'))
 const NotFound = lazy(() => import('../features/not-found/NotFound.tsx'))
@@ -86,8 +87,9 @@ function App() {
                           e.g. /blog/postman-isnt-a-browser
           "/updates…" → the blog's old address. Old shared links are sent on to /blog.
           "/projects/:slug" → one project's page, e.g. /projects/cinetwork
+          "/products/:slug" → one of Axihex's own products (src/data/products.ts; hidden until published)
           "/background" → the founder's full background: experience, capabilities, education
-          "/studio" → Axihex's identity, purpose and approach ("Studio" in the navbar)
+          "/studio" → what Axihex does and how it builds ("Studio" in the navbar)
           To add a new page: create its component, add a <Route> here,
           and add a link to it in Navbar.tsx.
           The last route ("*") catches any unknown URL and shows a "Page not found" page.
@@ -102,6 +104,7 @@ function App() {
             <Route path="/updates" element={<Navigate to="/blog" replace />} />
             <Route path="/updates/:slug" element={<OldPostRedirect />} />
             <Route path="/projects/:slug" element={<ProjectPage />} />
+            <Route path="/products/:slug" element={<ProductPage />} />
             <Route path="/background" element={<BackgroundPage />} />
             <Route path="/studio" element={<StudioPage />} />
             <Route path="*" element={<NotFound />} />
