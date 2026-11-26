@@ -10,9 +10,9 @@
 // - On arrival the hexagons fly in from all over the drawing, scattered and tumbling, and come
 //   together as a flying saucer, widest at the base: Infrastructure is its wide rim (the
 //   foundation), Backend sits on it, Interface is the small dome on top, and the small scattered
-//   hexagons become the lights around the rim. A soft beam then shines down from it. It plays when
-//   the drawing first comes into view, and again when the navbar's Home link (or the back-to-top
-//   button) brings you back to the top.
+//   hexagons become the lights around the rim. A soft beam then shines down from it. It plays each
+//   time you scroll down to the drawing (not when scrolling back up to it), and again when the
+//   navbar's Home link (or the back-to-top button) brings you back to the top.
 // Colors follow the theme (light / dark): see "Home hero" in global.css.
 
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
@@ -143,10 +143,18 @@ function HeroMark({ layer, onLayer }: { layer?: number; onLayer?: (index: number
   useEffect(() => {
     const drawing = drawingRef.current
     if (!drawing) return
+    // Coming into view: it flies together. Leaving out the bottom (the visitor scrolled back up
+    // past it): it's quietly scattered again, so the next scroll down plays it once more.
+    // Leaving out the top (scrolled down past it): it stays together, so scrolling back up
+    // finds the saucer already assembled, with no replay.
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         setAssembling(true)
-        observer.disconnect()
+      } else if (entry.boundingClientRect.top > 0) {
+        setAssembling(false)
+        setAssembly((n) => n + 1)
+      } else {
+        setAssembling(true)
       }
     })
     observer.observe(drawing)

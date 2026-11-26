@@ -5,9 +5,9 @@
 //
 // It's plain, meaningful HTML: the same headings, paragraphs and links as the real page, made from
 // the same data files (src/data), so it always says the same thing. React replaces it with the real
-// page as soon as the app starts (createRoot empties the box first). Until then it stays invisible
-// (.prerender in global.css), and only fades in if the app hasn't started after a moment (no
-// JavaScript, or a very slow connection), so visitors never see it flash.
+// page as soon as the app starts (createRoot empties the box first). Until then visitors see a
+// loading screen instead (see "loader" below); the text shows without JavaScript only, or if the
+// app still hasn't started after a long wait.
 
 import { profile } from '../src/data/profile.ts'
 import { studio } from '../src/data/studio.ts'
@@ -52,7 +52,15 @@ const nav = `<nav>${[
 // The contact links (email, LinkedIn, GitHub), without phone numbers, like the Contact section.
 const contactLinks = list(contacts.filter((c) => !c.href.startsWith('tel:')).map((c) => `${esc(c.label)}: ${link(c.href, c.value)}`))
 
-const wrap = (body: string) => `<div class="prerender">${nav}<main>${body}</main></div>`
+// While the app loads, visitors see a branded loading screen (the Axihex mark, breathing), not
+// this plain text: on a slow connection the text used to show up first, like a page without its
+// design. The text stays in the HTML for search engines and anything that reads it, and shows for
+// visitors only without JavaScript, or as a last resort if the app still hasn't started after a
+// long wait (global.css, "boot-loader" and ".prerender"). React replaces both when it starts.
+const loader =
+  '<div class="boot-loader" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5 20.2 7.25v9.5L12 21.5 3.8 16.75v-9.5Z"/><circle cx="12" cy="12" r="2.6"/></svg><span></span></div>'
+
+const wrap = (body: string) => `${loader}<div class="prerender">${nav}<main>${body}</main></div>`
 
 const cv = link('/Ali_Chahine_CV.pdf', 'Download CV')
 
@@ -127,7 +135,7 @@ export function founderBody() {
 
 export function studioBody() {
   return wrap(
-    `<header>${el('p', 'The studio')}${el('h1', 'Smart about what to build. Precise about how.')}${el('p', studioLead)}` +
+    `<header>${el('p', 'The studio')}${el('h1', 'Right idea, right time. Built right.')}${el('p', studioLead)}` +
       list(offerings.map((o) => `<strong>${esc(o.title)}</strong>: ${esc(o.text)}`)) +
       '</header>' +
       `<section id="approach">${el('p', 'How we think about our products')}${el('h2', 'When, what, and how.')}` +

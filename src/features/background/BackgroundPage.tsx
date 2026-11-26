@@ -9,7 +9,7 @@
 //   7. Education & languages
 //   8. Contact (the CV is in the hero)
 
-import { useLayoutEffect } from 'react'
+import { lazy, Suspense, useLayoutEffect } from 'react'
 import { Link, useLocation } from 'react-router'
 import { profile } from '../../data/profile.ts'
 import { BACKGROUND_DESCRIPTION } from '../../data/seo.ts'
@@ -17,7 +17,6 @@ import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import { clearHash } from '../../utils/goToTop.ts'
 import SectionTitle from '../../components/SectionTitle.tsx'
 import Hero from '../home/Hero.tsx'
-import AvatarGuide from '../../components/AvatarGuide.tsx'
 import { founderGuideTips } from '../../data/guide.ts'
 import BackLink from '../../components/BackLink.tsx'
 import ScrollUpBack from '../../components/ScrollUpBack.tsx'
@@ -27,6 +26,9 @@ import Testimonials from './Testimonials.tsx'
 import Experience from '../experience/Experience.tsx'
 import Skills from '../skills/Skills.tsx'
 import Education from '../education/Education.tsx'
+
+// The avatar guide (its tips appear after a while): its own small file, loaded after the page.
+const AvatarGuide = lazy(() => import('../../components/AvatarGuide.tsx'))
 
 // After the work history: where to see that experience in practice. The project cards live on the
 // home page (Selected Work), so this only links there instead of repeating them.
@@ -91,7 +93,9 @@ function BackgroundPage() {
       <FounderContact />
       {/* Your avatar peeks out at each section, waving at one and standing at the next (see
           AvatarGuide.tsx). On phones it comes out up to 3 times, more than on the home page. */}
-      <AvatarGuide tips={founderGuideTips} turns={['wave', 'stand']} phoneMax={3} />
+      <Suspense fallback={null}>
+        <AvatarGuide tips={founderGuideTips} turns={['wave', 'stand']} phoneMax={3} />
+      </Suspense>
       {/* Phones, in the middle of the page: the same way back, under the thumb when you scroll up. */}
       <ScrollUpBack label={back.label} onClick={() => back.go()} />
     </div>

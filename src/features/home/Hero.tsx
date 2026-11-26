@@ -3,7 +3,7 @@
 //   "Meet Ali Chahine" with the avatar, ali.build(...), "View my work" and "Download CV".
 // The text comes from src/data/profile.ts.
 
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { profile } from '../../data/profile.ts'
 import Icon from '../../components/Icon.tsx'
 import SocialLinks from '../../components/SocialLinks.tsx'
@@ -11,12 +11,18 @@ import GradientText from '../../components/GradientText.tsx'
 import { BACK_AT_TOP_EVENT } from '../../utils/goToTop.ts'
 import { asset } from '../../utils/asset.ts'
 import { useRobotHome } from '../../components/robotStore.ts'
-import RobotLab from './RobotLab.tsx'
-import HeroRobot from '../../components/HeroRobot.tsx'
 import { Link } from 'react-router'
 import BackLink from '../../components/BackLink.tsx'
 import { useBack } from '../../utils/pageHistory.ts'
 import RobotPerch from './RobotPerch.tsx'
+
+// Loaded only when needed, so the page's first download stays small: the tiny robot once it comes
+// out of the welcome box, and the night desk once a visitor comes back to the top. Both are fetched
+// quietly in the background once the page is idle, so they're ready by the time they appear.
+const loadHeroRobot = () => import('../../components/HeroRobot.tsx')
+const loadRobotLab = () => import('./RobotLab.tsx')
+const HeroRobot = lazy(loadHeroRobot)
+const RobotLab = lazy(loadRobotLab)
 
 // How fast the welcome plays is --art-time in global.css (faster with a mouse, as it plays while
 // you hover; as before on touch screens). The inline delays below are multiplied by it in CSS.
@@ -192,6 +198,14 @@ function Hero({ variant = 'founder' }: { variant?: 'founder' }) {
   // Founder: the avatar, or the night desk once a visitor comes back to the top (useReturnSwap).
   const lab = useReturnSwap(profile.lab)
   const away = lab
+
+  useEffect(() => {
+    const idle = window.requestIdleCallback ?? ((run: () => void) => window.setTimeout(run, 1500))
+    idle(() => {
+      void loadHeroRobot()
+      if (founder) void loadRobotLab()
+    })
+  }, [founder])
 
   function startDrawing() {
     window.clearTimeout(hideTimer.current)
@@ -395,12 +409,20 @@ function Hero({ variant = 'founder' }: { variant?: 'founder' }) {
               <img src={asset(profile.photo)} alt={profile.name} width={1024} height={1024} fetchPriority="high" />
             ) : null}
           </div>
-          {founder && lab && <RobotLab robotHome={robotHome} />}
+          {founder && lab && (
+            <Suspense fallback={null}>
+              <RobotLab robotHome={robotHome} />
+            </Suspense>
+          )}
         </div>
       )}
 
       {/* The tiny robot, once it's out of the welcome box: it lives in here (HeroRobot.tsx). */}
-      <HeroRobot />
+      {!robotHome && (
+        <Suspense fallback={null}>
+          <HeroRobot />
+        </Suspense>
+      )}
     </section>
   )
 }

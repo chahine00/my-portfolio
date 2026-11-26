@@ -45,6 +45,14 @@
         try { localStorage.removeItem('theme') } catch {}
       }
     </script>
+    <!-- Without JavaScript: the page's plain text (scripts/prerender.ts) shows right away, and the loading screen
+         (which would never end) doesn't. -->
+    <noscript>
+      <style>
+        .prerender { opacity: 1 !important; animation: none !important; }
+        .boot-loader { display: none !important; }
+      </style>
+    </noscript>
   </head>
   <body>
     <div id="root"></div>

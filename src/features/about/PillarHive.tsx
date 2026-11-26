@@ -57,7 +57,7 @@ const orbit =
     .join(' ') + ' Z'
 
 // How long each pillar shows by itself (also the progress bar's length, --hive-step in CSS).
-const STEP_MS = 5200
+const STEP_MS = 3400
 
 // With a mouse, a pillar opens only once the pointer rests on it this long (in milliseconds), so
 // sweeping across the honeycomb on the way to the card doesn't change the card. A click is instant.
@@ -92,6 +92,9 @@ function PillarHive() {
   const [active, setActive] = useState(0)
   // True until the visitor picks a pillar themselves.
   const [auto, setAuto] = useState(true)
+  // Set once the visitor clicks (or taps, or uses the keys on) a pillar, not on hover: they're
+  // reading, so the honeycomb goes quiet (global.css, hive--reading).
+  const [reading, setReading] = useState(false)
   const [reduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const [onScreen, setOnScreen] = useState(false)
   // Set the first time the hive is on screen: the cells open out of the center (global.css).
@@ -138,6 +141,7 @@ function PillarHive() {
     const open = (event: Event) => {
       const index = (event as CustomEvent<number>).detail
       setAuto(false)
+      setReading(true)
       setActive(index)
     }
     window.addEventListener(OPEN_PILLAR_EVENT, open)
@@ -154,13 +158,14 @@ function PillarHive() {
     if (next === undefined) return
     event.preventDefault()
     choose(next)
+    setReading(true)
     tabRefs.current[next]?.focus()
   }
 
 
   return (
     <div className="hive-layout">
-      <div className={opened ? 'hive hive--opened' : 'hive'} ref={hiveRef}>
+      <div className={`hive${opened ? ' hive--opened' : ''}${reading ? ' hive--reading' : ''}`} ref={hiveRef}>
         {/* The orbit: a faint track around the center, and the line of light running along it.
             Under the cells, so it only shows in the gaps. */}
         <svg className="hive__orbit" viewBox="0 0 100 92" aria-hidden="true">
@@ -193,7 +198,10 @@ function PillarHive() {
               tabIndex={i === active ? 0 : -1}
               className={`hive__cell${i === active ? ' hive__cell--on' : ''}`}
               style={place(spots[i], i)}
-              onClick={() => choose(i)}
+              onClick={() => {
+                choose(i)
+                setReading(true)
+              }}
               onPointerEnter={(event) => {
                 if (event.pointerType !== 'mouse') return
                 window.clearTimeout(hoverTimer.current)

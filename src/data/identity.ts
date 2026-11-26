@@ -13,7 +13,7 @@
 
 import type { IconName } from '../components/iconNames.ts'
 
-// The Studio page's opening (under "Smart about what to build. Precise about how."): the five pillars
+// The Studio page's opening (under "Right idea, right time. Built right."): the five pillars
 // as one story (explore, build, showcase, share, grow). Our own products lead; clients follow.
 // Writing rule for this page: plain words a visitor uses, no slogans ("transforming ideas",
 // "cutting-edge", "solutions"), and nothing presented as launched before it is.
@@ -137,12 +137,12 @@ export const thinking: {
     },
   ],
   principle: 'Opportunity decides when. Product thinking decides what, why and for whom. Engineering decides how.',
-  // For clients and founders: the same thinking, applied to their idea, before any code.
+  // For clients and founders: the same thinking, applied to their idea, before anything is built.
   clients:
-    'We think it through with you before writing any code: who it’s for, which features matter first, and a clear plan from first version to launch.',
+    'Before we build anything, we think it through with you: who it’s for, which features matter most at first, and a clear path from the first version to launch.',
 }
 
-// "With our name, or its own." (Studio page): where Axihex products live.
+// "With our name, or with its own." (Studio page): where Axihex products live.
 export const channels: { title: string; text: string; icon: IconName }[] = [
   { title: 'axihex.com', text: 'Small online tools and experiments you can use right away.', icon: 'globe' },
   { title: 'Their own websites', text: 'Bigger apps and services, with their own name.', icon: 'external' },

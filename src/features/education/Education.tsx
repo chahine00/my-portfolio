@@ -20,7 +20,7 @@ function initialsOf(name: string) {
 function Logo({ item }: { item: EducationItem }) {
   return (
     <span className="edu-logo" aria-hidden="true">
-      {item.logo ? <img src={asset(item.logo)} alt="" /> : initialsOf(item.place)}
+      {item.logo ? <img src={asset(item.logo)} alt="" loading="lazy" decoding="async" /> : initialsOf(item.place)}
     </span>
   )
 }

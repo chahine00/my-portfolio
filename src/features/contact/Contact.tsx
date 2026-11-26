@@ -91,7 +91,7 @@ function Contact() {
                     aria-label={`Copy ${phone.value}`}
                     title="Click to copy"
                   >
-                    {phone.flag && <img src={asset(phone.flag)} alt="" className="contact-flag" />}
+                    {phone.flag && <img src={asset(phone.flag)} alt="" className="contact-flag" loading="lazy" decoding="async" />}
                     {/* The number keeps its space while "Copied!" shows over it, so the WhatsApp icons
                         don't move. role="status" makes screen readers say "Copied!" when it appears. */}
                     <span className="contact-phones__value">
@@ -184,7 +184,7 @@ function Contact() {
                     <strong>
                       {contact.label}
                       {/* "&&" only renders the flag when the contact has one. */}
-                      {contact.flag && <img src={asset(contact.flag)} alt="" className="contact-flag" />}
+                      {contact.flag && <img src={asset(contact.flag)} alt="" className="contact-flag" loading="lazy" decoding="async" />}
                     </strong>
                     <span>{contact.value}</span>
                   </span>

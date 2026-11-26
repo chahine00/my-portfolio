@@ -17,9 +17,10 @@ interface CapabilitiesProps {
   variant?: 'grid' | 'list'
   lit?: (index: number) => boolean
   onPick?: (index: number) => void
+  picked?: number | null // the row the visitor chose: fully selected; other lit rows stay quiet
 }
 
-function Capabilities({ hideTitle = false, variant = 'grid', lit, onPick }: CapabilitiesProps) {
+function Capabilities({ hideTitle = false, variant = 'grid', lit, onPick, picked }: CapabilitiesProps) {
   const listRef = useReveal<HTMLUListElement>('.caps__item')
 
   return (
@@ -37,6 +38,7 @@ function Capabilities({ hideTitle = false, variant = 'grid', lit, onPick }: Capa
             // changing className here would wipe it (the rows then vanished for good).
             className="caps__item"
             data-lit={lit?.(i) || undefined}
+            data-picked={(picked === i && lit?.(i)) || undefined}
             {...(onPick && {
               tabIndex: 0,
               // Pointing picks it with a mouse only: on a touch screen "enter" fires as soon as a

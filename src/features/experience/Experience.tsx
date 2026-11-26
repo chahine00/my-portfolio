@@ -73,7 +73,7 @@ function Experience() {
               {/* The company: its logo (or initials), its name, and how long in total. */}
               <header className="job__head">
                 {job.logo ? (
-                  <img className="job__logo" src={asset(job.logo)} alt="" width={40} height={40} />
+                  <img className="job__logo" src={asset(job.logo)} alt="" width={40} height={40} loading="lazy" decoding="async" />
                 ) : (
                   <span className="job__logo job__logo--initials" aria-hidden="true">
                     {initials(job.company)}

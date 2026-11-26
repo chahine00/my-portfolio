@@ -1,6 +1,6 @@
 // The one-page home: all the sections you scroll through, in order.
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useNavigationType } from 'react-router'
 import HomeHero from './HomeHero.tsx'
 import Products from '../products/Products.tsx'
@@ -9,11 +9,13 @@ import BuildSection from '../studio/BuildSection.tsx'
 import Projects from '../projects/Projects.tsx'
 import Updates from '../updates/Updates.tsx'
 import Contact from '../contact/Contact.tsx'
-import AvatarGuide from '../../components/AvatarGuide.tsx'
 import { BACK_AT_TOP_EVENT, clearHash } from '../../utils/goToTop.ts'
 import { forgetProjectLeft, projectJustLeft, scrollToProjectCard } from '../projects/projectReturn.ts'
 import { useDocumentTitle } from '../../utils/useDocumentTitle.ts'
 import { restoringTo } from '../../utils/pageHistory.ts'
+
+// The avatar guide (its tips appear after a while): its own small file, loaded after the page.
+const AvatarGuide = lazy(() => import('../../components/AvatarGuide.tsx'))
 
 // Sections that used to be on the home page, and where they are now. Old links (in the CV, on
 // LinkedIn, in bookmarks) to /#experience and the like are sent there instead of the page's top.
@@ -118,7 +120,9 @@ function HomePage() {
       <Contact />
       {/* The tiny robot peeks out at a few sections to say what they are (see AvatarGuide.tsx). The
           founder's avatar appears on the founder's page only. */}
-      <AvatarGuide turns={['robot']} />
+      <Suspense fallback={null}>
+        <AvatarGuide turns={['robot']} />
+      </Suspense>
     </>
   )
 }

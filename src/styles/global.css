@@ -3668,15 +3668,32 @@ p.blog-empty {
   position: absolute;
   top: 50%;
   translate: 0 -50%;
+  display: grid;
+  place-items: center;
   width: 40px;
   height: 40px;
+  padding: 0;
   border: none;
   border-radius: 50%;
   background: rgb(0 0 0 / 0.5);
   color: #fff;
-  font-size: 1.5rem;
-  line-height: 1;
   cursor: pointer;
+}
+
+/* The chevron: centered on the circle, nudged half a unit toward its tip (a chevron's weight sits on
+   its open side, so a strictly centered one looks pushed back). "Previous" is the very same chevron,
+   mirrored, so both match exactly. */
+.gallery__arrow svg {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gallery__arrow--prev svg {
+  scale: -1 1;
 }
 
 .gallery__arrow:hover {
@@ -5352,6 +5369,49 @@ a {
   height: var(--robot-size);
 }
 
+/* "You can tap me": until the robot is first clicked, a soft ring grows out from behind it and
+   fades, every couple of seconds, like a "live" dot. Not while it boots up or flies (it would trail
+   behind), and not for visitors who turn off animations. */
+.robot__pulse {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: 150%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--accent-2) 85%, transparent);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-2) 22%, transparent), transparent 70%);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent-2) 45%, transparent);
+  translate: -50% -50%;
+  pointer-events: none;
+  opacity: 0;
+  animation: robot-pulse 2.2s cubic-bezier(0.22, 1, 0.36, 1) 1s infinite;
+}
+
+@keyframes robot-pulse {
+  0% {
+    scale: 0.5;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    scale: 1.6;
+    opacity: 0;
+  }
+}
+
+:is([data-robot='boot'], [data-robot='jet'], [data-robot='leave']) .robot__pulse {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .robot__pulse {
+    display: none;
+  }
+}
+
 /* Hidden for the moment before HeroRobot.tsx has placed it. */
 .robot:not([data-robot]) {
   visibility: hidden;
@@ -6579,12 +6639,96 @@ a {
 /* The page's text written into the HTML at build time (scripts/prerender.ts), for search engines.
    React replaces it as soon as the app starts, so visitors don't see it; it only fades in if the
    app hasn't started after a moment (no JavaScript, or a very slow connection). */
+/* The page's plain text (scripts/prerender.ts), for search engines: hidden from visitors while the
+   app loads (the loading screen below shows instead). Without JavaScript it shows right away
+   (index.html, <noscript>); otherwise only as a last resort, if the app still hasn't started after
+   12 seconds (it failed to download), so the visitor isn't left with nothing. */
 .prerender {
   max-width: 760px;
   margin: 0 auto;
   padding: 32px 20px;
   opacity: 0;
-  animation: prerender-show 0.4s ease 2s forwards;
+  animation: prerender-show 0.4s ease 12s forwards;
+}
+
+/* The loading screen while the app downloads (slow connections): the page's own background with
+   the Axihex mark in the middle, breathing, and a thin bar of light sliding under it. It fades in
+   only after a short moment, so on a fast connection nothing flashes. Gone with the text at 12s. */
+.boot-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 18px;
+  background: var(--bg);
+  opacity: 0;
+  animation:
+    boot-in 0.4s ease 0.3s forwards,
+    boot-out 0.4s ease 12s forwards;
+}
+
+.boot-loader svg {
+  width: 52px;
+  height: 52px;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent) 45%, transparent));
+  animation: boot-breathe 1.6s ease-in-out infinite;
+}
+
+.boot-loader circle {
+  fill: var(--accent-2);
+  stroke: none;
+}
+
+.boot-loader span {
+  position: relative;
+  width: 72px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.boot-loader span::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  animation: boot-slide 1.1s ease-in-out infinite;
+}
+
+@keyframes boot-in {
+  to { opacity: 1; }
+}
+
+@keyframes boot-out {
+  to { opacity: 0; visibility: hidden; }
+}
+
+@keyframes boot-breathe {
+  50% {
+    scale: 0.9;
+    opacity: 0.7;
+  }
+}
+
+@keyframes boot-slide {
+  from { translate: -100% 0; }
+  to { translate: 250% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-loader svg,
+  .boot-loader span::after {
+    animation: none;
+  }
 }
 
 .prerender nav {
@@ -7312,11 +7456,11 @@ a {
 
 /* The cycle (PillarHive.tsx): a soft light runs around the ring of cells, one after another (--i:
    Explore, Build, Showcase, Share, Grow, Your idea), then starts again, like a life cycle. Not the
-   center. One cell after another, 0.8s apart: the whole ring in 4.8 seconds. The orbit's line of
+   center. One cell after another, 0.7s apart: the whole ring in 4.2 seconds. The orbit's line of
    light (below) runs with it. Change both durations together. */
 .hive__cell:not(.hive__cell--core, .hive__cell--on) .hive__hex {
-  animation: hive-cycle 4.8s ease-in-out infinite;
-  animation-delay: calc(var(--i) * 0.8s);
+  animation: hive-cycle 4.2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.7s);
 }
 
 /* The orbit (PillarHive.tsx): a faint ring in the gap around the center, and a short line of light
@@ -7346,7 +7490,7 @@ a {
   stroke-width: 0.9;
   stroke-dasharray: 0.9 5.1;
   filter: drop-shadow(0 0 1.5px var(--accent-2));
-  animation: hive-orbit 4.8s linear infinite;
+  animation: hive-orbit 4.2s linear infinite;
 }
 
 /* The line's middle reaches the middle of cell i's side as that cell is brightest (8% of its glow). */
@@ -7495,7 +7639,7 @@ a {
   height: 3px;
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
   transform-origin: 0 50%;
-  animation: hive-progress 5.2s linear both;
+  animation: hive-progress 3.4s linear both;
 }
 
 @keyframes hive-progress {
@@ -7997,7 +8141,7 @@ a {
 }
 
 /* How we think: three lenses side by side (one column on phones). Each: icon, name, one line, then
-   its questions. Opportunity, the first, is highlighted: it's where our own products start. */
+   its questions. All three look the same at rest; only the one under the mouse lights up. */
 .lenses {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -8015,11 +8159,6 @@ a {
   border: 1px solid var(--border);
   border-radius: 18px;
   background: var(--card);
-}
-
-.lens:first-child {
-  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
-  background: color-mix(in srgb, var(--accent) 7%, var(--card));
 }
 
 .lens strong {
@@ -8053,6 +8192,124 @@ a {
 @media (max-width: 860px) {
   .lenses {
     grid-template-columns: 1fr;
+  }
+}
+
+/* The lenses come alive under the mouse: the card lifts on a soft accent glow, a gradient line
+   lights along its top, the icon fills with the brand gradient and gives a small hop, the name takes
+   the accent, and the questions step in one after another, each with its dot lighting up. Mouse
+   only (phones keep the last tapped card "hovered"). */
+.lens {
+  position: relative;
+  overflow: hidden;
+  transition:
+    translate 0.35s cubic-bezier(0.34, 1.4, 0.64, 1),
+    border-color 0.3s,
+    box-shadow 0.35s,
+    background 0.3s;
+}
+
+.lens::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  scale: 0 1;
+  transform-origin: left;
+  transition: scale 0.45s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.lens strong {
+  transition: color 0.3s;
+}
+
+.lens .trait__icon {
+  transition:
+    background 0.3s,
+    color 0.3s,
+    scale 0.35s cubic-bezier(0.34, 1.6, 0.64, 1),
+    rotate 0.35s cubic-bezier(0.34, 1.6, 0.64, 1);
+}
+
+.lens ul li {
+  position: relative;
+  padding-left: 14px;
+  transition:
+    translate 0.3s ease calc(var(--q, 0) * 0.05s),
+    color 0.3s ease calc(var(--q, 0) * 0.05s);
+}
+
+.lens ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 35%, var(--border));
+  transition:
+    background 0.3s ease calc(var(--q, 0) * 0.05s),
+    box-shadow 0.3s ease calc(var(--q, 0) * 0.05s);
+}
+
+.lens ul li:nth-child(2) { --q: 1; }
+.lens ul li:nth-child(3) { --q: 2; }
+.lens ul li:nth-child(4) { --q: 3; }
+.lens ul li:nth-child(5) { --q: 4; }
+
+@media (hover: hover) and (pointer: fine) {
+  .lens:hover {
+    translate: 0 -6px;
+    border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
+    box-shadow:
+      0 18px 40px -18px color-mix(in srgb, var(--accent) 55%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+
+  .lens:hover::before {
+    scale: 1 1;
+  }
+
+  .lens:hover strong {
+    color: var(--accent);
+  }
+
+  .lens:hover .trait__icon {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    scale: 1.1;
+    rotate: -8deg;
+  }
+
+  .lens:hover ul li {
+    translate: 4px 0;
+  }
+
+  .lens:hover ul li::before {
+    background: var(--accent-2);
+    box-shadow: 0 0 6px var(--accent-2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lens,
+  .lens::before,
+  .lens .trait__icon,
+  .lens ul li,
+  .lens ul li::before {
+    transition: none;
+  }
+
+  .lens:hover,
+  .lens:hover ul li {
+    translate: none;
+  }
+
+  .lens:hover .trait__icon {
+    scale: none;
+    rotate: none;
   }
 }
 
@@ -8176,6 +8433,32 @@ a {
 .built-by__mark {
   width: 18px;
   height: 18px;
+}
+
+/* The Studio page's "look for this mark" badge: the point of that paragraph, so it stands out:
+   bigger, a brand-gradient outline, a soft accent glow, and "Axihex" in the gradient. */
+.built-by--feature {
+  gap: 10px;
+  padding: 10px 20px 10px 14px;
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    linear-gradient(135deg, var(--accent), var(--accent-2)) border-box;
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--accent) 22%, transparent);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.built-by--feature .built-by__mark {
+  width: 24px;
+  height: 24px;
+}
+
+.built-by__name {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .channels__list {
@@ -8908,6 +9191,19 @@ a {
 .layer-switch input:checked + span {
   color: var(--switch-on-text);
   background: var(--switch-on-bg);
+}
+
+/* Letting go of a layer is instant: it used to fade out while the clicked one faded in, so for a
+   moment both looked chosen, as if the other button had been pressed too. Only the one you click
+   animates. */
+.layer-switch input:not(:checked) + span {
+  transition: scale 0.15s ease;
+}
+
+/* The same in the drawing: a plate that's let go settles down plainly, without the springy
+   bounce that the chosen plate rises with (that bounce made it look picked too). */
+.plate:not(.plate--active) {
+  transition: transform 0.25s ease-out;
 }
 
 .layer-switch input:focus-visible + span {
@@ -10493,6 +10789,121 @@ a {
   outline-offset: 2px;
 }
 
+/* One layer, one block: the lit capabilities of the same layer (Web + Mobile, Backend + AI
+   integration) join into a single block, with a faint line between them and one accent bar down
+   the left, so they read as one layer, not as two separate buttons. */
+.caps--list .caps__item {
+  position: relative;
+  overflow: hidden;
+  transition:
+    opacity 0.55s ease var(--reveal-delay, 0s),
+    translate 0.55s ease var(--reveal-delay, 0s),
+    scale 0.15s ease,
+    margin 0.3s ease,
+    border-radius 0.3s ease,
+    border-color 0.3s,
+    background 0.3s,
+    box-shadow 0.3s;
+}
+
+.caps--list .caps__item[data-lit] {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.caps--list .caps__item[data-lit]:has(+ .caps__item[data-lit]) {
+  border-bottom-color: transparent;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.caps--list .caps__item[data-lit] + .caps__item[data-lit] {
+  margin-top: -11px;
+  border-top-color: color-mix(in srgb, var(--accent) 22%, var(--border));
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* A row the visitor picked is the one selected; its layer partner stays joined to it but quiet (a
+   faint tint, no accent bar, no lit number) and changes instantly, so it never flashes as if it
+   had been pressed too. */
+.caps--list .caps__list:has([data-picked]) .caps__item[data-lit]:not([data-picked]) {
+  background: color-mix(in srgb, var(--accent) 3%, var(--card));
+  box-shadow: none;
+  transition:
+    opacity 0.55s ease var(--reveal-delay, 0s),
+    translate 0.55s ease var(--reveal-delay, 0s);
+}
+
+.caps--list .caps__list:has([data-picked]) .caps__item[data-lit]:not([data-picked]) .caps__num {
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+/* Clickable, and it feels it: a small press under the finger or mouse. */
+.caps--list .caps__item,
+.layer-switch label {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.caps--list .caps__item:active {
+  scale: 0.98;
+}
+
+.layer-switch label span {
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.2s, color 0.2s, scale 0.15s ease;
+}
+
+.layer-switch label:active span {
+  scale: 0.95;
+}
+
+/* The "you can click these" hint (BuildSection.tsx, build--hint): as the section comes into view
+   while scrolling down, a light sweeps once across each row, one after another, then across each
+   layer button. */
+.build--hint .caps--list .caps__item::after,
+.build--hint .layer-switch label span::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 25%,
+    color-mix(in srgb, var(--accent) 24%, transparent) 50%,
+    transparent 75%
+  );
+  translate: -100% 0;
+  pointer-events: none;
+  animation: tap-sheen 0.9s ease-out both;
+  animation-delay: var(--sheen-delay, 1s);
+}
+
+.build--hint .caps--list .caps__item:nth-child(2)::after { --sheen-delay: 1.12s; }
+.build--hint .caps--list .caps__item:nth-child(3)::after { --sheen-delay: 1.24s; }
+.build--hint .caps--list .caps__item:nth-child(4)::after { --sheen-delay: 1.36s; }
+.build--hint .caps--list .caps__item:nth-child(5)::after { --sheen-delay: 1.48s; }
+.build--hint .layer-switch label:nth-of-type(1) span::after { --sheen-delay: 1.7s; }
+.build--hint .layer-switch label:nth-of-type(2) span::after { --sheen-delay: 1.82s; }
+.build--hint .layer-switch label:nth-of-type(3) span::after { --sheen-delay: 1.94s; }
+
+@keyframes tap-sheen {
+  to {
+    translate: 100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .build--hint .caps--list .caps__item::after,
+  .build--hint .layer-switch label span::after {
+    display: none;
+  }
+
+  .caps--list .caps__item:active,
+  .layer-switch label:active span {
+    scale: none;
+  }
+}
+
 @media (max-width: 860px) {
   .build__layout {
     grid-template-columns: 1fr;
@@ -10556,6 +10967,25 @@ a {
 
   .caps--list .caps__item:last-child {
     grid-column: 1 / -1;
+  }
+
+  /* Phones: the two capabilities of a layer share a row, so they join side by side instead. */
+  .caps--list .caps__item[data-lit] {
+    box-shadow: none;
+  }
+
+  .caps--list .caps__item[data-lit]:has(+ .caps__item[data-lit]) {
+    border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
+    border-right-color: transparent;
+    border-radius: 12px 0 0 12px;
+  }
+
+  .caps--list .caps__item[data-lit] + .caps__item[data-lit] {
+    margin-top: 0;
+    margin-left: -9px;
+    border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
+    border-left-color: color-mix(in srgb, var(--accent) 22%, var(--border));
+    border-radius: 0 12px 12px 0;
   }
 
   .caps--list .caps__icon {
@@ -10713,9 +11143,13 @@ a {
   pointer-events: none;
 }
 
-.hive__cell:not(.hive__cell--core, .hive__cell--on) .hive__hex::before {
-  animation: hive-cycle-light 4.8s ease-in-out infinite;
-  animation-delay: calc(var(--i) * 0.8s);
+/* The twinkle that shows the pillars can be clicked: it lights them in order, 01 → 05, one every
+   0.7s, in step with the orbit's line. "Your idea" (a link, not a pillar) stays out of it, so the
+   line passes it quietly before starting again at 01. */
+.hive__cell:not(.hive__cell--core, .hive__cell--on, .hive__cell--you) .hive__hex::before,
+.hive__cell:not(.hive__cell--core, .hive__cell--on, .hive__cell--you) .hive__hex-inner::after {
+  animation: hive-cycle-light 4.2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.7s);
 }
 
 @keyframes hive-cycle-light {
@@ -10726,6 +11160,66 @@ a {
   }
   8% {
     opacity: 1;
+  }
+}
+
+/* Light mode: the running light was a thin teal edge that faded into the white page. There it
+   runs in the full brand gradient (indigo to a bright cyan), the cell's inside takes a soft wash of
+   the same color as the light passes, and the orbit's line is the indigo accent, thicker, with a
+   stronger glow. Same timing as above, so it still runs from cell to cell. */
+.hive__hex-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* under the icon and word, over the cell's own background */
+  background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, #06b6d4 14%, transparent));
+  opacity: 0;
+  pointer-events: none;
+}
+
+:root[data-theme='light'] .hive__hex::before {
+  background: linear-gradient(150deg, var(--accent), #06b6d4);
+}
+
+:root[data-theme='light'] .hive__orbit-light {
+  stroke: var(--accent);
+  stroke-width: 1.2;
+  filter: drop-shadow(0 0 1.5px color-mix(in srgb, var(--accent) 70%, transparent));
+}
+
+:root[data-theme='light'] .hive__orbit-track {
+  stroke: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .hive__hex::before {
+    background: linear-gradient(150deg, var(--accent), #06b6d4);
+  }
+
+  :root:not([data-theme='dark']) .hive__orbit-light {
+    stroke: var(--accent);
+    stroke-width: 1.2;
+    filter: drop-shadow(0 0 1.5px color-mix(in srgb, var(--accent) 70%, transparent));
+  }
+
+  :root:not([data-theme='dark']) .hive__orbit-track {
+    stroke: color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+}
+
+/* Dark mode, a little stronger: a slightly thicker, brighter line. (Light mode's rules above win.) */
+.hive__orbit-light {
+  stroke-width: 1.1;
+  filter: drop-shadow(0 0 2.5px var(--accent-2));
+}
+
+.hive__orbit-track {
+  stroke: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hive__hex-inner::after {
+    animation: none !important;
   }
 }
 
@@ -10944,4 +11438,25 @@ a {
 .build__drawing .layer-drawing {
   scroll-margin-top: calc(var(--navbar-height, 64px) + 16px);
   scroll-margin-bottom: 16px;
+}
+
+/* The pillars while the visitor reads (PillarHive.tsx, hive--reading: set by a click, a tap or the
+   keys, not by hover). Everything goes quiet: the twinkle stops, the cells stop floating (frozen
+   where they are, no jump), and the line around the center fades to a faint, slow glide. */
+.hive--reading .hive__cell .hive__hex::before,
+.hive--reading .hive__cell .hive__hex-inner::after {
+  animation: none;
+}
+
+.hive--reading .hive__cell {
+  animation-play-state: paused;
+}
+
+.hive__orbit-light {
+  transition: opacity 0.8s ease;
+}
+
+.hive--reading .hive__orbit-light {
+  opacity: 0.35;
+  animation-duration: 10s;
 }

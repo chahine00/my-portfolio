@@ -10,6 +10,6 @@ export const studio = {
   pillarsAccent: 'One studio.',
   // The one line about who is behind it, under Selected work (Projects.tsx), with a quiet link to
   // the founder's page (/background).
-  founderNote: 'Born from a passion for computers.',
+  founderNote: 'From the internet age to the AI era.',
   founderLink: 'Meet the founder',
 }

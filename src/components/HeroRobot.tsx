@@ -188,11 +188,11 @@ const SPOT_INVITE_CHANCE = 0.7 // on such a spot, it hints at it this often
 const PROMISE_MS = 10000 // clicked this soon after a spot hint (still there): it answers about it
 const NUDGES = ['I see you 👀', 'Curious?', 'Hi there 👋'] // mouse lingering near it
 const REMINDERS = ['There’s more…', 'Still here 👋', 'Back again?'] // once it was clicked
-// The first invite comes a few seconds after it lands (FIRST_INVITE_MS, see 'jet' in tick): long
-// enough to read the hero first, while it stands still on its spot. These are the waits before each
+// The first invite comes soon after it lands (FIRST_INVITE_MS, see 'jet' in tick): quick enough
+// to show early that it can be tapped, while it stands still on its spot. These are the waits before each
 // one after it (counted from the end of the one before): it talks more once it has started.
-const FIRST_INVITE_MS = 4500
-const INVITE_GAPS = [2500, 5000, 7000, 9000, 12000]
+const FIRST_INVITE_MS = 2500
+const INVITE_GAPS = [2000, 4500, 7000, 9000, 12000]
 const MAX_INVITES = 5 // per visit, with a mouse…
 const MAX_TOUCH_INVITES = 5 // …on touch screens…
 const MAX_STILL_INVITES = 1 // …and for visitors who turned off animations
@@ -327,6 +327,9 @@ function Robot() {
   const inviteRef = useRef<HTMLSpanElement>(null)
   const brain = useRef<{ talk: () => void } | null>(null)
   const [line, setLine] = useState<string | null>(null)
+  // Until it's first clicked (on this visit or an earlier one): a soft ring pulses out around it,
+  // like a "live" dot, so it reads as something you can tap (global.css, robot__pulse).
+  const [met, setMet] = useState(robotMet)
   const [side, setSide] = useState<'left' | 'right'>('left')
 
   // Keep the speech bubble on screen: on a phone a long sentence can be wider than the room on
@@ -1076,6 +1079,7 @@ function Robot() {
       // Clicked: no more invites. At most one reminder, once it's been a while since.
       s.tapped = true
       rememberRobotMet()
+      setMet(true)
       hideInvite()
       window.clearTimeout(stillInviteTimer)
       s.nextInvite = performance.now() + REMINDER_AFTER_MS
@@ -1245,6 +1249,7 @@ function Robot() {
         </div>
       )}
       <span ref={markRef} className="robot__mark" aria-hidden="true" />
+      {!met && <span className="robot__pulse" aria-hidden="true" />}
       {/* Its invite ("Good evening 👋" and friends): a small call above or beside it (see sayInvite). */}
       <span ref={inviteRef} className="robot__invite" aria-hidden="true" />
       <button

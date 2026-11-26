@@ -1,7 +1,7 @@
 // The Studio page (/studio, "Studio" in the navbar): what Axihex is, told as a story, opportunity
 // first. The home page's Studio section is the short version and links here (the five pillars live
 // there, in the honeycomb, so they aren't repeated here).
-//   1. Smart about what to build. Precise about how.: what Axihex does, and the three things it makes
+//   1. Right idea, right time. Built right.: what Axihex does, and the three things it makes
 //   2. How we think: three lenses (opportunity, product, engineering), each with its questions
 //   3. What we build: the five skills, and where the products live (with or without our name)
 //   4. Have an idea? The philosophy, the invitation, and what "independent" means
@@ -41,9 +41,9 @@ function StudioPage() {
         <p className="eyebrow">The studio</p>
         <h1 className="identity__title">
           {/* One sentence per line. */}
-          Smart about what to build.
+          Right idea, right time.
           <br />
-          <GradientText text="Precise about how." />
+          <GradientText text="Built right." />
         </h1>
         <p className="identity__lead">{studioLead}</p>
 
@@ -94,13 +94,13 @@ function StudioPage() {
         <Capabilities hideTitle />
         <div className="channels" id="brand">
           <div className="channels__text">
-            <h3>With our name, or its own.</h3>
+            <h3>With our name, or with its own.</h3>
             <p>
-              Small tools live here on axihex.com. Bigger apps and services get their own name and website. Wherever you
-              find them, they carry this mark:
+              Small tools live right here on axihex.com. Bigger apps and services get their own name and website.
+              Wherever you find one, this mark tells you we built it:
             </p>
-            <span className="built-by">
-              <AxihexMark className="built-by__mark" /> Built by Axihex
+            <span className="built-by built-by--feature">
+              <AxihexMark className="built-by__mark" /> Built by <span className="built-by__name">Axihex</span>
             </span>
           </div>
           <ul className="channels__list">

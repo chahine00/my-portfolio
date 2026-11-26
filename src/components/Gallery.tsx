@@ -71,14 +71,21 @@ function Gallery({ images, title, descriptions }: GalleryProps) {
   // What the photo shows (for Google Images and screen readers), or its place in the set.
   const alt = descriptions?.[index] ?? `${title} — photo ${index + 1} of ${count}`
 
-  // Previous / next buttons, used both in the gallery and in the full-screen view.
+  // Previous / next buttons, used both in the gallery and in the full-screen view. One drawn chevron
+  // for both (flipped for "previous" in CSS), centered on the circle: the old ‹ › text characters
+  // sat off-center and weren't quite the same shape.
+  const chevron = (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+      <path d="M9.5 6 15.5 12 9.5 18" />
+    </svg>
+  )
   const arrows = hasMany && (
     <>
       <button type="button" className="gallery__arrow gallery__arrow--prev" onClick={() => move(-1)} aria-label="Previous photo">
-        ‹
+        {chevron}
       </button>
       <button type="button" className="gallery__arrow gallery__arrow--next" onClick={() => move(1)} aria-label="Next photo">
-        ›
+        {chevron}
       </button>
     </>
   )
@@ -93,7 +100,7 @@ function Gallery({ images, title, descriptions }: GalleryProps) {
     >
       <div className="gallery__main">
         <button type="button" className="gallery__open" onClick={openFullScreen} aria-label="View full size">
-          <img src={asset(images[index])} alt={alt} />
+          <img src={asset(images[index])} alt={alt} decoding="async" />
         </button>
         {arrows}
         {hasMany && (
@@ -130,7 +137,8 @@ function Gallery({ images, title, descriptions }: GalleryProps) {
           if (event.target === event.currentTarget) dialogRef.current?.close()
         }}
       >
-        <img src={asset(images[index])} alt={alt} />
+        {/* Only drawn while open: a closed dialog's photo was downloaded for nothing. */}
+        {fullScreen && <img src={asset(images[index])} alt={alt} decoding="async" />}
         {arrows}
         <button type="button" className="lightbox__close" onClick={() => dialogRef.current?.close()} aria-label="Close">
           ✕
