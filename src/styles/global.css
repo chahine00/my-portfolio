@@ -10855,3 +10855,24 @@ a {
     translate: -50% 0;
   }
 }
+
+/* The buttons under the engine and its caption: full strength while the inputs and outputs leave,
+   then a quick fade as the pillars come out (--p 0.4 → 0.6), gone once they're out. */
+.engine-hero__stage .engine-hero__actions {
+  margin-top: clamp(0.9rem, 2vw, 1.4rem);
+  opacity: calc(1 - (var(--p) - 0.4) * 5);
+}
+
+.engine-hero--pillars .engine-hero__actions {
+  visibility: hidden;
+}
+
+@media (max-width: 720px) {
+  .engine-hero__stage .engine-hero__actions {
+    opacity: 1;
+  }
+
+  .engine-hero--pillars .engine-hero__actions {
+    visibility: visible;
+  }
+}
