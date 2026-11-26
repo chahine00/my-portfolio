@@ -10,7 +10,7 @@ export const profile = {
   role: 'Independent software studio',
   // The hero's headline. The words in "headlineAccent" are shown in the accent gradient. What Axihex
   // does, products first; the Axihex engine under it (ideas in, products out) is the "how".
-  headline: 'We build',
+  headline: 'Creating',
   headlineAccent: 'what’s next.',
   // The founder line at the bottom of the hero.
   founderTitle: 'Software Engineer',
@@ -23,7 +23,7 @@ export const profile = {
   // hero (the hero shows the Axihex mark). Also the person's image in the structured data.
   photo: '/avatar.webp',
   // Typed out one by one under the home page's headline, like code being written. Keep each one short.
-  // It answers the headline ("We build what's next."): the kinds of things Axihex builds, our own
+  // It answers the headline ("Creating what's next."): the kinds of things Axihex builds, our own
   // products first, ending with the visitor's idea. Not the tech stack (the intro already names it).
   building: [
     'products of our own',
