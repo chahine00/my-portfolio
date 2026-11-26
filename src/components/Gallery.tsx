@@ -56,15 +56,16 @@ function Gallery({ images, title, descriptions }: GalleryProps) {
     setFullScreen(true)
   }
 
-  // Go to photo i. The % (remainder) makes it wrap around: after the last comes the first.
-  function show(i: number) {
-    setIndex((i + count) % count)
+  // Move by "step" photos (-1 back, +1 on). The % (remainder) makes it wrap around: after the last
+  // comes the first. From the latest index, not the one this render saw, so fast clicks all count.
+  function move(step: number) {
+    setIndex((i) => (i + step + count) % count)
   }
 
   // Left/right arrow keys switch photos.
   function handleKeyDown(event: KeyboardEvent) {
-    if (event.key === 'ArrowLeft') show(index - 1)
-    if (event.key === 'ArrowRight') show(index + 1)
+    if (event.key === 'ArrowLeft') move(-1)
+    if (event.key === 'ArrowRight') move(1)
   }
 
   // What the photo shows (for Google Images and screen readers), or its place in the set.
@@ -73,10 +74,10 @@ function Gallery({ images, title, descriptions }: GalleryProps) {
   // Previous / next buttons, used both in the gallery and in the full-screen view.
   const arrows = hasMany && (
     <>
-      <button type="button" className="gallery__arrow gallery__arrow--prev" onClick={() => show(index - 1)} aria-label="Previous photo">
+      <button type="button" className="gallery__arrow gallery__arrow--prev" onClick={() => move(-1)} aria-label="Previous photo">
         ‹
       </button>
-      <button type="button" className="gallery__arrow gallery__arrow--next" onClick={() => show(index + 1)} aria-label="Next photo">
+      <button type="button" className="gallery__arrow gallery__arrow--next" onClick={() => move(1)} aria-label="Next photo">
         ›
       </button>
     </>

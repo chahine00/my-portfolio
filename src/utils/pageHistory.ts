@@ -277,6 +277,12 @@ export interface Back {
   go: (options?: { homeHash?: string; state?: unknown }) => void
 }
 
+// When the last "back" happened. A fast double click (or a double tap) on a back link used to
+// navigate twice, leaving the same page twice in the browser's history (so its own Back button
+// then had to be pressed twice); presses within REPEAT_MS of the last one are ignored.
+let lastBack = -Infinity
+const REPEAT_MS = 700
+
 // The way back from the current page. "fallback": where to go when there is no earlier page
 // (opened from a shared link or a bookmark), e.g. '/' or '/blog'.
 export function useBack(currentPath: string, fallback: string): Back {
@@ -302,6 +308,9 @@ export function useBack(currentPath: string, fallback: string): Back {
     label: nameOf(visit.path),
     homeSection,
     go(options) {
+      const now = performance.now()
+      if (now - lastBack < REPEAT_MS) return
+      lastBack = now
       backTo = found ? found.index : null
       if (visit.path === '/' && visit.scroll !== undefined) {
         // The home page, at the exact spot you left it (App.tsx restores it): no #section to jump to.

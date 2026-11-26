@@ -115,7 +115,7 @@ function ProjectPage() {
 
       {/* key={project.slug} gives each project a fresh gallery, starting at photo 1. */}
       {project.images && project.images.length > 0 && (
-        <Gallery key={project.slug} images={project.images} title={project.title} descriptions={project.imageDescriptions} />
+        <Gallery key={`gallery-${project.slug}`} images={project.images} title={project.title} descriptions={project.imageDescriptions} />
       )}
 
       {project.metrics && (
@@ -226,7 +226,7 @@ function ProjectPage() {
       </nav>
 
       {/* Phones, in the middle of the page: the same way back, under the thumb when you scroll up. */}
-      <ScrollUpBack key={project.slug} label={back.label} onClick={goBackToPast} />
+      <ScrollUpBack key={`back-${project.slug}`} label={back.label} onClick={goBackToPast} />
     </article>
   )
 }
