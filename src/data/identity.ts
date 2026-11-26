@@ -18,7 +18,7 @@ import type { IconName } from '../components/iconNames.ts'
 // Writing rule for this page: plain words a visitor uses, no slogans ("transforming ideas",
 // "cutting-edge", "solutions"), and nothing presented as launched before it is.
 export const studioLead =
-  'We explore ideas fast and build the ones worth building. The work we ship is our proof, what we learn we share, and every product helps the studio grow. We’re independent, so our own products come first, and clients and founders get the same approach.'
+  'Axihex is an independent software studio. We spot opportunities, build products around them, and put them in people’s hands. We also take on projects for clients and founders, from a single feature to a complete app.'
 
 // The three things you'll find from Axihex (cards under the Studio page's opening). Our own products first.
 export const offerings: { title: string; text: string; icon: IconName }[] = [

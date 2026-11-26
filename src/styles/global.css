@@ -10535,3 +10535,41 @@ a {
     opacity: 1;
   }
 }
+
+/* --- A bigger hero: a wider column, a larger headline, and an engine that takes most of the
+   screen (on a laptop the buttons sit just under the first screen, the engine leads). */
+.engine-hero {
+  --hero-width: min(84rem, calc(100vw - 2 * clamp(16px, 3vw, 40px)));
+  padding-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+.engine-hero h1 {
+  font-size: clamp(2.6rem, 6.4vw, 6rem);
+}
+
+.engine-hero__lede {
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+}
+
+.engine-wrap {
+  max-width: clamp(720px, (100svh - 250px) * 1.613, 1200px);
+}
+
+@media (max-width: 720px) {
+  .engine-hero h1 {
+    font-size: clamp(2.2rem, 10vw, 2.9rem);
+  }
+
+  .engine-wrap {
+    max-width: none;
+  }
+}
+
+/* The headline on one line where it fits; on a phone it breaks before "what's next.", never inside it. */
+.engine-hero__text {
+  max-width: 72rem;
+}
+
+.engine-hero h1 .grad {
+  white-space: nowrap;
+}
