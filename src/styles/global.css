@@ -10537,3 +10537,97 @@ a {
     display: none;
   }
 }
+
+/* The pillar's info block (PillarHive.tsx), more compact, so the honeycomb stays the thing to use:
+   tighter spacing, a smaller word and text, and the examples as small chips instead of a list. On
+   phones it's smaller still, so the honeycomb and its info fit on one screen together. */
+.pillars-stage .hive-panel {
+  min-height: 0;
+  padding: 22px 24px;
+}
+
+.pillars-stage .hive-panel__word {
+  margin: 12px 0 4px;
+  font-size: clamp(1.7rem, 3.2vw, 2.2rem);
+}
+
+.pillars-stage .hive-panel__text {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.pillars-stage .hive-panel__examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.pillars-stage .hive-panel__examples li {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 11%, transparent);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+  .pillars-stage .hive-layout {
+    gap: 6px;
+  }
+
+  .pillars-stage .hive-panel {
+    padding: 14px 16px 16px;
+    border-radius: 16px;
+  }
+
+  .pillars-stage .hive-panel__count {
+    gap: 8px;
+    font-size: 0.68rem;
+  }
+
+  .pillars-stage .hive-panel__icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+  }
+
+  .pillars-stage .hive-panel__icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .pillars-stage .hive-panel__word {
+    margin: 8px 0 2px;
+    font-size: 1.45rem;
+  }
+
+  .pillars-stage .hive-panel__statement {
+    margin: 0 0 6px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .pillars-stage .hive-panel__text {
+    margin: 0 0 10px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .pillars-stage .hive-panel__examples {
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .pillars-stage .hive-panel__examples li {
+    padding: 2px 8px;
+    font-size: 0.72rem;
+  }
+
+  .pillars-stage .hive-panel__link {
+    font-size: 0.88rem;
+  }
+}
