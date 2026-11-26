@@ -2,6 +2,9 @@
 // the Axihex hexagon in the middle, and what comes out on the right (web products, mobile apps,
 // intelligent tools), joined by lines with light flowing along them.
 //
+// On arrival it powers up once: the hexagon lights, the lines draw themselves in, then out, and the
+// tiles pop in, before the light starts running. After that the core sends out a slow pulse.
+//
 // Interactive:
 // - Hover (or tap, or focus) an input or an output: its line lights up, the light runs faster, and
 //   the readout under the drawing says what it means.
@@ -125,7 +128,7 @@ function AxihexEngine() {
         <svg className="engine__svg" viewBox={`0 0 ${W} ${H}`} focusable="false" aria-hidden="true">
           <defs>
             <radialGradient id="engine-glow">
-              <stop offset="0" style={{ stopColor: 'var(--accent)', stopOpacity: 0.22 }} />
+              <stop offset="0" style={{ stopColor: 'var(--accent)', stopOpacity: 0.3 }} />
               <stop offset="1" style={{ stopColor: 'var(--accent)', stopOpacity: 0 }} />
             </radialGradient>
           </defs>
@@ -141,7 +144,7 @@ function AxihexEngine() {
           <g className="engine__links engine__links--in">
             {ROWS.map((y, row) => (
               <g key={y} className={isHot('in', row) ? 'engine__link engine__link--hot' : 'engine__link'}>
-                <path className="engine__line" d={inPath(y)} />
+                <path className="engine__line" d={inPath(y)} pathLength={100} style={{ '--row': row } as CSSProperties} />
                 <path className="engine__flow" d={inPath(y)} pathLength={100} style={{ '--d': `${y / -300}s` } as CSSProperties} />
               </g>
             ))}
@@ -149,7 +152,7 @@ function AxihexEngine() {
           <g className="engine__links engine__links--out">
             {ROWS.map((y, row) => (
               <g key={y} className={isHot('out', row) ? 'engine__link engine__link--hot' : 'engine__link'}>
-                <path className="engine__line" d={outPath(y)} />
+                <path className="engine__line" d={outPath(y)} pathLength={100} style={{ '--row': row } as CSSProperties} />
                 <path
                   className="engine__flow"
                   d={outPath(y)}
@@ -159,6 +162,10 @@ function AxihexEngine() {
               </g>
             ))}
           </g>
+
+          {/* The pulse: two waves going out from the hexagon, one after the other. */}
+          <polygon className="engine__pulse" points={hex(CORE_R)} />
+          <polygon className="engine__pulse engine__pulse--late" points={hex(CORE_R)} />
 
           {/* The core: three hexagons, one inside the other, and the name. */}
           <g className="engine__core">
@@ -189,7 +196,7 @@ function AxihexEngine() {
               key={input.label}
               type="button"
               className={isHot('in', row) ? 'engine__input is-hot' : 'engine__input'}
-              style={at(IN_X, ROWS[row])}
+              style={at(IN_X, ROWS[row], { '--row': row })}
               aria-describedby="engine-readout"
               {...lightUp({ side: 'in', row })}
             >
@@ -206,7 +213,7 @@ function AxihexEngine() {
               key={output.label}
               type="button"
               className={isHot('out', row) ? 'engine__output is-hot' : 'engine__output'}
-              style={at(OUT_X, ROWS[row])}
+              style={at(OUT_X, ROWS[row], { '--row': row })}
               aria-describedby="engine-readout"
               {...lightUp({ side: 'out', row })}
             >

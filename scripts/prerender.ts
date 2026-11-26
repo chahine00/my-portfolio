@@ -64,7 +64,7 @@ export function homeBody(posts: Update[]) {
   )
 
   return wrap(
-    `<header>${el('p', profile.role)}${el('h1', `${profile.headline} ${profile.headlineAccent}`)}${el('p', profile.intro)}</header>` +
+    `<header>${el('p', profile.role)}${el('h1', `${profile.headline} ${profile.headlineAccent}`)}</header>` +
       (publishedProducts.length
         ? `<section id="products">${el('h2', 'Products: made by Axihex')}` +
           list(publishedProducts.map((p) => `${link(`/products/${p.slug}`, p.name)} (${esc(statusLabel[p.status])}) ${esc(p.tagline)}`)) +

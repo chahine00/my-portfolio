@@ -12,8 +12,6 @@ export const profile = {
   // does, products first; the Axihex engine under it (ideas in, products out) is the "how".
   headline: 'We build',
   headlineAccent: 'what’s next.',
-  // One short line under the headline: our own products first, then client work.
-  intro: 'Our own products. Software for ambitious ideas.',
   // The founder line at the bottom of the hero.
   founderTitle: 'Software Engineer',
   location: 'Beirut, Lebanon',
