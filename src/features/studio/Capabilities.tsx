@@ -3,6 +3,7 @@
 // "What we build" (BuildSection.tsx, as a list beside the app's layers) and on the Studio page (as
 // a row of tiles). Text: "capabilities" in src/data/identity.ts.
 
+import type React from 'react'
 import { capabilities, capabilitiesPrinciple } from '../../data/identity.ts'
 import Icon from '../../components/Icon.tsx'
 import { useReveal } from '../../utils/useReveal.ts'
@@ -38,8 +39,15 @@ function Capabilities({ hideTitle = false, variant = 'grid', lit, onPick }: Capa
             data-lit={lit?.(i) || undefined}
             {...(onPick && {
               tabIndex: 0,
-              onPointerEnter: () => onPick(i),
-              onFocus: () => onPick(i),
+              // Pointing picks it with a mouse only: on a touch screen "enter" fires as soon as a
+              // finger lands, so scrolling over the tiles kept picking them (and pulling the page up
+              // to the drawing). A tap is a click, and a click never fires after a scroll.
+              onPointerEnter: (event: React.PointerEvent) => {
+                if (event.pointerType === 'mouse') onPick(i)
+              },
+              onFocus: (event: React.FocusEvent<HTMLLIElement>) => {
+                if (event.currentTarget.matches(':focus-visible')) onPick(i)
+              },
               onClick: () => onPick(i),
             })}
           >

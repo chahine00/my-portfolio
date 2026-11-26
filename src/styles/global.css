@@ -9714,18 +9714,25 @@ a {
   pointer-events: none;
 }
 
-.engine__svg {
+.engine__layer {
   position: absolute;
   inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
+  pointer-events: none;
 }
 
-/* The glow behind the core: it grows in on arrival, then breathes. */
+/* The glow behind the core (600 units across, centered): it grows in on arrival, then breathes. */
 .engine__glow {
-  transform-origin: 500px 310px;
-  transition: opacity 0.4s;
+  inset: auto;
+  left: 20%;
+  top: calc(50% - 30cqw);
+  width: 60cqw;
+  height: 60cqw;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 30%, transparent), transparent);
   animation:
     engine-glow-in 1.2s ease 0.1s backwards,
     engine-glow 5s ease-in-out 1.3s infinite;
@@ -9739,16 +9746,21 @@ a {
 }
 
 .engine__ring {
+  animation: engine-turn 60s linear infinite;
+}
+
+.engine__ring circle {
   fill: none;
   stroke: color-mix(in srgb, var(--muted) 45%, transparent);
   stroke-width: 1.5;
   stroke-dasharray: 9 11;
-  transform-origin: 500px 310px;
-  animation: engine-turn 60s linear infinite;
+}
+
+.engine__ring--outer circle {
+  stroke-dasharray: 6 14;
 }
 
 .engine__ring--outer {
-  stroke-dasharray: 6 14;
   opacity: 0.6;
   animation-direction: reverse;
   animation-duration: 90s;
@@ -9758,6 +9770,7 @@ a {
    short bright dashes keep running along each one. */
 .engine__links {
   opacity: calc(1 - var(--p) * 3);
+  will-change: opacity;
 }
 
 .engine__line,
@@ -9774,11 +9787,11 @@ a {
   animation: engine-draw 0.7s cubic-bezier(0.45, 0, 0.2, 1) backwards;
 }
 
-.engine__links--in .engine__line {
+.engine__line--in {
   animation-delay: calc(0.55s + var(--row) * 0.1s);
 }
 
-.engine__links--out .engine__line {
+.engine__line--out {
   animation-delay: calc(1.05s + var(--row) * 0.1s);
 }
 
@@ -9794,24 +9807,29 @@ a {
 
 /* The pulse: hexagon waves going out from the core's edge, fading as they grow. */
 .engine__pulse {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2;
   opacity: 0;
-  transform-origin: 500px 310px;
   animation: engine-pulse 3.6s cubic-bezier(0.2, 0.6, 0.4, 1) 2s infinite;
 }
 
+.engine__pulse polygon {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
 .engine__pulse--late {
-  stroke: var(--accent-2);
   animation-delay: 3.8s;
+}
+
+.engine__pulse--late polygon {
+  stroke: var(--accent-2);
 }
 
 /* The core: it powers up on arrival, grows a little as the hero scrolls away, and (with a mouse)
    leans toward the pointer. */
 .engine__core {
-  transform-origin: 500px 310px;
   scale: calc(1 + var(--p) * 0.05);
+  will-change: transform, scale;
   animation: engine-power 0.9s cubic-bezier(0.34, 1.45, 0.64, 1) 0.1s backwards;
 }
 
@@ -9836,7 +9854,10 @@ a {
   fill: none;
   stroke: color-mix(in srgb, var(--accent) 60%, var(--border));
   stroke-width: 2.5;
-  transform-origin: 500px 310px;
+}
+
+/* The middle hexagon's breath, on its own layer. */
+.engine__breathe {
   animation: engine-breathe 4s ease-in-out infinite;
 }
 
@@ -9877,6 +9898,7 @@ a {
   inset: 0;
   opacity: calc(1 - var(--p) * 3);
   pointer-events: none;
+  will-change: opacity, translate;
 }
 
 .engine__side--in {
@@ -10043,6 +10065,7 @@ a {
   transform: translate(calc((1 - var(--ek)) * var(--to-cx) * 0.35), calc((1 - var(--ek)) * var(--to-cy) * 0.35))
     scale(calc(0.6 + var(--ek) * 0.4));
   pointer-events: none;
+  will-change: transform, opacity;
 }
 
 .engine-hero--pillars .engine__node {
@@ -10196,7 +10219,7 @@ a {
     stroke-width: 5;
   }
 
-  :root:not([data-theme='dark']) .engine__ring {
+  :root:not([data-theme='dark']) .engine__ring circle {
     stroke: color-mix(in srgb, var(--accent) 40%, transparent);
   }
 }
@@ -10213,7 +10236,7 @@ a {
   stroke-width: 5;
 }
 
-:root[data-theme='light'] .engine__ring {
+:root[data-theme='light'] .engine__ring circle {
   stroke: color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
@@ -10642,5 +10665,58 @@ a {
 @media (max-width: 720px) {
   .section.identity > .back-link.hero__back:first-child {
     margin: -8px 0 16px;
+  }
+}
+
+/* --- Smooth scrolling between the hero and the pillars (no change to how anything looks).
+   The parts that fade or move while the hero scrolls away each get their own layer, so the browser
+   only fades or slides them instead of redrawing what's around them on every scroll step. */
+.engine-hero__text,
+.engine-hero__actions,
+.engine-hero__after,
+.engine__readout {
+  will-change: opacity;
+}
+
+/* The honeycomb's light running around the ring of cells: each cell's outline used to change its
+   background color on every frame (a redraw of the cell each time). Now a cyan copy of the outline
+   sits on it and only its opacity changes, which looks the same and needs no redraw. */
+.hive__cell:not(.hive__cell--core, .hive__cell--on) .hive__hex {
+  animation: none;
+}
+
+.hive__hex::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent-2);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hive__cell:not(.hive__cell--core, .hive__cell--on) .hive__hex::before {
+  animation: hive-cycle-light 4.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.8s);
+}
+
+@keyframes hive-cycle-light {
+  0%,
+  22%,
+  100% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+}
+
+/* The orbit's running light: on its own layer, so its redraws stay out of the cells'. */
+.hive__orbit {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hive__hex::before {
+    animation: none !important;
   }
 }

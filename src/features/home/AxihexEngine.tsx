@@ -24,7 +24,7 @@
 // Drawn on a 1000 × 620 grid: the SVG uses it directly, the HTML labels use % of it (and cqw, so
 // everything scales together). Looks: global.css, under "Axihex engine".
 
-import { useEffect, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import Icon from '../../components/Icon.tsx'
 import type { IconName } from '../../components/iconNames.ts'
@@ -113,6 +113,20 @@ const at = (x: number, y: number, extra: Record<string, string | number> = {}) =
     ...extra,
   }) as CSSProperties
 
+// One layer of the drawing: an <svg> on the 1000 × 620 grid, filling the engine's box.
+function Layer({ className, children }: { className?: string; children: ReactNode }) {
+  return (
+    <svg
+      className={className ? `engine__layer ${className}` : 'engine__layer'}
+      viewBox={`0 0 ${W} ${H}`}
+      focusable="false"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  )
+}
+
 // What's lit: an input ('in', row) or an output ('out', row), the core, or nothing.
 type Hot = { side: 'in' | 'out'; row: number } | 'core' | null
 
@@ -197,62 +211,75 @@ function AxihexEngine() {
         onPointerMove={lean}
         onPointerLeave={unlean}
       >
-        <svg className="engine__svg" viewBox={`0 0 ${W} ${H}`} focusable="false" aria-hidden="true">
-          <defs>
-            <radialGradient id="engine-glow">
-              <stop offset="0" style={{ stopColor: 'var(--accent)', stopOpacity: 0.3 }} />
-              <stop offset="1" style={{ stopColor: 'var(--accent)', stopOpacity: 0 }} />
-            </radialGradient>
-          </defs>
+        {/* The drawing, as a stack of layers on the same 1000 × 620 grid (each an <svg> filling the
+            box, in the order they're drawn). Every part that moves all the time (the glow, the rings,
+            the pulse, the middle hexagon's breath, the running light) is its own layer and moves as a
+            whole, so the browser only slides or fades it, without redrawing the rest of the drawing
+            (the blurred glow of the hexagon above all) on every frame. That keeps scrolling smooth. */}
+        <span className="engine__layer engine__glow" aria-hidden="true" />
+        {/* Two dashed rings, turning slowly in opposite directions. */}
+        <span className="engine__layer engine__rings" aria-hidden="true">
+          <Layer className="engine__ring">
+            <circle cx={CX} cy={CY} r="178" />
+          </Layer>
+          <Layer className="engine__ring engine__ring--outer">
+            <circle cx={CX} cy={CY} r="246" />
+          </Layer>
+        </span>
 
-          <circle className="engine__glow" cx={CX} cy={CY} r="300" fill="url(#engine-glow)" />
-          {/* Two dashed rings, turning slowly in opposite directions. */}
-          <g className="engine__rings">
-            <circle className="engine__ring" cx={CX} cy={CY} r="178" />
-            <circle className="engine__ring engine__ring--outer" cx={CX} cy={CY} r="246" />
-          </g>
+        {/* In and out: the lines, then the light running along them (its own layer). */}
+        <Layer className="engine__links">
+          {ROWS.map((y, row) => (
+            <g key={`in-${y}`} className={isHot('in', row) ? 'engine__link engine__link--hot' : 'engine__link'}>
+              <path className="engine__line engine__line--in" d={inPath(y)} pathLength={100} style={{ '--row': row } as CSSProperties} />
+            </g>
+          ))}
+          {ROWS.map((y, row) => (
+            <g key={`out-${y}`} className={isHot('out', row) ? 'engine__link engine__link--hot' : 'engine__link'}>
+              <path className="engine__line engine__line--out" d={outPath(y)} pathLength={100} style={{ '--row': row } as CSSProperties} />
+            </g>
+          ))}
+        </Layer>
+        <Layer className="engine__links engine__flows">
+          {ROWS.map((y, row) => (
+            <g key={`in-${y}`} className={isHot('in', row) ? 'engine__link engine__link--hot' : 'engine__link'}>
+              <path className="engine__flow" d={inPath(y)} pathLength={100} style={{ '--d': `${y / -300}s` } as CSSProperties} />
+            </g>
+          ))}
+          {ROWS.map((y, row) => (
+            <g key={`out-${y}`} className={isHot('out', row) ? 'engine__link engine__link--hot' : 'engine__link'}>
+              <path className="engine__flow" d={outPath(y)} pathLength={100} style={{ '--d': `${y / -300 - 0.6}s` } as CSSProperties} />
+            </g>
+          ))}
+        </Layer>
 
-          {/* In and out: the lines, then the light running along them. */}
-          <g className="engine__links engine__links--in">
-            {ROWS.map((y, row) => (
-              <g key={y} className={isHot('in', row) ? 'engine__link engine__link--hot' : 'engine__link'}>
-                <path className="engine__line" d={inPath(y)} pathLength={100} style={{ '--row': row } as CSSProperties} />
-                <path className="engine__flow" d={inPath(y)} pathLength={100} style={{ '--d': `${y / -300}s` } as CSSProperties} />
-              </g>
-            ))}
-          </g>
-          <g className="engine__links engine__links--out">
-            {ROWS.map((y, row) => (
-              <g key={y} className={isHot('out', row) ? 'engine__link engine__link--hot' : 'engine__link'}>
-                <path className="engine__line" d={outPath(y)} pathLength={100} style={{ '--row': row } as CSSProperties} />
-                <path
-                  className="engine__flow"
-                  d={outPath(y)}
-                  pathLength={100}
-                  style={{ '--d': `${y / -300 - 0.6}s` } as CSSProperties}
-                />
-              </g>
-            ))}
-          </g>
+        {/* The pulse: two waves going out from the hexagon, one after the other. */}
+        <Layer className="engine__pulse">
+          <polygon points={hex(CORE_R)} />
+        </Layer>
+        <Layer className="engine__pulse engine__pulse--late">
+          <polygon points={hex(CORE_R)} />
+        </Layer>
 
-          {/* The pulse: two waves going out from the hexagon, one after the other. */}
-          <polygon className="engine__pulse" points={hex(CORE_R)} />
-          <polygon className="engine__pulse engine__pulse--late" points={hex(CORE_R)} />
-
-          {/* The core: three hexagons, one inside the other, and the name. */}
-          <g className="engine__core">
-            <g className="engine__lean">
+        {/* The core: three hexagons, one inside the other, and the name. */}
+        <span className="engine__layer engine__core" aria-hidden="true">
+          <span className="engine__layer engine__lean">
+            <Layer>
               <polygon className="engine__hex engine__hex--outer" points={hex(CORE_R)} />
+            </Layer>
+            <Layer className="engine__breathe">
               <polygon className="engine__hex engine__hex--mid" points={hex(CORE_R * 0.82)} />
+            </Layer>
+            <Layer>
               {/* The inner hexagon is wide enough for the name to sit fully inside it (its outline
                   used to cut through the first and last letters). */}
               <polygon className="engine__hex engine__hex--inner" points={hex(CORE_R * 0.64)} />
               <text className="engine__name" x={CX} y={CY} textAnchor="middle" dominantBaseline="central">
                 AXIHEX
               </text>
-            </g>
-          </g>
-        </svg>
+            </Layer>
+          </span>
+        </span>
 
         {/* The hexagon, as a way in: down to the five pillars. */}
         <Link

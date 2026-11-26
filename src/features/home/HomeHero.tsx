@@ -22,15 +22,21 @@ function HomeHero() {
     if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const phone = window.matchMedia('(max-width: 720px)')
     let frame = 0
+    // What was last written, so nothing is rewritten unchanged: each write makes the browser
+    // re-check the hero's styles, and past the turn (or before it) every scroll step was a no-op.
+    let lastP = ''
+    let lastSpan = ''
     const update = () => {
       frame = 0
       const box = hero.getBoundingClientRect()
       const span = box.height * (phone.matches ? 0.32 : 0.55)
-      const p = Math.min(Math.max(-box.top / span, 0), 1)
-      hero.style.setProperty('--p', p.toFixed(3))
-      hero.style.setProperty('--span', `${Math.round(span)}px`)
+      const p = Math.min(Math.max(-box.top / span, 0), 1).toFixed(3)
+      const spanPx = `${Math.round(span)}px`
+      if (spanPx !== lastSpan) hero.style.setProperty('--span', (lastSpan = spanPx))
+      if (p === lastP) return
+      hero.style.setProperty('--p', (lastP = p))
       // The pillar nodes are out: they can be clicked (before that they're hidden in the hexagon).
-      hero.classList.toggle('engine-hero--pillars', p > 0.65)
+      hero.classList.toggle('engine-hero--pillars', Number(p) > 0.65)
     }
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update)
