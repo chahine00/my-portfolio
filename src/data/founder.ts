@@ -40,8 +40,8 @@ export const coreStack = [
     skills: ['SQL (MySQL)', 'Docker', 'AWS', 'Nginx', 'CI/CD'],
   },
   {
-    category: 'Mobile',
-    skills: ['React Native'],
+    category: 'Mobile & Frontend',
+    skills: ['React Native', 'React'],
   },
 ]
 

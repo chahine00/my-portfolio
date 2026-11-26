@@ -20,7 +20,7 @@ function Products() {
             Made by <em>Axihex.</em>
           </h2>
         </div>
-        <p>Apps, tools, games and services we own, launch and keep improving.</p>
+        <p>Launched by Axihex and still growing. Try them, share them, and tell us what you think.</p>
       </header>
       <div className="work-grid" ref={gridRef}>
         {shownProducts.map((product, index) => (

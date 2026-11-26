@@ -315,7 +315,7 @@ const studioPage: Page = {
   path: '/studio',
   title: pageTitle(STUDIO_TITLE),
   description: STUDIO_DESCRIPTION,
-  imageAlt: `${profile.brand}: where we see an opportunity, we build it`,
+  imageAlt: `${profile.brand}: we build what’s next`,
   body: studioBody(),
   jsonLd: [
     { '@type': 'AboutPage', url: absoluteUrl('/studio'), about: { '@id': BRAND_ID } },

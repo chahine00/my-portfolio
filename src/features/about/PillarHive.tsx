@@ -5,10 +5,10 @@
 // The pillars are tabs: choosing one (click, hover with a mouse, or arrow keys) shows its panel on
 // the right (below on phones), with a link to where that pillar lives on this site. While nobody
 // has touched it and it's on screen, it moves to the next pillar by itself every few seconds.
-// At rest the cells float in a slow wave. While the hive is on screen and the page is scrolled (up
-// or down), a shine sweeps across every cell, one after another, so the cells read as buttons to
-// press (phones have no hover to show it). It doesn't play while the page is still. Visitors who
-// turn off animations get it still.
+// The cycle: a soft light runs around the ring of cells, one after another (Explore → Build → Showcase →
+// Share → Grow → Your idea → Explore again), so the pillars read as a life cycle. With it, a line of
+// light runs around the center, in the gap between it and the cells, passing each one as it lights.
+// At rest the cells float in a slow wave. Visitors who turn off animations get it still.
 // Text: src/data/identity.ts. Looks: global.css, under "pillar hive".
 
 import { useEffect, useId, useRef, useState } from 'react'
@@ -34,6 +34,18 @@ const spots = [
 const place = (spot: { x: number; y: number }, i: number) =>
   ({ left: `calc(50cqw + ${spot.x}cqw)`, top: `calc(46cqw + ${spot.y}cqw)`, '--i': i }) as CSSProperties
 
+// The orbit: the ring in the gap around the center cell (halfway to its neighbors), as a hexagon
+// in the hive's units (1 = 1cqw, center at 50, 46). It starts at Explore's side and goes clockwise,
+// one side per cell, so the light passes the cells in the order they light up (global.css).
+const ORBIT_R = PITCH / 2 / 0.866
+const orbit =
+  [-150, -90, -30, 30, 90, 150, 210]
+    .map((deg, n) => {
+      const a = (deg * Math.PI) / 180
+      return `${n ? 'L' : 'M'} ${(50 + ORBIT_R * Math.cos(a)).toFixed(2)} ${(46 + ORBIT_R * Math.sin(a)).toFixed(2)}`
+    })
+    .join(' ') + ' Z'
+
 // How long each pillar shows by itself (also the progress bar's length, --hive-step in CSS).
 const STEP_MS = 5200
 
@@ -41,9 +53,30 @@ const STEP_MS = 5200
 // sweeping across the honeycomb on the way to the card doesn't change the card. A click is instant.
 const HOVER_INTENT_MS = 280
 
-// How long one shine takes across all the cells (the last cell's delay plus its sweep, in global.css
-// under "The shine"). Scrolling during a shine doesn't restart it; the next scroll after it does.
-const SHINE_MS = 1700
+// One pillar's text in the panel: its number, word, statement, text, examples and link.
+function panelBody(pillar: (typeof pillars)[number], i: number) {
+  return (
+    <>
+      <p className="hive-panel__count">
+        <span className="hive-panel__icon" aria-hidden="true">
+          <Icon name={pillar.icon} size={18} />
+        </span>
+        Pillar 0{i + 1} <span aria-hidden="true">/ 0{pillars.length}</span>
+      </p>
+      <h3 className="hive-panel__word">{pillar.word}</h3>
+      <p className="hive-panel__statement">{pillar.statement}</p>
+      <p className="hive-panel__text">{pillar.text}</p>
+      <ul className="hive-panel__examples">
+        {pillar.examples.map((example) => (
+          <li key={example}>{example}</li>
+        ))}
+      </ul>
+      <Link to={pillar.link.to} state={pillar.link.state} className="forward-link hive-panel__link">
+        {pillar.link.label} <span aria-hidden="true">→</span>
+      </Link>
+    </>
+  )
+}
 
 function PillarHive() {
   const [active, setActive] = useState(0)
@@ -51,8 +84,6 @@ function PillarHive() {
   const [auto, setAuto] = useState(true)
   const [reduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const [onScreen, setOnScreen] = useState(false)
-  const [shining, setShining] = useState(false)
-  const shineTimer = useRef<number | undefined>(undefined)
   const hiveRef = useRef<HTMLDivElement>(null)
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
   const hoverTimer = useRef<number | undefined>(undefined)
@@ -67,23 +98,6 @@ function PillarHive() {
     observer.observe(hive)
     return () => observer.disconnect()
   }, [])
-
-  // The shine: plays when the page scrolls while the hive is on screen, once per scroll gesture.
-  useEffect(() => {
-    if (!onScreen || reduceMotion) return
-    function handleScroll() {
-      if (shineTimer.current !== undefined) return // a shine is already playing
-      setShining(true)
-      shineTimer.current = window.setTimeout(() => {
-        shineTimer.current = undefined
-        setShining(false)
-      }, SHINE_MS)
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [onScreen, reduceMotion])
-
-  useEffect(() => () => window.clearTimeout(shineTimer.current), [])
 
   useEffect(() => {
     if (!cycling) return
@@ -114,11 +128,17 @@ function PillarHive() {
     tabRefs.current[next]?.focus()
   }
 
-  const pillar = pillars[active]
 
   return (
     <div className="hive-layout">
-      <div className={shining ? 'hive hive--shine' : 'hive'} ref={hiveRef}>
+      <div className="hive" ref={hiveRef}>
+        {/* The orbit: a faint track around the center, and the line of light running along it.
+            Under the cells, so it only shows in the gaps. */}
+        <svg className="hive__orbit" viewBox="0 0 100 92" aria-hidden="true">
+          <path className="hive__orbit-track" d={orbit} />
+          <path className="hive__orbit-light" d={orbit} pathLength={6} />
+        </svg>
+
         {/* The center: the Axihex mark itself. */}
         <div className="hive__cell hive__cell--core" style={place({ x: 0, y: 0 }, 6)} aria-hidden="true">
           <span className="hive__hex">
@@ -175,25 +195,21 @@ function PillarHive() {
       </div>
 
       <div className="hive-panel" role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-tab-${active}`}>
-        {/* key: rebuilt per pillar, so its fade-in plays each time. */}
-        <div key={active} className="hive-panel__body">
-          <p className="hive-panel__count">
-            <span className="hive-panel__icon" aria-hidden="true">
-              <Icon name={pillar.icon} size={18} />
-            </span>
-            Pillar 0{active + 1} <span aria-hidden="true">/ 0{pillars.length}</span>
-          </p>
-          <h3 className="hive-panel__word">{pillar.word}</h3>
-          <p className="hive-panel__statement">{pillar.statement}</p>
-          <p className="hive-panel__text">{pillar.text}</p>
-          <ul className="hive-panel__examples">
-            {pillar.examples.map((example) => (
-              <li key={example}>{example}</li>
-            ))}
-          </ul>
-          <Link to={pillar.link.to} state={pillar.link.state} className="forward-link hive-panel__link">
-            {pillar.link.label} <span aria-hidden="true">→</span>
-          </Link>
+        {/* Every pillar's text sits in the same spot, the others invisible, so the panel is always as
+            tall as the longest one and the page below never jumps when the pillar changes. The
+            chosen one is rebuilt (key) so its fade-in plays each time. */}
+        <div className="hive-panel__stack">
+          {pillars.map((item, i) =>
+            i === active ? (
+              <div key={`on-${active}`} className="hive-panel__body">
+                {panelBody(item, i)}
+              </div>
+            ) : (
+              <div key={item.word} className="hive-panel__body hive-panel__body--ghost" aria-hidden="true" inert>
+                {panelBody(item, i)}
+              </div>
+            ),
+          )}
         </div>
         {/* How long until the next pillar, while it moves by itself. */}
         {cycling && <span key={`bar-${active}`} className="hive-panel__progress" aria-hidden="true" />}

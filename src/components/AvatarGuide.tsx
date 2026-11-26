@@ -116,10 +116,11 @@ const isPhone = () => window.matchMedia(`(max-width: ${PHONE_MAX}px)`).matches
 // near the top to near the bottom). Then, if none of its posts has room for the guide, it comes
 // out in the screen's corner instead (dockSpot), so scrolling fast past the title doesn't skip it.
 // On bigger screens the posts have room beside them, so it never uses the corner there.
+// No longer used on phones either: parked in the corner it covered buttons and text (the contact
+// form's topics, the founder page's headings), so phones only use spots that cover nothing.
 function deepIn(section: HTMLElement) {
-  if (!isPhone()) return false
-  const rect = section.getBoundingClientRect()
-  return rect.top < window.innerHeight * 0.35 && rect.bottom > window.innerHeight * 0.65
+  void section
+  return false
 }
 
 // True while some of this section is on screen (below the navbar). The guide stays as long as
@@ -129,6 +130,9 @@ function deepIn(section: HTMLElement) {
 function sectionOnScreen(tip: GuideTip) {
   const rect = document.getElementById(tip.section)?.getBoundingClientRect()
   if (!rect) return false
+  // Phones: it leaves once the footer comes up, so it never covers the footer's text and links.
+  const footer = document.querySelector('.footer')?.getBoundingClientRect()
+  if (isPhone() && footer && footer.top < window.innerHeight - SECTION_MARGIN) return false
   const lowestTop = tip.leaveBelow ? window.innerHeight * tip.leaveBelow : window.innerHeight - SECTION_MARGIN
   return rect.bottom > navBottom() + SECTION_MARGIN && rect.top < lowestTop
 }
@@ -229,6 +233,13 @@ function AvatarGuide({ tips = guideTips, turns = ['robot'], phoneMax = PHONE_MAX
       // It's out, its post has scrolled away, but you're still in the same section (a long one
       // like Projects): once the page rests, it moves to a post of that section that's on screen.
       const current = shownRef.current
+      // Phones: once its spot has scrolled away it simply leaves (counted as shown), instead of
+      // following you down the section, where it ended up over the content.
+      if (current && awayRef.current && phaseRef.current !== 'out' && !moveRef.current && isPhone()) {
+        unreadRef.current = false
+        setPhase('out')
+        return
+      }
       if (current && awayRef.current && phaseRef.current !== 'out' && !moveRef.current) {
         const section = document.getElementById(current.tip.section)
         if (section && sectionOnScreen(current.tip)) {

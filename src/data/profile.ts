@@ -8,13 +8,13 @@ export const profile = {
   site: 'https://axihex.com',
   // The small label above the hero's headline: what Axihex is.
   role: 'Independent software studio',
-  // The hero's headline. The words in "headlineAccent" are shown in the accent gradient. It names
-  // the three layers drawn next to it (interface, backend, infrastructure): what Axihex engineers.
-  headline: 'From the screen',
-  headlineAccent: 'to the server.',
+  // The hero's headline. The words in "headlineAccent" are shown in the accent gradient. What Axihex
+  // does, products first; the app drawn next to it (interface, backend, infrastructure) is the "how".
+  headline: 'We build',
+  headlineAccent: 'what’s next.',
   // One or two sentences under the headline: what Axihex does, concretely.
   // Opportunity first, our own products before client work (like the Studio page).
-  intro: 'We spot opportunities and turn them into products. Web, mobile, AI and cloud, built end to end.',
+  intro: 'We spot opportunities early and ship the products around them, across web, mobile, AI and cloud.',
   // The founder line at the bottom of the hero.
   founderTitle: 'Software Engineer',
   location: 'Beirut, Lebanon',
@@ -26,14 +26,15 @@ export const profile = {
   // hero (the hero shows the Axihex mark). Also the person's image in the structured data.
   photo: '/avatar.webp',
   // Typed out one by one under the home page's headline, like code being written. Keep each one short.
-  // One per core capability (src/data/identity.ts): web, mobile, backend, AI, cloud.
+  // It answers the headline ("We build what's next."): the kinds of things Axihex builds, our own
+  // products first, ending with the visitor's idea. Not the tech stack (the intro already names it).
   building: [
     'products of our own',
-    'web apps, end to end',
-    'cross-platform mobile apps',
-    'secure APIs & databases',
-    'LLM & RAG features',
-    'cloud deployments on AWS',
+    'mobile apps',
+    'online tools',
+    'games',
+    'AI-powered features',
+    'your idea',
   ],
   // The night desk (RobotLab.tsx): shown in the hero instead of the avatar every other time a
   // visitor comes back to the top. Set to false to always show the avatar.

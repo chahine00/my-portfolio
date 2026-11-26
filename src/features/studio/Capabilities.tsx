@@ -6,14 +6,17 @@ import { capabilities, capabilitiesPrinciple } from '../../data/identity.ts'
 import Icon from '../../components/Icon.tsx'
 import { useReveal } from '../../utils/useReveal.ts'
 
-function Capabilities() {
+// hideTitle: the Studio page gives the section its own big title, so the small one is left out.
+function Capabilities({ hideTitle = false }: { hideTitle?: boolean }) {
   const listRef = useReveal<HTMLUListElement>('.caps__item')
 
   return (
     <div className="studio__block caps">
-      <h3 className="studio__subtitle">
-        {capabilitiesPrinciple.title} <span className="studio__subtitle-muted">{capabilitiesPrinciple.accent}</span>
-      </h3>
+      {!hideTitle && (
+        <h3 className="studio__subtitle">
+          {capabilitiesPrinciple.title} <span className="studio__subtitle-muted">{capabilitiesPrinciple.accent}</span>
+        </h3>
+      )}
       <ul className="caps__list" ref={listRef}>
         {capabilities.map((capability) => (
           <li key={capability.title} className="caps__item">

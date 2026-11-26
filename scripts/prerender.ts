@@ -11,7 +11,7 @@
 
 import { profile } from '../src/data/profile.ts'
 import { studio } from '../src/data/studio.ts'
-import { capabilities, channels, offerings, philosophy, pillars, process, studioLead, thinking, traits } from '../src/data/identity.ts'
+import { capabilities, channels, offerings, philosophy, pillars, studioLead, thinking } from '../src/data/identity.ts'
 import { coreStack, mindset, testimonials } from '../src/data/founder.ts'
 import { projects, selectedProjects, type Project } from '../src/data/projects.ts'
 import { publishedProducts, statusLabel, type Product } from '../src/data/products.ts'
@@ -70,8 +70,8 @@ export function homeBody(posts: Update[]) {
           list(publishedProducts.map((p) => `${link(`/products/${p.slug}`, p.name)} (${esc(statusLabel[p.status])}) ${esc(p.tagline)}`)) +
           '</section>'
         : '') +
-      `<section id="studio">${el('h2', studio.eyebrow)}${el('p', studio.text)}` +
-      `<p>${link('/studio', 'How we work')}</p>` +
+      `<section id="studio">${el('h2', `${studio.title} ${studio.titleAccent}`)}${el('p', studio.text)}` +
+      `<p>${link('/studio', 'Identity, purpose & vision')}</p>` +
       el('h3', `${studio.pillarsTitle} ${studio.pillarsAccent}`) +
       list(pillars.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.statement)}`)) +
       el('h3', 'Core engineering capabilities') +
@@ -127,31 +127,19 @@ export function founderBody() {
 
 export function studioBody() {
   return wrap(
-    `<header>${el('p', 'The studio')}${el('h1', 'Where we see an opportunity, we build it.')}${el('p', studioLead)}` +
+    `<header>${el('p', 'The studio')}${el('h1', 'Smart about what to build. Precise about how.')}${el('p', studioLead)}` +
       list(offerings.map((o) => `<strong>${esc(o.title)}</strong>: ${esc(o.text)}`)) +
       '</header>' +
-      `<section id="defines">${el('h2', 'What defines Axihex.')}` +
-      list(traits.map((t) => `<strong>${esc(t.title)}</strong>: ${esc(t.text)}`)) +
-      '</section>' +
-      `<section id="approach">${el('h2', 'From opportunity to product')}` +
-      `<ol>${process.map((s) => `<li><strong>${esc(s.title)}</strong>: ${esc(s.text)}</li>`).join('')}</ol>` +
-      el('p', `Engineering asks: ${thinking.how.join(' ')}`) +
-      el('p', `Product thinking asks: ${thinking.why.join(' ')}`) +
-      el('p', `Opportunity thinking asks: ${thinking.when.join(' ')}`) +
+      `<section id="approach">${el('p', 'How we think about our products')}${el('h2', 'When, what, and how.')}` +
+      list(thinking.lenses.map((l) => `<strong>${esc(l.title)}</strong>: ${esc(l.line)} ${esc(l.questions.join(' '))}`)) +
       el('p', thinking.principle) +
-      el('p', thinking.founders) +
+      el('p', `For your idea: ${thinking.clients}`) +
       '</section>' +
-      `<section id="pillars">${el('h2', 'Five pillars. One studio.')}` +
-      list(pillars.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.statement)}`)) +
-      '</section>' +
-      `<section id="capabilities">${el('h2', 'The technical foundation')}` +
+      `<section id="capabilities">${el('h2', 'Focused in engineering. Flexible in what we build.')}` +
       list(capabilities.map((c) => `<strong>${esc(c.title)}</strong>: ${esc(c.text)}`)) +
-      '</section>' +
-      `<section id="brand">${el('h2', 'Built by Axihex, wherever it lives')}` +
       list(channels.map((c) => `<strong>${esc(c.title)}</strong>: ${esc(c.text)}`)) +
       '</section>' +
-      `<section id="philosophy">${el('p', philosophy)}</section>` +
-      `<section id="studio-contact">${el('h2', 'Spotted an opportunity? Let’s build it.')}` +
+      `<section id="studio-contact">${el('p', philosophy)}${el('h2', 'Have an idea? Now’s the time.')}` +
       `<p>${link('/#contact', 'Start a project')} · ${link('/background', 'Meet the founder')}</p>` +
       '</section>',
   )

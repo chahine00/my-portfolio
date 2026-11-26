@@ -23,7 +23,7 @@ export const HOME_DESCRIPTION =
   'apps and tools around them, and builds software for clients.'
 
 // The Studio page (/studio): what Axihex does, opportunity first, and how it builds.
-export const STUDIO_TITLE = 'The studio: from opportunity to product'
+export const STUDIO_TITLE = 'The studio: from idea to product'
 export const STUDIO_DESCRIPTION =
   `${profile.brand} spots opportunities and builds products around them: apps, online tools, ` +
   'games and services, plus software for clients.'

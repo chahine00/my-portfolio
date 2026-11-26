@@ -11,7 +11,7 @@
 //   (a "Back" link or the browser's back button) returns to that exact spot (restoreScroll).
 
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useNavigationType } from 'react-router'
 import { projects } from '../data/projects.ts'
 import { sortedUpdates } from '../data/updates.ts'
 
@@ -46,12 +46,15 @@ let backTo: number | null = null
 
 // The trail once this page is added: going back (a "Back" link, or the browser's back button) trims
 // it to that page; any other page is added at the end. Pure: the page reads it before App.tsx saves it.
-function withVisit(saved: Visit[], path: string, search: string) {
+// "popped": opened with the browser's back/forward buttons. Only then does opening the page before
+// the last one count as a step back: clicking a link to it again (project → Home → the same
+// project) is a new visit, so "Back" from there still returns to Home.
+function withVisit(saved: Visit[], path: string, search: string, popped: boolean) {
   let trail = [...saved]
   const last = trail[trail.length - 1]
   if (backTo !== null && trail[backTo]?.path === path) {
     trail = trail.slice(0, backTo + 1)
-  } else if (trail.length > 1 && trail[trail.length - 2].path === path && last?.path !== path) {
+  } else if (popped && trail.length > 1 && trail[trail.length - 2].path === path && last?.path !== path) {
     // Back to the page before (the browser's back button): step back in the trail too.
     trail = trail.slice(0, -1)
   } else if (last?.path !== path) {
@@ -67,7 +70,7 @@ function withVisit(saved: Visit[], path: string, search: string) {
 export function recordVisit(path: string, search: string, popped: boolean): number | null {
   const saved = read<Visit[]>(TRAIL_KEY, [])
   const scroll = restoringTo(path, popped)
-  write(TRAIL_KEY, withVisit(saved, path, search))
+  write(TRAIL_KEY, withVisit(saved, path, search, popped))
   backTo = null
   return scroll ?? null
 }
@@ -167,8 +170,11 @@ function nameOf(path: string) {
   if (path === '/blog') return 'Blog'
   if (path === '/studio') return 'Studio'
   if (path === '/background') return 'Founder'
-  if (path.startsWith('/projects/')) return projects.find((p) => `/projects/${p.slug}` === path)?.title ?? 'the project'
-  if (path.startsWith('/blog/')) return sortedUpdates.find((u) => `/blog/${u.slug}` === path)?.title ?? 'the post'
+  // Kept short, so "← Back to …" fits on one line on phones: a project's name before its subtitle
+  // ("boxMind AI", not "boxMind AI: the backend behind…"), and "the post" for a blog post.
+  if (path.startsWith('/projects/'))
+    return projects.find((p) => `/projects/${p.slug}` === path)?.title.split(':')[0] ?? 'the project'
+  if (path.startsWith('/blog/')) return 'the post'
   return 'previous page'
 }
 
@@ -183,10 +189,11 @@ export interface Back {
 // (opened from a shared link or a bookmark), e.g. '/' or '/blog'.
 export function useBack(currentPath: string, fallback: string): Back {
   const navigate = useNavigate()
+  const popped = useNavigationType() === 'POP'
   // Decided once, when the page opens (before App.tsx records this visit).
   const [found] = useState(() => {
     // The trail as it will be with this page in it (its last entry is this page).
-    const trail = withVisit(read<Visit[]>(TRAIL_KEY, []), currentPath, '')
+    const trail = withVisit(read<Visit[]>(TRAIL_KEY, []), currentPath, '', popped)
     const kind = kindOf(currentPath)
     for (let i = trail.length - 2; i >= 0; i--) {
       const path = trail[i].path

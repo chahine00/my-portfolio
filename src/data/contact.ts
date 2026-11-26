@@ -12,7 +12,8 @@ export interface ContactLink {
 
 // Opens a WhatsApp chat with a first message already written, so visitors don't start from an
 // empty chat. The number goes with the country code, no "+" or spaces.
-const whatsapp = (number: string) => `https://wa.me/${number}?text=Hi%20Ali%2C%20I%20saw%20your%20portfolio`
+const whatsapp = (number: string) =>
+  `https://wa.me/${number}?text=${encodeURIComponent('Hi, I came across Axihex and would like to talk.')}`
 
 export const contacts: ContactLink[] = [
   {

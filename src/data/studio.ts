@@ -13,9 +13,10 @@ export const proof: { icon: IconName; label: string }[] = [
 
 export const studio = {
   eyebrow: 'The Studio',
-  // One short paragraph: how Axihex thinks: catching opportunities at the right time (like the
-  // Studio page's process). The hero already says what it does (opportunity → products), so don't repeat that here.
-  text: 'Good ideas have a moment. We watch for rising demand, move fast when the timing is right, and build software solid enough to make the most of it. Some products run for a season, others for years. Founder-led, and never tied to one tool or framework.',
+  title: 'Explore, build,',
+  titleAccent: 'and grow.', // in the accent gradient
+  // One short paragraph: what Axihex is (the Studio page tells the longer story).
+  text: 'Axihex is an independent software studio. We spot opportunities, build products around them, and put them in people’s hands. We also take on projects for clients and founders, from a single feature to a complete app.',
   // The pillars, capabilities and the rest of the identity live in src/data/identity.ts.
   pillarsTitle: 'Five pillars.',
   pillarsAccent: 'One studio.',

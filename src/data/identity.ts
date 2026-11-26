@@ -7,32 +7,24 @@
 
 import type { IconName } from '../components/iconNames.ts'
 
-// The Studio page's opening (under "Where we see an opportunity, we build it."): what Axihex does,
+// The Studio page's opening (under "Smart about what to build. Precise about how."): what Axihex does,
 // opportunity first. Our own products lead; client work is welcome alongside them.
 // Writing rule for this page: plain words a visitor uses, no slogans ("transforming ideas",
 // "cutting-edge", "solutions"), and nothing presented as launched before it is.
 export const studioLead =
-  'Axihex is an independent software studio. We spot opportunities, build products around them, and put them in people’s hands. We also partner with founders who’ve spotted an opportunity of their own.'
+  'We explore ideas fast and build the ones worth building. The work we ship is our proof, what we learn we share, and every product helps the studio grow. We’re independent, so our own products come first, and clients and founders get the same approach.'
 
 // What we do: the three things you'll find from Axihex. Our own products first.
 export const offerings: { title: string; text: string; icon: IconName }[] = [
   { title: 'Our own products', text: 'Apps, online tools, games and services we build, launch and keep improving.', icon: 'box' },
-  { title: 'Software for clients', text: 'Web, mobile, backend, AI and cloud, for people with an idea of their own.', icon: 'briefcase' },
+  { title: 'Software for clients', text: 'Web, mobile, backend, AI and cloud, built with you from plan to launch.', icon: 'briefcase' },
   { title: 'What we learn, shared', text: 'Notes, experiments and lessons from every build, on the blog.', icon: 'book' },
 ]
 
+// The Axihex philosophy: the three lenses in one line (opportunity: see them early; product thinking:
+// think them through; engineering: build them to last).
 export const philosophy =
-  'The best software is the kind people stop noticing: it simply works, every day.'
-
-// What defines Axihex: four traits, on the Studio page. They sum up "How it works": opportunity
-// thinking for our own products, product thinking for every build (ours and founders'), solid
-// engineering, and the freedom to choose.
-export const traits: { title: string; text: string; icon: IconName }[] = [
-  { title: 'Opportunity first', text: 'We watch for rising demand and move when the timing is right.', icon: 'trend' },
-  { title: 'Product thinking', text: 'Who it’s for, what they need, and what it’s worth, for our products and for yours.', icon: 'target' },
-  { title: 'Engineering', text: 'Reliable, secure software, built fast and built to hold up as it grows.', icon: 'code' },
-  { title: 'Independence', text: 'Free to choose ideas, projects, and partners, and to shape the direction.', icon: 'compass' },
-]
+  'Opportunities don’t wait for anyone. So we see them early, think them through, and build them to last.'
 
 // The five pillars, in order around the hexagon (clockwise from the top).
 // "link": where that pillar lives on this site. Each pillar has its own place, so the five don't
@@ -50,7 +42,7 @@ export interface Pillar {
 export const pillars: Pillar[] = [
   {
     word: 'Explore',
-    statement: 'Spot opportunities and try ideas, fast.',
+    statement: 'Discover ideas and new technological opportunities.',
     // Where Axihex sees an opportunity, it tries it: not limited to one kind of product.
     text: 'Where we see an opportunity, we move on it. Quick research and prototypes tell us if the demand is real and the timing is right, before we invest more.',
     examples: ['Watching trends & demand', 'Prototyping to test ideas', 'Experimenting with AI'],
@@ -106,29 +98,37 @@ export const capabilities: { title: string; text: string; icon: IconName }[] = [
 
 export const capabilitiesPrinciple = { title: 'Focused in engineering.', accent: 'Flexible in what we build.' }
 
-// From opportunity to product: the steps every Axihex product goes through, the same ones we
-// follow for clients.
-export const process: { title: string; text: string }[] = [
-  { title: 'Spot', text: 'A rising demand, a new trend, or a need nobody serves well yet: the right idea at the right moment.' },
-  { title: 'Explore', text: 'How big the demand is, what’s already out there, and how long the window stays open.' },
-  { title: 'Validate', text: 'A quick version in front of real people, to see if they want it before we invest more.' },
-  { title: 'Build', text: 'Fast, reliable software, ready while the opportunity is still there.' },
-  { title: 'Launch', text: 'On the web or in the app stores, then in front of the right people through social media.' },
-  { title: 'Improve', text: 'We grow what works. Some products run for a season, others for years.' },
-]
-
-// The two questions behind every build.
-export const thinking = {
-  how: ['How should we build it?', 'Which technologies?', 'How should it scale?', 'How do we maintain it?'],
-  // Product thinking: for every build, ours or a founder's.
-  why: ['Why should we build it?', 'Who will use it?', 'Which features are necessary?', 'What value does it provide?'],
-  // Opportunity thinking: for our own products, catching the right chance at the right time.
-  when: ['Is there real demand?', 'Is the timing right?', 'Can it pay off?', 'How do we reach people?'],
-  principle:
-    'Engineering decides how to build it. Product thinking decides what, why and for whom. Opportunity thinking decides when.',
-  // Working with founders: how these questions shape their idea and their plan.
-  founders:
-    'Have an idea? We bring the same questions to it and help shape the plan: who it’s for, which features come first, what it’s worth, and how it reaches people. Then we build it with you, all the way to launch.',
+// How we think: three lenses, each a short line and the questions it asks. Opportunity is for our own
+// products; product thinking and engineering are for every build, ours or a founder's.
+export const thinking: {
+  lenses: { title: string; line: string; icon: IconName; questions: string[] }[]
+  principle: string
+  clients: string
+} = {
+  lenses: [
+    {
+      title: 'Opportunity',
+      line: 'We watch for rising demand and move when the timing is right.',
+      icon: 'trend',
+      questions: ['Is there real demand?', 'Is the timing right?', 'Can it pay off?', 'How do we reach people?'],
+    },
+    {
+      title: 'Product thinking',
+      line: 'Who it’s for, what they need, and what it’s worth.',
+      icon: 'target',
+      questions: ['Why should we build it?', 'Who will use it?', 'Which features are necessary?', 'What value does it provide?'],
+    },
+    {
+      title: 'Engineering',
+      line: 'Reliable, secure software, built fast and built to last.',
+      icon: 'code',
+      questions: ['How should we build it?', 'Which technologies?', 'How should it scale?', 'How do we maintain it?'],
+    },
+  ],
+  principle: 'Opportunity decides when. Product thinking decides what, why and for whom. Engineering decides how.',
+  // For clients and founders: the same thinking, applied to their idea, before any code.
+  clients:
+    'We think it through with you before writing any code: who it’s for, which features matter first, and a clear plan from first version to launch.',
 }
 
 // Where Axihex products live. Not everything carries the Axihex name.
