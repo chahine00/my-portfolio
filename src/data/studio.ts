@@ -1,13 +1,3 @@
-import type { IconName } from '../components/iconNames.ts'
-
-// The proof strip: where the work has actually shipped (Cinetwork is live on all three). Keep it
-// true: only places it's live.
-export const proof: { icon: IconName; label: string }[] = [
-  { icon: 'smartphone', label: 'App Store' },
-  { icon: 'smartphone', label: 'Google Play' },
-  { icon: 'globe', label: 'Web' },
-]
-
 // The home page's pillars section (About.tsx), right under the hero: just the label and the title,
 // so the hero's engine leads straight into the honeycomb (what Axihex is, in words, opens the
 // Studio page: studioLead in src/data/identity.ts). Also read by the build

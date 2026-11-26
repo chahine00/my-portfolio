@@ -2,13 +2,17 @@
 // the Axihex hexagon in the middle, and what comes out on the right (web products, mobile apps,
 // intelligent tools), joined by lines with light flowing along them.
 //
-// On arrival it powers up once: the hexagon lights, the lines draw themselves in, then out, and the
-// tiles pop in, before the light starts running. After that the core sends out a slow pulse.
+// On arrival it powers up: the hexagon lights, the lines draw themselves in, then out, and the
+// tiles pop in, before the light starts running. After that the core sends out a slow pulse. It
+// powers up again each time the navbar's Home link (or the back-to-top button) brings you back.
 //
 // Interactive:
-// - Hover (or tap, or focus) an input or an output: its line lights up, the light runs faster, and
+// - Point at (or focus) an input or an output: its line lights up, the light runs faster, and
 //   the caption under the drawing says what it means (at rest, it's the studio's line: we spot
 //   opportunities, engineer solutions, and bring products to market).
+// - Each one leads somewhere: an output to a project we built of that kind (in Selected work), an
+//   input to the Explore pillar. With a mouse or the keyboard, a click goes there; on a touch
+//   screen, the first tap explains it and a second tap goes there.
 // - With a mouse, the hexagon and its rings lean a little toward the pointer.
 // - The hexagon is a way in: clicking it goes down to the five pillars.
 // - Once the pillar nodes are out (below), clicking one opens that pillar in the honeycomb.
@@ -20,12 +24,13 @@
 // Drawn on a 1000 × 620 grid: the SVG uses it directly, the HTML labels use % of it (and cqw, so
 // everything scales together). Looks: global.css, under "Axihex engine".
 
-import { useRef, useState, type CSSProperties, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent } from 'react'
 import { Link } from 'react-router'
 import Icon from '../../components/Icon.tsx'
 import type { IconName } from '../../components/iconNames.ts'
 import { pillars } from '../../data/identity.ts'
 import { openPillar } from '../about/pillarEvents.ts'
+import { BACK_AT_TOP_EVENT } from '../../utils/goToTop.ts'
 
 const W = 1000
 const H = 620
@@ -49,17 +54,38 @@ const IN_X = 175
 const OUT_X = 840
 const BOX_W = 124
 
-// What each one means, for the readout under the drawing.
+// What each one means (for the caption under the drawing) and where it leads: the inputs to the
+// Explore pillar, each output to a project of that kind in Selected work ("project": its slug in
+// src/data/projects.ts).
 const inputs = [
   { label: 'Ideas', note: 'Our own, and the ones founders bring to us.' },
   { label: 'Demand', note: 'What people are already looking for, and not finding.' },
   { label: 'Problems', note: 'The slow, the broken and the missing, worth solving.' },
 ]
-const outputs: { label: string; icon: IconName; note: string }[] = [
-  { label: 'Web products', icon: 'globe', note: 'Web apps, platforms, dashboards and online tools.' },
-  { label: 'Mobile apps', icon: 'smartphone', note: 'Apps for iOS and Android, live in both stores.' },
-  { label: 'Intelligent tools', icon: 'bulb', note: 'AI features that do real work inside a product.' },
+const INPUT_GOES = 'see how we explore'
+const outputs: { label: string; icon: IconName; note: string; project: string }[] = [
+  { label: 'Web products', icon: 'globe', note: 'Web apps, platforms, dashboards and online tools.', project: 'boxmind-academy' },
+  { label: 'Mobile apps', icon: 'smartphone', note: 'Apps for iOS and Android, live in both stores.', project: 'cinetwork' },
+  { label: 'Intelligent tools', icon: 'bulb', note: 'AI features that do real work inside a product.', project: 'boxmind-ai-backend' },
 ]
+const OUTPUT_GOES = 'see one we built'
+
+// Where an input or output leads.
+function go(side: 'in' | 'out', row: number) {
+  if (side === 'in') {
+    openPillar(0) // Explore
+    document.getElementById('studio')?.scrollIntoView({ behavior: 'smooth' })
+    return
+  }
+  const card = document.querySelector<HTMLElement>(`[data-project-slug="${outputs[row].project}"]`)
+  if (!card) return
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  // A short glow on the card, so the eye finds it.
+  card.classList.remove('work-card--found')
+  void card.offsetWidth
+  card.classList.add('work-card--found')
+  window.setTimeout(() => card.classList.remove('work-card--found'), 2400)
+}
 // At rest, the caption is the studio's line, in two parts (the second in the accent gradient):
 // what the engine does, from opportunity to market.
 const RESTING = ['We spot opportunities, engineer solutions,', 'and bring products to market.']
@@ -92,11 +118,31 @@ type Hot = { side: 'in' | 'out'; row: number } | 'core' | null
 
 function AxihexEngine() {
   const [hot, setHot] = useState<Hot>(null)
+  // How the last press came: by touch, the first tap only explains.
+  const [touch, setTouch] = useState(false)
   const engineRef = useRef<HTMLDivElement>(null)
+  // Whether the part being pressed was already lit when the press began, and whether it's a touch
+  // (refs: the click comes before the re-render the press asked for).
+  const wasHot = useRef(false)
+  const pressByTouch = useRef(false)
+
+  // Brought back to the top (the navbar's Home link, the back-to-top button): power up again (a new
+  // key rebuilds the drawing, which replays its entrance).
+  const [run, setRun] = useState(0)
+  useEffect(() => {
+    const replay = () => {
+      setHot(null)
+      setRun((n) => n + 1)
+    }
+    window.addEventListener(BACK_AT_TOP_EVENT, replay)
+    return () => window.removeEventListener(BACK_AT_TOP_EVENT, replay)
+  }, [])
 
   const isHot = (side: 'in' | 'out', row: number) => hot !== null && hot !== 'core' && hot.side === side && hot.row === row
   const lit = hot && hot !== 'core' ? (hot.side === 'in' ? inputs : outputs)[hot.row] : null
-  const readout = hot === 'core' ? CORE_NOTE : lit ? `${lit.label}: ${lit.note}` : null
+  const goes = hot && hot !== 'core' ? (hot.side === 'in' ? INPUT_GOES : OUTPUT_GOES) : ''
+  const readout =
+    hot === 'core' ? CORE_NOTE : lit ? `${lit.label}: ${lit.note} ${touch ? 'Tap again' : 'Click'} to ${goes} →` : null
 
   // The lean toward the pointer: --mx / --my from -1 to 1 across the drawing (mouse only).
   function lean(event: PointerEvent<HTMLDivElement>) {
@@ -111,17 +157,40 @@ function AxihexEngine() {
     engineRef.current?.style.setProperty('--my', '0')
   }
 
-  // Hover, focus and tap all light the same thing; leaving puts it back.
+  // Pointing (mouse), focus and a tap all light the same thing; leaving puts it back. The hexagon
+  // only lights (it's a link of its own).
   const lightUp = (value: Hot) => ({
-    onPointerEnter: () => setHot(value),
-    onPointerLeave: () => setHot(null),
+    onPointerEnter: (event: PointerEvent) => {
+      if (event.pointerType === 'mouse') setHot(value)
+    },
+    onPointerLeave: (event: PointerEvent) => {
+      if (event.pointerType === 'mouse') setHot(null)
+    },
     onFocus: () => setHot(value),
     onBlur: () => setHot(null),
-    onClick: () => setHot(value),
+  })
+
+  // An input or output: lights up, and leads to its place. A mouse click or the keyboard goes
+  // straight there; a tap goes there only if it was already lit (the first tap explains it).
+  const part = (side: 'in' | 'out', row: number) => ({
+    ...lightUp({ side, row }),
+    onPointerDown: (event: PointerEvent) => {
+      pressByTouch.current = event.pointerType !== 'mouse'
+      setTouch(pressByTouch.current)
+      wasHot.current = isHot(side, row)
+    },
+    onClick: (event: MouseEvent) => {
+      const tapped = event.detail > 0 && pressByTouch.current
+      if (tapped && !wasHot.current) {
+        setHot({ side, row })
+        return
+      }
+      go(side, row)
+    },
   })
 
   return (
-    <div className="engine-wrap">
+    <div className="engine-wrap" key={run}>
       <div
         ref={engineRef}
         className={`engine${hot ? ' engine--hot' : ''}${hot === 'core' ? ' engine--core' : ''}`}
@@ -203,7 +272,7 @@ function AxihexEngine() {
               className={isHot('in', row) ? 'engine__input is-hot' : 'engine__input'}
               style={at(IN_X, ROWS[row], { '--row': row })}
               aria-describedby="engine-readout"
-              {...lightUp({ side: 'in', row })}
+              {...part('in', row)}
             >
               <span className="engine__dot" aria-hidden="true" />
               <span className="engine__input-word">{input.label}</span>
@@ -220,7 +289,7 @@ function AxihexEngine() {
               className={isHot('out', row) ? 'engine__output is-hot' : 'engine__output'}
               style={at(OUT_X, ROWS[row], { '--row': row })}
               aria-describedby="engine-readout"
-              {...lightUp({ side: 'out', row })}
+              {...part('out', row)}
             >
               <span className="engine__tile" aria-hidden="true">
                 <Icon name={output.icon} size={28} />

@@ -8463,99 +8463,6 @@ a {
 }
 
 
-/* ------------------------------------------------------------------------------------------------
-   Home hero (HomeHero.tsx): a big headline on the left and the anatomy of an app (HeroMark.tsx) on
-   the right. Wider than the other sections (72rem), so the hero has room to breathe.
-   ------------------------------------------------------------------------------------------------ */
-.home-hero {
-  --hero-width: min(72rem, calc(100vw - 2 * clamp(16px, 4vw, 48px)));
-  width: var(--hero-width);
-  margin-left: calc((100% - var(--hero-width)) / 2);
-  display: grid;
-  grid-template-columns: minmax(0, 1.16fr) minmax(0, 0.94fr);
-  align-items: center;
-  gap: clamp(2rem, 5.2vw, 5rem);
-  padding-block: clamp(3rem, 6.3vw, 5.8rem);
-  scroll-margin-top: calc(var(--navbar-height, 64px) - 40px);
-}
-
-.home-hero__text {
-  min-width: 0;
-}
-
-/* The label above the headline: a small badge with a glowing dot, so it reads as the studio's
-   tag line, not as another section title (those are plain small capitals). */
-.home-hero__label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.4rem 0.85rem 0.4rem 0.7rem;
-  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 9%, transparent);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-}
-
-.home-hero__label::before {
-  content: '';
-  flex-shrink: 0;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
-  animation: hero-label-pulse 2.6s ease-out infinite;
-}
-
-@keyframes hero-label-pulse {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
-  70%, 100% { box-shadow: 0 0 0 7px transparent; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .home-hero__label::before {
-    animation: none;
-  }
-}
-
-/* The studio's name in the label: in the text color, so it stands out from the tag line. */
-.home-hero__brand {
-  color: var(--text);
-  font-weight: 800;
-}
-
-.home-hero__sep {
-  margin: 0 -0.15rem;
-  opacity: 0.6;
-}
-
-.home-hero .home-hero__label + h1 {
-  margin-top: 16px;
-}
-
-.home-hero h1 {
-  margin: 10px 0 0;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(3rem, 5.6vw, 5.2rem);
-  line-height: 0.99;
-  letter-spacing: -0.045em;
-}
-
-/* The accent words on a line of their own. */
-.home-hero h1 > span:last-child {
-  display: block;
-}
-
-.home-hero__lede {
-  max-width: 44ch;
-  margin: 1.4rem 0 0;
-  color: var(--text-body);
-  font-size: clamp(1.05rem, 1.4vw, 1.23rem);
-  line-height: 1.65;
-}
-
 /* The figure's colors: light by default, the dark set below for the dark theme. */
 .layer-figure {
   --fig-bg: #f7f5fd;
@@ -9026,130 +8933,8 @@ a {
 }
 
 @media (max-width: 860px) {
-  .home-hero {
-    grid-template-columns: 1fr;
-    max-width: 37rem;
-    width: auto;
-    margin-inline: auto;
-    gap: 2rem;
-    padding-block: 2.5rem;
-  }
-
   .layer-drawing svg {
     height: clamp(10.5rem, 32vw, 13rem);
-  }
-}
-
-@media (max-width: 720px) {
-  .home-hero {
-    padding-top: 22px;
-  }
-
-  /* Phones: a softer opening. A smaller, lighter headline with a little more air between its
-     letters and lines, calmer body text, and two equal buttons side by side instead of two big
-     stacked blocks, so the first screen reads gently instead of shouting. */
-  .home-hero {
-    gap: 1.6rem;
-    padding-bottom: 1.5rem;
-  }
-
-  .home-hero h1 {
-    margin-top: 8px;
-    font-size: clamp(2.1rem, 9.2vw, 2.55rem);
-    font-weight: 650;
-    line-height: 1.08;
-    letter-spacing: -0.03em;
-  }
-
-  .home-hero__lede {
-    margin-top: 0.9rem;
-    font-size: 0.98rem;
-    line-height: 1.62;
-  }
-
-  .home-hero .hero__code {
-    margin-top: 10px;
-    font-size: clamp(0.7rem, 3.1vw, 0.86rem);
-    white-space: nowrap;
-    opacity: 0.85;
-  }
-
-  .home-hero .hero-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 20px;
-  }
-
-  .home-hero .hero-actions .button {
-    padding: 11px 8px;
-    border-radius: 10px;
-    font-size: clamp(0.8rem, 3.6vw, 0.93rem);
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .home-hero .hero__proof {
-    margin-top: 22px;
-    padding-top: 14px;
-  }
-
-  /* The figure under the text: a little lighter, so it doesn't crowd the intro. */
-  .home-hero .layer-figure {
-    padding: 1rem 0.9rem 0.9rem;
-    border-radius: 14px;
-    box-shadow: none;
-  }
-
-  .home-hero .layer-switch label span {
-    min-height: 34px;
-    font-size: 0.8rem;
-  }
-
-  .home-hero .layer-caption {
-    font-size: 0.83rem;
-  }
-
-  /* Phones: the label above the headline stays on one line (smaller). */
-  .home-hero__label {
-    gap: 0.45rem;
-    padding: 0.35rem 0.75rem 0.35rem 0.6rem;
-    /* Readable on small phones (at least 10px); the spacing between letters shrinks to keep
-       "Axihex · Independent software studio" on one line. */
-    font-size: clamp(0.62rem, 2.7vw, 0.72rem);
-    letter-spacing: 0.03em;
-    white-space: nowrap;
-  }
-
-  .home-hero .home-hero__label + h1 {
-    margin-top: 12px;
-  }
-
-  /* Phones: "Shipped to" on its own line, then the four places on ONE line, sized to fit. */
-  .home-hero .hero__proof {
-    gap: 8px;
-  }
-
-  .home-hero .hero__proof-label {
-    flex-basis: 100%;
-  }
-
-  .home-hero .hero__proof ul {
-    flex-wrap: nowrap;
-    gap: clamp(4px, 1.4vw, 8px);
-    min-width: 0;
-  }
-
-  .home-hero .hero__proof li {
-    gap: 4px;
-    padding: 3px clamp(6px, 2vw, 10px);
-    font-size: clamp(0.66rem, 3vw, 0.85rem);
-    white-space: nowrap;
-  }
-
-  .home-hero .hero__proof li svg {
-    width: 13px;
-    height: 13px;
   }
 }
 
@@ -9781,60 +9566,82 @@ a {
   }
 }
 
-/* ------------------------------------------------------------------------------------------------
-   Home hero, centered (HomeHero.tsx): the label, the headline and one line, then the Axihex engine
-   (AxihexEngine.tsx), the two buttons and "Discover the studio". Wider than the other sections, so
-   the engine has room. --p (0 → 1) is how far the hero has scrolled away (set in HomeHero.tsx):
-   the engine turns into the five pillars with it.
-   ------------------------------------------------------------------------------------------------ */
+/* ================================================================================================
+   Home hero (HomeHero.tsx) and the Axihex engine (AxihexEngine.tsx)
+   ------------------------------------------------------------------------------------------------
+   Centered: the label and a modest headline, then the engine (the opening's centerpiece) with its
+   caption, the two buttons, and "Discover the studio". The engine is sized to the screen's height,
+   so all of it fits on the first screen.
+
+   --p (0 → 1, set by HomeHero.tsx) is how far the hero has scrolled away. The turn into the five
+   pillars happens in clean steps, so no two texts ever show on top of each other half-faded:
+     0    → 0.29  the caption goes;
+     0    → 0.33  the inputs, outputs and their lines go;
+     0    → 0.17  "Discover the studio" goes (the buttons slide over its place);
+     0    → 0.4   the headline goes;
+     0.38 → 0.83  the five pillar nodes come out from the hexagon's edge, their words last;
+     0.4  → 0.6   the buttons go.
+   Meanwhile the stage (the engine and the buttons) holds back against the scroll, so the hexagon
+   stays near the middle of the screen while the pillars come out.
+   ================================================================================================ */
 .engine-hero {
-  --hero-width: min(72rem, calc(100vw - 2 * clamp(16px, 4vw, 48px)));
+  --hero-width: min(84rem, calc(100vw - 2 * clamp(16px, 3vw, 40px)));
+  /* How much of the scroll the stage holds back (it then moves up at a quarter of the scroll's
+     speed, roughly). --span, the length of the turn's scroll in px, is set by HomeHero.tsx. */
+  --hold-k: 0.85;
   width: var(--hero-width);
   margin-left: calc((100% - var(--hero-width)) / 2);
-  padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(1rem, 3vw, 2rem);
+  padding-block: clamp(1.25rem, 2.5vw, 2.25rem) clamp(1rem, 3vw, 2rem);
   text-align: center;
   scroll-margin-top: calc(var(--navbar-height, 64px) - 40px);
 }
 
 .engine-hero__text {
-  max-width: 46rem;
+  max-width: 72rem;
   margin-inline: auto;
+  opacity: calc(1 - var(--p) * 2.5);
 }
 
+.engine-hero__label {
+  font-size: 0.72rem;
+}
+
+/* The headline steps back: the engine is what the page opens on. Still the page's h1. */
 .engine-hero h1 {
-  margin: 14px 0 0;
+  margin: 8px 0 0;
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(2.4rem, 5.4vw, 4.6rem);
-  line-height: 1.02;
-  letter-spacing: -0.045em;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 2.6vw, 2.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
 }
 
-.engine-hero__lede {
-  margin: 1rem 0 0;
-  color: var(--muted);
-  font-size: clamp(1rem, 1.4vw, 1.18rem);
-  letter-spacing: 0.01em;
+/* Never broken inside "what's next." */
+.engine-hero h1 .grad {
+  white-space: nowrap;
 }
 
-/* The engine stays nearer the middle of the screen as the hero scrolls away (it moves down a
-   little against the scroll), while the text above and the buttons below fade out. */
 .engine-hero__stage {
   position: relative;
   z-index: 1;
-  margin-top: clamp(1rem, 3vw, 2.2rem);
-  transform: translateY(calc(var(--p) * min(16vw, 190px)));
-  will-change: transform;
-}
-
-.engine-hero__text,
-.engine-hero__after {
-  opacity: calc(1 - var(--p) * 1.6);
+  margin-top: clamp(0.25rem, 1vw, 0.75rem);
+  transform: translateY(calc(var(--p) * var(--span, 0px) * var(--hold-k)));
+  /* In the second half of the turn it also steps back (to 65%), so the ring of pillars stays clear
+     of the navbar above and of the pillars' title coming up below. */
+  scale: calc(1 - clamp(0, (var(--p) - 0.5) * 0.7, 0.35));
+  will-change: transform, scale;
 }
 
 .engine-hero__actions {
   justify-content: center;
-  margin-top: clamp(1rem, 2.5vw, 1.8rem);
+  margin-top: clamp(0.9rem, 2vw, 1.4rem);
+  opacity: calc(1 - (var(--p) - 0.4) * 5);
+}
+
+/* "Discover the studio" goes first of all: the buttons slide down over its place as the stage
+   holds back. */
+.engine-hero__after {
+  opacity: calc(1 - var(--p) * 6);
 }
 
 .engine-hero__discover {
@@ -9842,7 +9649,7 @@ a {
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  margin-top: clamp(1.6rem, 3vw, 2.4rem);
+  margin-top: clamp(1.4rem, 3vw, 2.2rem);
   color: var(--muted);
   font-size: 0.95rem;
   text-decoration: none;
@@ -9867,13 +9674,28 @@ a {
   50% { translate: 0 5px; }
 }
 
-/* --- The Axihex engine (AxihexEngine.tsx) ------------------------------------------------------- */
+/* Once the pillars are out, everything faded is gone for good: nothing faded can be clicked or
+   selected (HomeHero.tsx sets the class). */
+.engine-hero--pillars :is(.engine-hero__text, .engine-hero__after, .engine-hero__actions, .engine__readout, .engine__side, .engine__pulse) {
+  visibility: hidden;
+}
+
+/* --- The engine's box: as big as the screen's height allows under the headline, and up to 1240px
+   wide on tall screens. The drawing is a 1000 × 620 grid (cqw: 1% of its width). */
+.engine-wrap {
+  width: 100%;
+  max-width: clamp(640px, (100svh - 330px) * 1.613, 1240px);
+  margin-inline: auto;
+}
+
 .engine {
   --e-line: color-mix(in srgb, var(--accent) 55%, var(--border));
   --e-hex-fill: color-mix(in srgb, var(--accent) 8%, var(--bg));
   --e-tile: color-mix(in srgb, var(--accent) 6%, var(--card));
-  /* The nodes come out once the inputs and outputs have mostly gone: 0 → 1 over the second half. */
-  --e: clamp(0, (var(--p) - 0.3) * 1.8, 1);
+  --e-tile-border: color-mix(in srgb, var(--accent) 45%, var(--border));
+  --e-glow: 45%;
+  /* The pillar nodes' progress: 0 → 1 over --p 0.38 → 0.83. */
+  --e: clamp(0, (var(--p) - 0.38) * 2.2, 1);
   position: relative;
   width: 100%;
   aspect-ratio: 1000 / 620;
@@ -9887,6 +9709,7 @@ a {
   inset: -2% -3%;
   background-image: radial-gradient(color-mix(in srgb, var(--muted) 38%, transparent) 1px, transparent 1.4px);
   background-size: 5.6cqw 5.6cqw;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 35%, transparent 75%);
   mask-image: radial-gradient(ellipse at center, #000 35%, transparent 75%);
   pointer-events: none;
 }
@@ -9897,6 +9720,22 @@ a {
   width: 100%;
   height: 100%;
   overflow: visible;
+}
+
+/* The glow behind the core: it grows in on arrival, then breathes. */
+.engine__glow {
+  transform-origin: 500px 310px;
+  transition: opacity 0.4s;
+  animation:
+    engine-glow-in 1.2s ease 0.1s backwards,
+    engine-glow 5s ease-in-out 1.3s infinite;
+}
+
+/* Two dashed rings, turning slowly in opposite directions; with a mouse they lean away from it. */
+.engine__rings {
+  transform: translate(calc(var(--mx, 0) * -6px), calc(var(--my, 0) * -6px));
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: engine-appear 1s ease 0.4s backwards;
 }
 
 .engine__ring {
@@ -9915,44 +9754,70 @@ a {
   animation-duration: 90s;
 }
 
-@keyframes engine-turn {
-  to { rotate: 360deg; }
-}
-
+/* The lines in and out. They draw themselves on arrival (the inputs, then the outputs), then two
+   short bright dashes keep running along each one. */
 .engine__links {
-  opacity: calc(1 - var(--p) * 2.2);
+  opacity: calc(1 - var(--p) * 3);
 }
 
 .engine__line,
 .engine__flow {
   fill: none;
   stroke-linecap: round;
+  transition: stroke 0.3s, stroke-width 0.3s, opacity 0.3s;
 }
 
 .engine__line {
   stroke: var(--e-line);
   stroke-width: 2.2;
+  stroke-dasharray: 100;
+  animation: engine-draw 0.7s cubic-bezier(0.45, 0, 0.2, 1) backwards;
 }
 
-/* A short bright dash running along each line: into the hexagon, then out of it. */
+.engine__links--in .engine__line {
+  animation-delay: calc(0.55s + var(--row) * 0.1s);
+}
+
+.engine__links--out .engine__line {
+  animation-delay: calc(1.05s + var(--row) * 0.1s);
+}
+
 .engine__flow {
   stroke: var(--accent-2);
   stroke-width: 3;
-  stroke-dasharray: 6 94;
+  stroke-dasharray: 5 45;
   filter: drop-shadow(0 0 3px var(--accent-2));
-  animation: engine-flow 2.8s linear infinite;
-  animation-delay: var(--d, 0s);
+  animation:
+    engine-flow 2.8s linear var(--d, 0s) infinite,
+    engine-appear 0.5s ease 1.8s backwards;
 }
 
-@keyframes engine-flow {
-  from { stroke-dashoffset: 100; }
-  to { stroke-dashoffset: 0; }
+/* The pulse: hexagon waves going out from the core's edge, fading as they grow. */
+.engine__pulse {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  opacity: 0;
+  transform-origin: 500px 310px;
+  animation: engine-pulse 3.6s cubic-bezier(0.2, 0.6, 0.4, 1) 2s infinite;
 }
 
-/* The core: it grows a little as the hero scrolls away. */
+.engine__pulse--late {
+  stroke: var(--accent-2);
+  animation-delay: 3.8s;
+}
+
+/* The core: it powers up on arrival, grows a little as the hero scrolls away, and (with a mouse)
+   leans toward the pointer. */
 .engine__core {
   transform-origin: 500px 310px;
   scale: calc(1 + var(--p) * 0.05);
+  animation: engine-power 0.9s cubic-bezier(0.34, 1.45, 0.64, 1) 0.1s backwards;
+}
+
+.engine__lean {
+  transform: translate(calc(var(--mx, 0) * 9px), calc(var(--my, 0) * 9px));
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .engine__hex {
@@ -9963,7 +9828,8 @@ a {
   fill: var(--e-hex-fill);
   stroke: var(--accent);
   stroke-width: 4;
-  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 45%, transparent));
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--accent) var(--e-glow), transparent));
+  transition: filter 0.4s;
 }
 
 .engine__hex--mid {
@@ -9974,30 +9840,42 @@ a {
   animation: engine-breathe 4s ease-in-out infinite;
 }
 
+/* Wide enough for the name to sit fully inside it, with a calm outline and a deeper fill. */
 .engine__hex--inner {
-  fill: color-mix(in srgb, var(--accent) 20%, var(--bg));
-  stroke: color-mix(in srgb, var(--text) 75%, var(--accent));
-  stroke-width: 2.5;
+  fill: color-mix(in srgb, var(--accent) 16%, var(--bg));
+  stroke: color-mix(in srgb, var(--accent) 70%, var(--text));
+  stroke-width: 2;
 }
 
-@keyframes engine-breathe {
-  0%, 100% { scale: 1; opacity: 1; }
-  50% { scale: 1.04; opacity: 0.7; }
-}
-
+/* The name: bold, in the brightest text color, with a thin outline in the hexagon's own fill under
+   the letters, so the glow, lines and pulse behind can't blur them. */
 .engine__name {
   fill: var(--text);
+  stroke: color-mix(in srgb, var(--accent) 20%, var(--bg));
+  stroke-width: 5px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
   font-family: var(--font-display);
-  font-size: 37px;
+  font-size: 33px;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
 }
 
-/* The inputs and outputs: HTML on the drawing's grid, sliding toward the hexagon as they fade. */
+/* The hexagon as a link (down to the pillars): an invisible hexagon over it. */
+.engine__core-link {
+  position: absolute;
+  width: 22cqw;
+  aspect-ratio: 0.866;
+  translate: -50% -50%;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+/* --- The inputs and outputs: buttons on the drawing's grid. They slide toward the hexagon as they
+   fade, and pop in on arrival. */
 .engine__side {
   position: absolute;
   inset: 0;
-  opacity: calc(1 - var(--p) * 2.2);
+  opacity: calc(1 - var(--p) * 3);
   pointer-events: none;
 }
 
@@ -10022,15 +9900,22 @@ a {
   cursor: pointer;
 }
 
+.engine__input,
+.engine__output {
+  pointer-events: auto;
+}
+
+/* The dot sits on the line's start; the word floats above it. The button is bigger than the dot,
+   so it's easy to point at. */
 .engine__input {
   display: grid;
   place-items: center;
   width: 4cqw;
   height: 4cqw;
   border-radius: 50%;
+  animation: engine-pop 0.5s cubic-bezier(0.34, 1.6, 0.64, 1) calc(0.35s + var(--row) * 0.12s) backwards;
 }
 
-/* The dot sits on the line's start; the word floats above it. */
 .engine__dot {
   width: 1.9cqw;
   height: 1.9cqw;
@@ -10042,21 +9927,22 @@ a {
 
 .engine__input-word {
   position: absolute;
-  bottom: calc(100% + 1.6cqw);
+  bottom: calc(100% + 0.6cqw);
   left: 50%;
   translate: -50% 0;
   color: var(--text);
   font-size: clamp(0.72rem, 2.8cqw, 1.75rem);
   font-weight: 500;
-  transition: color 0.3s;
   letter-spacing: -0.01em;
   white-space: nowrap;
+  transition: color 0.3s;
 }
 
 .engine__output {
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: engine-pop 0.55s cubic-bezier(0.34, 1.6, 0.64, 1) calc(1.45s + var(--row) * 0.12s) backwards;
 }
 
 .engine__tile {
@@ -10064,7 +9950,7 @@ a {
   place-items: center;
   width: 12.4cqw;
   height: 9.4cqw;
-  border: max(1.5px, 0.25cqw) solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border: max(1.5px, 0.25cqw) solid var(--e-tile-border);
   border-radius: 1.6cqw;
   background: var(--e-tile);
   color: var(--accent);
@@ -10084,13 +9970,69 @@ a {
   color: var(--text);
   font-size: clamp(0.7rem, 2.5cqw, 1.55rem);
   font-weight: 500;
-  transition: color 0.3s;
   letter-spacing: -0.01em;
   white-space: nowrap;
+  transition: color 0.3s;
 }
 
-/* The five pillar nodes: they start inside the hexagon, small and hidden, and move out to their
-   place on the ring as --e goes from 0 to 1, each a little after the one before. */
+/* Lit (pointed at, focused or tapped): its line brightens and its light runs faster, the other
+   lines step back, and the dot or tile lights up in the cyan accent. */
+.engine--hot:not(.engine--core) .engine__link:not(.engine__link--hot) {
+  opacity: 0.3;
+}
+
+.engine__link--hot .engine__line {
+  stroke: var(--accent-2);
+  stroke-width: 3.2;
+}
+
+.engine__link--hot .engine__flow {
+  stroke-width: 4;
+  animation-duration: 1.1s, 0.5s;
+}
+
+.engine__input.is-hot .engine__dot {
+  scale: 1.45;
+  background: var(--accent-2);
+  box-shadow: 0 0 0 0.9cqw color-mix(in srgb, var(--accent-2) 22%, transparent);
+}
+
+.engine__input.is-hot .engine__input-word,
+.engine__output.is-hot .engine__output-word {
+  color: var(--accent-2);
+}
+
+.engine__output.is-hot .engine__tile {
+  translate: 0 -0.5cqw;
+  border-color: var(--accent-2);
+  background: color-mix(in srgb, var(--accent-2) 10%, var(--card));
+  box-shadow: 0 0 0 0.5cqw color-mix(in srgb, var(--accent-2) 16%, transparent), var(--shadow-lift);
+}
+
+/* The core, pointed at: a stronger glow, and the rings speed up. */
+.engine--core .engine__hex--outer {
+  filter: drop-shadow(0 0 26px color-mix(in srgb, var(--accent) 75%, transparent));
+}
+
+.engine--core .engine__ring {
+  animation-duration: 14s;
+}
+
+.engine--core .engine__ring--outer {
+  animation-duration: 22s;
+}
+
+.engine__input:focus-visible,
+.engine__output:focus-visible,
+.engine__core-link:focus-visible,
+.engine__node:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* --- The five pillar nodes: they come out from the hexagon's edge (not from inside it, where
+   they'd cross the name), each a little after the one before, their words showing only once
+   they're almost in place. Clickable once they're out. */
 .engine__node {
   --ek: clamp(0, var(--e) * 1.5 - var(--k) * 0.12, 1);
   display: flex;
@@ -10098,12 +10040,11 @@ a {
   align-items: center;
   gap: 0.5cqw;
   opacity: var(--ek);
-  transform: translate(calc((1 - var(--ek)) * var(--to-cx)), calc((1 - var(--ek)) * var(--to-cy)))
-    scale(calc(0.35 + var(--ek) * 0.65));
+  transform: translate(calc((1 - var(--ek)) * var(--to-cx) * 0.35), calc((1 - var(--ek)) * var(--to-cy) * 0.35))
+    scale(calc(0.6 + var(--ek) * 0.4));
   pointer-events: none;
 }
 
-/* Out of the hexagon: the nodes can be clicked (HomeHero.tsx sets the class). */
 .engine-hero--pillars .engine__node {
   pointer-events: auto;
 }
@@ -10124,6 +10065,11 @@ a {
   height: 3cqw;
 }
 
+.engine-hero--pillars .engine__node:hover .engine__node-hex {
+  scale: 1.12;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 55%, var(--card)), var(--card));
+}
+
 .engine__node-word {
   position: absolute;
   top: calc(100% + 0.4cqw);
@@ -10132,41 +10078,161 @@ a {
   font-size: clamp(0.66rem, 2.2cqw, 1.35rem);
   font-weight: 600;
   white-space: nowrap;
+  opacity: clamp(0, (var(--ek) - 0.6) * 2.5, 1);
 }
 
-/* No animations wanted: the engine as it is at the top, still. */
-@media (prefers-reduced-motion: reduce) {
-  .engine-hero {
-    --p: 0 !important;
-  }
+/* --- The caption under the drawing. At rest it's the studio's line, big, its second half in the
+   accent gradient; while a part is lit, the part's explanation takes its place (the same height,
+   so nothing below moves). On desktop it may run wider than the drawing, to stay on one line. */
+.engine__readout {
+  display: grid;
+  place-items: center;
+  min-height: clamp(2.4rem, 3.6vw, 3.4rem);
+  margin: clamp(0.4rem, 1.2vw, 0.9rem) auto 0;
+  color: var(--muted);
+  font: 500 clamp(0.78rem, 1.1vw, 0.9rem) / 1.6 ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  opacity: calc(1 - var(--p) * 3.5);
+  animation: engine-appear 0.6s ease 2s backwards;
+}
 
-  .engine__ring,
-  .engine__flow,
-  .engine__hex--mid,
-  .engine-hero__discover svg {
-    animation: none;
-  }
-
-  .engine__flow {
-    display: none;
+@media (min-width: 721px) {
+  .engine__readout {
+    width: min(90vw, 64rem);
+    margin-left: 50%;
+    translate: -50% 0;
   }
 }
 
+.engine__readout > span {
+  display: inline-block;
+  animation: readout-in 0.35s ease;
+}
+
+.engine__tagline {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.75vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.engine__tagline strong {
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* --- The engine's motion */
+@keyframes engine-power {
+  from { opacity: 0; scale: 0.55; }
+}
+
+@keyframes engine-glow-in {
+  from { opacity: 0; scale: 0.4; }
+}
+
+@keyframes engine-glow {
+  0%, 100% { scale: 1; opacity: 1; }
+  50% { scale: 1.12; opacity: 0.75; }
+}
+
+@keyframes engine-turn {
+  to { rotate: 360deg; }
+}
+
+@keyframes engine-draw {
+  from { stroke-dashoffset: 100; }
+}
+
+@keyframes engine-flow {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes engine-appear {
+  from { opacity: 0; }
+}
+
+@keyframes engine-pop {
+  from { opacity: 0; scale: 0.6; }
+}
+
+@keyframes engine-breathe {
+  0%, 100% { scale: 1; opacity: 1; }
+  50% { scale: 1.04; opacity: 0.7; }
+}
+
+@keyframes engine-pulse {
+  0% { opacity: 0.55; scale: 1; }
+  70%, 100% { opacity: 0; scale: 2; }
+}
+
+@keyframes readout-in {
+  from { opacity: 0; translate: 0 4px; }
+}
+
+/* Off screen (scrolled past, HomeHero.tsx sets the class): every animation in the hero pauses, so
+   it costs nothing while the rest of the page is read. */
+.engine-hero--asleep,
+.engine-hero--asleep * {
+  animation-play-state: paused !important;
+}
+
+/* --- Light mode: the engine keeps its presence on white (stronger lines, tiles and glow). Written
+   twice: for "computer is light and nothing picked", and for "light picked with the toggle". */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .engine {
+    --e-line: color-mix(in srgb, var(--accent) 72%, var(--border));
+    --e-hex-fill: color-mix(in srgb, var(--accent) 10%, var(--bg));
+    --e-tile: color-mix(in srgb, var(--accent) 7%, #fff);
+    --e-tile-border: color-mix(in srgb, var(--accent) 62%, var(--border));
+    --e-glow: 60%;
+  }
+
+  :root:not([data-theme='dark']) .engine__hex--outer {
+    stroke-width: 5;
+  }
+
+  :root:not([data-theme='dark']) .engine__ring {
+    stroke: color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+}
+
+:root[data-theme='light'] .engine {
+  --e-line: color-mix(in srgb, var(--accent) 72%, var(--border));
+  --e-hex-fill: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  --e-tile: color-mix(in srgb, var(--accent) 7%, #fff);
+  --e-tile-border: color-mix(in srgb, var(--accent) 62%, var(--border));
+  --e-glow: 60%;
+}
+
+:root[data-theme='light'] .engine__hex--outer {
+  stroke-width: 5;
+}
+
+:root[data-theme='light'] .engine__ring {
+  stroke: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* --- Phones: the same experience, fitted to a narrow screen and a thumb.
+   The drawing is a little wider than the column; the turn into the pillars happens over a shorter
+   scroll (HomeHero.tsx) with the stage holding back further, so the hexagon stays on screen while
+   the pillars come out. The buttons sit on the first screen at full strength and fade like on
+   desktop once scrolled past (so they never land on the pillars' title), and the nodes are bigger
+   tap targets. */
 @media (max-width: 720px) {
   .engine-hero {
+    --hold-k: 0.7;
     padding-top: 28px;
   }
 
   .engine-hero h1 {
-    font-size: clamp(2.1rem, 9.4vw, 2.7rem);
-    letter-spacing: -0.035em;
+    font-size: clamp(1.45rem, 6.4vw, 1.75rem);
   }
 
-  .engine-hero__lede {
-    font-size: 0.98rem;
-  }
-
-  /* Phones: the drawing is small, so the words get a bit more room. */
   .engine-wrap {
     width: 112%;
     max-width: none;
@@ -10180,18 +10246,68 @@ a {
   }
 
   .engine-hero__actions .button {
-    padding: 11px 8px;
+    padding: 12px 8px;
     border-radius: 10px;
-    font-size: clamp(0.8rem, 3.6vw, 0.93rem);
+    font-size: clamp(0.82rem, 3.7vw, 0.95rem);
     text-align: center;
     white-space: nowrap;
   }
+
+  .engine__readout {
+    min-height: 3.4rem;
+    padding-inline: 8%;
+    font-size: 0.74rem;
+  }
+
+  .engine__tagline {
+    font-size: 1.02rem;
+  }
+
+  /* One half per line. */
+  .engine__tagline strong {
+    display: block;
+  }
+
+  .engine__node-hex {
+    width: 9.6cqw;
+  }
+
+  .engine__node-hex svg {
+    width: 4cqw;
+    height: 4cqw;
+  }
+
+  .engine__node-word {
+    font-size: 0.7rem;
+  }
 }
 
-/* ------------------------------------------------------------------------------------------------
+/* No animations wanted: the engine as it is at the top, still. */
+@media (prefers-reduced-motion: reduce) {
+  .engine-hero {
+    --p: 0 !important;
+  }
+
+  .engine-hero *,
+  .engine-hero *::before {
+    animation: none !important;
+  }
+
+  .engine__flow,
+  .engine__pulse {
+    display: none;
+  }
+
+  .engine__lean,
+  .engine__rings {
+    transform: none;
+  }
+}
+
+/* ================================================================================================
    The five pillars (About.tsx): their own section right after the hero, big and centered. The
    honeycomb opens out of its center the first time it's on screen (.hive--opened, PillarHive.tsx).
-   ------------------------------------------------------------------------------------------------ */
+   ================================================================================================ */
 .pillars-stage {
   --hero-width: min(72rem, calc(100vw - 2 * clamp(16px, 4vw, 48px)));
   position: relative;
@@ -10214,12 +10330,9 @@ a {
   letter-spacing: -0.035em;
 }
 
-.pillars-stage__lede {
-  max-width: 40rem;
-  margin: 18px auto 0;
-  color: var(--muted);
-  font-size: clamp(1rem, 1.3vw, 1.1rem);
-  line-height: 1.65;
+/* "One studio." stays together, so a narrow screen breaks the title after "Five pillars." */
+.pillars-stage__title .studio__subtitle-muted {
+  white-space: nowrap;
 }
 
 .pillars-stage .hive-layout {
@@ -10273,9 +10386,10 @@ a {
   }
 }
 
-/* ------------------------------------------------------------------------------------------------
-   What we build (BuildSection.tsx): the anatomy of an app beside the capabilities, as a list.
-   ------------------------------------------------------------------------------------------------ */
+/* ================================================================================================
+   What we build (BuildSection.tsx): the anatomy of an app beside the capabilities, as a list. The
+   two select each other: the rows in the chosen layer are lit.
+   ================================================================================================ */
 .build__layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -10300,6 +10414,12 @@ a {
   align-items: center;
   padding: 14px 18px;
   border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition:
+    opacity 0.55s ease var(--reveal-delay, 0s),
+    translate 0.55s ease var(--reveal-delay, 0s),
+    border-color 0.3s,
+    background 0.3s;
 }
 
 .caps--list .caps__icon {
@@ -10321,8 +10441,19 @@ a {
   font: 600 0.8rem ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
 
-.caps--list .caps__item:hover .caps__num {
+.caps--list .caps__item:hover .caps__num,
+.caps--list .caps__item--lit .caps__num {
   color: var(--accent);
+}
+
+.caps--list .caps__item--lit {
+  border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
+  background: color-mix(in srgb, var(--accent) 7%, var(--card));
+}
+
+.caps--list .caps__item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 @media (max-width: 860px) {
@@ -10331,612 +10462,25 @@ a {
   }
 }
 
-/* The founder line, now under Selected work. */
+/* The founder line, under Selected work. */
 .work-founder {
   justify-content: center;
 }
 
-/* --- The engine's size and interactions (AxihexEngine.tsx) --------------------------------------
-   Sized to the screen's height too, so the headline, the drawing and the buttons fit on the first
-   screen of a laptop. */
-.engine-wrap {
-  width: 100%;
-  max-width: clamp(540px, (100svh - 460px) * 1.613, 1000px);
-  margin-inline: auto;
+/* A project card the engine just led to (AxihexEngine.tsx): a short accent glow, so the eye finds it. */
+.work-card--found {
+  animation: card-found 2.2s ease;
 }
 
-/* With a mouse, the hexagon leans a little toward the pointer and the rings the other way. */
-.engine__lean,
-.engine__rings {
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.engine__lean {
-  transform: translate(calc(var(--mx, 0) * 9px), calc(var(--my, 0) * 9px));
-}
-
-.engine__rings {
-  transform: translate(calc(var(--mx, 0) * -6px), calc(var(--my, 0) * -6px));
-}
-
-/* A lit line: brighter and thicker, its light running faster. The other lines step back. */
-.engine__link .engine__line,
-.engine__link .engine__flow {
-  transition: stroke 0.3s, stroke-width 0.3s, opacity 0.3s;
-}
-
-.engine--hot:not(.engine--core) .engine__link:not(.engine__link--hot) {
-  opacity: 0.3;
-}
-
-.engine__link--hot .engine__line {
-  stroke: var(--accent-2);
-  stroke-width: 3.2;
-}
-
-.engine__link--hot .engine__flow {
-  stroke-width: 4;
-  animation-duration: 1.1s;
-}
-
-.engine__input.is-hot .engine__dot {
-  scale: 1.45;
-  background: var(--accent-2);
-  box-shadow: 0 0 0 0.9cqw color-mix(in srgb, var(--accent-2) 22%, transparent);
-}
-
-.engine__input.is-hot .engine__input-word,
-.engine__output.is-hot .engine__output-word {
-  color: var(--accent-2);
-}
-
-.engine__output.is-hot .engine__tile {
-  translate: 0 -0.5cqw;
-  border-color: var(--accent-2);
-  background: color-mix(in srgb, var(--accent-2) 10%, var(--card));
-  box-shadow: 0 0 0 0.5cqw color-mix(in srgb, var(--accent-2) 16%, transparent), var(--shadow-lift);
-}
-
-.engine__input:focus-visible,
-.engine__output:focus-visible,
-.engine__core-link:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
-}
-
-/* The hexagon as a link: an invisible hexagon over it. Pointing at it brightens the core. */
-.engine__core-link {
-  position: absolute;
-  width: 22cqw;
-  aspect-ratio: 0.866;
-  translate: -50% -50%;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-}
-
-.engine__hex--outer,
-.engine__glow {
-  transition: filter 0.4s, opacity 0.4s;
-}
-
-.engine--core .engine__hex--outer {
-  filter: drop-shadow(0 0 26px color-mix(in srgb, var(--accent) 75%, transparent));
-}
-
-.engine--core .engine__ring {
-  animation-duration: 14s;
-}
-
-.engine--core .engine__ring--outer {
-  animation-duration: 22s;
-}
-
-/* Pillar nodes, once out: they grow under the pointer. */
-.engine-hero--pillars .engine__node:hover .engine__node-hex {
-  scale: 1.12;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 55%, var(--card)), var(--card));
-}
-
-/* The readout: what the lit part means. A new line fades in each time. */
-.engine__readout {
-  min-height: 1.6em;
-  margin: clamp(0.4rem, 1.2vw, 0.9rem) auto 0;
-  color: var(--muted);
-  font: 500 clamp(0.78rem, 1.1vw, 0.9rem) / 1.6 ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  opacity: calc(1 - var(--p) * 2.4);
-}
-
-.engine__readout span {
-  display: inline-block;
-  animation: readout-in 0.35s ease;
-}
-
-@keyframes readout-in {
-  from {
-    opacity: 0;
-    translate: 0 4px;
+@keyframes card-found {
+  0%, 60% {
+    box-shadow: 0 0 0 3px var(--accent), 0 0 32px color-mix(in srgb, var(--accent) 45%, transparent);
   }
 }
 
-/* The capabilities beside the app's layers: each row can be pointed at, and the ones in the
-   chosen layer are lit. */
-.caps--list .caps__item {
-  cursor: pointer;
-  transition:
-    opacity 0.55s ease var(--reveal-delay, 0s),
-    translate 0.55s ease var(--reveal-delay, 0s),
-    border-color 0.3s,
-    background 0.3s;
-}
-
-.caps--list .caps__item--lit {
-  border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
-  background: color-mix(in srgb, var(--accent) 7%, var(--card));
-}
-
-.caps--list .caps__item--lit .caps__num {
-  color: var(--accent);
-}
-
-.caps--list .caps__item:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .engine__lean,
-  .engine__rings {
-    transform: none;
-  }
-
-  .engine__readout span {
-    animation: none;
-  }
-}
-
-/* The inputs and outputs can be pointed at; once the hero has turned into the pillars they're
-   gone (and can't be clicked by accident). */
-.engine__input,
-.engine__output {
-  pointer-events: auto;
-}
-
-.engine-hero--pillars .engine__side {
-  visibility: hidden;
-}
-
-/* Phones: the drawing a little wider than the column (after the screen-height sizing above). */
-@media (max-width: 720px) {
-  .engine-wrap {
-    width: 112%;
-    max-width: none;
-    margin-left: -6%;
-  }
-}
-
-/* "One studio." stays together, so a narrow screen breaks the title after "Five pillars." */
-.pillars-stage__title .studio__subtitle-muted {
-  white-space: nowrap;
-}
-
-@media (max-width: 720px) {
-  /* The readout stays inside the screen (the drawing's box is wider than the column). */
-  .engine__readout {
-    padding-inline: 8%;
-    font-size: 0.74rem;
-  }
-
-  /* Phones: the engine doesn't hold back while scrolling, and the buttons stay put, so the turn
-     into the pillars leaves no empty gap on a small screen. */
-  .engine-hero__stage {
-    transform: none;
-  }
-
-  .engine-hero__after {
-    opacity: 1;
-  }
-}
-
-/* --- A bigger hero: a wider column, a larger headline, and an engine that takes most of the
-   screen (on a laptop the buttons sit just under the first screen, the engine leads). */
-.engine-hero {
-  --hero-width: min(84rem, calc(100vw - 2 * clamp(16px, 3vw, 40px)));
-  padding-top: clamp(2rem, 4vw, 3.5rem);
-}
-
-.engine-hero h1 {
-  font-size: clamp(2.6rem, 6.4vw, 6rem);
-}
-
-.engine-hero__lede {
-  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
-}
-
-.engine-wrap {
-  max-width: clamp(720px, (100svh - 250px) * 1.613, 1200px);
-}
-
-@media (max-width: 720px) {
-  .engine-hero h1 {
-    font-size: clamp(2.2rem, 10vw, 2.9rem);
-  }
-
-  .engine-wrap {
-    max-width: none;
-  }
-}
-
-/* The headline on one line where it fits; on a phone it breaks before "what's next.", never inside it. */
-.engine-hero__text {
-  max-width: 72rem;
-}
-
-.engine-hero h1 .grad {
-  white-space: nowrap;
-}
-
-/* --- The turn from the hero into the pillars, in clean steps, so no two texts ever show on top of
-   each other half-faded:
-   1. (--p 0 → 0.33) the inputs, outputs and their lines go; the readout goes first of all.
-   2. (--p 0 → 0.4) the text above and the buttons below go.
-   3. (--p 0.38 → 0.83) the pillar nodes come out from the hexagon's edge (not from inside it, where
-      they'd cross the AXIHEX name), their words showing only once they're almost in place. */
-.engine-hero__text,
-.engine-hero__after {
-  opacity: calc(1 - var(--p) * 2.5);
-}
-
-.engine__readout {
-  opacity: calc(1 - var(--p) * 3.5);
-}
-
-.engine__side,
-.engine__links {
-  opacity: calc(1 - var(--p) * 3);
-}
-
-.engine {
-  --e: clamp(0, (var(--p) - 0.38) * 2.2, 1);
-}
-
-.engine__node {
-  transform: translate(calc((1 - var(--ek)) * var(--to-cx) * 0.35), calc((1 - var(--ek)) * var(--to-cy) * 0.35))
-    scale(calc(0.6 + var(--ek) * 0.4));
-}
-
-.engine__node-word {
-  opacity: clamp(0, (var(--ek) - 0.6) * 2.5, 1);
-}
-
-/* Gone for good once the pillars are out: nothing faded can be clicked or selected. */
-.engine-hero--pillars .engine-hero__after,
-.engine-hero--pillars .engine__readout,
-.engine-hero--pillars .engine-hero__text {
-  visibility: hidden;
-}
-
-/* Phones keep their buttons (the engine doesn't hold back there, see above). */
-@media (max-width: 720px) {
-  .engine-hero__after {
-    opacity: 1;
-  }
-
-  .engine-hero--pillars .engine-hero__after {
-    visibility: visible;
-  }
-}
-
-/* --- The engine draws the eye (AxihexEngine.tsx) ------------------------------------------------
-   On arrival it powers up once (about 2s): the hexagon lights up, the lines draw themselves in on
-   the left and then out on the right, the dots and tiles pop in, and the light starts running.
-   After that, the core keeps sending out a slow pulse and its glow breathes. */
-.engine__core {
-  animation: engine-power 0.9s cubic-bezier(0.34, 1.45, 0.64, 1) 0.1s backwards;
-}
-
-@keyframes engine-power {
-  from {
-    opacity: 0;
-    scale: 0.55;
-  }
-}
-
-.engine__glow {
-  transform-origin: 500px 310px;
-  animation:
-    engine-glow-in 1.2s ease 0.1s backwards,
-    engine-glow 5s ease-in-out 1.3s infinite;
-}
-
-@keyframes engine-glow-in {
-  from {
-    opacity: 0;
-    scale: 0.4;
-  }
-}
-
-@keyframes engine-glow {
-  0%, 100% { scale: 1; opacity: 1; }
-  50% { scale: 1.12; opacity: 0.75; }
-}
-
-.engine__rings {
-  animation: engine-appear 1s ease 0.4s backwards;
-}
-
-/* The lines draw from their start: the inputs first, then the outputs. */
-.engine__line {
-  stroke-dasharray: 100;
-  animation: engine-draw 0.7s cubic-bezier(0.45, 0, 0.2, 1) backwards;
-}
-
-.engine__links--in .engine__line {
-  animation-delay: calc(0.55s + var(--row) * 0.1s);
-}
-
-.engine__links--out .engine__line {
-  animation-delay: calc(1.05s + var(--row) * 0.1s);
-}
-
-@keyframes engine-draw {
-  from {
-    stroke-dashoffset: 100;
-  }
-}
-
-/* The running light: two dashes per line now, and only once the lines are drawn. */
-.engine__flow {
-  stroke-dasharray: 5 45;
-  animation:
-    engine-flow 2.8s linear var(--d, 0s) infinite,
-    engine-appear 0.5s ease 1.8s backwards;
-}
-
-.engine__link--hot .engine__flow {
-  animation-duration: 1.1s, 0.5s;
-}
-
-@keyframes engine-appear {
-  from {
-    opacity: 0;
-  }
-}
-
-.engine__input {
-  animation: engine-pop 0.5s cubic-bezier(0.34, 1.6, 0.64, 1) calc(0.35s + var(--row) * 0.12s) backwards;
-}
-
-.engine__output {
-  animation: engine-pop 0.55s cubic-bezier(0.34, 1.6, 0.64, 1) calc(1.45s + var(--row) * 0.12s) backwards;
-}
-
-@keyframes engine-pop {
-  from {
-    opacity: 0;
-    scale: 0.6;
-  }
-}
-
-.engine__readout {
-  animation: engine-appear 0.6s ease 2s backwards;
-}
-
-/* The pulse: a hexagon wave from the core's edge, fading as it grows. */
-.engine__pulse {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2;
-  opacity: 0;
-  transform-origin: 500px 310px;
-  animation: engine-pulse 3.6s cubic-bezier(0.2, 0.6, 0.4, 1) 2s infinite;
-}
-
-.engine__pulse--late {
-  stroke: var(--accent-2);
-  animation-delay: 3.8s;
-}
-
-@keyframes engine-pulse {
-  0% {
-    opacity: 0.55;
-    scale: 1;
-  }
-  70%, 100% {
-    opacity: 0;
-    scale: 2;
-  }
-}
-
-/* The pulse fades with the rest of the drawing as the hero turns into the pillars. */
-.engine__pulse {
-  visibility: visible;
-}
-
-.engine-hero--pillars .engine__pulse {
-  visibility: hidden;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .engine__core,
-  .engine__glow,
-  .engine__rings,
-  .engine__line,
-  .engine__input,
-  .engine__output,
-  .engine__readout {
-    animation: none;
-  }
-
-  .engine__pulse {
-    display: none;
-  }
-}
-
-/* The whole engine on the first screen: as big as the screen's height allows under the headline
-   and the buttons (up to 1200px wide on tall screens). */
-.engine-wrap {
-  max-width: clamp(660px, (100svh - 360px) * 1.613, 1200px);
-}
-
-.engine-hero__stage {
-  margin-top: clamp(0.5rem, 2vw, 1.4rem);
-}
-
-@media (max-width: 720px) {
-  .engine-wrap {
-    max-width: none;
-  }
-}
-
-/* The caption at rest: the studio's line, big and in the display font, the second half in the
-   accent gradient, so the drawing has its own headline. While a part is pointed at, the usual
-   small readout takes its place (the same height, so nothing below moves). */
-.engine__readout {
-  display: grid;
-  place-items: center;
-  min-height: clamp(2.4rem, 3.6vw, 3.4rem);
-}
-
-.engine__tagline {
-  font-family: var(--font-display);
-  font-size: clamp(1.15rem, 2.2vw, 1.9rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
-  color: var(--text);
-}
-
-.engine__tagline strong {
-  font-weight: 700;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-@media (max-width: 720px) {
-  .engine__readout {
-    min-height: 3.4rem;
-  }
-
-  .engine__tagline {
-    font-size: 1.12rem;
-  }
-
-  /* Phones: one half per line. */
-  .engine__tagline strong {
-    display: block;
-  }
-}
-
-/* The drawing and its caption together on the first screen. */
-.engine-hero {
-  padding-top: clamp(1.25rem, 2.5vw, 2.25rem);
-}
-
-.engine-wrap {
-  max-width: clamp(600px, (100svh - 415px) * 1.613, 1200px);
-}
-
-@media (max-width: 720px) {
+/* Tablets: the navbar is two rows tall there, so the engine holds back a little more. */
+@media (min-width: 721px) and (max-width: 1024px) {
   .engine-hero {
-    padding-top: 28px;
-  }
-
-  .engine-wrap {
-    max-width: none;
-  }
-}
-
-/* Desktop: the caption may run wider than the drawing, so the line stays on one line. */
-@media (min-width: 721px) {
-  .engine__readout {
-    width: min(90vw, 64rem);
-    margin-left: 50%;
-    translate: -50% 0;
-  }
-}
-
-/* The buttons under the engine and its caption: full strength while the inputs and outputs leave,
-   then a quick fade as the pillars come out (--p 0.4 → 0.6), gone once they're out. */
-.engine-hero__stage .engine-hero__actions {
-  margin-top: clamp(0.9rem, 2vw, 1.4rem);
-  opacity: calc(1 - (var(--p) - 0.4) * 5);
-}
-
-.engine-hero--pillars .engine-hero__actions {
-  visibility: hidden;
-}
-
-@media (max-width: 720px) {
-  .engine-hero__stage .engine-hero__actions {
-    opacity: 1;
-  }
-
-  .engine-hero--pillars .engine-hero__actions {
-    visibility: visible;
-  }
-}
-
-/* --- The engine leads the opening: the headline steps back to a modest line above it (still the
-   page's h1), and the room it gave up goes to the drawing. */
-.engine-hero h1 {
-  margin-top: 8px;
-  font-size: clamp(1.5rem, 2.6vw, 2.4rem);
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
-}
-
-.engine-hero__label {
-  font-size: 0.72rem;
-}
-
-.engine-hero__stage {
-  margin-top: clamp(0.25rem, 1vw, 0.75rem);
-}
-
-.engine-wrap {
-  max-width: clamp(640px, (100svh - 330px) * 1.613, 1240px);
-}
-
-@media (max-width: 720px) {
-  .engine-hero h1 {
-    font-size: clamp(1.45rem, 6.4vw, 1.75rem);
-  }
-
-  .engine-wrap {
-    max-width: none;
-  }
-}
-
-/* The name in the hexagon, crisp: a little smaller than the inner hexagon's width, bolder, in the
-   brightest text color, with a thin outline in the hexagon's own fill drawn under the letters, so
-   the lines, glow and pulse behind can't blur them. */
-.engine__name {
-  font-size: 33px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  fill: var(--text);
-  stroke: color-mix(in srgb, var(--accent) 20%, var(--bg));
-  stroke-width: 5px;
-  stroke-linejoin: round;
-  paint-order: stroke fill;
-}
-
-/* The inner hexagon: a calmer outline and a slightly deeper fill, so the name stands out on it. */
-.engine__hex--inner {
-  fill: color-mix(in srgb, var(--accent) 16%, var(--bg));
-  stroke: color-mix(in srgb, var(--accent) 70%, var(--text));
-  stroke-width: 2;
-}
-
-/* The caption's longer line: a little smaller, so it stays on one line on laptops. */
-.engine__tagline {
-  font-size: clamp(1.05rem, 1.75vw, 1.6rem);
-}
-
-@media (max-width: 720px) {
-  .engine__tagline {
-    font-size: 1.02rem;
+    --hold-k: 0.97;
   }
 }

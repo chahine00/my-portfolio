@@ -14,17 +14,21 @@ function HomeHero() {
   const heroRef = useRef<HTMLElement>(null)
 
   // How far the hero has scrolled away, as --p: 0 at the top, 1 once a little over half of it is
-  // gone. Set straight on the element (no re-render), at most once a frame. Visitors who turn off
-  // animations keep the engine as it is (the CSS ignores --p for them).
+  // gone (on phones, after a shorter scroll: the screen is short, so the turn into the pillars
+  // happens while the hexagon is still on it). Set straight on the element (no re-render), at most
+  // once a frame. Visitors who turn off animations keep the engine as it is (the CSS ignores --p).
   useEffect(() => {
     const hero = heroRef.current
     if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const phone = window.matchMedia('(max-width: 720px)')
     let frame = 0
     const update = () => {
       frame = 0
       const box = hero.getBoundingClientRect()
-      const p = Math.min(Math.max(-box.top / (box.height * 0.55), 0), 1)
+      const span = box.height * (phone.matches ? 0.32 : 0.55)
+      const p = Math.min(Math.max(-box.top / span, 0), 1)
       hero.style.setProperty('--p', p.toFixed(3))
+      hero.style.setProperty('--span', `${Math.round(span)}px`)
       // The pillar nodes are out: they can be clicked (before that they're hidden in the hexagon).
       hero.classList.toggle('engine-hero--pillars', p > 0.65)
     }
@@ -39,6 +43,16 @@ function HomeHero() {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }
+  }, [])
+
+  // Off screen: the hero's animations pause (the CSS's "engine-hero--asleep"), so the glow, the
+  // pulse and the running light cost nothing while the rest of the page is read.
+  useEffect(() => {
+    const hero = heroRef.current
+    if (!hero) return
+    const observer = new IntersectionObserver(([entry]) => hero.classList.toggle('engine-hero--asleep', !entry.isIntersecting))
+    observer.observe(hero)
+    return () => observer.disconnect()
   }, [])
 
   return (
