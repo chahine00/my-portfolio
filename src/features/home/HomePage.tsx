@@ -36,6 +36,9 @@ function HomePage() {
   const replayWelcome = (state as { replayWelcome?: boolean } | null)?.replayWelcome === true
   // Set by a project page's "All projects" links: the project whose card to come back to.
   const returnToProject = (state as { returnToProject?: string } | null)?.returnToProject
+  // Set by links that open the Contact form with a topic chosen ("Build with us", "+ Your idea",
+  // "Start a project"…): on phones they land on the "Send a message" box itself.
+  const topic = (state as { topic?: string } | null)?.topic
   const navigationType = useNavigationType()
   const navigate = useNavigate()
   useDocumentTitle() // the site's usual title
@@ -85,12 +88,16 @@ function HomePage() {
       // Back from a project's page: straight to that project's card (no glide past the sections
       // above), so you carry on from the project you were looking at.
       if (!returnToProject || !scrollToProjectCard(returnToProject)) {
-        document.getElementById(hash.slice(1))?.scrollIntoView()
+        // On a phone the contact boxes come first and the form is far below the section's title,
+        // so a link that's there to write a message goes straight to the form's box.
+        const toForm = hash === '#contact' && topic && window.matchMedia('(max-width: 720px)').matches
+        const target = toForm ? document.querySelector('.contact-panel') : document.getElementById(hash.slice(1))
+        target?.scrollIntoView()
       }
     }
     // The section is on screen: take the "#section" out of the address (axihex.com/, not /#contact).
     if (hash) clearHash()
-  }, [hash, key, replayWelcome, returnToProject, moved])
+  }, [hash, key, replayWelcome, returnToProject, moved, topic])
 
   return (
     <>

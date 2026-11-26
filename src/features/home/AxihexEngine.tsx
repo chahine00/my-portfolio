@@ -45,6 +45,25 @@ const hex = (r: number) =>
   }).join(' ')
 
 const CORE_R = 128
+// The hexagon's six corners (clockwise from the top), for the gem's facets and rivets.
+const corner = (k: number, r = CORE_R) => {
+  const a = ((-90 + 60 * k) * Math.PI) / 180
+  return [CX + r * Math.cos(a), CY + r * Math.sin(a)] as const
+}
+// The six facets (center to each side), lit from the top left: how much light each one catches.
+const FACET_LIGHT = [0.09, 0.03, 0, 0.02, 0.06, 0.14]
+const facet = (k: number) => {
+  const [x1, y1] = corner(k)
+  const [x2, y2] = corner(k + 1)
+  return `${CX},${CY} ${x1.toFixed(1)},${y1.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`
+}
+// The lens in the middle, and the Axihex mark (the logo's hexagon with a dot) inside it.
+const LENS_R = CORE_R * 0.64
+const MARK_Y = CY - 24
+const mark = Array.from({ length: 6 }, (_, k) => {
+  const a = ((-90 + 60 * k) * Math.PI) / 180
+  return `${(CX + 15 * Math.cos(a)).toFixed(1)},${(MARK_Y + 15 * Math.sin(a)).toFixed(1)}`
+}).join(' ')
 // The hexagon's left and right corners (where the lines join it).
 const CORE_LEFT = CX - CORE_R * Math.cos(Math.PI / 6)
 const CORE_RIGHT = CX + CORE_R * Math.cos(Math.PI / 6)
@@ -221,14 +240,28 @@ function AxihexEngine() {
         <span className="engine__layer engine__rings" aria-hidden="true">
           <Layer className="engine__ring">
             <circle cx={CX} cy={CY} r="178" />
+            {/* A spark riding the ring as it turns. */}
+            <circle className="engine__spark" cx={CX + 178 * Math.cos(-2.4)} cy={CY + 178 * Math.sin(-2.4)} r="3.2" />
           </Layer>
           <Layer className="engine__ring engine__ring--outer">
             <circle cx={CX} cy={CY} r="246" />
+            <circle className="engine__spark engine__spark--alt" cx={CX + 246 * Math.cos(0.9)} cy={CY + 246 * Math.sin(0.9)} r="3.6" />
           </Layer>
         </span>
 
         {/* In and out: the lines, then the light running along them (its own layer). */}
         <Layer className="engine__links">
+          <defs>
+            {/* The lines brighten toward the core: dim where they start, cyan where they plug in. */}
+            <linearGradient id="engine-line-in" gradientUnits="userSpaceOnUse" x1={IN_X} y1="0" x2={CORE_LEFT} y2="0">
+              <stop style={{ stopColor: 'var(--e-line)' }} />
+              <stop offset="1" style={{ stopColor: 'var(--accent-2)' }} />
+            </linearGradient>
+            <linearGradient id="engine-line-out" gradientUnits="userSpaceOnUse" x1={CORE_RIGHT} y1="0" x2={OUT_X - BOX_W / 2} y2="0">
+              <stop style={{ stopColor: 'var(--accent-2)' }} />
+              <stop offset="1" style={{ stopColor: 'var(--e-line)' }} />
+            </linearGradient>
+          </defs>
           {ROWS.map((y, row) => (
             <g key={`in-${y}`} className={isHot('in', row) ? 'engine__link engine__link--hot' : 'engine__link'}>
               <path className="engine__line engine__line--in" d={inPath(y)} pathLength={100} style={{ '--row': row } as CSSProperties} />
@@ -261,23 +294,64 @@ function AxihexEngine() {
           <polygon points={hex(CORE_R)} />
         </Layer>
 
-        {/* The core: three hexagons, one inside the other, and the name. */}
+        {/* The core: a cut gem. A glassy hexagon lit from the top left, with six facets, a
+            gradient rim and a fine bevel; two sockets where the lines plug in, and rivets at its
+            corners; in the middle, a dark lens with the Axihex mark over the name. A glint of light
+            sweeps across it now and then (its own layer). */}
         <span className="engine__layer engine__core" aria-hidden="true">
           <span className="engine__layer engine__lean">
             <Layer>
+              <defs>
+                <radialGradient id="engine-glass" cx="0.36" cy="0.26" r="0.85">
+                  <stop style={{ stopColor: 'var(--e-glass-1)' }} />
+                  <stop offset="1" style={{ stopColor: 'var(--e-glass-2)' }} />
+                </radialGradient>
+                <linearGradient id="engine-rim" x1="0" y1="0" x2="1" y2="1">
+                  <stop style={{ stopColor: 'var(--accent-2)' }} />
+                  <stop offset="0.5" style={{ stopColor: 'var(--accent)' }} />
+                  <stop offset="1" style={{ stopColor: 'var(--e-rim-end)' }} />
+                </linearGradient>
+                <linearGradient id="engine-lens-rim" x1="0" y1="0" x2="0" y2="1">
+                  <stop style={{ stopColor: 'var(--e-lens-hi)' }} />
+                  <stop offset="1" style={{ stopColor: 'var(--accent)' }} />
+                </linearGradient>
+                <linearGradient id="engine-word" x1="0" y1="0" x2="1" y2="0">
+                  <stop style={{ stopColor: 'var(--text)' }} />
+                  <stop offset="1" style={{ stopColor: 'var(--e-word-end)' }} />
+                </linearGradient>
+              </defs>
               <polygon className="engine__hex engine__hex--outer" points={hex(CORE_R)} />
+              <g className="engine__facets">
+                {FACET_LIGHT.map((light, k) => (
+                  <polygon key={k} points={facet(k)} fillOpacity={light} />
+                ))}
+              </g>
+              <polygon className="engine__bevel" points={hex(CORE_R * 0.91)} />
             </Layer>
             <Layer className="engine__breathe">
-              <polygon className="engine__hex engine__hex--mid" points={hex(CORE_R * 0.82)} />
+              <polygon className="engine__hex engine__hex--mid" points={hex(CORE_R * 0.8)} />
             </Layer>
             <Layer>
-              {/* The inner hexagon is wide enough for the name to sit fully inside it (its outline
-                  used to cut through the first and last letters). */}
-              <polygon className="engine__hex engine__hex--inner" points={hex(CORE_R * 0.64)} />
-              <text className="engine__name" x={CX} y={CY} textAnchor="middle" dominantBaseline="central">
+              <polygon className="engine__lens" points={hex(LENS_R)} />
+              <polygon className="engine__mark" points={mark} />
+              <circle className="engine__mark-dot" cx={CX} cy={MARK_Y} r="4.2" />
+              {/* letter-spacing adds space after the last letter too: nudged right by half of it. */}
+              <text className="engine__name" x={CX + 3} y={CY + 22} textAnchor="middle" dominantBaseline="central">
                 AXIHEX
               </text>
+              {/* The sockets where the lines plug in, and a rivet at each corner. */}
+              {[CORE_LEFT, CORE_RIGHT].map((x) => (
+                <g key={x} className="engine__port">
+                  <circle cx={x} cy={CY} r="8" />
+                  <circle className="engine__port-dot" cx={x} cy={CY} r="3.4" />
+                </g>
+              ))}
+              {Array.from({ length: 6 }, (_, k) => {
+                const [x, y] = corner(k)
+                return <circle key={k} className="engine__rivet" cx={x} cy={y} r="3" />
+              })}
             </Layer>
+            <span className="engine__shine" />
           </span>
         </span>
 

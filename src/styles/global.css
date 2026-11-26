@@ -10720,3 +10720,169 @@ a {
     animation: none !important;
   }
 }
+
+/* Phones: the "Send a message" box, when a link lands on it (HomePage.tsx), sits just under the
+   navbar. */
+.contact-panel {
+  scroll-margin-top: calc(var(--navbar-height, 64px) + 12px);
+}
+
+/* --- The engine's core as a cut gem (AxihexEngine.tsx). Same place, size and role as before; a
+   more finished object: glass lit from the top left, six facets, a gradient rim with a fine bevel,
+   sockets where the lines plug in, rivets at the corners, a dark lens with the Axihex mark over
+   the name, a glint of light now and then, and a spark riding each orbit ring. */
+.engine {
+  --e-glass-1: color-mix(in srgb, var(--accent) 32%, var(--bg));
+  --e-glass-2: color-mix(in srgb, var(--accent) 7%, var(--bg));
+  --e-rim-end: color-mix(in srgb, var(--accent) 70%, #d946ef);
+  --e-lens: color-mix(in srgb, var(--accent) 11%, var(--bg));
+  --e-lens-hi: color-mix(in srgb, var(--text) 50%, transparent);
+  --e-word-end: color-mix(in srgb, var(--accent) 40%, var(--text));
+  --e-shine: rgb(255 255 255 / 0.3);
+}
+
+.engine__hex--outer {
+  fill: url(#engine-glass);
+  stroke: url(#engine-rim);
+  stroke-width: 4;
+}
+
+.engine__facets polygon {
+  fill: #fff;
+}
+
+/* A fine inner bevel, just inside the rim. */
+.engine__bevel {
+  fill: none;
+  stroke: color-mix(in srgb, var(--text) 16%, transparent);
+  stroke-width: 1.2;
+}
+
+/* The breathing ring between the rim and the lens: finer, dashed. */
+.engine__hex--mid {
+  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 7;
+}
+
+/* The lens: dark glass with a light top edge. */
+.engine__lens {
+  fill: var(--e-lens);
+  stroke: url(#engine-lens-rim);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+/* The Axihex mark: the logo's hexagon with its dot, glowing softly. */
+.engine__mark {
+  fill: none;
+  stroke: var(--accent-2);
+  stroke-width: 2.6;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent-2) 70%, transparent));
+}
+
+.engine__mark-dot {
+  fill: var(--accent-2);
+}
+
+/* The name: smaller, wider apart, in a soft gradient, with an outline in the lens's color under it. */
+.engine__name {
+  fill: url(#engine-word);
+  stroke: var(--e-lens);
+  stroke-width: 4px;
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+}
+
+/* The sockets where the lines plug in. */
+.engine__port circle:first-child {
+  fill: var(--e-lens);
+  stroke: var(--accent-2);
+  stroke-width: 2;
+}
+
+.engine__port-dot {
+  fill: var(--accent-2);
+  filter: drop-shadow(0 0 4px var(--accent-2));
+}
+
+.engine__rivet {
+  fill: color-mix(in srgb, var(--accent-2) 65%, #fff);
+  opacity: 0.85;
+}
+
+/* The lines brighten toward the core (gradients in AxihexEngine.tsx). A lit line stays cyan. */
+.engine__line--in {
+  stroke: url(#engine-line-in);
+}
+
+.engine__line--out {
+  stroke: url(#engine-line-out);
+}
+
+/* A spark riding each ring (it turns with its ring, on the ring's own layer). */
+.engine__ring .engine__spark {
+  fill: var(--accent-2);
+  stroke: none;
+  filter: drop-shadow(0 0 4px var(--accent-2));
+}
+
+.engine__ring .engine__spark--alt {
+  fill: var(--accent);
+  filter: drop-shadow(0 0 4px var(--accent));
+}
+
+/* The glint: a band of light sweeping across the gem every 7 seconds, clipped to its shape. Its own
+   layer: it slides, nothing is redrawn. */
+.engine__shine {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22.2cqw;
+  aspect-ratio: 0.866;
+  translate: -50% -50%;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.engine__shine::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, var(--e-shine) 50%, transparent 65%);
+  transform: translateX(-110%);
+  animation: engine-shine 7s ease-in-out 2.6s infinite;
+  will-change: transform;
+}
+
+@keyframes engine-shine {
+  0% { transform: translateX(-110%); }
+  16%, 100% { transform: translateX(110%); }
+}
+
+/* Paused off screen like the rest (pseudo-elements included). */
+.engine-hero--asleep *::before {
+  animation-play-state: paused !important;
+}
+
+/* Light mode: the glass lit the other way round (lighter where the light hits), a stronger glint. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .engine {
+    --e-glass-1: color-mix(in srgb, var(--accent) 6%, #fff);
+    --e-glass-2: color-mix(in srgb, var(--accent) 22%, #fff);
+    --e-lens: color-mix(in srgb, var(--accent) 7%, #fff);
+    --e-lens-hi: #fff;
+    --e-shine: rgb(255 255 255 / 0.75);
+  }
+}
+
+:root[data-theme='light'] .engine {
+  --e-glass-1: color-mix(in srgb, var(--accent) 6%, #fff);
+  --e-glass-2: color-mix(in srgb, var(--accent) 22%, #fff);
+  --e-lens: color-mix(in srgb, var(--accent) 7%, #fff);
+  --e-lens-hi: #fff;
+  --e-shine: rgb(255 255 255 / 0.75);
+}
