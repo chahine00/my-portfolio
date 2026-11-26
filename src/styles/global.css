@@ -10908,3 +10908,24 @@ a {
     max-width: none;
   }
 }
+
+/* The name in the hexagon, crisp: a little smaller than the inner hexagon's width, bolder, in the
+   brightest text color, with a thin outline in the hexagon's own fill drawn under the letters, so
+   the lines, glow and pulse behind can't blur them. */
+.engine__name {
+  font-size: 33px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  fill: var(--text);
+  stroke: color-mix(in srgb, var(--accent) 20%, var(--bg));
+  stroke-width: 5px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+
+/* The inner hexagon: a calmer outline and a slightly deeper fill, so the name stands out on it. */
+.engine__hex--inner {
+  fill: color-mix(in srgb, var(--accent) 16%, var(--bg));
+  stroke: color-mix(in srgb, var(--accent) 70%, var(--text));
+  stroke-width: 2;
+}

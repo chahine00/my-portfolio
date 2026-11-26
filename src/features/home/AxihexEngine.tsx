@@ -173,8 +173,10 @@ function AxihexEngine() {
           <g className="engine__core">
             <g className="engine__lean">
               <polygon className="engine__hex engine__hex--outer" points={hex(CORE_R)} />
-              <polygon className="engine__hex engine__hex--mid" points={hex(CORE_R * 0.76)} />
-              <polygon className="engine__hex engine__hex--inner" points={hex(CORE_R * 0.5)} />
+              <polygon className="engine__hex engine__hex--mid" points={hex(CORE_R * 0.82)} />
+              {/* The inner hexagon is wide enough for the name to sit fully inside it (its outline
+                  used to cut through the first and last letters). */}
+              <polygon className="engine__hex engine__hex--inner" points={hex(CORE_R * 0.64)} />
               <text className="engine__name" x={CX} y={CY} textAnchor="middle" dominantBaseline="central">
                 AXIHEX
               </text>
