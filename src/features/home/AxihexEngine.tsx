@@ -7,8 +7,8 @@
 //
 // Interactive:
 // - Hover (or tap, or focus) an input or an output: its line lights up, the light runs faster, and
-//   the caption under the drawing says what it means (at rest, it's the studio's line: our own
-//   products, software for ambitious ideas).
+//   the caption under the drawing says what it means (at rest, it's the studio's line: we spot
+//   opportunities, engineer solutions, and bring products to market).
 // - With a mouse, the hexagon and its rings lean a little toward the pointer.
 // - The hexagon is a way in: clicking it goes down to the five pillars.
 // - Once the pillar nodes are out (below), clicking one opens that pillar in the honeycomb.
@@ -60,8 +60,9 @@ const outputs: { label: string; icon: IconName; note: string }[] = [
   { label: 'Mobile apps', icon: 'smartphone', note: 'Apps for iOS and Android, live in both stores.' },
   { label: 'Intelligent tools', icon: 'bulb', note: 'AI features that do real work inside a product.' },
 ]
-// At rest, the caption is the studio's line, in two parts: what comes out of the engine.
-const RESTING = ['Our own products.', 'Software for ambitious ideas.']
+// At rest, the caption is the studio's line, in two parts (the second in the accent gradient):
+// what the engine does, from opportunity to market.
+const RESTING = ['We spot opportunities, engineer solutions,', 'and bring products to market.']
 const CORE_NOTE = 'Inside: five pillars that turn one into the other. Click to look inside.'
 
 const inPath = (y: number) => `M${IN_X} ${y} C${IN_X + 130} ${y}, ${CORE_LEFT - 110} ${CY}, ${CORE_LEFT} ${CY}`

@@ -10929,3 +10929,14 @@ a {
   stroke: color-mix(in srgb, var(--accent) 70%, var(--text));
   stroke-width: 2;
 }
+
+/* The caption's longer line: a little smaller, so it stays on one line on laptops. */
+.engine__tagline {
+  font-size: clamp(1.05rem, 1.75vw, 1.6rem);
+}
+
+@media (max-width: 720px) {
+  .engine__tagline {
+    font-size: 1.02rem;
+  }
+}
