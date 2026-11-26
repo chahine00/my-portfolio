@@ -10631,3 +10631,16 @@ a {
     font-size: 0.88rem;
   }
 }
+
+/* The Studio page's "← Back to …" (StudioPage.tsx): clear space between it and "The studio" label
+   under it. (On phones the shared rule for back links gave it a negative bottom margin, so it ran
+   into the label.) */
+.section.identity > .back-link.hero__back {
+  margin: 0 0 clamp(22px, 3vw, 34px);
+}
+
+@media (max-width: 720px) {
+  .section.identity > .back-link.hero__back:first-child {
+    margin: -8px 0 16px;
+  }
+}
