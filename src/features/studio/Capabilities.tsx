@@ -32,7 +32,10 @@ function Capabilities({ hideTitle = false, variant = 'grid', lit, onPick }: Capa
         {capabilities.map((capability, i) => (
           <li
             key={capability.title}
-            className={lit?.(i) ? 'caps__item caps__item--lit' : 'caps__item'}
+            // Lit as an attribute, not a class: useReveal adds "is-visible" to the class list, and
+            // changing className here would wipe it (the rows then vanished for good).
+            className="caps__item"
+            data-lit={lit?.(i) || undefined}
             {...(onPick && {
               tabIndex: 0,
               onPointerEnter: () => onPick(i),

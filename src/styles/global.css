@@ -10442,11 +10442,11 @@ a {
 }
 
 .caps--list .caps__item:hover .caps__num,
-.caps--list .caps__item--lit .caps__num {
+.caps--list .caps__item[data-lit] .caps__num {
   color: var(--accent);
 }
 
-.caps--list .caps__item--lit {
+.caps--list .caps__item[data-lit] {
   border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
   background: color-mix(in srgb, var(--accent) 7%, var(--card));
 }
