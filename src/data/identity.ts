@@ -35,7 +35,9 @@ export const philosophy =
 // The five pillars: the home page's honeycomb, in order around the hexagon (clockwise from the top),
 // with "Your idea" closing the cycle. Each one's panel shows its statement, text, examples and link.
 // "link": where that pillar lives on this site. Each pillar has its own place, so the five don't
-// blur together (Showcase → the work, Share → the blog). "state" goes with the link: { topic } picks
+// blur together: Explore → the Studio page (how we find opportunities), Build → what we build (the
+// home page's capabilities, with our products just above once there are some), Showcase → the
+// work, Share → the blog, Grow → the Contact form, set to collaboration. "state" goes with the link: { topic } picks
 // the Contact form's topic for the visitor.
 export interface Pillar {
   word: string
@@ -54,8 +56,8 @@ export const pillars: Pillar[] = [
     text: 'Where we see an opportunity, we move on it. Quick research and prototypes tell us if the demand is real and the timing is right, before we invest more.',
     examples: ['Watching trends & demand', 'Prototyping to test ideas', 'Experimenting with AI'],
     icon: 'compass',
-    // The blog's Ideas posts, not the whole blog (that's Share's link).
-    link: { to: '/blog?category=Ideas', label: 'Read our ideas' },
+    // The Studio page: the philosophy, and how we decide what to build.
+    link: { to: '/studio', label: 'How we find opportunities' },
   },
   {
     word: 'Build',
@@ -63,8 +65,9 @@ export const pillars: Pillar[] = [
     text: 'The heart of Axihex: turning an opportunity into working software. Two directions side by side: products we own and run, and software we build for clients.',
     examples: ['Our own apps, tools & games', 'Client web & mobile apps', 'Backends, AI & cloud'],
     icon: 'layers',
-    // Build is the doing: the action is to build something together. (The work is Showcase's link.)
-    link: { to: '/#contact', label: 'Start a project', state: { topic: 'project' } },
+    // What gets built: the home page's "What we build" (the layers of an app and the capabilities).
+    // (The finished work is Showcase's link.)
+    link: { to: '/#build', label: 'See what we build' },
   },
   {
     // Showcase shows the work (proof); Share gives the knowledge away. Different links make it clear.
@@ -82,7 +85,7 @@ export const pillars: Pillar[] = [
     text: 'What we learn while building is worth passing on: articles, case studies and lessons from real projects, never anything confidential.',
     examples: ['Technical articles', 'Engineering case studies', 'Open-source & free tools'],
     icon: 'share',
-    link: { to: '/blog', label: 'Read the blog' },
+    link: { to: '/blog', label: 'Read the blog, tutorials & tools' },
   },
   {
     word: 'Grow',

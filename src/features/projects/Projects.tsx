@@ -1,8 +1,12 @@
 // The "Selected work" section: every project in one grid, studio work first, then the founder's
 // client work, then his work at previous employers. The first card is featured (full width).
-// Each card's label (its "context", e.g. 'Client project') says who delivered it.
+// Each card's label (its "context", e.g. 'Client project') says who delivered it. Under the cards,
+// one quiet line about who is behind the work, linking to the founder's page (/background).
 
+import { Link } from 'react-router'
 import { selectedProjects } from '../../data/projects.ts'
+import { studio } from '../../data/studio.ts'
+import { asset } from '../../utils/asset.ts'
 import ProjectCard from './ProjectCard.tsx'
 import { useReveal } from '../../utils/useReveal.ts'
 
@@ -26,6 +30,13 @@ function Projects() {
           <ProjectCard key={project.slug} project={project} featured={index === 0} />
         ))}
       </div>
+      <p className="studio__founder work-founder">
+        {studio.founderNote}{' '}
+        <Link to="/background" className="founder-line">
+          <img src={asset('/avatar.webp')} alt="" width={28} height={28} loading="lazy" />
+          <span className="founder-line__more">{studio.founderLink} →</span>
+        </Link>
+      </p>
     </section>
   )
 }

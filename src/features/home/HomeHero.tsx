@@ -1,87 +1,84 @@
-// The home page's hero: a big headline on the left, and on the right the anatomy of an app
-// (HeroMark.tsx), whose layers you can click. Text: src/data/profile.ts and src/data/studio.ts.
+// The home page's hero, centered: what Axihex is, the headline, one short line, then the Axihex
+// engine (AxihexEngine.tsx: what goes in, the hexagon, what comes out), the two ways in, and a
+// nudge down to the studio. As it scrolls away, the engine turns into the five pillars, which the
+// next section (About.tsx) takes over. Text: src/data/profile.ts.
 
+import { useEffect, useRef, type CSSProperties } from 'react'
 import { Link } from 'react-router'
 import { profile } from '../../data/profile.ts'
-import { proof } from '../../data/studio.ts'
 import GradientText from '../../components/GradientText.tsx'
-import Icon from '../../components/Icon.tsx'
-import HeroMark from './HeroMark.tsx'
+import AxihexEngine from './AxihexEngine.tsx'
 import { hasProducts } from '../products/shownProducts.ts'
-import { longestPhrase, useTypingLoop } from './typing.ts'
 
 function HomeHero() {
-  const typed = useTypingLoop(profile.building)
+  const heroRef = useRef<HTMLElement>(null)
+
+  // How far the hero has scrolled away, as --p: 0 at the top, 1 once a little over half of it is
+  // gone. Set straight on the element (no re-render), at most once a frame. Visitors who turn off
+  // animations keep the engine as it is (the CSS ignores --p for them).
+  useEffect(() => {
+    const hero = heroRef.current
+    if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const box = hero.getBoundingClientRect()
+      const p = Math.min(Math.max(-box.top / (box.height * 0.55), 0), 1)
+      hero.style.setProperty('--p', p.toFixed(3))
+    }
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
 
   return (
     // id="home" lets the navbar link "/#home" scroll here.
-    <section id="home" className="home-hero" aria-labelledby="home-title">
-      <div className="home-hero__text">
-        {/* The studio's name, then what it is: the name shows in the hero without a big logo title. */}
-        <p className="eyebrow home-hero__label">
-          <span className="home-hero__brand">{profile.brand}</span>
-          <span className="home-hero__sep" aria-hidden="true">·</span>
-          {profile.role}
-        </p>
+    <section id="home" ref={heroRef} className="engine-hero" style={{ '--p': 0 } as CSSProperties} aria-labelledby="home-title">
+      <div className="engine-hero__text">
+        <p className="eyebrow engine-hero__label">{profile.role}</p>
         <h1 id="home-title">
           {profile.headline} <GradientText text={profile.headlineAccent} />
         </h1>
-        <p className="home-hero__lede">{profile.intro}</p>
-
-        {/* A line of "code" that keeps typing what Axihex builds. Screen readers get the list once. */}
-        <p className="hero__code" aria-label={`Axihex builds ${profile.building.join(', ')}`}>
-          <span className="hero__code-ghost" aria-hidden="true">
-            &gt; axihex.build('{longestPhrase}')
-          </span>
-          <span aria-hidden="true">
-            <span className="hero__code-prompt">&gt;</span> axihex.build(<span className="hero__code-string">'{typed}</span>
-            <span className="hero__code-caret" />
-            <span className="hero__code-string">'</span>)
-          </span>
-        </p>
-
-        <div className="hero-actions">
-          {/* Once Axihex has products to show, they lead: "See our products", then the work.
-              Until then: the work, then a way to start a project. */}
-          {hasProducts ? (
-            <>
-              <Link to="/#products" className="button">
-                See our products <span aria-hidden="true">→</span>
-              </Link>
-              <Link to="/#projects" className="button button-outline">
-                Explore our work
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link to="/#projects" className="button">
-                Explore our work <span aria-hidden="true">→</span>
-              </Link>
-              {/* Axihex welcomes client projects, so the second way in is the Contact form, with "project"
-                  already chosen (like the honeycomb's "Your idea" cell). An outline button, so the offer
-                  shows without making the studio look like a freelance agency. The Studio page is in the
-                  navbar and the Studio section starts right below the hero. */}
-              <Link to="/#contact" state={{ topic: 'project' }} className="button button-outline">
-                Start a project
-              </Link>
-            </>
-          )}
-        </div>
-
-        {/* Proof the work is real: where it has shipped. */}
-        <div className="hero__proof">
-          <span className="hero__proof-label">Our work is live on</span>
-          <ul>
-            {proof.map((item) => (
-              <li key={item.label}>
-                <Icon name={item.icon} size={15} /> {item.label}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <p className="engine-hero__lede">{profile.intro}</p>
       </div>
 
-      <HeroMark />
+      <div className="engine-hero__stage">
+        <AxihexEngine />
+      </div>
+
+      <div className="engine-hero__after">
+        <div className="hero-actions engine-hero__actions">
+          {/* Once Axihex has products to show, they lead. Then the work, and building together. */}
+          {hasProducts ? (
+            <Link to="/#products" className="button">
+              See our products <span aria-hidden="true">→</span>
+            </Link>
+          ) : (
+            <Link to="/#projects" className="button">
+              Explore our work <span aria-hidden="true">→</span>
+            </Link>
+          )}
+          <Link to="/#contact" state={{ topic: 'project' }} className="button button-outline">
+            Build with us
+          </Link>
+        </div>
+
+        {/* Down to the five pillars, right below. */}
+        <Link to="/#studio" className="engine-hero__discover">
+          Discover the studio
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </Link>
+      </div>
     </section>
   )
 }

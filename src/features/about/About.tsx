@@ -1,49 +1,30 @@
-// The Studio section, right under the hero: what Axihex does, kept short.
-// 1. The intro: the label, the title, one paragraph, and a link to the full Studio page (/studio).
-// 2. The five pillars (PillarHive.tsx): a honeycomb around the Axihex mark; each pillar explains itself.
-// 3. The core engineering capabilities: what gets built.
-// 4. One quiet line about who is behind it, linking to the founder's page.
-// Everything else (process, pillars in brief, where products live, philosophy) lives on the Studio page.
+// The five pillars, the heart of Axihex: right under the hero, big and centered. The hero's engine
+// turns into five nodes as it scrolls away, and here the honeycomb (PillarHive.tsx) opens out of
+// its own center, so it reads as looking inside Axihex. One short line (the Studio page's opening),
+// then the honeycomb speaks for itself: each pillar leads to where it lives on the site.
 // Text: src/data/studio.ts and src/data/identity.ts.
 
 import { Link } from 'react-router'
-import GradientText from '../../components/GradientText.tsx'
-import { asset } from '../../utils/asset.ts'
 import { studio } from '../../data/studio.ts'
+import { studioLead } from '../../data/identity.ts'
 import PillarHive from './PillarHive.tsx'
-import Capabilities from '../studio/Capabilities.tsx'
 
 function About() {
   return (
-    <section id="studio" className="section studio">
-      <div className="studio__intro">
+    <section id="studio" className="section pillars-stage" aria-labelledby="pillars-title">
+      <header className="pillars-stage__head">
         <p className="eyebrow">{studio.eyebrow}</p>
-        <h2 className="studio__title">
-          {studio.title} <GradientText text={studio.titleAccent} />
-        </h2>
-        <p className="studio__text">{studio.text}</p>
-        <Link to="/studio" className="forward-link studio__more">
-          Identity, purpose &amp; vision <span aria-hidden="true">→</span>
-        </Link>
-      </div>
-
-      <div className="studio__block">
-        <h3 className="studio__subtitle">
+        <h2 id="pillars-title" className="pillars-stage__title">
           {studio.pillarsTitle} <span className="studio__subtitle-muted">{studio.pillarsAccent}</span>
-        </h3>
-        <PillarHive />
-      </div>
+        </h2>
+        <p className="pillars-stage__lede">{studioLead}</p>
+      </header>
 
-      <Capabilities />
+      <PillarHive />
 
-      {/* Who is behind it: one small line, so the section stays about Axihex. */}
-      <p className="studio__founder">
-        {studio.founderNote}{' '}
-        <Link to="/background" className="founder-line">
-          <img src={asset('/avatar.webp')} alt="" width={28} height={28} loading="lazy" />
-          <span className="founder-line__more">{studio.founderLink} →</span>
-        </Link>
-      </p>
+      <Link to="/studio" className="forward-link pillars-stage__more">
+        Identity, purpose &amp; vision <span aria-hidden="true">→</span>
+      </Link>
     </section>
   )
 }

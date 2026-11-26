@@ -9,12 +9,11 @@ export const profile = {
   // The small label above the hero's headline: what Axihex is.
   role: 'Independent software studio',
   // The hero's headline. The words in "headlineAccent" are shown in the accent gradient. What Axihex
-  // does, products first; the app drawn next to it (interface, backend, infrastructure) is the "how".
+  // does, products first; the Axihex engine under it (ideas in, products out) is the "how".
   headline: 'We build',
   headlineAccent: 'what’s next.',
-  // One or two sentences under the headline: what Axihex does, concretely.
-  // Opportunity first, our own products before client work (like the Studio page).
-  intro: 'We spot opportunities early and ship the products around them, across web, mobile, AI and cloud.',
+  // One short line under the headline: our own products first, then client work.
+  intro: 'Our own products. Software for ambitious ideas.',
   // The founder line at the bottom of the hero.
   founderTitle: 'Software Engineer',
   location: 'Beirut, Lebanon',

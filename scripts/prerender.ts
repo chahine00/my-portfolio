@@ -11,7 +11,7 @@
 
 import { profile } from '../src/data/profile.ts'
 import { studio } from '../src/data/studio.ts'
-import { capabilities, channels, offerings, philosophy, pillars, studioLead, thinking } from '../src/data/identity.ts'
+import { capabilities, capabilitiesPrinciple, channels, offerings, philosophy, pillars, studioLead, thinking } from '../src/data/identity.ts'
 import { coreStack, mindset, testimonials } from '../src/data/founder.ts'
 import { projects, selectedProjects, type Project } from '../src/data/projects.ts'
 import { publishedProducts, statusLabel, type Product } from '../src/data/products.ts'
@@ -70,14 +70,14 @@ export function homeBody(posts: Update[]) {
           list(publishedProducts.map((p) => `${link(`/products/${p.slug}`, p.name)} (${esc(statusLabel[p.status])}) ${esc(p.tagline)}`)) +
           '</section>'
         : '') +
-      `<section id="studio">${el('h2', `${studio.title} ${studio.titleAccent}`)}${el('p', studio.text)}` +
-      `<p>${link('/studio', 'Identity, purpose & vision')}</p>` +
-      el('h3', `${studio.pillarsTitle} ${studio.pillarsAccent}`) +
+      `<section id="studio">${el('h2', `${studio.pillarsTitle} ${studio.pillarsAccent}`)}${el('p', studioLead)}` +
       list(pillars.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.statement)}`)) +
-      el('h3', 'Core engineering capabilities') +
+      `<p>${link('/studio', 'Identity, purpose & vision')}</p></section>` +
+      `<section id="build">${el('h2', `${capabilitiesPrinciple.title} ${capabilitiesPrinciple.accent}`)}` +
       list(capabilities.map((c) => `<strong>${esc(c.title)}</strong>: ${esc(c.text)}`)) +
+      '</section>' +
+      `<section id="projects">${el('h2', 'Selected work')}${work}` +
       `<p>${esc(studio.founderNote)} ${link('/background', studio.founderLink)}</p></section>` +
-      `<section id="projects">${el('h2', 'Selected work')}${work}</section>` +
       `<section id="blog">${el('h2', 'Blog: latest notes')}` +
       list(posts.slice(0, 3).map((post) => `${link(`/blog/${post.slug}`, post.title)} ${esc(post.summary)}`)) +
       `<p>${link('/blog', 'All posts')}</p></section>` +

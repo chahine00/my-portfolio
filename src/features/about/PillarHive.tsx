@@ -9,6 +9,8 @@
 // Share → Grow → Your idea → Explore again), so the pillars read as a life cycle. With it, a line of
 // light runs around the center, in the gap between it and the cells, passing each one as it lights.
 // At rest the cells float in a slow wave. Visitors who turn off animations get it still.
+// The first time it comes on screen, the cells open out of the center one after another (the hero's
+// engine has just turned into five nodes around the hexagon, so it reads as one movement).
 // Text: src/data/identity.ts. Looks: global.css, under "pillar hive".
 
 import { useEffect, useId, useRef, useState } from 'react'
@@ -31,8 +33,15 @@ const spots = [
   { x: -PITCH / 2, y: ROW },
   { x: -PITCH, y: 0 },
 ]
+// "--to-cx"/"--to-cy": the way back to the center, where the cells start when they open out.
 const place = (spot: { x: number; y: number }, i: number) =>
-  ({ left: `calc(50cqw + ${spot.x}cqw)`, top: `calc(46cqw + ${spot.y}cqw)`, '--i': i }) as CSSProperties
+  ({
+    left: `calc(50cqw + ${spot.x}cqw)`,
+    top: `calc(46cqw + ${spot.y}cqw)`,
+    '--i': i,
+    '--to-cx': `${-spot.x}cqw`,
+    '--to-cy': `${-spot.y}cqw`,
+  }) as CSSProperties
 
 // The orbit: the ring in the gap around the center cell (halfway to its neighbors), as a hexagon
 // in the hive's units (1 = 1cqw, center at 50, 46). It starts at Explore's side and goes clockwise,
@@ -84,6 +93,8 @@ function PillarHive() {
   const [auto, setAuto] = useState(true)
   const [reduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const [onScreen, setOnScreen] = useState(false)
+  // Set the first time the hive is on screen: the cells open out of the center (global.css).
+  const [opened, setOpened] = useState(false)
   const hiveRef = useRef<HTMLDivElement>(null)
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
   const hoverTimer = useRef<number | undefined>(undefined)
@@ -94,7 +105,13 @@ function PillarHive() {
   useEffect(() => {
     const hive = hiveRef.current
     if (!hive) return
-    const observer = new IntersectionObserver(([entry]) => setOnScreen(entry.isIntersecting), { threshold: 0.35 })
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setOnScreen(entry.isIntersecting)
+        if (entry.isIntersecting) setOpened(true)
+      },
+      { threshold: 0.35 },
+    )
     observer.observe(hive)
     return () => observer.disconnect()
   }, [])
@@ -131,7 +148,7 @@ function PillarHive() {
 
   return (
     <div className="hive-layout">
-      <div className="hive" ref={hiveRef}>
+      <div className={opened ? 'hive hive--opened' : 'hive'} ref={hiveRef}>
         {/* The orbit: a faint track around the center, and the line of light running along it.
             Under the cells, so it only shows in the gaps. */}
         <svg className="hive__orbit" viewBox="0 0 100 92" aria-hidden="true">

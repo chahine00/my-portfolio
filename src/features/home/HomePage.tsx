@@ -5,6 +5,7 @@ import { useLocation, useNavigate, useNavigationType } from 'react-router'
 import HomeHero from './HomeHero.tsx'
 import Products from '../products/Products.tsx'
 import About from '../about/About.tsx'
+import BuildSection from '../studio/BuildSection.tsx'
 import Projects from '../projects/Projects.tsx'
 import Updates from '../updates/Updates.tsx'
 import Contact from '../contact/Contact.tsx'
@@ -93,14 +94,17 @@ function HomePage() {
 
   return (
     <>
+      {/* Hero (the Axihex engine) → the five pillars, the heart of Axihex: the engine turns into them
+          as the hero scrolls away → our products → what we build → work → blog → contact. Each
+          pillar leads to its place below (or to the Studio page / blog). The founder's background has
+          its own page (/background), linked under the work; the full identity has its own page too
+          (/studio, "Studio" in the navbar). */}
       <HomeHero />
-      {/* Axihex's own products, the main highlight: right under the hero. Not shown at all until
+      <About />
+      {/* Axihex's own products, the main highlight once there are some. Not shown at all until
           there's a published product (src/data/products.ts). */}
       <Products />
-      {/* Studio-first: Hero → Studio (pillars, traits, capabilities, process, Behind Axihex) → Work →
-          Blog → Contact. The founder's background has its own page (/background), linked from
-          "Meet the founder"; the full identity has its own page too (/studio, "Studio" in the navbar). */}
-      <About />
+      <BuildSection />
       <Projects />
       {/* The blog sits just before Contact: the latest news, then a way to get in touch. */}
       <Updates />
