@@ -10876,3 +10876,35 @@ a {
     visibility: visible;
   }
 }
+
+/* --- The engine leads the opening: the headline steps back to a modest line above it (still the
+   page's h1), and the room it gave up goes to the drawing. */
+.engine-hero h1 {
+  margin-top: 8px;
+  font-size: clamp(1.5rem, 2.6vw, 2.4rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.engine-hero__label {
+  font-size: 0.72rem;
+}
+
+.engine-hero__stage {
+  margin-top: clamp(0.25rem, 1vw, 0.75rem);
+}
+
+.engine-wrap {
+  max-width: clamp(640px, (100svh - 330px) * 1.613, 1240px);
+}
+
+@media (max-width: 720px) {
+  .engine-hero h1 {
+    font-size: clamp(1.45rem, 6.4vw, 1.75rem);
+  }
+
+  .engine-wrap {
+    max-width: none;
+  }
+}
