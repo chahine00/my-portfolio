@@ -1,32 +1,39 @@
-// Axihex's identity and purpose: the text behind the Studio section (About.tsx, PillarHive.tsx) and
-// the full Studio page (/studio, StudioPage.tsx).
-// Condensed from "Axihex — Identity, Purpose & Vision". Plain data: the build also reads it
-// (scripts/prerender.ts), so search engines see the same words.
+// Axihex's identity, as the website shows it today (this file is the source, not any older document):
+// - the home page's Studio section: the five pillars (PillarHive.tsx) and the capabilities
+// - the Studio page (/studio, StudioPage.tsx): the opening, the three offerings, "How we think about
+//   our products" (three lenses), "What we build" (capabilities + where products live), the
+//   philosophy and the closing invitation
+// - the Contact form's topics
+// The home page's Studio paragraph and title live in src/data/studio.ts.
+// Plain data: the build also reads it (scripts/prerender.ts), so search engines see the same words.
 //
-// Keep it honest: what Axihex IS today goes in "today"; ambitions go in "next", never presented as fact.
+// The identity in one line: Axihex spots opportunities and builds its own products around them
+// first (opportunity → product thinking → engineering), and also takes on projects for clients and
+// founders. Keep it honest: nothing presented as launched or bigger than it is.
 
 import type { IconName } from '../components/iconNames.ts'
 
-// The Studio page's opening (under "Smart about what to build. Precise about how."): what Axihex does,
-// opportunity first. Our own products lead; client work is welcome alongside them.
+// The Studio page's opening (under "Smart about what to build. Precise about how."): the five pillars
+// as one story (explore, build, showcase, share, grow). Our own products lead; clients follow.
 // Writing rule for this page: plain words a visitor uses, no slogans ("transforming ideas",
 // "cutting-edge", "solutions"), and nothing presented as launched before it is.
 export const studioLead =
   'We explore ideas fast and build the ones worth building. The work we ship is our proof, what we learn we share, and every product helps the studio grow. We’re independent, so our own products come first, and clients and founders get the same approach.'
 
-// What we do: the three things you'll find from Axihex. Our own products first.
+// The three things you'll find from Axihex (cards under the Studio page's opening). Our own products first.
 export const offerings: { title: string; text: string; icon: IconName }[] = [
   { title: 'Our own products', text: 'Apps, online tools, games and services we build, launch and keep improving.', icon: 'box' },
   { title: 'Software for clients', text: 'Web, mobile, backend, AI and cloud, built with you from plan to launch.', icon: 'briefcase' },
   { title: 'What we learn, shared', text: 'Notes, experiments and lessons from every build, on the blog.', icon: 'book' },
 ]
 
-// The Axihex philosophy: the three lenses in one line (opportunity: see them early; product thinking:
-// think them through; engineering: build them to last).
+// The Axihex philosophy, at the end of the Studio page: the three lenses in one line (opportunity:
+// see them early; product thinking: think them through; engineering: build them to last).
 export const philosophy =
   'Opportunities don’t wait for anyone. So we see them early, think them through, and build them to last.'
 
-// The five pillars, in order around the hexagon (clockwise from the top).
+// The five pillars: the home page's honeycomb, in order around the hexagon (clockwise from the top),
+// with "Your idea" closing the cycle. Each one's panel shows its statement, text, examples and link.
 // "link": where that pillar lives on this site. Each pillar has its own place, so the five don't
 // blur together (Showcase → the work, Share → the blog). "state" goes with the link: { topic } picks
 // the Contact form's topic for the visitor.
@@ -87,7 +94,8 @@ export const pillars: Pillar[] = [
   },
 ]
 
-// The five core engineering capabilities: the focus. Products may vary; this doesn't.
+// The five core engineering capabilities (home page's Studio section and the Studio page's "What we
+// build"): the focus. Products may vary; this doesn't.
 export const capabilities: { title: string; text: string; icon: IconName }[] = [
   { title: 'Web', text: 'Web apps, dashboards & interactive platforms', icon: 'globe' },
   { title: 'Mobile', text: 'Cross-platform apps for iOS & Android', icon: 'smartphone' },
@@ -98,8 +106,8 @@ export const capabilities: { title: string; text: string; icon: IconName }[] = [
 
 export const capabilitiesPrinciple = { title: 'Focused in engineering.', accent: 'Flexible in what we build.' }
 
-// How we think: three lenses, each a short line and the questions it asks. Opportunity is for our own
-// products; product thinking and engineering are for every build, ours or a founder's.
+// "How we think about our products" (Studio page): three lenses, each a short line and the questions
+// it asks, then the principle and the note "For your idea:" (the same thinking for clients).
 export const thinking: {
   lenses: { title: string; line: string; icon: IconName; questions: string[] }[]
   principle: string
@@ -131,23 +139,12 @@ export const thinking: {
     'We think it through with you before writing any code: who it’s for, which features matter first, and a clear plan from first version to launch.',
 }
 
-// Where Axihex products live. Not everything carries the Axihex name.
+// "With our name, or its own." (Studio page): where Axihex products live.
 export const channels: { title: string; text: string; icon: IconName }[] = [
   { title: 'axihex.com', text: 'Small online tools and experiments you can use right away.', icon: 'globe' },
   { title: 'Their own websites', text: 'Bigger apps and services, with their own name.', icon: 'external' },
   { title: 'App Store & Google Play', text: 'Mobile apps and games.', icon: 'smartphone' },
   { title: 'GitHub', text: 'Open-source code and resources.', icon: 'github' },
-]
-
-// Today, and where it's heading. "home": also shown in the home page's Direction section.
-export const horizon: { aspect: string; today: string; next: string; home?: boolean }[] = [
-  { aspect: 'Brand', today: 'Emerging software studio', next: 'Established technology brand', home: true },
-  { aspect: 'Products', today: 'Ideas in development', next: 'Published, maintained products', home: true },
-  { aspect: 'Client work', today: 'Open to independent projects', next: 'Lasting client relationships', home: true },
-  { aspect: 'Engineering', today: 'Founder-led expertise', next: 'Expanded capabilities' },
-  { aspect: 'Knowledge', today: 'Technical insights & articles', next: 'Wider community contributions', home: true },
-  { aspect: 'Collaboration', today: 'Professional relationships', next: 'Partnerships & a team', home: true },
-  { aspect: 'Distribution', today: 'axihex.com', next: 'Product sites & app stores' },
 ]
 
 // Why people write: the Contact section's choices. Each adds a short tag to the message, so the

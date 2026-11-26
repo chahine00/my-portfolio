@@ -19,14 +19,15 @@ export const SITE_URL = profile.site // 'https://axihex.com', no slash at the en
 export const SITE_TITLE = `${profile.brand} | Web, mobile & AI app studio in Beirut`
 
 export const HOME_DESCRIPTION =
-  `${profile.brand} is an independent software studio in Beirut. It spots opportunities, builds its own ` +
-  'apps and tools around them, and builds software for clients.'
+  `${profile.brand} is an independent software studio in Beirut. It spots opportunities and builds its own ` +
+  'web, mobile and AI products, and takes on client projects.'
 
-// The Studio page (/studio): what Axihex does, opportunity first, and how it builds.
-export const STUDIO_TITLE = 'The studio: from idea to product'
+// The Studio page (/studio): who Axihex is, how it thinks (opportunity, product thinking,
+// engineering) and what it builds.
+export const STUDIO_TITLE = 'The studio: how we think and build'
 export const STUDIO_DESCRIPTION =
-  `${profile.brand} spots opportunities and builds products around them: apps, online tools, ` +
-  'games and services, plus software for clients.'
+  `How ${profile.brand} works: opportunity, product thinking and engineering, for its own web, mobile ` +
+  'and AI products first, and for client projects.'
 
 // Who the founder is: used for the person in the structured data (scripts/seo-plugin.ts).
 export const FOUNDER_DESCRIPTION =
