@@ -151,14 +151,13 @@ export const channels: { title: string; text: string; icon: IconName }[] = [
 // email says what it's about. "role" is for recruiters: Axihex being independent doesn't mean the
 // founder isn't open to employment.
 // App topics come first: Axihex builds, owns and maintains its own apps, so people using them are
-// the first ones this form is for. Then the project and collaboration topics.
-export type Topic = 'app-issue' | 'app-support' | 'advice' | 'project' | 'collab' | 'role' | 'hello'
+// the first ones this form is for. Then the project and collaboration topics. Kept to a few short
+// labels, so the choices fit on one line. No topic chosen means a general message.
+export type Topic = 'app' | 'feedback' | 'project' | 'collab' | 'role'
 export const topics: { id: Topic; label: string; tag: string; placeholder: string }[] = [
-  { id: 'app-issue', label: 'Report an app issue', tag: 'App issue', placeholder: 'Which app, what happened, and on which device? Steps to reproduce it help a lot.' },
-  { id: 'app-support', label: 'Technical support / app fix', tag: 'Technical support', placeholder: 'Which app, and what do you need help with or fixed?' },
-  { id: 'advice', label: 'Advice or consultation', tag: 'Advice / consultation', placeholder: 'What are you working on, and where would a second opinion help?' },
-  { id: 'project', label: 'Start a project', tag: 'Project inquiry', placeholder: 'What would you like to build? A few lines on the idea, the users, and the timeline help.' },
-  { id: 'collab', label: 'A collaboration', tag: 'Collaboration', placeholder: 'Tell me about the partnership or idea you have in mind.' },
-  { id: 'role', label: 'A role for the founder', tag: 'Engineering opportunity', placeholder: 'Tell me about the role and the team.' },
-  { id: 'hello', label: 'Just saying hi', tag: 'Hello', placeholder: 'Your message' },
+  { id: 'app', label: 'App support', tag: 'App support', placeholder: 'Which app, what happened (or what needs fixing), and on which device?' },
+  { id: 'feedback', label: 'Feedback', tag: 'Feedback', placeholder: 'An idea, a suggestion, or something you liked or didn’t in one of our apps.' },
+  { id: 'project', label: 'New project', tag: 'Project inquiry', placeholder: 'What would you like to build? A few lines on the idea, the users, and the timeline help.' },
+  { id: 'collab', label: 'Collaboration', tag: 'Collaboration', placeholder: 'Tell me about the partnership or idea you have in mind.' },
+  { id: 'role', label: 'A role', tag: 'Engineering opportunity', placeholder: 'Tell me about the role and the team.' },
 ]

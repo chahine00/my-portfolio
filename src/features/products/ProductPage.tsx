@@ -83,7 +83,7 @@ function ProductPage() {
             </a>
           ) : (
             // Not out yet: a way to hear about it or to talk about it.
-            <Link to="/#contact" state={{ topic: 'hello' }} className="button">
+            <Link to="/#contact" className="button">
               Ask about it
             </Link>
           )}

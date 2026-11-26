@@ -158,7 +158,7 @@ function Contact() {
       {/* Axihex builds and maintains its own apps first, and also welcomes projects and collaborations:
           the intro names both, in that order, like the form's topic choices (src/data/identity.ts). */}
       <p className="contact-intro">
-        Using one of our apps and need help, or want advice? Have a project or a collaboration in mind? Reach out by
+        Using one of our apps and need help, or have feedback? Have a project or a collaboration in mind? Reach out by
         email, on LinkedIn, or with the form.
       </p>
 
