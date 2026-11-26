@@ -158,8 +158,8 @@ function Contact() {
       {/* Axihex welcomes client projects and collaborations, and the founder is open to roles:
           the intro names all three, the form's topic choices (src/data/identity.ts) too. */}
       <p className="contact-intro">
-        Spotted an opportunity, have a project in mind, or want to work together? Reach out by email, on LinkedIn, or
-        with the form.
+        A project in mind, an idea to build together, or a collaboration. Reach out by email, on LinkedIn, or with the
+        form.
       </p>
 
       {/* Two boxes side by side on wide screens, level at the top and the bottom: the ways to reach

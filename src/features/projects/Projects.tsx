@@ -20,7 +20,6 @@ function Projects() {
             Selected <em>work.</em>
           </h2>
         </div>
-        <p>Real work, attributed honestly: studio projects, client work, and the founder's experience.</p>
       </header>
       <div className="work-grid" ref={gridRef}>
         {selectedProjects.map((project, index) => (

@@ -88,13 +88,14 @@ const founderTip = (section: string, text: string, spot: Partial<GuideTip> = {})
 })
 
 export const founderGuideTips: GuideTip[] = [
-  // Right under the hero, so on screen as the page opens: it waits until you scroll. It stands in
-  // the empty space on the left of the "how I work" cards, its bubble above it.
+  // Right under the hero, so on screen as the page opens: it waits until you scroll. It stands
+  // beside the "Think bigger. Adapt faster." title, its bubble above it. (No room there on a phone:
+  // it uses the nearest free spot instead.)
   founderTip('mindset', 'This is how I think about building software.', {
     afterScroll: true,
-    anchor: '.mindset__item',
+    anchor: '.mindset__title',
     index: 0,
-    edge: 'beside-left',
+    edge: 'beside',
     bubble: 'above',
   }),
   founderTip('experience', 'I was lucky to explore different roles across the industry.'),

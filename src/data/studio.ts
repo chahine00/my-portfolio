@@ -21,6 +21,6 @@ export const studio = {
   pillarsTitle: 'Five pillars.',
   pillarsAccent: 'One studio.',
   // The one line about who is behind it, with a quiet link to the founder's page (/background).
-  founderNote: 'Born from a passion for creating digital things.',
+  founderNote: 'Born from a passion for computers.',
   founderLink: 'Meet the founder',
 }

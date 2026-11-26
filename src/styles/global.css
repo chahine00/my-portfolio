@@ -1608,6 +1608,10 @@ main {
 }
 
 .mindset__title {
+  /* As wide as its words, plus some room on the right: the guide stands "beside" it (guide.ts),
+     a little apart from the words. */
+  width: fit-content;
+  padding-right: 32px;
   max-width: 26ch;
   margin: 8px 0 28px;
   letter-spacing: -0.02em;
