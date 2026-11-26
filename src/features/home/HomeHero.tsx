@@ -1,6 +1,6 @@
-// The home page's hero, centered: what Axihex is, the headline, one short line, then the Axihex
-// engine (AxihexEngine.tsx: what goes in, the hexagon, what comes out), the two ways in, and a
-// nudge down to the studio. As it scrolls away, the engine turns into the five pillars, which the
+// The home page's hero, centered: what Axihex is, the headline, one short line and the two ways in,
+// then the Axihex engine (AxihexEngine.tsx: what goes in, the hexagon, what comes out) and a nudge
+// down to the studio. As it scrolls away, the engine turns into the five pillars, which the
 // next section (About.tsx) takes over. Text: src/data/profile.ts.
 
 import { useEffect, useRef, type CSSProperties } from 'react'
@@ -50,13 +50,9 @@ function HomeHero() {
           {profile.headline} <GradientText text={profile.headlineAccent} />
         </h1>
         <p className="engine-hero__lede">{profile.intro}</p>
-      </div>
 
-      <div className="engine-hero__stage">
-        <AxihexEngine />
-      </div>
-
-      <div className="engine-hero__after">
+        {/* The two ways in, on the first screen (under the headline, not under the engine, where the
+            scroll's turn into the pillars would fade them as you reach them). */}
         <div className="hero-actions engine-hero__actions">
           {/* Once Axihex has products to show, they lead. Then the work, and building together. */}
           {hasProducts ? (
@@ -72,7 +68,13 @@ function HomeHero() {
             Build with us
           </Link>
         </div>
+      </div>
 
+      <div className="engine-hero__stage">
+        <AxihexEngine />
+      </div>
+
+      <div className="engine-hero__after">
         {/* Down to the five pillars, right below. */}
         <Link to="/#studio" className="engine-hero__discover">
           Discover the studio
