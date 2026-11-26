@@ -7,11 +7,13 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import { Link, useLocation } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { hasRecentUpdate } from '../data/updates.ts'
 import { profile } from '../data/profile.ts'
 import ThemeToggle from './ThemeToggle.tsx'
 import { goToTop } from '../utils/goToTop.ts'
+import { hasSavedScroll, lastInSection } from '../utils/pageHistory.ts'
+import { readListSpot } from '../features/updates/listSpot.ts'
 import Icon from './Icon.tsx'
 import AxihexMark from './AxihexMark.tsx'
 import { hasProducts } from '../features/products/shownProducts.ts'
@@ -48,8 +50,31 @@ const links: NavItem[] = [
   { to: '/#contact', label: 'Contact', icon: 'chat' },
 ]
 
+// Where a link takes you back to: the page you last saw in its section, at the spot you left it
+// (App.tsx restores it). null: the link's usual address. Read at click time, so it's never stale.
+// Tapping the link of the section you're in goes to that section's start (its list, or the top).
+function resumeTarget(link: NavItem, pathname: string): string | null {
+  if (link.to === '/#home') return pathname !== '/' && hasSavedScroll('/') ? '/' : null
+  if (link.to === '/studio' || link.to === '/background') return pathname !== link.to ? link.to : null
+  if (link.to === '/blog') {
+    // On a post: back to the list, as you left it (search, category, scroll).
+    if (pathname.startsWith('/blog/')) return `/blog${readListSpot()?.search ?? ''}`
+    if (pathname === '/blog') return null
+    return lastInSection('blog') ?? '/blog'
+  }
+  // Work and Products: their lists live on the home page; a project (or product) you were viewing
+  // and haven't closed yet is where the link takes you back to.
+  const section = link.to === '/#projects' ? 'work' : link.to === '/#products' ? 'products' : null
+  if (section) {
+    const last = lastInSection(section)
+    return last && last !== pathname ? last : null
+  }
+  return null
+}
+
 function Navbar() {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   // Which home section is on screen right now, e.g. 'skills'. Used to light up its link.
   const [activeSection, setActiveSection] = useState('')
   // True once the page is scrolled a little: the navbar then gets a soft shadow.
@@ -111,12 +136,22 @@ function Navbar() {
             className={isActive(link) ? 'active' : undefined}
             // Home works like the back-to-top button: a smooth trip up, then the welcome plays.
             // From another page, the home page opens at the top and plays it (see HomePage.tsx).
-            state={link.to === '/#home' ? { replayWelcome: true } : undefined}
+            // fromNav: see pageHistory.ts (leaving a project through the navbar keeps Work on it).
+            state={link.to === '/#home' ? { replayWelcome: true, fromNav: true } : { fromNav: true }}
             onClick={(event) => {
-              // Home on the home page, or Studio / Founder on their own page: a smooth trip to the top.
+              // Home on the home page, or Studio / Founder / Blog on their own page: a smooth trip to the top.
               if ((link.to === '/#home' && onHome) || (!link.to.startsWith('/#') && pathname === link.to)) {
                 event.preventDefault()
                 goToTop()
+                return
+              }
+              // Ctrl/⌘-click or a middle click (new tab): leave it to the browser.
+              if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
+              // Back to where you left this section (its last page, at the same spot).
+              const target = resumeTarget(link, pathname)
+              if (target) {
+                event.preventDefault()
+                navigate(target, { state: { resume: true, fromNav: true } })
               }
             }}
           >

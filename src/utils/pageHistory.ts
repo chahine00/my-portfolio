@@ -24,6 +24,13 @@ interface Visit {
 const TRAIL_KEY = 'page-trail'
 const HOME_SECTION_KEY = 'home-section'
 const MAX = 40
+// How far down each history entry was (by its key), for the browser's back/forward buttons.
+const ENTRY_SCROLL_KEY = 'scroll-by-entry'
+// How far down each page (path + search) was the last time you left it, for the navbar.
+const PAGE_SCROLL_KEY = 'scroll-by-page'
+// The last page visited in each navbar section (e.g. the post you were reading), for the navbar.
+const SECTION_KEY = 'section-last'
+const MAX_SCROLLS = 80
 
 function read<T>(key: string, fallback: T): T {
   try {
@@ -39,6 +46,53 @@ function write(key: string, value: unknown) {
   } catch {
     // Storage blocked: back links use each page's default instead.
   }
+}
+
+// The current history entry's key and state, as React Router stores them in the browser's history.
+// "resume" (set by the navbar): open the page where you last left it. "fromNav": opened from the navbar.
+interface EntryState {
+  resume?: boolean
+  fromNav?: boolean
+}
+function historyEntry(): { key?: string; usr?: EntryState | null } {
+  return (window.history.state as { key?: string; usr?: EntryState | null } | null) ?? {}
+}
+
+// Keeps a { name: number } map from growing forever: the most recent entries are kept.
+function writeScrollMap(key: string, map: Record<string, number>) {
+  const entries = Object.entries(map)
+  write(key, Object.fromEntries(entries.slice(-MAX_SCROLLS)))
+}
+
+// Which navbar section a page belongs to. Each section remembers the last page you saw in it, so
+// its navbar link takes you back there (the post you were reading, the project you were viewing).
+export type NavSection = 'home' | 'studio' | 'work' | 'products' | 'founder' | 'blog'
+
+function sectionOf(path: string): NavSection | null {
+  if (path === '/') return 'home'
+  if (path === '/studio') return 'studio'
+  if (path === '/background') return 'founder'
+  if (path === '/blog' || path.startsWith('/blog/')) return 'blog'
+  if (path.startsWith('/projects/')) return 'work'
+  if (path.startsWith('/products/')) return 'products'
+  return null
+}
+
+// The last page (path + search) visited in a section, or null when there's none to go back to.
+export function lastInSection(section: NavSection): string | null {
+  return read<Partial<Record<NavSection, string>>>(SECTION_KEY, {})[section] ?? null
+}
+
+function setLastInSection(section: NavSection, page: string | null) {
+  const saved = read<Partial<Record<NavSection, string>>>(SECTION_KEY, {})
+  if (page === null) delete saved[section]
+  else saved[section] = page
+  write(SECTION_KEY, saved)
+}
+
+// Whether a page has a saved scroll position (the navbar then opens it right there).
+export function hasSavedScroll(page: string): boolean {
+  return read<Record<string, number>>(PAGE_SCROLL_KEY, {})[page] !== undefined
 }
 
 // Where "Back" just sent the visitor (its place in the trail), so recordVisit trims instead of adding.
@@ -70,8 +124,20 @@ function withVisit(saved: Visit[], path: string, search: string, popped: boolean
 export function recordVisit(path: string, search: string, popped: boolean): number | null {
   const saved = read<Visit[]>(TRAIL_KEY, [])
   const scroll = restoringTo(path, popped)
+  const left = saved[saved.length - 1]?.path
   write(TRAIL_KEY, withVisit(saved, path, search, popped))
   backTo = null
+  // Remember this page as its section's last one. The project (or product) pages' list lives on the
+  // home page: going straight back to it from a project (Back, "All projects", the back button)
+  // means you're done with that project, so the Work link goes to the list again. (Leaving through
+  // the navbar doesn't count: Work then still takes you back to the project.)
+  const section = sectionOf(path)
+  if (section) setLastInSection(section, path + search)
+  // Tapping Work (or Products) while on a project goes to its list (/#projects): that closes it too.
+  const hash = window.location.hash
+  const leftByNav = historyEntry().usr?.fromNav && !popped
+  if (path === '/' && left?.startsWith('/projects/') && (!leftByNav || hash === '#projects')) setLastInSection('work', null)
+  if (path === '/' && left?.startsWith('/products/') && (!leftByNav || hash === '#products')) setLastInSection('products', null)
   return scroll ?? null
 }
 
@@ -79,6 +145,17 @@ export function recordVisit(path: string, search: string, popped: boolean): numb
 // undefined. Pages call it when they open, to skip their own "where to open" scrolling in that case.
 // "popped": opened with the browser's back/forward buttons.
 export function restoringTo(path: string, popped: boolean): number | undefined {
+  const entry = historyEntry()
+  // The browser's back/forward buttons: the exact spot this history entry was left at.
+  if (popped && entry.key) {
+    const y = read<Record<string, number>>(ENTRY_SCROLL_KEY, {})[entry.key]
+    if (y !== undefined) return y
+  }
+  // Opened from the navbar: where you last left this page.
+  if (entry.usr?.resume) {
+    const y = read<Record<string, number>>(PAGE_SCROLL_KEY, {})[path + window.location.search]
+    if (y !== undefined) return y
+  }
   const trail = read<Visit[]>(TRAIL_KEY, [])
   if (backTo !== null && trail[backTo]?.path === path) return trail[backTo].scroll
   const before = trail[trail.length - 2]
@@ -96,8 +173,23 @@ export function rememberScroll() {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '')
   const path = window.location.pathname.slice(base.length) || '/'
   if (!last || last.path !== path) return
-  trail[trail.length - 1] = { ...last, scroll: Math.round(window.scrollY) }
+  const y = Math.round(window.scrollY)
+  trail[trail.length - 1] = { ...last, scroll: y }
   write(TRAIL_KEY, trail)
+  // Also by history entry (back/forward buttons) and by page (the navbar). Re-inserted, so the
+  // most recently used stay when the maps are trimmed.
+  const key = historyEntry().key
+  if (key) {
+    const byEntry = read<Record<string, number>>(ENTRY_SCROLL_KEY, {})
+    delete byEntry[key]
+    byEntry[key] = y
+    writeScrollMap(ENTRY_SCROLL_KEY, byEntry)
+  }
+  const page = path + window.location.search
+  const byPage = read<Record<string, number>>(PAGE_SCROLL_KEY, {})
+  delete byPage[page]
+  byPage[page] = y
+  writeScrollMap(PAGE_SCROLL_KEY, byPage)
 }
 
 // Brings the page back to a saved spot, and holds it there until it's settled: the page's own "open

@@ -2,7 +2,7 @@
 // its job is to put all the other components together in order.
 
 // To use a component from another file, import it first.
-import { lazy, Suspense, useEffect, useLayoutEffect } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react'
 import { Navigate, Route, Routes, useLocation, useNavigationType, useParams } from 'react-router'
 import { recordVisit, rememberHomeSection, rememberScroll, restoreScroll } from '../utils/pageHistory.ts'
 import Navbar from '../components/Navbar.tsx'
@@ -39,9 +39,16 @@ function App() {
   // Going back (a "Back" link or the browser's back button) returns to the exact spot you left.
   const navigationType = useNavigationType()
   // A layout effect: it runs before the page is painted, so going back never flashes the top first.
+  const shownPath = useRef(pathname)
   useLayoutEffect(() => {
     const y = recordVisit(pathname, search, navigationType === 'POP')
     if (y !== null) restoreScroll(y)
+    else if (shownPath.current !== pathname && !window.location.hash) {
+      // A new page opens at the top right away, even while its file is still downloading: otherwise
+      // the spot of the page you left would be saved as this page's own (see rememberScroll).
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    }
+    shownPath.current = pathname
     // navigationType only changes together with the address, so this runs once per page change.
   }, [pathname, search, navigationType])
   // Save how far down the page is: as you scroll (once per frame at most), and on any click, just

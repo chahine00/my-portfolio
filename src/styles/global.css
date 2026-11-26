@@ -6845,13 +6845,30 @@ a {
 }
 
 .footer__nav ul {
+  --footer-sep-space: 12px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 4px 22px;
+  /* No column gap: the "|" between links carries the same space on both of its sides. */
+  gap: 4px 0;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.footer__nav li {
+  display: flex;
+  align-items: center;
+}
+
+/* A vertical bar between links (not before the first). Decorative: screen readers skip it. */
+.footer__nav li + li::before {
+  content: '|';
+  content: '|' / '';
+  margin-inline: var(--footer-sep-space);
+  color: var(--text-body);
+  opacity: 0.45;
+  font-size: 0.86rem;
 }
 
 .footer__nav a {
@@ -6895,9 +6912,10 @@ a {
 
   /* Phones: the links wrap onto a second line when they don't fit (never past the screen's edge). */
   .footer__nav ul {
+    --footer-sep-space: 10px;
     flex-wrap: wrap;
     justify-content: flex-start;
-    gap: 2px 18px;
+    gap: 2px 0;
   }
 
   .footer__nav a {
@@ -8246,6 +8264,12 @@ a {
   justify-content: center;
 }
 
+/* "Start a project" and the second button share one size, whatever their labels. */
+.studio-cta__actions .button {
+  min-width: 13rem;
+  text-align: center;
+}
+
 .studio-cta .forward-link {
   color: var(--accent);
   font-weight: 600;
@@ -8593,13 +8617,6 @@ a {
   overflow: visible;
 }
 
-.layer-axis {
-  fill: none;
-  stroke: var(--fig-axis);
-  stroke-dasharray: 3 5;
-  animation: layer-axis-flow 0.9s linear infinite;
-}
-
 /* The dark theme: picked with the toggle, or the system's when nothing was picked. */
 :root[data-theme='dark'] .layer-figure {
   --fig-bg: #201e2d;
@@ -8683,6 +8700,106 @@ a {
     transform: scale(1.12, 1.2);
     opacity: 0.65;
   }
+}
+
+/* The flying saucer coming together (see HeroMark.tsx). Each plate flies in from its scattered
+   start (--from-x/y, a tilt and a size), fading in, and glides into its place in the saucer with a
+   long, soft ease-out: the belly first, then the rim, then the dome lands on top. The small
+   hexagons follow and settle along the rim as its lights, then the beam shines down.
+   Everything waits at its scattered start until the drawing is on screen (--assemble). */
+.plate-place {
+  animation: saucer-assemble 2.6s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: calc(0.15s + (2 - var(--i)) * 0.25s);
+}
+
+.rim-light-place {
+  animation: saucer-assemble 1.7s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: calc(1.4s + var(--k) * 0.1s);
+}
+
+@keyframes saucer-assemble {
+  0% {
+    transform: translate(var(--from-x), var(--from-y)) rotate(var(--from-turn)) scale(var(--from-scale, 2.2));
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* The rim's lights twinkle one after another once they've landed. */
+.rim-light {
+  fill: var(--plate-light);
+  stroke: none;
+  filter: drop-shadow(0 0 2.5px var(--plate-light));
+  animation: rim-light-blink 2.4s ease-in-out infinite;
+  animation-delay: calc(3.8s + var(--k) * 0.4s);
+}
+
+@keyframes rim-light-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* The beam under the saucer: fades in once it has come together, then breathes softly. */
+.saucer-beam {
+  pointer-events: none;
+  animation:
+    saucer-beam-in 1.1s ease-out 3.1s both,
+    saucer-beam-pulse 3.2s ease-in-out 4.2s infinite;
+}
+
+@keyframes saucer-beam-in {
+  from {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes saucer-beam-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.saucer-beam {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+/* The shadow on the ground grows as the saucer comes together above it. */
+.saucer-shadow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: saucer-shadow-in 2.6s cubic-bezier(0.33, 1, 0.68, 1) 0.3s both;
+}
+
+@keyframes saucer-shadow-in {
+  from {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+}
+
+.layer-drawing:not(.layer-drawing--assemble) :is(.plate-place, .rim-light-place, .rim-light, .saucer-beam, .saucer-shadow) {
+  animation-play-state: paused;
 }
 
 /* The wave: a quick ripple up the stack. Each plate bobs a moment after the one under it, and the
@@ -8816,12 +8933,6 @@ a {
   stroke: var(--plate-on-edge-stroke);
 }
 
-@keyframes layer-axis-flow {
-  to {
-    stroke-dashoffset: -16;
-  }
-}
-
 @keyframes layer-pulse {
   50% {
     opacity: 0.35;
@@ -8893,7 +9004,11 @@ a {
   .plate-float,
   .plate-light,
   .layer-shadow,
-  .layer-axis,
+  .plate-place,
+  .rim-light-place,
+  .rim-light,
+  .saucer-beam,
+  .saucer-shadow,
   .layer-figure figcaption::before {
     animation: none;
     transition: none;

@@ -155,11 +155,11 @@ function Contact() {
           (email, LinkedIn…); on a phone box it copies the number. A number that's on WhatsApp also gets a small
           "WhatsApp" button: only that button opens the chat. Links starting with https open in a new tab. */}
       <SectionTitle label="Contact" title="Let's" accent="talk." />
-      {/* Axihex welcomes client projects and collaborations, and the founder is open to roles:
-          the intro names all three, the form's topic choices (src/data/identity.ts) too. */}
+      {/* Axihex builds and maintains its own apps first, and also welcomes projects and collaborations:
+          the intro names both, in that order, like the form's topic choices (src/data/identity.ts). */}
       <p className="contact-intro">
-        A project in mind, an idea to build together, or a collaboration. Reach out by email, on LinkedIn, or with the
-        form.
+        Using one of our apps and need help, or want advice? Have a project or a collaboration in mind? Reach out by
+        email, on LinkedIn, or with the form.
       </p>
 
       {/* Two boxes side by side on wide screens, level at the top and the bottom: the ways to reach
