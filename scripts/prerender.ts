@@ -70,7 +70,7 @@ export function homeBody(posts: Update[]) {
           list(publishedProducts.map((p) => `${link(`/products/${p.slug}`, p.name)} (${esc(statusLabel[p.status])}) ${esc(p.tagline)}`)) +
           '</section>'
         : '') +
-      `<section id="studio">${el('h2', `${studio.pillarsTitle} ${studio.pillarsAccent}`)}${el('p', studioLead)}` +
+      `<section id="studio">${el('h2', `${studio.pillarsTitle} ${studio.pillarsAccent}`)}${el('p', studio.text)}` +
       list(pillars.map((p) => `<strong>${esc(p.word)}</strong>: ${esc(p.statement)}`)) +
       `<p>${link('/studio', 'Identity, purpose & vision')}</p></section>` +
       `<section id="build">${el('h2', `${capabilitiesPrinciple.title} ${capabilitiesPrinciple.accent}`)}` +

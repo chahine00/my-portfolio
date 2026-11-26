@@ -15,7 +15,7 @@
 //   button) brings you back to the top.
 // Colors follow the theme (light / dark): see "Home hero" in global.css.
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { BACK_AT_TOP_EVENT } from '../../utils/goToTop.ts'
 
 // "y": where the plate sits in the saucer; "sx"/"sy": its size there (Infrastructure the biggest,
@@ -114,13 +114,26 @@ const lightHex = smallHex(3.6)
 // The glyph on a plate turns with it: un-squash, turn, squash again.
 const glyphTurn = (turn: number) => `scale(1 ${SQUASH}) rotate(${turn}) scale(1 ${1 / SQUASH})`
 
-function HeroMark() {
+// layer / onLayer (optional): choosing a layer from outside (the capabilities beside it in
+// BuildSection.tsx), and hearing which one the visitor picked here.
+function HeroMark({ layer, onLayer }: { layer?: number; onLayer?: (index: number) => void } = {}) {
   const [selected, setSelected] = useState(0)
   // How far the selected plate has turned right now (0 to 360, in degrees).
   const [turn, setTurn] = useState(0)
   const frame = useRef(0)
 
   useEffect(() => () => cancelAnimationFrame(frame.current), [])
+
+  // A layer chosen from outside: select it here too (with its spin), unless it already is.
+  const selectedRef = useRef(selected)
+  const selectRef = useRef(select)
+  useLayoutEffect(() => {
+    selectedRef.current = selected
+    selectRef.current = select
+  })
+  useEffect(() => {
+    if (layer !== undefined && layer !== selectedRef.current) selectRef.current(layer)
+  }, [layer])
 
   // The saucer comes together once the drawing is on screen (not while it's scrolled away), and
   // again each time the visitor is brought back to the top (a new "assembly" key replays it).
@@ -147,6 +160,7 @@ function HeroMark() {
 
   function select(i: number) {
     setSelected(i)
+    onLayer?.(i)
     cancelAnimationFrame(frame.current)
     setTurn(0)
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return

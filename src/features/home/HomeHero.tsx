@@ -25,6 +25,8 @@ function HomeHero() {
       const box = hero.getBoundingClientRect()
       const p = Math.min(Math.max(-box.top / (box.height * 0.55), 0), 1)
       hero.style.setProperty('--p', p.toFixed(3))
+      // The pillar nodes are out: they can be clicked (before that they're hidden in the hexagon).
+      hero.classList.toggle('engine-hero--pillars', p > 0.65)
     }
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update)

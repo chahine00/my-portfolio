@@ -9,7 +9,16 @@ import { useReveal } from '../../utils/useReveal.ts'
 
 // hideTitle: the section gives it its own big title, so the small one is left out.
 // variant: "grid", tiles in a row; "list", numbered rows, one under the other.
-function Capabilities({ hideTitle = false, variant = 'grid' }: { hideTitle?: boolean; variant?: 'grid' | 'list' }) {
+// lit / onPick (list only): which rows are highlighted, and a row pointed at, focused or tapped
+// (BuildSection.tsx ties them to the app's layers beside the list).
+interface CapabilitiesProps {
+  hideTitle?: boolean
+  variant?: 'grid' | 'list'
+  lit?: (index: number) => boolean
+  onPick?: (index: number) => void
+}
+
+function Capabilities({ hideTitle = false, variant = 'grid', lit, onPick }: CapabilitiesProps) {
   const listRef = useReveal<HTMLUListElement>('.caps__item')
 
   return (
@@ -21,7 +30,16 @@ function Capabilities({ hideTitle = false, variant = 'grid' }: { hideTitle?: boo
       )}
       <ul className="caps__list" ref={listRef}>
         {capabilities.map((capability, i) => (
-          <li key={capability.title} className="caps__item">
+          <li
+            key={capability.title}
+            className={lit?.(i) ? 'caps__item caps__item--lit' : 'caps__item'}
+            {...(onPick && {
+              tabIndex: 0,
+              onPointerEnter: () => onPick(i),
+              onFocus: () => onPick(i),
+              onClick: () => onPick(i),
+            })}
+          >
             <span className="caps__icon" aria-hidden="true">
               <Icon name={capability.icon} size={20} />
             </span>

@@ -18,6 +18,7 @@ import type { CSSProperties, KeyboardEvent } from 'react'
 import { Link } from 'react-router'
 import { pillars } from '../../data/identity.ts'
 import AxihexMark from '../../components/AxihexMark.tsx'
+import { OPEN_PILLAR_EVENT } from './pillarEvents.ts'
 import Icon from '../../components/Icon.tsx'
 
 // The honeycomb, in % of the hive's width (cqw), around its center. PITCH: from one cell's center to
@@ -131,6 +132,17 @@ function PillarHive() {
   }
 
   useEffect(() => () => window.clearTimeout(hoverTimer.current), [])
+
+  // A pillar node clicked in the hero's engine (AxihexEngine.tsx): show that pillar.
+  useEffect(() => {
+    const open = (event: Event) => {
+      const index = (event as CustomEvent<number>).detail
+      setAuto(false)
+      setActive(index)
+    }
+    window.addEventListener(OPEN_PILLAR_EVENT, open)
+    return () => window.removeEventListener(OPEN_PILLAR_EVENT, open)
+  }, [])
 
   // Arrow keys move between the pillars (around the ring), like any set of tabs.
   function handleKey(event: KeyboardEvent<HTMLDivElement>) {
