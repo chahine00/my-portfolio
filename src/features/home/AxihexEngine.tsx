@@ -7,7 +7,8 @@
 //
 // Interactive:
 // - Hover (or tap, or focus) an input or an output: its line lights up, the light runs faster, and
-//   the readout under the drawing says what it means.
+//   the caption under the drawing says what it means (at rest, it's the studio's line: our own
+//   products, software for ambitious ideas).
 // - With a mouse, the hexagon and its rings lean a little toward the pointer.
 // - The hexagon is a way in: clicking it goes down to the five pillars.
 // - Once the pillar nodes are out (below), clicking one opens that pillar in the honeycomb.
@@ -59,7 +60,8 @@ const outputs: { label: string; icon: IconName; note: string }[] = [
   { label: 'Mobile apps', icon: 'smartphone', note: 'Apps for iOS and Android, live in both stores.' },
   { label: 'Intelligent tools', icon: 'bulb', note: 'AI features that do real work inside a product.' },
 ]
-const RESTING = 'Ideas, demand and problems go in. Products people use come out.'
+// At rest, the caption is the studio's line, in two parts: what comes out of the engine.
+const RESTING = ['Our own products.', 'Software for ambitious ideas.']
 const CORE_NOTE = 'Inside: five pillars that turn one into the other. Click to look inside.'
 
 const inPath = (y: number) => `M${IN_X} ${y} C${IN_X + 130} ${y}, ${CORE_LEFT - 110} ${CY}, ${CORE_LEFT} ${CY}`
@@ -92,8 +94,8 @@ function AxihexEngine() {
   const engineRef = useRef<HTMLDivElement>(null)
 
   const isHot = (side: 'in' | 'out', row: number) => hot !== null && hot !== 'core' && hot.side === side && hot.row === row
-  const readout =
-    hot === 'core' ? CORE_NOTE : hot ? `${(hot.side === 'in' ? inputs : outputs)[hot.row].label}: ${(hot.side === 'in' ? inputs : outputs)[hot.row].note}` : RESTING
+  const lit = hot && hot !== 'core' ? (hot.side === 'in' ? inputs : outputs)[hot.row] : null
+  const readout = hot === 'core' ? CORE_NOTE : lit ? `${lit.label}: ${lit.note}` : null
 
   // The lean toward the pointer: --mx / --my from -1 to 1 across the drawing (mouse only).
   function lean(event: PointerEvent<HTMLDivElement>) {
@@ -250,8 +252,14 @@ function AxihexEngine() {
       </div>
 
       {/* What the lit part means (or the whole idea, at rest). */}
-      <p id="engine-readout" className="engine__readout" aria-live="polite">
-        <span key={readout}>{readout}</span>
+      <p id="engine-readout" className={readout ? 'engine__readout' : 'engine__readout engine__readout--rest'} aria-live="polite">
+        {readout ? (
+          <span key={readout}>{readout}</span>
+        ) : (
+          <span key="rest" className="engine__tagline">
+            {RESTING[0]} <strong>{RESTING[1]}</strong>
+          </span>
+        )}
       </p>
     </div>
   )
