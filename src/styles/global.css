@@ -10484,3 +10484,56 @@ a {
     --hold-k: 0.97;
   }
 }
+
+/* What we build on phones: the capabilities as compact tiles (icon and name, two per row, the last
+   one full width) right under the drawing, so the drawing and all five fit on one screen and a tap
+   shows its layer spinning just above. The drawing's own caption says what the layer is. */
+.build__drawing {
+  min-width: 0;
+  scroll-margin-top: calc(var(--navbar-height, 64px) + 12px);
+}
+
+@media (max-width: 720px) {
+  .build__layout {
+    gap: 12px;
+  }
+
+  .caps--list .caps__list {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .caps--list .caps__item {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto;
+    column-gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .caps--list .caps__item:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .caps--list .caps__icon {
+    grid-row: auto;
+    width: 30px;
+    height: 30px;
+  }
+
+  .caps--list .caps__icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .caps--list .caps__item strong {
+    font-size: 0.92rem;
+    line-height: 1.2;
+  }
+
+  .caps--list .caps__item > span:nth-child(3),
+  .caps--list .caps__num {
+    display: none;
+  }
+}
