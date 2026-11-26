@@ -10573,3 +10573,54 @@ a {
 .engine-hero h1 .grad {
   white-space: nowrap;
 }
+
+/* --- The turn from the hero into the pillars, in clean steps, so no two texts ever show on top of
+   each other half-faded:
+   1. (--p 0 → 0.33) the inputs, outputs and their lines go; the readout goes first of all.
+   2. (--p 0 → 0.4) the text above and the buttons below go.
+   3. (--p 0.38 → 0.83) the pillar nodes come out from the hexagon's edge (not from inside it, where
+      they'd cross the AXIHEX name), their words showing only once they're almost in place. */
+.engine-hero__text,
+.engine-hero__after {
+  opacity: calc(1 - var(--p) * 2.5);
+}
+
+.engine__readout {
+  opacity: calc(1 - var(--p) * 3.5);
+}
+
+.engine__side,
+.engine__links {
+  opacity: calc(1 - var(--p) * 3);
+}
+
+.engine {
+  --e: clamp(0, (var(--p) - 0.38) * 2.2, 1);
+}
+
+.engine__node {
+  transform: translate(calc((1 - var(--ek)) * var(--to-cx) * 0.35), calc((1 - var(--ek)) * var(--to-cy) * 0.35))
+    scale(calc(0.6 + var(--ek) * 0.4));
+}
+
+.engine__node-word {
+  opacity: clamp(0, (var(--ek) - 0.6) * 2.5, 1);
+}
+
+/* Gone for good once the pillars are out: nothing faded can be clicked or selected. */
+.engine-hero--pillars .engine-hero__after,
+.engine-hero--pillars .engine__readout,
+.engine-hero--pillars .engine-hero__text {
+  visibility: hidden;
+}
+
+/* Phones keep their buttons (the engine doesn't hold back there, see above). */
+@media (max-width: 720px) {
+  .engine-hero__after {
+    opacity: 1;
+  }
+
+  .engine-hero--pillars .engine-hero__after {
+    visibility: visible;
+  }
+}
