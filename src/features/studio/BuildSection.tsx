@@ -4,8 +4,8 @@
 // put together; the capabilities are what we build them with, so the two are tied: pointing at a
 // capability lifts its layer in the drawing, and picking a layer lights its capabilities.
 // On phones the drawing sits above the capabilities (compact tiles there, so both fit on one
-// screen); a tap on a tile while the drawing is out of view brings it back into view, so the layer's
-// spin can be seen. Text: src/data/identity.ts.
+// screen); a tap on a tile while the plates are out of view scrolls just enough to show them, so
+// the layer's spin can be seen. Text: src/data/identity.ts.
 
 import { useRef, useState } from 'react'
 import SectionTitle from '../../components/SectionTitle.tsx'
@@ -23,12 +23,13 @@ function BuildSection() {
 
   function pick(index: number) {
     setLayer(layerOf(index))
-    // Stacked (phones, small tablets): if the drawing isn't fully in view, bring it there.
-    const drawing = drawingRef.current
-    if (!drawing || !window.matchMedia('(max-width: 860px)').matches) return
-    const box = drawing.getBoundingClientRect()
+    // Stacked (phones, small tablets): if the spinning plates aren't in view, scroll just enough to
+    // show them (not up to the section's top): "nearest" moves the page the least it can.
+    const plates = drawingRef.current?.querySelector<HTMLElement>('.layer-drawing')
+    if (!plates || !window.matchMedia('(max-width: 860px)').matches) return
+    const box = plates.getBoundingClientRect()
     const navbar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height')) || 64
-    if (box.top < navbar || box.bottom > window.innerHeight) drawing.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    if (box.top < navbar || box.bottom > window.innerHeight) plates.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }
 
   return (

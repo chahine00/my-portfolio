@@ -26,6 +26,7 @@ function HomeHero() {
     // re-check the hero's styles, and past the turn (or before it) every scroll step was a no-op.
     let lastP = ''
     let lastSpan = ''
+    let lastTop = ''
     const update = () => {
       frame = 0
       const box = hero.getBoundingClientRect()
@@ -33,6 +34,10 @@ function HomeHero() {
       const p = Math.min(Math.max(-box.top / span, 0), 1).toFixed(3)
       const spanPx = `${Math.round(span)}px`
       if (spanPx !== lastSpan) hero.style.setProperty('--span', (lastSpan = spanPx))
+      // Where the hero starts on the page: the stage's movement (global.css) is driven by the
+      // browser from the scroll position itself, between this point and this point + --span.
+      const topPx = `${Math.round(box.top + window.scrollY)}px`
+      if (topPx !== lastTop) hero.style.setProperty('--hero-top', (lastTop = topPx))
       if (p === lastP) return
       hero.style.setProperty('--p', (lastP = p))
       // The pillar nodes are out: they can be clicked (before that they're hidden in the hexagon).
